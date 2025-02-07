@@ -1,0 +1,58 @@
+name: Build docker and deploy
+
+on:
+  push:
+    branches: [ main, mig_to_art_reg ]
+
+jobs:
+
+    deploy:
+
+        name: Build docker image and deploy
+        runs-on: ubuntu-latest
+        env:
+          IMAGE_NAME: europe-west2-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/quasar-containers/${{ secrets.GCP_APP_NAME }}
+        steps:
+
+        - name: Login
+          uses: google-github-actions/setup-gcloud@v0
+          with:
+            project_id: ${{ secrets.GCP_PROJECT_ID }}
+            service_account_email: ${{ secrets.GCP_EMAIL }}
+            service_account_key: ${{ secrets.GCP_CREDENTIALS }}
+
+        - name: Configure Docker
+          run: |
+            gcloud auth configure-docker europe-west2-docker.pkg.dev
+
+        - name: Checkout repository
+          uses: actions/checkout@v4
+
+        - name: Build Docker image
+          run: docker build . -t $IMAGE_NAME
+
+        - name: Push Docker image
+          run: docker push $IMAGE_NAME
+
+        - name: Deploy Docker image
+          uses: 'google-github-actions/deploy-cloudrun@v2'
+          with:
+            service: ${{ secrets.GCP_APP_NAME }}
+            image: europe-west2-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/quasar-containers/${{ secrets.GCP_APP_NAME }}
+            region: ${{ secrets.GCP_PROJECT_REGION }}
+            env_vars: |
+              SERVER_PORT=${{ secrets.ENV_DOCKER_PORT }}
+              INFURA_KEY=${{ secrets.INFURA_KEY }}
+              QUASAR_RPC_ENDPOINT=${{ secrets.ENV_QUASAR_RPC_ENDPOINT }}
+              REDIS_HOST=${{ secrets.ENV_REDIS_HOST }}
+              REDIS_PORT=${{ secrets.ENV_REDIS_PORT }}
+              REDIS_PW=${{ secrets.ENV_DOCKER_REDIS_PW }}
+              ADMIN_KEY=${{ secrets.ENV_DOCKER_ADMIN_KEY }}
+              COINGECKO_KEY=${{ secrets.ENV_COINGECKO_KEY }}
+              NUMIA_TOKEN=${{ secrets.ENV_NUMIA_TOKEN }}
+              PUBLIC_NETWORK=${{ secrets.ENV_PUBLIC_NETWORK }}
+              ALL_NODES_AUTH=${{ secrets.ENV_ALL_NODES_AUTH }}
+              ALL_NODES_ACCESS=${{ secrets.ENV_ALL_NODES_ACCESS }}
+              CORS='${{ secrets.ENV_CORS }}'
+              SUPABASE_URL=${{ secrets.ENV_SUPABASE_URL }}
+              SUPABASE_KEY=${{ secrets.ENV_SUPABASE_KEY }}

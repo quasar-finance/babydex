@@ -1,14 +1,14 @@
 export default {
   openapi: '3.0.3',
   info: {
-    title: 'Quasar API',
+    title: 'Tower API',
     version: '1.0.0',
     description:
-      'This is a sample API documentation for the Vaults API.  This API provides methods for performing GET actions on the products of our app [Quasar](https://app.quasar.fi/).\n\nYou can find out more about QuasarFI [here](https://quasar.fi/).\n\nSome useful links:\n- [Telegram contact](https://t.me/quasarfi)\n- [Discord contact](https://discord.com/invite/quasarfi)'
+      'This is a the API documentation for the Tower API.  This API provides methods for performing actions on the products of our app [Tower](https://app.tower.fi/).\n\nYou can find out more about TowerFI [here](https://tower.fi/).\n\n'
   },
   servers: [
     {
-      url: 'https://api.quasar.fi'
+      url: 'https://api.tower.fi'
     }
   ],
   tags: [
@@ -17,16 +17,16 @@ export default {
       description: 'Health endpoint'
     },
     {
-      name: 'Vaults',
-      description: 'Everything about our vaults'
+      name: 'Pools',
+      description: 'Available pools'
     },
     {
-      name: 'Quasar',
-      description: 'Usefull endpoints for Quasar app'
+      name: 'Assets',
+      description: 'Available assets'
     },
     {
-      name: 'User',
-      description: 'Operations about user'
+      name: 'Routes',
+      description: 'Available swap routes for pairs'
     }
   ],
   paths: {
@@ -47,7 +47,7 @@ export default {
                     $ref: '#/components/schemas/health'
                   },
                   example: {
-                    name: 'quasar-api',
+                    name: 'tower-api',
                     version: '1.0.0'
                   }
                 }
@@ -57,19 +57,40 @@ export default {
         }
       }
     },
-    '/vaults': {
+    '/pools': {
       get: {
-        tags: ['Vaults'],
-        summary: 'Get all vaults info',
-        description: 'Get all vaults info',
-        operationId: 'vaults',
+        tags: ['Pools'],
+        summary: 'Get all pools info',
+        description: 'Get all pools info',
+        operationId: 'getPools',
         responses: {
           '200': {
             description: 'successful operation',
             content: {
               'application/json': {
                 schema: {
-                  type: 'object'
+                  type: 'object',
+                  properties: {
+                    'status': {
+                      'type': 'string',
+                      'enum': ['success']
+                    },
+                    'data': {
+                      'type': 'array',
+                      'items': {
+                        $ref: '#/components/schemas/pool'
+                      }
+                    }
+                  },
+                  example: {
+                    'status': 'success',
+                    'data': [{
+                      pool_address: { type: 'string'},
+                      token0: { address: 'put_a_correct_address_example_here', symbol: 'WBTC', name: 'Wrapped Bitcoin', reserve: '100000000000000' },
+                      token1: { address: 'put_a_correct_address_example_here', symbol: 'WETH', name: 'Wrapped Ether', reserve: '100000000000000' },
+                      fee_tier: 2
+                    }]
+                  }
                 }
               }
             }
@@ -77,136 +98,125 @@ export default {
         }
       }
     },
-    '/vaults/{slug}/info': {
+    '/assets': {
       get: {
-        tags: ['Vaults'],
-        summary: 'Get Vault info by slug',
-        description: 'Get Vault info by slug',
-        operationId: 'quasarVaultsSlugInfo',
+        tags: ['Assets'],
+        summary: 'Get all assets info',
+        description: 'Get all assets info',
+        operationId: 'getAssets',
         responses: {
           '200': {
-            description: 'successful operation'
-          }
-        }
-      },
-      parameters: [
-        {
-          name: 'slug',
-          in: 'path',
-          required: true,
-          schema: {
-            type: 'string',
-            example: 'stdydx-dydx-dynamic-s'
-          }
-        }
-      ]
-    },
-    '/vaults/by_pool/{poolID}': {
-      get: {
-        tags: ['Vaults'],
-        summary: 'Get Vault info by Osmosis Pool ID',
-        description: 'Get Vault info by Osmosis Pool ID',
-        operationId: 'vaultsByPoolPoolid',
-        responses: {
-          '200': {
-            description: 'successful operation'
-          }
-        }
-      },
-      parameters: [
-        {
-          name: 'poolID',
-          in: 'path',
-          required: true,
-          schema: {
-            type: 'string',
-            example: 1423
-          }
-        }
-      ]
-    },
-    '/vaults/total_tvl': {
-      get: {
-        tags: ['Vaults'],
-        summary: 'Gets the sum of the TVL of all Quasar vaults.',
-        description: 'Gets the sum of the TVL of all Quasar vaults.',
-        operationId: 'vaultsTotalTvl',
-        responses: {
-          '200': {
-            description: ''
+            description: 'successful operation',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    'status': {
+                      'type': 'string',
+                      'enum': ['success']
+                    },
+                    'data': {
+                      'type': 'array',
+                      'items': {
+                        $ref: '#/components/schemas/asset'
+                      }
+                    }
+                  },
+                  example: {
+                    'status': 'success',
+                    'data': [{
+                      address: 'put_a_correct_address_example_here',
+                      symbol: 'WBTC',
+                      denom: 'ibc/0EF15DF2F02480ADE0BB6E85D9EBB5DAEA2836D3860E9F97F9AADE4F57A31AA0',
+                      type: 'IBC',
+                      decimals: 8,
+                      current_price: '99999999999999',
+                      name: 'Wrapped Bitcoin',
+                      logo_uri: 'bitcoin_logo_uri'
+                    }]
+                  }
+                }
+              }
+            }
           }
         }
       }
     },
-    '/vaults/{vaultAddress}/balances/{userAddress}': {
+    '/route': {
       get: {
-        tags: ['User'],
-        summary: 'Get user balance from a specified vault',
-        description: 'Get user balance from a specified vault',
-        operationId: 'quasarVaultsVaultaddressBalancesUseraddressNow',
+        tags: ['Route'],
+        summary: 'Get the best route for a token pair',
+        description: 'Get the best route for a token pair represented as list of hops involved',
+        operationId: 'getRoute',
         responses: {
           '200': {
-            description: 'successful operation'
+            description: 'successful operation',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    'status': {
+                      'type': 'string',
+                      'enum': ['success', 'error']
+                    },
+                    'message': {
+                      'type': 'string',
+                    },
+                    'data': {
+                      'type': 'array',
+                      'items': {
+                        $ref: '#/components/schemas/hop'
+                      }
+                    }
+                  },
+                  example: {
+                    'status': 'success',
+                    'message': '',
+                    'data': [{
+                      address: 'put_a_correct_address_example_here',
+                      token_in: 'WBTC',
+                      token_out: 'WETH',
+                      amount_out: '100000000000',
+                      slippage: '2',
+                    }]
+                  }
+                }
+              }
+            }
           }
         }
       },
       parameters: [
         {
-          name: 'vaultAddress',
-          in: 'path',
+          name: 'token_in',
+          in: 'query',
           required: true,
           schema: {
             type: 'string',
-            example: 'osmo1zvyemtz9tuyhucq6vqfk556zzz62pznya6pch2ndqxtq7amlxkdq3zkl54'
+            example: 'WBTC',
           }
         },
         {
-          name: 'userAddress',
-          in: 'path',
+          name: 'token_out',
+          in: 'query',
           required: true,
           schema: {
             type: 'string',
-            example: 'osmo16nsxukkff43y703xzj4p7mcg9z7enuher6h4t4'
+            example: 'WETH',
           }
-        }
-      ]
-    },
-    '/vaults/by_user/{userAddress}': {
-      get: {
-        tags: ['User'],
-        summary: 'Get all vaults where user have balance or rewards',
-        description: 'Get all vaults where user have balance or rewards',
-        operationId: 'quasarVaultsByUser',
-        responses: {
-          '200': {
-            description: 'successful operation'
-          }
-        }
-      },
-      parameters: [
+        },
         {
-          name: 'userAddress',
-          in: 'path',
+          name: 'amount_in',
+          in: 'query',
           required: true,
           schema: {
             type: 'string',
-            example: 'osmo16nsxukkff43y703xzj4p7mcg9z7enuher6h4t4'
+            example: '1',
           }
         }
-      ]
-    },
-    '/quasar/token_price': {
-      get: {
-        tags: ['Quasar'],
-        summary: 'Get Quasar token price',
-        description: 'Get Quasar token price',
-        operationId: 'quasarTokenPrice',
-        responses: {
-          '200': {
-            description: ''
-          }
-        }
-      }
+      ],
     }
   },
   components: {
@@ -216,11 +226,108 @@ export default {
         properties: {
           name: {
             type: 'string',
-            example: 'quasar-api'
+            example: 'tower-api'
           },
           version: {
             type: 'string',
             example: '1.0.0'
+          }
+        }
+      },
+      pool: {
+        type: 'object',
+        properties: {
+          pool_address: {
+            type: 'string',
+          },
+          token_one: {
+            type: 'object',
+            properties: {
+              address: {
+                type: 'string'
+              },
+              symbol: {
+                type: 'string'
+              },
+              name: {
+                type: 'string'
+              },
+              reserve: {
+                type: 'string'
+              }
+            }
+          },
+          token_two: {
+            type: 'object',
+            properties: {
+              address: {
+                type: 'string'
+              },
+              symbol: {
+                type: 'string'
+              },
+              name: {
+                type: 'string'
+              },
+              reserve: {
+                type: 'string'
+              }
+            }
+          },
+          fee_tier: {
+            type: 'integer',
+            format: 'int32'
+          }
+        }
+      },
+      asset: {
+        type: 'object',
+        properties: {
+          address: {
+            type: 'string',
+          },
+          symbol: {
+            type: 'string',
+          },
+          denom: {
+            type: 'string',
+          },
+          type: {
+            type: 'string',
+            enum: ['Native', 'CW20', 'IBC']
+          },
+          decimals: {
+            type: 'integer',
+            format: 'int32',
+          },
+          current_price: {
+            type: 'string',
+          },
+          name: {
+            type: 'string',
+          },
+          logo_uri: {
+            type: 'string',
+          },
+        }
+      },
+      hop: {
+        type: 'object',
+        properties: {
+          address: {
+            type: 'string',
+          },
+          token_in: {
+            type: 'string',
+          },
+          token_out: {
+            type: 'string',
+          },
+          amount_out: {
+            type: 'string',
+          },
+          slippage: {
+            type: 'string',
           }
         }
       }

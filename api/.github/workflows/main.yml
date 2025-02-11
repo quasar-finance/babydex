@@ -2,7 +2,7 @@ name: Build docker and deploy
 
 on:
   push:
-    branches: [ main, mig_to_art_reg ]
+    branches: [ main ]
 
 jobs:
 

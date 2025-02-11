@@ -8,6 +8,7 @@
   "type": "module",
   "dependencies": {
     "@google-cloud/error-reporting": "^3.0.5",
+    "@quasar-labs/fallback-falooda": "^0.2.2",
     "@supabase/supabase-js": "^2.46.2",
     "axios": "^1.6.7",
     "chain-registry": "^1.63.56",

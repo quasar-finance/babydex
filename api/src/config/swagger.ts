@@ -85,9 +85,19 @@ export default {
                   example: {
                     'status': 'success',
                     'data': [{
-                      pool_address: { type: 'string'},
-                      token0: { address: 'put_a_correct_address_example_here', symbol: 'WBTC', name: 'Wrapped Bitcoin', reserve: '100000000000000' },
-                      token1: { address: 'put_a_correct_address_example_here', symbol: 'WETH', name: 'Wrapped Ether', reserve: '100000000000000' },
+                      pool_address: { type: 'string' },
+                      token0: {
+                        address: 'put_a_correct_address_example_here',
+                        symbol: 'WBTC',
+                        name: 'Wrapped Bitcoin',
+                        reserve: '100000000000000'
+                      },
+                      token1: {
+                        address: 'put_a_correct_address_example_here',
+                        symbol: 'WETH',
+                        name: 'Wrapped Ether',
+                        reserve: '100000000000000'
+                      },
                       fee_tier: 2
                     }]
                   }
@@ -162,12 +172,12 @@ export default {
                       'enum': ['success', 'error']
                     },
                     'message': {
-                      'type': 'string',
+                      'type': 'string'
                     },
                     'data': {
-                      'type': 'array',
+                      'type': 'object',
                       'items': {
-                        $ref: '#/components/schemas/hop'
+                        $ref: '#/components/schemas/route'
                       }
                     }
                   },
@@ -179,7 +189,7 @@ export default {
                       token_in: 'WBTC',
                       token_out: 'WETH',
                       amount_out: '100000000000',
-                      slippage: '2',
+                      slippage: '2'
                     }]
                   }
                 }
@@ -195,7 +205,7 @@ export default {
           required: true,
           schema: {
             type: 'string',
-            example: 'WBTC',
+            example: 'WBTC'
           }
         },
         {
@@ -204,7 +214,7 @@ export default {
           required: true,
           schema: {
             type: 'string',
-            example: 'WETH',
+            example: 'WETH'
           }
         },
         {
@@ -213,10 +223,10 @@ export default {
           required: true,
           schema: {
             type: 'string',
-            example: '1',
+            example: '1'
           }
         }
-      ],
+      ]
     }
   },
   components: {
@@ -237,10 +247,10 @@ export default {
       pool: {
         type: 'object',
         properties: {
-          pool_address: {
-            type: 'string',
+          address: {
+            type: 'string'
           },
-          token_one: {
+          token0: {
             type: 'object',
             properties: {
               address: {
@@ -257,7 +267,7 @@ export default {
               }
             }
           },
-          token_two: {
+          token1: {
             type: 'object',
             properties: {
               address: {
@@ -284,50 +294,61 @@ export default {
         type: 'object',
         properties: {
           address: {
-            type: 'string',
+            type: 'string'
           },
           symbol: {
-            type: 'string',
+            type: 'string'
           },
           denom: {
-            type: 'string',
+            type: 'string'
           },
           type: {
             type: 'string',
-            enum: ['Native', 'CW20', 'IBC']
+            enum: ['native', 'erc20', 'ibc']
           },
           decimals: {
             type: 'integer',
-            format: 'int32',
+            format: 'int32'
           },
-          current_price: {
-            type: 'string',
+          price: {
+            type: 'string'
           },
           name: {
-            type: 'string',
+            type: 'string'
           },
           logo_uri: {
-            type: 'string',
-          },
+            type: 'string'
+          }
+        }
+      },
+      route: {
+        type: 'object',
+        properties: {
+          hops: {
+            type: 'array',
+            items: {
+              $ref: '#/components/schemas/hop'
+            }
+          }
         }
       },
       hop: {
         type: 'object',
         properties: {
           address: {
-            type: 'string',
+            type: 'string'
           },
           token_in: {
-            type: 'string',
+            type: 'string'
           },
           token_out: {
-            type: 'string',
+            type: 'string'
           },
           amount_out: {
-            type: 'string',
+            type: 'string'
           },
           slippage: {
-            type: 'string',
+            type: 'string'
           }
         }
       }

@@ -102,7 +102,7 @@ The API layer needs (minimally) to serve
     * `address`: String, address of the token  
     * `symbol`: String, symbol of the token  
     * `denom`: String, denomination of the token (eg: ibc/49A…)  
-    * `type`: String, enumeration, Native/CW20/IBC  
+    * `type`: String, enumeration, native/erc20/ibc  
     * `decimals`: Number, the amount of decimals the asset uses  
     * `current_price`: String, Price of 1 unit of the asset, price of coingecko  
     * `name`: String, name of the token  

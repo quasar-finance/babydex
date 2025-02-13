@@ -11,12 +11,4 @@ export default class RedisService {
     const serializeData = JSON.stringify(data);
     await redis.set(key, serializeData, options);
   }
-
-  async getCoin(coin: string): Promise<{ usd: number; eur: number } | null> {
-    return await this.get<{ usd: number; eur: number }>(`cg_${coin}`);
-  }
-
-  async setCoin(coin: string, data: unknown): Promise<void> {
-    return await this.set(`cg_${coin}`, data, { EX: 60 });
-  }
 }

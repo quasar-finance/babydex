@@ -1,6 +1,6 @@
 import { Pool } from '~/interfaces';
 
-export default class AssetService {
+export default class PoolService {
   async getPools(): Promise<Pool[]> {
     try {
       // todo:

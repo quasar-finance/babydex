@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response, Router } from 'express';
-import AssetService from '~/services/pool.service';
+import AssetService from '~/services/asset.service';
 import { serialize } from 'superjson';
+import { Controller } from '~/interfaces/controller';
 
 const controller = Router();
 const assetService = new AssetService();
@@ -18,3 +19,5 @@ controller.get('/assets', async (req: Request, res: Response, next: NextFunction
     next(err);
   }
 });
+
+export default { prefixPath: '/', middlewares: [], controller } as Controller;

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response, Router } from 'express';
 import RouteService from '~/services/route.service';
-import { serialize } from 'superjson';
+import { Controller } from '~/interfaces/controller';
 
 const controller = Router();
 const routeService = new RouteService();
@@ -13,10 +13,12 @@ controller.get('/route', async (req: Request, res: Response, next: NextFunction)
       {
         status: 'success',
         message: '',
-        data: serialize(route)
+        data: route
       }
     );
   } catch (err) {
     next(err);
   }
 });
+
+export default { prefixPath: '/', middlewares: [], controller } as Controller;

@@ -20,5 +20,5 @@ declare global {
   namespace Express {
     interface Request {}
   }
-  var logger: P.Logger;
+  let logger: P.Logger;
 }

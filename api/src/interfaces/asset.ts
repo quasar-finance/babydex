@@ -1,7 +1,7 @@
-export type AssetType = "native" | "erc20" | "ibc";
+export type AssetType = 'native' | 'erc20' | 'ibc';
 
-export interface Asset {
-  address: string;
+export type Asset = {
+  contract_addr: Addr;
   symbol: string;
   denom: string;
   type: AssetType;
@@ -9,4 +9,34 @@ export interface Asset {
   price: string;
   name: string;
   logo_URI: string;
+}
+
+export type Addr = string;
+// export type AssetInfo = {
+//   token: {
+//     contract_addr: Addr;
+//   };
+// } | {
+//   native_token: {
+//     denom: string;
+//   };
+// };
+
+export type AssetInfo = Token | NativeToken;
+
+export type Token = {
+  token: {
+    contract_addr: Addr;
+  }
+}
+
+export type NativeToken = {
+  native_token: {
+    denom: string;
+  };
+}
+
+export interface CoinResponse {
+  decimals: number;
+  denom: string;
 }

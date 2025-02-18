@@ -7,7 +7,8 @@ const poolService = new PoolService();
 
 controller.get('/pools', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const pools = await poolService.getPools();
+    const { chainId, contractAddress } = req.query;
+    const pools = await poolService.getPools(chainId as string, contractAddress as string);
     res.status(200).send(
       {
         status: 'success',

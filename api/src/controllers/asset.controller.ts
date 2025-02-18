@@ -8,7 +8,8 @@ const assetService = new AssetService();
 
 controller.get('/assets', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const assets = await assetService.getAssets();
+    const { chainId, contractAddress } = req.query;
+    const assets = await assetService.getNativeTokens(chainId as string, contractAddress as string);
     res.status(200).send(
       {
         status: 'success',

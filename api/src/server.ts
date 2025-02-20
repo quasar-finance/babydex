@@ -14,6 +14,7 @@ import swaggerUI from 'swagger-ui-express';
 import swaggerDocument from './config/swagger';
 const { SERVER_PORT } = process.env;
 
+const globalAny:any = global;
 const server = express();
 server.use(cors());
 // server.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100, standardHeaders: true, legacyHeaders: false }));
@@ -21,7 +22,7 @@ server.use(helmet());
 server.use(nocache());
 server.use(compression());
 server.use(express.json());
-server.use(httpLogger({ logger: globalThis.logger, useLevel: 'debug' }));
+server.use(httpLogger({ logger: globalAny.logger, useLevel: 'debug' }));
 server.use(express.urlencoded({ extended: false }));
 server.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 

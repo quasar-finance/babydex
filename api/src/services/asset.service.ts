@@ -1,32 +1,38 @@
-import { Addr, Asset, AssetInfo, AssetType, CoinResponse, NativeToken, PairInfo } from '~/interfaces';
+import {Asset, AssetInfo, CoinResponse, NativeToken } from '~/interfaces';
 import CosmosService from '~/services/cosmos.service';
+import CGeckoService from '~/services/cgecko.service';
+
+import {asset_list} from '~/../test/mock_data'
 
 export default class AssetService {
   cosmosService: CosmosService;
+  cgeckoService: CGeckoService;
 
   constructor() {
     this.cosmosService = new CosmosService();
+    this.cgeckoService = new CGeckoService();
   }
 
   async getNativeTokens(chainId: string, contractAddress: string): Promise<Asset[]> {
     try {
-      let res: CoinResponse[] = await this.cosmosService.queryContract<CoinResponse[]>(chainId, contractAddress, {
-        native_tokens: { limit: 1000 }
-      });
+      // let res: CoinResponse[] = await this.cosmosService.queryContract<CoinResponse[]>(chainId, contractAddress, {
+      //   native_tokens: { limit: 1000 }
+      // });
 
       // todo: apply schema
-      return res.map((item: CoinResponse) => {
-        return {
-          contract_addr: 'undefined',
-          symbol: 'undefined',
-          denom: item.denom,
-          type: 'native',
-          decimals: item.decimals,
-          price: 'undefined',
-          name: 'undefined',
-          logo_URI: 'undefined'
-        } as Asset;
-      }) as Asset[];
+      // return res.map((item: CoinResponse) => {
+      //   return {
+      //     contract_addr: 'undefined',
+      //     symbol: 'undefined',
+      //     denom: item.denom,
+      //     type: 'native',
+      //     decimals: item.decimals,
+      //     price: 'undefined',
+      //     name: 'undefined',
+      //     logo_URI: 'undefined'
+      //   } as Asset;
+      // }) as Asset[];
+      return asset_list;
     } catch (err) {
       // todo determine failure case return
       console.log(err);
@@ -38,21 +44,29 @@ export default class AssetService {
   async getNativeTokenByDenom(chainId: string, contractAddress: string, denom: string): Promise<Asset> {
     try {
       // todo: apply schema
-      let res: CoinResponse = await this.cosmosService.queryContract<CoinResponse>(chainId, contractAddress, {
-        native_token: { denom: denom }
-      });
+      // let res: CoinResponse = await this.cosmosService.queryContract<CoinResponse>(chainId, contractAddress, {
+      //   native_token: { denom: denom }
+      // });
 
       // todo determine all properties
-      return {
-        contract_addr: 'undefined',
-        symbol: 'undefined',
-        denom: res.denom,
-        type: 'native',
-        decimals: res.decimals,
-        price: 'undefined',
-        name: 'undefined',
-        logo_URI: 'undefined'
-      } as Asset;
+      // return {
+      //   contract_addr: 'undefined',
+      //   symbol: 'undefined',
+      //   denom: res.denom,
+      //   type: 'native',
+      //   decimals: res.decimals,
+      //   price: 'undefined',
+      //   name: 'undefined',
+      //   logo_URI: 'undefined'
+      // } as Asset;
+
+      let asset: Asset | undefined = asset_list.find((asset: Asset) => denom === denom);
+
+      if (!asset) {
+        throw Error('Could not find asset');
+      }
+
+      return asset;
     } catch (err) {
       // todo determine failure case return
       console.log(err);

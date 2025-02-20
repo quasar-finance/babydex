@@ -14,7 +14,7 @@ export type Pool = {
   fee_tier: number;
 }
 
-export interface PairInfo {
+export type PairInfo = {
   asset_infos: AssetInfo[];
   contract_addr: Addr;
   liquidity_token: string;

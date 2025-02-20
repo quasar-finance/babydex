@@ -1,6 +1,7 @@
 import { Pool, PairInfo, PoolAsset, Asset, CoinResponse } from '~/interfaces';
 import CosmosService from '~/services/cosmos.service';
 import AssetService from '~/services/asset.service';
+import { pair_info } from '../../test/mock_data';
 
 export default class PoolService {
   cosmosService: CosmosService;
@@ -15,9 +16,13 @@ export default class PoolService {
   // The message format is QueryMsg::Pairs { start_after: optional, limit: optional }
   async getPools(chainId: string, contractAddress: string): Promise<Pool[]> {
     try {
-      let res: PairInfo[] = await this.cosmosService.queryContract<PairInfo[]>(chainId, contractAddress, {
-        pairs: { limit: 1000 }
-      });
+      // todo remove after we use IoC or real data
+      let res: PairInfo[] = pair_info;
+
+      // let res: PairInfo[] = await this.cosmosService.queryContract<PairInfo[]>(chainId, contractAddress, {
+      //   pairs: { limit: 1000 }
+      // });
+
 
       return await Promise.all(
         res.map(async (item: PairInfo): Promise<Pool> => {
@@ -29,14 +34,14 @@ export default class PoolService {
             contract_addr: 'undefined',
             token0: {
               contract_addr: token0.contract_addr,
-              symbol: 'undefined',
-              name: 'undefined',
+              symbol: token0.symbol,
+              name: token0.name,
               reserve: 'undefined'
             } as PoolAsset,
             token1: {
               contract_addr: token1.contract_addr,
-              symbol: 'undefined',
-              name: 'undefined',
+              symbol: token1.symbol,
+              name: token1.name,
               reserve: 'undefined'
             } as PoolAsset,
             fee_tier: 0

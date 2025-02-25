@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { falooda } from '~/loaders';
+import { ContractQueryService } from '~/services/contract.query.service';
 
-export default class CosmosService {
+export default class CosmosService implements ContractQueryService {
   async queryContract<T = any>(chainId: string, contractAddress: string, queryMsg: Record<string, unknown>): Promise<T> {
     const restUrl = falooda.getFastestCosmosLcd(chainId);
     const queryB64Encoded = Buffer.from(JSON.stringify(queryMsg)).toString('base64');

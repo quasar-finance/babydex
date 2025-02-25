@@ -1,9 +1,11 @@
 import axios, { AxiosInstance } from 'axios';
 import RedisService from './redis.service';
+import { PricingQueryService } from '~/services/pricing.query.service';
 
-export default class CGeckoService {
+export default class CGeckoService implements PricingQueryService {
   http: AxiosInstance;
   redisService: RedisService;
+
   constructor() {
     this.http = axios.create({
       baseURL: 'https://api.coingecko.com/api/v3',
@@ -11,10 +13,12 @@ export default class CGeckoService {
     });
     this.redisService = new RedisService();
   }
+
   async ping(): Promise<boolean> {
     const { status } = await this.http.get('/ping');
     return status === 200;
   }
+
   async getCoinPrice(coinId?: string): Promise<{ usd: number; eur: number }> {
     if (!coinId) return { usd: 0, eur: 0 };
     try {

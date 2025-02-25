@@ -1,20 +1,20 @@
 import { Addr, AssetInfo } from '~/interfaces/asset';
 
-export type PoolAsset = {
+export interface PoolAsset {
   contract_addr: string;
   symbol: string;
   name: string;
   reserve: string;
 }
 
-export type Pool = {
+export interface Pool {
   contract_addr: string;
   token0: PoolAsset;
   token1: PoolAsset;
   fee_tier: number;
 }
 
-export type PairInfo = {
+export interface PairInfo {
   asset_infos: AssetInfo[];
   contract_addr: Addr;
   liquidity_token: string;

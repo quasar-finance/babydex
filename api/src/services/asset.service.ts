@@ -1,40 +1,41 @@
-import {Asset, AssetInfo, CoinResponse, NativeToken } from '~/interfaces';
-import CosmosService from '~/services/cosmos.service';
-import CGeckoService from '~/services/cgecko.service';
-
-import {asset_list} from '~/../test/mock_data'
+import { Asset, AssetInfo, CoinResponse, NativeToken } from '~/interfaces';
+import { ContractQueryService } from '~/services/contract.query.service';
+import RedisService from '~/services/redis.service';
+import { asset_list } from '../../test/mock_data';
+import { PricingQueryService } from '~/services/pricing.query.service';
 
 export default class AssetService {
-  cosmosService: CosmosService;
-  cgeckoService: CGeckoService;
 
-  constructor() {
-    this.cosmosService = new CosmosService();
-    this.cgeckoService = new CGeckoService();
+  constructor(
+    private contractQueryService: ContractQueryService,
+    private pricingQueryService: PricingQueryService,
+    private redisService: RedisService) {
   }
 
   async getNativeTokens(chainId: string, contractAddress: string): Promise<Asset[]> {
     try {
-      // let res: CoinResponse[] = await this.cosmosService.queryContract<CoinResponse[]>(chainId, contractAddress, {
-      //   native_tokens: { limit: 1000 }
-      // });
+      let res: CoinResponse[] | null = await this.redisService.get<CoinResponse[] | null>(`coin_response[]_${chainId}`);
 
-      // todo: apply schema
-      // return res.map((item: CoinResponse) => {
-      //   return {
-      //     contract_addr: 'undefined',
-      //     symbol: 'undefined',
-      //     denom: item.denom,
-      //     type: 'native',
-      //     decimals: item.decimals,
-      //     price: 'undefined',
-      //     name: 'undefined',
-      //     logo_URI: 'undefined'
-      //   } as Asset;
-      // }) as Asset[];
-      return asset_list;
+      if (!res) {
+        res = await this.contractQueryService.queryContract<CoinResponse[]>(chainId, contractAddress, {
+          native_tokens: { limit: 1000 }
+        });
+
+        if (!res) {
+          throw Error(`Coin response could not be found for chainId: ${chainId}, contractAddress: ${contractAddress}`);
+        }
+
+        await this.redisService.set(`coin_response[]_${chainId}`, res);
+
+        for (const coin of res) {
+          await this.redisService.set(`coin_response_${chainId}_${coin.denom}`, res);
+        }
+      }
+
+      return await Promise.all(res.map((item: CoinResponse) =>
+        this.getAssetFromChainRegistry(item.denom)
+      ));
     } catch (err) {
-      // todo determine failure case return
       console.log(err);
 
       throw err;
@@ -43,32 +44,22 @@ export default class AssetService {
 
   async getNativeTokenByDenom(chainId: string, contractAddress: string, denom: string): Promise<Asset> {
     try {
-      // todo: apply schema
-      // let res: CoinResponse = await this.cosmosService.queryContract<CoinResponse>(chainId, contractAddress, {
-      //   native_token: { denom: denom }
-      // });
+      let res: CoinResponse | null = await this.redisService.get<CoinResponse | null>(`coin_response_${chainId}_${denom}`);
 
-      // todo determine all properties
-      // return {
-      //   contract_addr: 'undefined',
-      //   symbol: 'undefined',
-      //   denom: res.denom,
-      //   type: 'native',
-      //   decimals: res.decimals,
-      //   price: 'undefined',
-      //   name: 'undefined',
-      //   logo_URI: 'undefined'
-      // } as Asset;
+      if (!res) {
+        res = await this.contractQueryService.queryContract<CoinResponse | null>(chainId, contractAddress, {
+          native_token: { denom: denom }
+        });
 
-      let asset: Asset | undefined = asset_list.find((asset: Asset) => denom === denom);
+        if (!res) {
+          throw Error(`Coin response could not be found: ${denom}`);
+        }
 
-      if (!asset) {
-        throw Error('Could not find asset');
+        await this.redisService.set(`coin_response_${chainId}_${denom}`, res);
       }
 
-      return asset;
+      return this.getAssetFromChainRegistry(denom);
     } catch (err) {
-      // todo determine failure case return
       console.log(err);
 
       throw err;
@@ -79,5 +70,28 @@ export default class AssetService {
     // Babylon only supports native tokens
     assetInfo = assetInfo as NativeToken;
     return await this.getNativeTokenByDenom(chainId, contractAddress, assetInfo.native_token.denom);
+  }
+
+  // TODO: replace when chain registry is live
+  async getAssetFromChainRegistry(denom: String): Promise<Asset> {
+
+    const asset: Asset | undefined = asset_list.find((item) => item.denom === denom);
+
+    if (!asset) {
+      throw new Error(`Asset with denom ${denom} could not be found`);
+    }
+
+    const price =  await this.pricingQueryService.getCoinPrice("");
+
+    return {
+      contract_addr: asset.contract_addr,
+      symbol: asset.symbol,
+      denom: asset.denom,
+      type: 'native',
+      decimals: asset.decimals,
+      price: `${price.usd}`,
+      name: asset.name,
+      logo_URI: asset.logo_URI
+    } as Asset;
   }
 }

@@ -12,15 +12,6 @@ export type Asset = {
 }
 
 export type Addr = string;
-// export type AssetInfo = {
-//   token: {
-//     contract_addr: Addr;
-//   };
-// } | {
-//   native_token: {
-//     denom: string;
-//   };
-// };
 
 export type AssetInfo = Token | NativeToken;
 

@@ -2,9 +2,15 @@ import { NextFunction, Request, Response, Router } from 'express';
 import AssetService from '~/services/asset.service';
 import { serialize } from 'superjson';
 import { Controller } from '~/interfaces/controller';
+import RedisService from '~/services/redis.service';
+import { ContractQueryServiceFactory } from '~/services/contract.query.service';
+import { PricingQueryServiceFactory } from '~/services/pricing.query.service';
 
 const controller = Router();
-const assetService = new AssetService();
+const contractQueryService = ContractQueryServiceFactory.getInstance();
+const pricingQueryService = PricingQueryServiceFactory.getInstance();
+const redisService = new RedisService();
+const assetService = new AssetService(contractQueryService, pricingQueryService, redisService);
 
 controller.get('/assets', async (req: Request, res: Response, next: NextFunction) => {
   try {

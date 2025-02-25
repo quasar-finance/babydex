@@ -1,10 +1,10 @@
-import { Addr, Asset, AssetInfo, PairInfo, PairType, Pool } from '../../src/interfaces';
+import { Asset, PairInfo, Pool } from '~/interfaces';
 
 export const asset_list: Asset[] = [
   {
-    contract_addr: 'some_contract_address',
+    contract_addr: 'some_contract_address_1',
     symbol: 'BABY',
-    denom: 'some_denom_address1',
+    denom: 'ubbn',
     type: 'native',
     decimals: 8,
     price: '1',
@@ -12,9 +12,9 @@ export const asset_list: Asset[] = [
     logo_URI: 'some_logo_URI'
   },
   {
-    contract_addr: 'some_contract_address',
+    contract_addr: 'some_contract_address_2',
     symbol: 'USDC',
-    denom: 'some_denom_address2',
+    denom: 'usdc',
     type: 'native',
     decimals: 8,
     price: '1',
@@ -22,18 +22,18 @@ export const asset_list: Asset[] = [
     logo_URI: 'some_logo_URI'
   },
   {
-    contract_addr: 'some_contract_address',
+    contract_addr: 'some_contract_address_3',
     symbol: 'WBTC',
-    denom: 'some_denom_address3',
+    denom: 'wbtc',
     type: 'native',
     decimals: 8,
     price: '1',
     name: 'some_name',
     logo_URI: 'some_logo_URI'
   }, {
-    contract_addr: 'some_contract_address',
+    contract_addr: 'some_contract_address_4',
     symbol: 'WETH',
-    denom: 'some_denom_address4',
+    denom: 'weth',
     type: 'native',
     decimals: 8,
     price: '1',
@@ -44,15 +44,15 @@ export const asset_list: Asset[] = [
 
 export const pools: Pool[] = [
   {
-    contract_addr: 'some_contract_address',
+    contract_addr: 'some_contract_address_pool_1',
     token0: {
-      contract_addr: 'some_contract_address',
+      contract_addr: 'some_contract_address_token_0',
       symbol: 'BABY',
       name: 'some_name',
       reserve: '1000'
     },
     token1: {
-      contract_addr: 'some_contract_address',
+      contract_addr: 'some_contract_address_token_1',
       symbol: 'USDC',
       name: 'some_name',
       reserve: '1000'
@@ -66,17 +66,17 @@ export const pair_info: PairInfo[] = [
     asset_infos: [
       {
         native_token: {
-          denom: 'some_denom_address1'
+          denom: 'ubbn'
         }
       },
       {
         native_token: {
-          denom: 'some_denom_address2'
+          denom: 'usdc'
         }
       }
     ],
-    contract_addr: 'some_contract_address1',
-    liquidity_token: 'some_liquidity_token1',
+    contract_addr: 'some_contract_address_1',
+    liquidity_token: 'some_liquidity_token_1',
     pair_type: {
       xyk: {}
     }
@@ -85,17 +85,17 @@ export const pair_info: PairInfo[] = [
     asset_infos: [
       {
         native_token: {
-          denom: 'some_denom_address3'
+          denom: 'wbtc'
         }
       },
       {
         native_token: {
-          denom: 'some_denom_address4'
+          denom: 'weth'
         }
       }
     ],
-    contract_addr: 'some_contract_address2',
-    liquidity_token: 'some_liquidity_token2',
+    contract_addr: 'some_contract_address_2',
+    liquidity_token: 'some_liquidity_token_2',
     pair_type: {
       xyk: {}
     }

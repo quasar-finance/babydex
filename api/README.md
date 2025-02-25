@@ -1,5 +1,8 @@
 ## Getting Started
 
+This project requires a valid Redis instance to be accessible.
+This can be accomplished via Docker for example.
+
 First, run the command to install dependencies:
 
 ```bash
@@ -7,6 +10,8 @@ npm i
 # or
 yarn
 ```
+
+Next, copy the .env.example to .env and replace the desired SERVER_PORT and Redis connection details.
 
 Then, run the development server:
 

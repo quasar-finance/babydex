@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "pnpm tsup --clean"
+    "build": "pnpm tsup --clean",
+    "start": "tsx src/server.ts"
   },
   "type": "module",
   "dependencies": {

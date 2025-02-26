@@ -1,6 +1,7 @@
 import CosmosService from '~/services/cosmos.service';
 import { pair_info } from '../../test/mock_data';
 import { coin_response } from '../../test/mock_data/coin_response_mock';
+import { NativeToken } from '~/interfaces';
 
 const { NODE_ENV } = process.env;
 
@@ -15,8 +16,8 @@ export class MockContractQueryService implements ContractQueryService {
     }
 
     if (queryMsg.hasOwnProperty('native_token')) {
-      // @ts-ignore
-      let res = coin_response.find((item) => item.denom === queryMsg.native_token.denom);
+      let native_token = queryMsg as NativeToken;
+      let res = coin_response.find((item) => item.denom === native_token.native_token.denom);
 
       if (!res) {
         throw new Error('Could not find a native token');
@@ -25,7 +26,6 @@ export class MockContractQueryService implements ContractQueryService {
       return res as T;
     }
 
-    console.log(queryMsg);
     if (queryMsg.hasOwnProperty('pairs')) {
       return pair_info as T;
     }

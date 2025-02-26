@@ -27,15 +27,13 @@ export default class AssetService {
         }
 
         await this.redisService.set(`coin_response[]_${chainId}`, res);
-
-        for (const coin of res) {
-          await this.redisService.set(`coin_response_${chainId}_${coin.denom}`, res);
-        }
       }
 
-      return await Promise.all(res.map((item: CoinResponse) =>
-        this.getAssetFromChainRegistry(item.denom)
-      ));
+      return await Promise.all(res.map((item: CoinResponse) => {
+        this.redisService.set(`coin_response_${chainId}_${item.denom}`, res);
+
+        return this.getAssetFromChainRegistry(item.denom);
+      }));
     } catch (err) {
       console.log(err);
 
@@ -43,22 +41,8 @@ export default class AssetService {
     }
   }
 
-  async getNativeTokenByDenom(chainId: string, contractAddress: string, denom: string): Promise<StrategyAsset> {
+  async getNativeTokenByDenom(denom: string): Promise<StrategyAsset> {
     try {
-      let res: CoinResponse | null = await this.redisService.get<CoinResponse | null>(`coin_response_${chainId}_${denom}`);
-
-      if (!res) {
-        res = await this.contractQueryService.queryContract<CoinResponse | null>(chainId, contractAddress, {
-          native_token: { denom: denom }
-        });
-
-        if (!res) {
-          throw Error(`Coin response could not be found: ${denom}`);
-        }
-
-        await this.redisService.set(`coin_response_${chainId}_${denom}`, res);
-      }
-
       return this.getAssetFromChainRegistry(denom);
     } catch (err) {
       console.log(err);
@@ -67,10 +51,10 @@ export default class AssetService {
     }
   }
 
-  async getAssetByAssetInfo(chainId: string, contractAddress: string, assetInfo: AssetInfo): Promise<StrategyAsset> {
+  async getAssetByAssetInfo(assetInfo: AssetInfo): Promise<StrategyAsset> {
     // Babylon only supports native tokens
     assetInfo = assetInfo as NativeToken;
-    return await this.getNativeTokenByDenom(chainId, contractAddress, assetInfo.native_token.denom);
+    return await this.getNativeTokenByDenom(assetInfo.native_token.denom);
   }
 
   // TODO: replace when chain registry is live
@@ -82,7 +66,7 @@ export default class AssetService {
       throw new Error(`Asset with denom ${denom} could not be found`);
     }
 
-    const price =  await this.pricingQueryService.getCoinPrice(asset.coingecko_id);
+    const price = await this.pricingQueryService.getCoinPrice(asset.coingecko_id);
     const decimals: number = asset.denom_units.reduce(
       (acc, { exponent }) => (acc > exponent ? acc : exponent), 0);
     const logo_URI = asset.logo_URIs?.svg || asset.logo_URIs?.png || '';

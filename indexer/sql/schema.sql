@@ -28,7 +28,7 @@ comment on column hubble.chains.execution is 'Execution chain indicator, which i
 
 -- Do I need this
 alter table hubble.chains
-    owner to "union";
+    owner to "postgres";
 
 create index if not exists chains_chain_id_idx
     on hubble.chains (chain_id) include (id);
@@ -49,7 +49,7 @@ comment on table v1_cosmos.blocks is 'DEPRECATED: use V1';
 
 -- Do I need this
 alter table v1_cosmos.blocks
-    owner to "union";
+    owner to "postgres";
 
 create index if not exists idx_blocks_height
     on v1_cosmos.blocks (chain_id, height);
@@ -73,7 +73,7 @@ comment on table v1_cosmos.transactions is 'DEPRECATED: use V1';
 
 -- Do I need this
 alter table v1_cosmos.transactions
-    owner to "union";
+    owner to "postgres";
 
 create index if not exists transactions_chain_id_height
     on v1_cosmos.transactions (chain_id asc, height desc);
@@ -102,7 +102,7 @@ comment on table v1_cosmos.events is 'DEPRECATED: use V1';
 
 -- Do I need this
 alter table v1_cosmos.events
-    owner to "union";
+    owner to "postgres";
 
 create index if not exists idx_events_type
     on v1_cosmos.events ((data ->> 'type'::text));
@@ -155,7 +155,7 @@ create table if not exists hubble.clients
 
 -- Do I need this
 alter table hubble.clients
-    owner to "union";
+    owner to "postgres";
 
 create table if not exists v1_evm.logs
 (
@@ -172,7 +172,7 @@ create table if not exists v1_evm.logs
 
 -- Do I need this
 alter table v1_evm.logs
-    owner to "union";
+    owner to "postgres";
 
 create unique index if not exists logs_chain_height_ids
     on v1_evm.logs (chain_id, height);
@@ -188,7 +188,7 @@ create table if not exists hubble.consensus_heights
 );
 
 alter table hubble.consensus_heights
-    owner to "union";
+    owner to "postgres";
 
 create table if not exists hubble.contract_status
 (
@@ -205,7 +205,7 @@ create table if not exists hubble.contract_status
 );
 
 alter table hubble.contract_status
-    owner to "union";
+    owner to "postgres";
 
 create table if not exists hubble.block_status
 (
@@ -219,7 +219,7 @@ create table if not exists hubble.block_status
 );
 
 alter table hubble.block_status
-    owner to "union";
+    owner to "postgres";
 
 create table if not exists hubble.indexer_status
 (
@@ -233,7 +233,7 @@ create table if not exists hubble.indexer_status
 );
 
 alter table hubble.indexer_status
-    owner to "union";
+    owner to "postgres";
 
 create table if not exists hubble.block_fix
 (
@@ -245,7 +245,7 @@ create table if not exists hubble.block_fix
 );
 
 alter table hubble.block_fix
-    owner to "union";
+    owner to "postgres";
 
 create table if not exists v1_evm.logs_sync
 (
@@ -262,7 +262,7 @@ create table if not exists v1_evm.logs_sync
 );
 
 alter table v1_evm.logs_sync
-    owner to "union";
+    owner to "postgres";
 
 create index if not exists logs_sync_chain_id_height_index
     on v1_evm.logs_sync (internal_chain_id asc, height desc);
@@ -285,7 +285,7 @@ create table if not exists v1_aptos.blocks
 );
 
 alter table v1_aptos.blocks
-    owner to "union";
+    owner to "postgres";
 
 create index if not exists idx_blocks_height
     on v1_aptos.blocks (internal_chain_id, height);
@@ -316,7 +316,7 @@ create table if not exists v1_aptos.transactions
 );
 
 alter table v1_aptos.transactions
-    owner to "union";
+    owner to "postgres";
 
 create index if not exists idx_transactions_height
     on v1_aptos.transactions (internal_chain_id, height);
@@ -349,7 +349,7 @@ create table if not exists v1_aptos.events
 );
 
 alter table v1_aptos.events
-    owner to "union";
+    owner to "postgres";
 
 create index if not exists idx_events_height
     on v1_aptos.events (internal_chain_id, height);
@@ -376,7 +376,7 @@ create table if not exists v1_aptos.contracts
 );
 
 alter table v1_aptos.contracts
-    owner to "union";
+    owner to "postgres";
 
 create table if not exists hubble.assets
 (
@@ -394,7 +394,7 @@ create table if not exists hubble.assets
 );
 
 alter table hubble.assets
-    owner to "union";
+    owner to "postgres";
 
 create table if not exists v1_evm.contracts
 (
@@ -414,7 +414,7 @@ create table if not exists v1_evm.contracts
 );
 
 alter table v1_evm.contracts
-    owner to "union";
+    owner to "postgres";
 
 create table if not exists hubble.token_sources
 (
@@ -429,7 +429,7 @@ create table if not exists hubble.token_sources
 );
 
 alter table hubble.token_sources
-    owner to "union";
+    owner to "postgres";
 
 create table if not exists hubble.token_source_representations
 (
@@ -451,7 +451,7 @@ create table if not exists hubble.token_source_representations
 );
 
 alter table hubble.token_source_representations
-    owner to "union";
+    owner to "postgres";
 
 create table if not exists v1_cosmos.contracts
 (
@@ -469,7 +469,7 @@ create table if not exists v1_cosmos.contracts
 );
 
 alter table v1_cosmos.contracts
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_evm.client_created
             (name, client_id, internal_chain_id, block_hash, height, log_index, timestamp, transaction_hash,
@@ -491,7 +491,7 @@ FROM v1_evm.logs_sync evm
 WHERE (log_to_jsonb ->> 'name'::text) = 'ClientCreated'::text;
 
 alter table v1_evm.client_created
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_cosmos.create_client
             (client_id, client_type, consensus_height, msg_index, internal_chain_id, block_hash, height, index,
@@ -514,7 +514,7 @@ FROM v1_cosmos.events
 WHERE (data ->> 'type'::text) = 'create_client'::text;
 
 alter table v1_cosmos.create_client
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_cosmos.send_packet
             (packet_data, packet_data_hex, packet_timeout_height, packet_timeout_timestamp, packet_sequence,
@@ -548,7 +548,7 @@ FROM v1_cosmos.events
 WHERE (data ->> 'type'::text) = 'send_packet'::text;
 
 alter table v1_cosmos.send_packet
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_cosmos.recv_packet
             (packet_data, packet_data_hex, packet_timeout_height, packet_timeout_timestamp, packet_sequence,
@@ -582,7 +582,7 @@ FROM v1_cosmos.events
 WHERE (data ->> 'type'::text) = 'recv_packet'::text;
 
 alter table v1_cosmos.recv_packet
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_cosmos.channel_open_ack
             (port_id, channel_id, counterparty_port_id, counterparty_channel_id, connection_id, msg_index,
@@ -608,7 +608,7 @@ FROM v1_cosmos.events
 WHERE (data ->> 'type'::text) = 'channel_open_ack'::text;
 
 alter table v1_cosmos.channel_open_ack
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_cosmos.channel_open_confirm
             (port_id, channel_id, counterparty_port_id, counterparty_channel_id, connection_id, msg_index,
@@ -634,7 +634,7 @@ FROM v1_cosmos.events
 WHERE (data ->> 'type'::text) = 'channel_open_confirm'::text;
 
 alter table v1_cosmos.channel_open_confirm
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_cosmos.channel_open_init
             (port_id, channel_id, counterparty_port_id, connection_id, version, msg_index, internal_chain_id,
@@ -659,7 +659,7 @@ FROM v1_cosmos.events
 WHERE (data ->> 'type'::text) = 'channel_open_init'::text;
 
 alter table v1_cosmos.channel_open_init
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_cosmos.channel_open_try
             (port_id, channel_id, counterparty_port_id, counterparty_channel_id, connection_id, version, msg_index,
@@ -686,7 +686,7 @@ FROM v1_cosmos.events
 WHERE (data ->> 'type'::text) = 'channel_open_try'::text;
 
 alter table v1_cosmos.channel_open_try
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_cosmos.connection_open_ack
             (connection_id, client_id, counterparty_client_id, counterparty_connection_id, msg_index, internal_chain_id,
@@ -710,7 +710,7 @@ FROM v1_cosmos.events
 WHERE (data ->> 'type'::text) = 'connection_open_ack'::text;
 
 alter table v1_cosmos.connection_open_ack
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_cosmos.connection_open_confirm
             (connection_id, client_id, counterparty_client_id, counterparty_connection_id, msg_index, internal_chain_id,
@@ -734,7 +734,7 @@ FROM v1_cosmos.events
 WHERE (data ->> 'type'::text) = 'connection_open_confirm'::text;
 
 alter table v1_cosmos.connection_open_confirm
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_cosmos.connection_open_init
             (connection_id, client_id, counterparty_client_id, msg_index, internal_chain_id, block_hash, height, index,
@@ -757,7 +757,7 @@ FROM v1_cosmos.events
 WHERE (data ->> 'type'::text) = 'connection_open_init'::text;
 
 alter table v1_cosmos.connection_open_init
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_cosmos.connection_open_try
             (connection_id, client_id, counterparty_client_id, counterparty_connection_id, msg_index, internal_chain_id,
@@ -781,7 +781,7 @@ FROM v1_cosmos.events
 WHERE (data ->> 'type'::text) = 'connection_open_try'::text;
 
 alter table v1_cosmos.connection_open_try
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_cosmos.acknowledge_packet
             (packet_timeout_height, packet_timeout_timestamp, packet_sequence, packet_src_port, packet_src_channel,
@@ -813,7 +813,7 @@ FROM v1_cosmos.events
 WHERE (data ->> 'type'::text) = 'acknowledge_packet'::text;
 
 alter table v1_cosmos.acknowledge_packet
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_cosmos.wasm_ibc_transfer
             (memo, sender, receiver, msg_index, _contract_address, json, assets, internal_chain_id, block_hash, height,
@@ -841,7 +841,7 @@ WHERE (data ->> 'type'::text) = 'wasm-ibc_transfer'::text
   AND (attributes(events.*) ->> 'assets'::text) IS NOT NULL;
 
 alter table v1_cosmos.wasm_ibc_transfer
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_cosmos.ibc_transfer
             (memo, denom, amount, sender, receiver, msg_index, json, internal_chain_id, block_hash, height, index,
@@ -867,7 +867,7 @@ FROM v1_cosmos.events
 WHERE (data ->> 'type'::text) = 'ibc_transfer'::text;
 
 alter table v1_cosmos.ibc_transfer
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_cosmos.fungible_token_packet
             (memo, denom, amount, module, sender, receiver, msg_index, acknowledgement, success, error, json,
@@ -898,7 +898,7 @@ FROM v1_cosmos.events
 WHERE (data ->> 'type'::text) = 'fungible_token_packet'::text;
 
 alter table v1_cosmos.fungible_token_packet
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_cosmos.wasm_fungible_token_packet
             (_contract_address, module, sender, receiver, acknowledgement, msg_index, success, error, assets,
@@ -928,7 +928,7 @@ FROM v1_cosmos.events
 WHERE (data ->> 'type'::text) = 'wasm-fungible_token_packet'::text;
 
 alter table v1_cosmos.wasm_fungible_token_packet
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_cosmos.internal_incoming_ibc_transfers
             (internal_chain_id, block_hash, transaction_hash, _contract_address, module, sender, receiver,
@@ -986,6 +986,7 @@ FROM (SELECT wf_1.internal_chain_id,
              wf_1.data,
              wf_1."timestamp"
       FROM v1_cosmos.wasm_fungible_token_packet wf_1
+      
       UNION ALL
       SELECT f.internal_chain_id,
              f.block_hash,
@@ -1014,7 +1015,7 @@ FROM (SELECT wf_1.internal_chain_id,
                    ON rp.transaction_hash = wf.transaction_hash AND rp.msg_index = wf.msg_index;
 
 alter table v1_cosmos.internal_incoming_ibc_transfers
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_cosmos.internal_outgoing_ibc_transfers
             (memo, sender, receiver, msg_index, _contract_address, json, internal_chain_id, block_hash, height,
@@ -1167,7 +1168,7 @@ FROM (SELECT wasm_ibc_transfer.memo,
       WHERE ibc_transfer.denom IS NOT NULL) it;
 
 alter table v1_cosmos.internal_outgoing_ibc_transfers
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_cosmos.update_client
             (client_id, client_type, consensus_height, consensus_heights, header, msg_index, revision_height,
@@ -1194,7 +1195,7 @@ FROM v1_cosmos.events
 WHERE (data ->> 'type'::text) = 'update_client'::text;
 
 alter table v1_cosmos.update_client
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_cosmos.wasm_packet_forward_hop
             (src_port, dest_port, src_channel, dest_channel, recv_sequence, sent_sequence, _contract_address, msg_index,
@@ -1222,7 +1223,7 @@ FROM v1_cosmos.events
 WHERE (data ->> 'type'::text) = 'wasm-packet_forward_hop'::text;
 
 alter table v1_cosmos.wasm_packet_forward_hop
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_evm.recv_packet
             (name, packet, data, sequence, source_port, source_channel, timeout_revision_height,
@@ -1258,7 +1259,7 @@ FROM v1_evm.logs_sync evm
 WHERE (log_to_jsonb ->> 'name'::text) = 'RecvPacket'::text;
 
 alter table v1_evm.recv_packet
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_evm.send_packet
             (name, data, sequence, source_port, source_channel, timeout_revision_height, timeout_revision_number,
@@ -1289,7 +1290,7 @@ FROM v1_evm.logs_sync evm
 WHERE (log_to_jsonb ->> 'name'::text) = 'SendPacket'::text;
 
 alter table v1_evm.send_packet
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_evm.write_acknowledgement
             (name, sequence, destination_port, destination_channel, acknowledgement, source_port, source_channel,
@@ -1323,7 +1324,7 @@ FROM v1_evm.logs_sync evm
 WHERE (log_to_jsonb ->> 'name'::text) = 'WriteAcknowledgement'::text;
 
 alter table v1_evm.write_acknowledgement
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_evm.channel_open_ack
             (name, port_id, channel_id, connection_id, counterparty_port_id, counterparty_channel_id, internal_chain_id,
@@ -1350,7 +1351,7 @@ FROM v1_evm.logs_sync evm
 WHERE (log_to_jsonb ->> 'name'::text) = 'ChannelOpenAck'::text;
 
 alter table v1_evm.channel_open_ack
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_evm.channel_open_confirm
             (name, port_id, channel_id, connection_id, counterparty_port_id, counterparty_channel_id, internal_chain_id,
@@ -1377,7 +1378,7 @@ FROM v1_evm.logs_sync evm
 WHERE (log_to_jsonb ->> 'name'::text) = 'ChannelOpenConfirm'::text;
 
 alter table v1_evm.channel_open_confirm
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_evm.channel_open_init
             (name, port_id, channel_id, connection_id, counterparty_port_id, version, internal_chain_id, block_hash,
@@ -1404,7 +1405,7 @@ FROM v1_evm.logs_sync evm
 WHERE (log_to_jsonb ->> 'name'::text) = 'ChannelOpenInit'::text;
 
 alter table v1_evm.channel_open_init
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_evm.client_registered
             (name, client_address, client_type, internal_chain_id, block_hash, height, log_index, timestamp,
@@ -1427,7 +1428,7 @@ FROM v1_evm.logs_sync evm
 WHERE (log_to_jsonb ->> 'name'::text) = 'ClientRegistered'::text;
 
 alter table v1_evm.client_registered
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_evm.channel_open_try
             (name, port_id, version, channel_id, connection_id, counterparty_port_id, counterparty_channel_id,
@@ -1455,7 +1456,7 @@ FROM v1_evm.logs_sync evm
 WHERE (log_to_jsonb ->> 'name'::text) = 'ChannelOpenTry'::text;
 
 alter table v1_evm.channel_open_try
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_evm.client_updated
             (name, revision_height, revision_number, client_id, internal_chain_id, block_hash, height, log_index,
@@ -1479,7 +1480,7 @@ FROM v1_evm.logs_sync evm
 WHERE (log_to_jsonb ->> 'name'::text) = 'ClientUpdated'::text;
 
 alter table v1_evm.client_updated
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_evm.connection_open_ack
             (name, connection_id, client_id, counterparty_connection_id, counterparty_client_id, internal_chain_id,
@@ -1505,7 +1506,7 @@ FROM v1_evm.logs_sync evm
 WHERE (log_to_jsonb ->> 'name'::text) = 'ConnectionOpenAck'::text;
 
 alter table v1_evm.connection_open_ack
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_evm.connection_open_confirm
             (name, connection_id, client_id, counterparty_connection_id, counterparty_client_id, internal_chain_id,
@@ -1531,7 +1532,7 @@ FROM v1_evm.logs_sync evm
 WHERE (log_to_jsonb ->> 'name'::text) = 'ConnectionOpenConfirm'::text;
 
 alter table v1_evm.connection_open_confirm
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_evm.connection_open_init
             (name, connection_id, client_id, counterparty_client_id, internal_chain_id, block_hash, height, log_index,
@@ -1555,7 +1556,7 @@ FROM v1_evm.logs_sync evm
 WHERE (log_to_jsonb ->> 'name'::text) = 'ConnectionOpenInit'::text;
 
 alter table v1_evm.connection_open_init
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_evm.connection_open_try
             (name, connection_id, client_id, counterparty_client_id, counterparty_connection_id, internal_chain_id,
@@ -1581,7 +1582,7 @@ FROM v1_evm.logs_sync evm
 WHERE (log_to_jsonb ->> 'name'::text) = 'ConnectionOpenTry'::text;
 
 alter table v1_evm.connection_open_try
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_evm.ucs1_denom_created
             (name, denom, token, channel_id, packet_sequence, internal_chain_id, block_hash, height, log_index,
@@ -1606,7 +1607,7 @@ FROM v1_evm.logs_sync evm
 WHERE (log_to_jsonb ->> 'name'::text) = 'DenomCreated'::text;
 
 alter table v1_evm.ucs1_denom_created
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_evm.ucs1_received
             (name, denom, token, amount, sender, receiver, channel_id, packet_sequence, internal_chain_id, block_hash,
@@ -1635,7 +1636,7 @@ FROM v1_evm.logs_sync evm
 WHERE (log_to_jsonb ->> 'name'::text) = 'Received'::text;
 
 alter table v1_evm.ucs1_received
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_evm.ucs1_sent
             (name, denom, token, amount, sender, receiver, channel_id, packet_sequence, internal_chain_id, block_hash,
@@ -1664,7 +1665,7 @@ FROM v1_evm.logs_sync evm
 WHERE (log_to_jsonb ->> 'name'::text) = 'Sent'::text;
 
 alter table v1_evm.ucs1_sent
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_evm.acknowledge_packet
             (name, packet, sequence, source_port, source_channel, timeout_revision_height, timeout_revision_number,
@@ -1700,7 +1701,7 @@ FROM v1_evm.logs_sync evm
 WHERE (log_to_jsonb ->> 'name'::text) = 'AcknowledgePacket'::text;
 
 alter table v1_evm.acknowledge_packet
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_aptos.channel_open_init
             (port_id, version, channel_id, connection_id, counterparty_port_id, internal_chain_id, block_hash, height,
@@ -1734,7 +1735,7 @@ FROM v1_aptos.events event
 WHERE SUBSTRING(event.type FROM POSITION(('::'::text) IN (event.type)) + 2) = 'ibc::ChannelOpenInit'::text;
 
 alter table v1_aptos.channel_open_init
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_aptos.channel_open_ack
             (port_id, channel_id, connection_id, counterparty_port_id, counterparty_channel_id, internal_chain_id,
@@ -1768,7 +1769,7 @@ FROM v1_aptos.events event
 WHERE SUBSTRING(event.type FROM POSITION(('::'::text) IN (event.type)) + 2) = 'ibc::ChannelOpenAck'::text;
 
 alter table v1_aptos.channel_open_ack
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_aptos.client_updated
             (client_id, client_type, consensus_revision_height, consensus_revision_number, internal_chain_id,
@@ -1801,7 +1802,7 @@ FROM v1_aptos.events event
 WHERE SUBSTRING(event.type FROM POSITION(('::'::text) IN (event.type)) + 2) = 'ibc::ClientUpdated'::text;
 
 alter table v1_aptos.client_updated
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_aptos.connection_open_ack
             (client_id, connection_id, counterparty_client_id, counterparty_connection_id, internal_chain_id,
@@ -1834,7 +1835,7 @@ FROM v1_aptos.events event
 WHERE SUBSTRING(event.type FROM POSITION(('::'::text) IN (event.type)) + 2) = 'ibc::ConnectionOpenAck'::text;
 
 alter table v1_aptos.connection_open_ack
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_aptos.connection_open_init
             (client_id, connection_id, counterparty_client_id, internal_chain_id, block_hash, height,
@@ -1866,7 +1867,7 @@ FROM v1_aptos.events event
 WHERE SUBSTRING(event.type FROM POSITION(('::'::text) IN (event.type)) + 2) = 'ibc::ConnectionOpenInit'::text;
 
 alter table v1_aptos.connection_open_init
-    owner to "union";
+    owner to "postgres";
 
 create or replace view v1_aptos.client_created_event
             (client_id, client_type, consensus_revision_height, consensus_revision_number, internal_chain_id,
@@ -1899,7 +1900,7 @@ FROM v1_aptos.events event
 WHERE SUBSTRING(event.type FROM POSITION(('::'::text) IN (event.type)) + 2) = 'ibc::ClientCreatedEvent'::text;
 
 alter table v1_aptos.client_created_event
-    owner to "union";
+    owner to "postgres";
 
 create or replace function hubble.update_updated_at_column() returns trigger
     language plpgsql
@@ -1911,7 +1912,7 @@ BEGIN
 END;
 $$;
 
-alter function hubble.update_updated_at_column() owner to "union";
+alter function hubble.update_updated_at_column() owner to "postgres";
 
 create trigger update_timestamp
     before update

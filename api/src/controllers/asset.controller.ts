@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response, Router } from 'express';
 import AssetService from '~/services/asset.service';
-import { serialize } from 'superjson';
 import { Controller } from '~/interfaces/controller';
 import RedisService from '~/services/redis.service';
 import { ContractQueryServiceFactory } from '~/services/contract.query.service';
@@ -19,7 +18,7 @@ controller.get('/assets', async (req: Request, res: Response, next: NextFunction
     res.status(200).send(
       {
         status: 'success',
-        data: serialize(assets)
+        data: assets
       }
     );
   } catch (err) {

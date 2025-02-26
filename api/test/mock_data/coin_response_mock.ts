@@ -11,7 +11,7 @@ export const coin_response: CoinResponse[] = [
   },
   {
     decimals: 8,
-    denom: 'wbtc'
+    denom: 'cbbtc'
   }, {
     decimals: 8,
     denom: 'weth'

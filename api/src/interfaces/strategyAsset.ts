@@ -1,6 +1,6 @@
 export type AssetType = 'native' | 'erc20' | 'ibc';
 
-export type Asset = {
+export type StrategyAsset = {
   contract_addr: Addr;
   symbol: string;
   denom: string;

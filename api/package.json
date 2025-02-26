@@ -2,7 +2,7 @@
   "name": "quasar-api",
   "version": "1.0.0",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
+    "dev": "redis-cli flushall && tsx watch src/server.ts",
     "build": "pnpm tsup --clean",
     "start": "tsx src/server.ts"
   },

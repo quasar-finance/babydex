@@ -1,8 +1,9 @@
-import { Asset, AssetInfo, CoinResponse, NativeToken } from '~/interfaces';
+import { StrategyAsset, AssetInfo, CoinResponse, NativeToken } from '~/interfaces';
 import { ContractQueryService } from '~/services/contract.query.service';
 import RedisService from '~/services/redis.service';
-import { asset_list } from '../../test/mock_data';
 import { PricingQueryService } from '~/services/pricing.query.service';
+import { getBaseAsset, getBaseAssetByDenom } from '~/utils/getMockAssets';
+import { Asset } from '../../@chain-registry/assetlist';
 
 export default class AssetService {
 
@@ -12,7 +13,7 @@ export default class AssetService {
     private redisService: RedisService) {
   }
 
-  async getNativeTokens(chainId: string, contractAddress: string): Promise<Asset[]> {
+  async getNativeTokens(chainId: string, contractAddress: string): Promise<StrategyAsset[]> {
     try {
       let res: CoinResponse[] | null = await this.redisService.get<CoinResponse[] | null>(`coin_response[]_${chainId}`);
 
@@ -42,7 +43,7 @@ export default class AssetService {
     }
   }
 
-  async getNativeTokenByDenom(chainId: string, contractAddress: string, denom: string): Promise<Asset> {
+  async getNativeTokenByDenom(chainId: string, contractAddress: string, denom: string): Promise<StrategyAsset> {
     try {
       let res: CoinResponse | null = await this.redisService.get<CoinResponse | null>(`coin_response_${chainId}_${denom}`);
 
@@ -66,32 +67,35 @@ export default class AssetService {
     }
   }
 
-  async getAssetByAssetInfo(chainId: string, contractAddress: string, assetInfo: AssetInfo): Promise<Asset> {
+  async getAssetByAssetInfo(chainId: string, contractAddress: string, assetInfo: AssetInfo): Promise<StrategyAsset> {
     // Babylon only supports native tokens
     assetInfo = assetInfo as NativeToken;
     return await this.getNativeTokenByDenom(chainId, contractAddress, assetInfo.native_token.denom);
   }
 
   // TODO: replace when chain registry is live
-  async getAssetFromChainRegistry(denom: String): Promise<Asset> {
+  async getAssetFromChainRegistry(denom: string): Promise<StrategyAsset> {
 
-    const asset: Asset | undefined = asset_list.find((item) => item.denom === denom);
+    const asset: Asset | undefined = getBaseAssetByDenom(denom);
 
     if (!asset) {
       throw new Error(`Asset with denom ${denom} could not be found`);
     }
 
-    const price =  await this.pricingQueryService.getCoinPrice("");
+    const price =  await this.pricingQueryService.getCoinPrice(asset.coingecko_id);
+    const decimals: number = asset.denom_units.reduce(
+      (acc, { exponent }) => (acc > exponent ? acc : exponent), 0);
+    const logo_URI = asset.logo_URIs?.svg || asset.logo_URIs?.png || '';
 
     return {
-      contract_addr: asset.contract_addr,
+      contract_addr: asset.address,
       symbol: asset.symbol,
-      denom: asset.denom,
+      denom: asset.base,
       type: 'native',
-      decimals: asset.decimals,
+      decimals: decimals,
       price: `${price.usd}`,
       name: asset.name,
-      logo_URI: asset.logo_URI
-    } as Asset;
+      logo_URI: logo_URI
+    } as StrategyAsset;
   }
 }

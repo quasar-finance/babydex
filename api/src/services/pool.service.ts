@@ -1,4 +1,4 @@
-import { Pool, PairInfo, PoolAsset, Asset, CoinResponse } from '~/interfaces';
+import { Pool, PairInfo, PoolAsset, StrategyAsset } from '~/interfaces';
 import { ContractQueryService } from '~/services/contract.query.service';
 import AssetService from '~/services/asset.service';
 import RedisService from '~/services/redis.service';
@@ -30,8 +30,8 @@ export default class PoolService {
 
       return await Promise.all(
         res.map(async (item: PairInfo): Promise<Pool> => {
-          let token0: Asset = await this.assetService.getAssetByAssetInfo(chainId, contractAddress, item.asset_infos[0]);
-          let token1: Asset = await this.assetService.getAssetByAssetInfo(chainId, contractAddress, item.asset_infos[1]);
+          let token0: StrategyAsset = await this.assetService.getAssetByAssetInfo(chainId, contractAddress, item.asset_infos[0]);
+          let token1: StrategyAsset = await this.assetService.getAssetByAssetInfo(chainId, contractAddress, item.asset_infos[1]);
 
           // todo determine all properties
           return {

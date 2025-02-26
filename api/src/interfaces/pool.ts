@@ -1,4 +1,4 @@
-import { Addr, AssetInfo } from '~/interfaces/asset';
+import { Addr, AssetInfo } from '~/interfaces/strategyAsset';
 
 export interface PoolAsset {
   contract_addr: string;

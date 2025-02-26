@@ -1,4 +1,4 @@
 export * from './cosmos';
-export * from './asset';
+export * from './strategyAsset';
 export * from './pool';
 export * from './route';

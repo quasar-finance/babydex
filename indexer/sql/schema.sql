@@ -1,3 +1,5 @@
+BEGIN;
+
 create schema hubble;
 create schema v1_aptos;
 create schema v1_cosmos;
@@ -1971,3 +1973,4 @@ create trigger update_timestamp
     for each row
 execute procedure hubble.update_updated_at_column();
 
+COMMIT;

@@ -65,7 +65,7 @@ create table if not exists v1_cosmos.transactions
     hash       text    not null,
     index      integer not null,
     primary key (chain_id, hash),
-    foreign key (block_hash, chain_id) references v1_cosmos.blocks ()
+    foreign key (block_hash, chain_id) references v1_cosmos.blocks (hash, chain_id)
         on update cascade on delete cascade
 );
 

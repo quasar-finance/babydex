@@ -98,6 +98,19 @@ create table if not exists v1_cosmos.events
         on update cascade on delete cascade
 );
 
+create function attributes(v1_cosmos.events) returns jsonb
+    immutable
+    parallel safe
+    language sql
+as
+$$
+  select (
+    select
+      jsonb_object_agg(j->>'key', j->>'value')
+    from jsonb_array_elements($1.data->'attributes') j
+);
+$$;
+
 comment on table v1_cosmos.events is 'DEPRECATED: use V1';
 
 -- Do I need this

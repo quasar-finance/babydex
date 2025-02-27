@@ -1,9 +1,9 @@
 
 # Use 'slim' variant due to its reduced size
-FROM node:20-slim as base
+FROM node:20-slim AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
+RUN npm install -g pnpm
 WORKDIR /app
 
 FROM base AS prod-deps
@@ -23,7 +23,7 @@ COPY --from=build /app/package.json /app/package.json
 COPY --from=build /app/dist /app
 
 # Execute
-CMD node ./server.js
+CMD ["sh", "-c", "node ./server.js"]
 
 # Port exposing
 EXPOSE 8080

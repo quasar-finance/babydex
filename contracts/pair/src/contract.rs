@@ -8,7 +8,7 @@ use cosmwasm_std::{
     attr, ensure_eq, from_json, to_json_binary, wasm_execute, wasm_instantiate, Addr, Binary,
     CosmosMsg, CustomMsg, CustomQuery, Decimal, Decimal256, Deps, DepsMut, Empty, Env, Fraction,
     Isqrt, MessageInfo, QuerierWrapper, Reply, Response, StdError, StdResult, SubMsg,
-    SubMsgResponse, SubMsgResult, Uint128, Uint256, WasmMsg,
+    SubMsgResponse, SubMsgResult, Uint128, Uint256, WasmMsg, Event,
 };
 use cw2::set_contract_version;
 use cw20::{Cw20ExecuteMsg, Cw20ReceiveMsg, MinterResponse};
@@ -370,13 +370,19 @@ pub fn provide_liquidity(
         CONFIG.save(deps.storage, &config)?;
     }
 
-    Ok(Response::new().add_messages(messages).add_attributes(vec![
+    let attrs = vec![
         attr("action", "provide_liquidity"),
-        attr("sender", info.sender),
-        attr("receiver", receiver),
-        attr("assets", format!("{}, {}", assets[0], assets[1])),
+        attr("sender", info.sender.to_string()),
+        attr("receiver", receiver.to_string()),
+        attr("assets", format!("{}, {}", assets[0].info, assets[1].info)),
         attr("share", share),
-    ]))
+    ];
+
+    let event = Event::new("provide_liquidity").add_attributes(attrs);
+
+    Ok(Response::new()
+        .add_messages(messages)
+        .add_event(event))
 }
 
 /// Mint LP tokens for a beneficiary and auto stake the tokens in the Incentive contract (if auto staking is specified).
@@ -493,7 +499,7 @@ pub fn withdraw_liquidity(
         .into(),
     );
 
-    Ok(Response::new().add_messages(messages).add_attributes(vec![
+    let attrs = vec![
         attr("action", "withdraw_liquidity"),
         attr("sender", &info.sender),
         attr("withdrawn_share", amount),
@@ -501,7 +507,13 @@ pub fn withdraw_liquidity(
             "refund_assets",
             format!("{}, {}", refund_assets[0], refund_assets[1]),
         ),
-    ]))
+    ];
+
+    let event = Event::new("withdraw_liquidity").add_attributes(attrs);
+
+    Ok(Response::new()
+        .add_messages(messages)
+        .add_event(event))
 }
 
 /// Returns the amount of pool assets that correspond to an amount of LP tokens.
@@ -665,25 +677,25 @@ pub fn swap(
         CONFIG.save(deps.storage, &config)?;
     }
 
+    let attrs = vec![
+        attr("action", "swap"),
+        attr("sender", sender),
+        attr("receiver", receiver),
+        attr("offer_asset", offer_asset.info.to_string()),
+        attr("ask_asset", ask_pool.info.to_string()),
+        attr("offer_amount", offer_amount),
+        attr("return_amount", return_amount),
+        attr("spread_amount", spread_amount),
+        attr("commission_amount", commission_amount),
+        attr("maker_fee_amount", maker_fee_amount),
+        attr("fee_share_amount", fee_share_amount),
+    ];
+
+    let event = Event::new("execute_swap").add_attributes(attrs);
+
     Ok(Response::new()
-        .add_messages(
-            // 1. send collateral tokens from the contract to a user
-            // 2. send inactive commission fees to the Maker contract
-            messages,
-        )
-        .add_attributes(vec![
-            attr("action", "swap"),
-            attr("sender", sender),
-            attr("receiver", receiver),
-            attr("offer_asset", offer_asset.info.to_string()),
-            attr("ask_asset", ask_pool.info.to_string()),
-            attr("offer_amount", offer_amount),
-            attr("return_amount", return_amount),
-            attr("spread_amount", spread_amount),
-            attr("commission_amount", commission_amount),
-            attr("maker_fee_amount", maker_fee_amount),
-            attr("fee_share_amount", fee_share_amount),
-        ]))
+        .add_messages(messages)
+        .add_event(event))
 }
 
 /// Updates the pool configuration with the specified parameters in the `params` variable.
@@ -701,7 +713,7 @@ pub fn update_config(
         return Err(ContractError::Unauthorized {});
     }
 
-    let mut response = Response::default();
+    let mut event = Event::new("update_config");
 
     match from_json::<XYKPoolUpdateParams>(&params)? {
         XYKPoolUpdateParams::EnableFeeShare {
@@ -725,26 +737,21 @@ pub fn update_config(
 
             CONFIG.save(deps.storage, &config)?;
 
-            response.attributes.push(attr("action", "enable_fee_share"));
-            response
-                .attributes
-                .push(attr("fee_share_bps", fee_share_bps.to_string()));
-            response
-                .attributes
-                .push(attr("fee_share_address", fee_share_address));
+            event = event.add_attribute("action", "enable_fee_share")
+                         .add_attribute("fee_share_bps", fee_share_bps.to_string())
+                         .add_attribute("fee_share_address", fee_share_address);
         }
         XYKPoolUpdateParams::DisableFeeShare => {
             // Disable fee sharing for this contract by setting bps and
             // address back to None
             config.fee_share = None;
             CONFIG.save(deps.storage, &config)?;
-            response
-                .attributes
-                .push(attr("action", "disable_fee_share"));
+
+            event = event.add_attribute("action", "disable_fee_share");
         }
     }
 
-    Ok(response)
+    Ok(Response::new().add_event(event))
 }
 
 /// Accumulate token prices for the assets in the pool.

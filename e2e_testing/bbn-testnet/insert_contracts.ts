@@ -7,10 +7,10 @@ import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 
 // PostgreSQL connection details
 const client = new Client({
-  user: "your_db_user",
-  host: "your_db_host",
-  database: "your_db_name",
-  password: "your_db_password",
+  user: "postgres",
+  host: "db.lvyyjzphlxqtdlponywj.supabase.co",
+  database: "postgres",
+  password: "CMU_arg5jrc1uvn9zmp",
   port: 5432, // Default PostgreSQL port
 });
 
@@ -34,7 +34,7 @@ async function getCreatedBlock(contract_address: string): Promise<number> {
 //   // Placeholder for actual logic to get the created block
 //   // This should be replaced with the actual query to get the block height
 //   return response.; // Example block height
-    // arbitrary value, but should be gotten customized
+    // arbitrary value, but should be gotten from onchain when the contract was created
     return 279262
 }
 
@@ -84,20 +84,35 @@ async function insertContracts(contracts: Contract[]) {
     await client.connect();
     console.log("Connected to the database.");
 
-    const query = `
+    const insertV1CosmosContractsQuery = `
       INSERT INTO v1_cosmos.contracts (
-        internal_chain_id, address, start_height, description
-      ) VALUES ($1, $2, $3, $4)
+        internal_chain_id, address, start_height
+      ) VALUES ($1, $2, $3)
       ON CONFLICT (address, internal_chain_id, start_height) DO NOTHING;
     `;
 
+    const insertHubbleContractStatusQuery = `
+      INSERT INTO hubble.contract_status (
+        internal_chain_id, address, height, timestamp
+      ) VALUES ($1, $2, $3, NOW())
+      ON CONFLICT (internal_chain_id, address) DO UPDATE
+      SET height = EXCLUDED.height, updated_at = NOW();
+    `;
+
     for (const contract of contracts) {
-      await client.query(query, [
+      await client.query(insertV1CosmosContractsQuery, [
         contract.internal_chain_id,
         contract.address,
         contract.start_height,
       ]);
-      console.log(`Inserted contract: ${contract.address}`);
+      console.log(`Inserted contract into v1_cosmos: ${contract.address}`);
+
+      await client.query(insertHubbleContractStatusQuery, [
+        contract.internal_chain_id,
+        contract.address,
+        contract.start_height,
+      ]);
+      console.log(`Inserted/Updated contract status in hubble: ${contract.address}`);
     }
   } catch (error) {
     console.error("Error inserting contracts:", error);
@@ -111,5 +126,5 @@ async function insertContracts(contracts: Contract[]) {
 (async () => {
   const contracts = await populateContracts();
   console.log(contracts)
-//   await insertContracts(contracts);
+  await insertContracts(contracts);
 })();

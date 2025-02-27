@@ -4,7 +4,7 @@ use std::collections::HashSet;
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{
     attr, to_json_binary, Binary, Deps, DepsMut, Env, MessageInfo, Order, Reply, Response,
-    StdError, StdResult, SubMsg, SubMsgResponse, SubMsgResult, WasmMsg,
+    StdError, StdResult, SubMsg, SubMsgResponse, SubMsgResult, WasmMsg, Event,
 };
 use cw2::set_contract_version;
 use cw_storage_plus::Bound;
@@ -218,7 +218,10 @@ pub fn execute_update_config(
 
     CONFIG.save(deps.storage, &config)?;
 
-    Ok(Response::new().add_attribute("action", "update_config"))
+    let event = Event::new("update_config")
+        .add_attribute("action", "update_config");
+
+    Ok(Response::new().add_event(event))
 }
 
 /// Updates a pair type's configuration.
@@ -250,7 +253,10 @@ pub fn execute_update_pair_config(
         &pair_config,
     )?;
 
-    Ok(Response::new().add_attribute("action", "update_pair_config"))
+    let event = Event::new("update_pair_config")
+        .add_attribute("action", "update_pair_config");
+
+    Ok(Response::new().add_event(event))
 }
 
 /// Creates a new pair of `pair_type` with the assets specified in `asset_infos`.
@@ -303,10 +309,11 @@ pub fn execute_create_pair(
         INSTANTIATE_PAIR_REPLY_ID,
     );
 
-    Ok(Response::new().add_submessage(sub_msg).add_attributes(vec![
-        attr("action", "create_pair"),
-        attr("pair", asset_infos.iter().join("-")),
-    ]))
+    let event = Event::new("create_pair")
+        .add_attribute("action", "create_pair")
+        .add_attribute("pair", asset_infos.iter().join("-"));
+
+    Ok(Response::new().add_submessage(sub_msg).add_event(event))
 }
 
 /// The entry point to the contract for processing replies from submessages.
@@ -332,10 +339,11 @@ pub fn reply(deps: DepsMut, _env: Env, msg: Reply) -> Result<Response, ContractE
 
             get_pairs_index().save(deps.storage, pair_contract.clone(), &pair_info)?;
 
-            Ok(Response::new().add_attributes(vec![
-                attr("action", "register"),
-                attr("pair_contract_addr", pair_contract),
-            ]))
+            let event = Event::new("register")
+                .add_attribute("action", "register")
+                .add_attribute("pair_contract_addr", pair_contract);
+
+            Ok(Response::new().add_event(event))
         }
         _ => Err(ContractError::FailedToParseReply {}),
     }

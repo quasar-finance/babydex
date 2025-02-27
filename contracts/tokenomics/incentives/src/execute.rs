@@ -8,6 +8,7 @@ use cosmwasm_std::{
 };
 use cw_utils::one_coin;
 use itertools::Itertools;
+use cosmwasm_std::Event;
 
 use astroport::asset::{
     addr_opt_validate, determine_asset_info, validate_native_denom, Asset, AssetInfo, AssetInfoExt,
@@ -180,7 +181,7 @@ fn deposit(
     sender: Addr,
     recipient: Option<String>,
 ) -> Result<Response, ContractError> {
-    let staker = addr_opt_validate(deps.api, &recipient)?.unwrap_or(sender);
+    let staker = addr_opt_validate(deps.api, &recipient)?.unwrap_or(sender.clone());
 
     let config = CONFIG.load(deps.storage)?;
     is_pool_registered(deps.querier, &config, &maybe_lp.info.to_string())?;
@@ -201,12 +202,11 @@ fn deposit(
     pool_info.save(deps.storage, &maybe_lp.info)?;
     user_info.save(deps.storage, &staker, &maybe_lp.info)?;
 
-    Ok(response.add_attributes([
-        attr("action", "deposit"),
-        attr("lp_token", maybe_lp.info.to_string()),
-        attr("user", staker.as_str()),
-        attr("amount", maybe_lp.amount),
-    ]))
+    let event = Event::new("deposit")
+        .add_attribute("action", "deposit")
+        .add_attribute("sender", sender.to_string());
+
+    Ok(response.add_event(event))
 }
 
 fn withdraw(
@@ -246,13 +246,13 @@ fn withdraw(
             user_info.save(deps.storage, &info.sender, &lp_token_asset)?;
         }
 
-        let transfer_msg = lp_token_asset.with_balance(amount).into_msg(info.sender)?;
+        let transfer_msg = lp_token_asset.with_balance(amount).into_msg(info.sender.clone())?;
 
-        Ok(response.add_message(transfer_msg).add_attributes([
-            attr("action", "withdraw"),
-            attr("lp_token", lp_token_asset.to_string()),
-            attr("amount", amount),
-        ]))
+        let event = Event::new("withdraw")
+            .add_attribute("action", "withdraw")
+            .add_attribute("sender", info.sender.to_string());
+
+        Ok(response.add_message(transfer_msg).add_event(event))
     }
 }
 
@@ -263,7 +263,7 @@ pub fn setup_pools(
     pools: Vec<(String, Uint128)>,
 ) -> Result<Response, ContractError> {
     let mut config = CONFIG.load(deps.storage)?;
-    if info.sender != config.owner && Some(info.sender) != config.generator_controller {
+    if info.sender != config.owner && Some(info.sender.clone()) != config.generator_controller {
         return Err(ContractError::Unauthorized {});
     }
 
@@ -333,7 +333,11 @@ pub fn setup_pools(
     ACTIVE_POOLS.save(deps.storage, &setup_pools)?;
     CONFIG.save(deps.storage, &config)?;
 
-    Ok(Response::new().add_attribute("action", "setup_pools"))
+    let event = Event::new("setup_pools")
+        .add_attribute("action", "setup_pools")
+        .add_attribute("sender", info.sender.to_string());
+
+    Ok(Response::new().add_event(event))
 }
 
 fn set_tokens_per_second(
@@ -368,7 +372,11 @@ fn set_tokens_per_second(
 
     CONFIG.save(deps.storage, &config)?;
 
-    Ok(Response::new().add_attribute("action", "set_tokens_per_second"))
+    let event = Event::new("set_tokens_per_second")
+        .add_attribute("action", "set_tokens_per_second")
+        .add_attribute("sender", info.sender.to_string());
+
+    Ok(Response::new().add_event(event))
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -455,7 +463,11 @@ fn update_config(
 
     CONFIG.save(deps.storage, &config)?;
 
-    Ok(Response::new().add_attributes(attrs))
+    let event = Event::new("update_config")
+        .add_attribute("action", "update_config")
+        .add_attribute("sender", info.sender.to_string());
+
+    Ok(Response::new().add_attributes(attrs).add_event(event))
 }
 
 fn update_blocked_pool_tokens(
@@ -468,7 +480,7 @@ fn update_blocked_pool_tokens(
     let mut config = CONFIG.load(deps.storage)?;
 
     // Permission check
-    if info.sender != config.owner && Some(info.sender) != config.guardian {
+    if info.sender != config.owner && Some(info.sender.clone()) != config.guardian {
         return Err(ContractError::Unauthorized {});
     }
 
@@ -572,5 +584,9 @@ fn update_blocked_pool_tokens(
 
     CONFIG.save(deps.storage, &config)?;
 
-    Ok(Response::new().add_attribute("action", "update_tokens_blocklist"))
+    let event = Event::new("update_blocked_pool_tokens")
+        .add_attribute("action", "update_blocked_pool_tokens")
+        .add_attribute("sender", info.sender.to_string());
+
+    Ok(Response::new().add_event(event))
 }

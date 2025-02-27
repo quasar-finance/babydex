@@ -1,6 +1,5 @@
 use cosmwasm_std::{
-    entry_point, from_json, to_json_binary, wasm_execute, Addr, Binary, Decimal, Deps, DepsMut,
-    Empty, Env, MessageInfo, Reply, Response, StdError, StdResult, SubMsg, SubMsgResult, Uint128,
+    entry_point, from_json, to_json_binary, wasm_execute, Addr, Binary, Decimal, Deps, DepsMut, Empty, Env, Event, MessageInfo, Reply, Response, StdError, StdResult, SubMsg, SubMsgResult, Uint128
 };
 use cw2::set_contract_version;
 use cw20::Cw20ReceiveMsg;
@@ -212,7 +211,9 @@ pub fn reply(deps: DepsMut, _env: Env, msg: Reply) -> Result<Response, ContractE
                 return_amount: swap_amount,
             })?;
 
-            Ok(Response::new().set_data(data))
+            let event = Event::new("swap_amount_out").add_attribute("amount_out", swap_amount);
+
+            Ok(Response::new().set_data(data).add_event(event))
         }
         _ => Err(StdError::generic_err("Failed to process reply").into()),
     }

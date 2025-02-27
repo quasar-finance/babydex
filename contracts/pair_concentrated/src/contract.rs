@@ -5,7 +5,7 @@ use cosmwasm_std::entry_point;
 use cosmwasm_std::{
     attr, ensure, ensure_eq, from_json, wasm_execute, wasm_instantiate, Addr, Binary, CosmosMsg,
     Decimal, Decimal256, DepsMut, Empty, Env, MessageInfo, Reply, Response, StdError, StdResult,
-    SubMsg, SubMsgResponse, SubMsgResult, Uint128,
+    SubMsg, SubMsgResponse, SubMsgResult, Uint128, Event,
 };
 use cw2::set_contract_version;
 use cw20::{Cw20ExecuteMsg, Cw20ReceiveMsg, MinterResponse};
@@ -154,7 +154,10 @@ pub fn instantiate(
         INSTANTIATE_TOKEN_REPLY_ID,
     );
 
-    Ok(Response::new().add_submessage(sub_msg))
+    let event = Event::new("instantiate")
+        .add_attribute("action", "instantiate");
+
+    Ok(Response::new().add_submessage(sub_msg).add_event(event))
 }
 
 /// The entry point to the contract for processing replies from submessages.
@@ -176,8 +179,10 @@ pub fn reply(deps: DepsMut, _env: Env, msg: Reply) -> Result<Response, ContractE
                 Ok(config)
             })?;
 
-            Ok(Response::new()
-                .add_attribute("liquidity_token_addr", config.pair_info.liquidity_token))
+            let event = Event::new("instantiate")
+                .add_attribute("liquidity_token_addr", config.pair_info.liquidity_token);
+
+            Ok(Response::new().add_event(event))
         }
         _ => Err(StdError::generic_err("Invalid reply".to_string()).into()),
     }
@@ -460,16 +465,16 @@ pub fn provide_liquidity(
 
     CONFIG.save(deps.storage, &config)?;
 
-    let attrs = vec![
+    let event = Event::new("provide_liquidity").add_attributes(vec![
         attr("action", "provide_liquidity"),
         attr("sender", info.sender),
         attr("receiver", receiver),
         attr("assets", format!("{}, {}", &assets[0], &assets[1])),
         attr("share", share_uint128),
         attr("slippage", slippage.to_string()),
-    ];
+    ]);
 
-    Ok(Response::new().add_messages(messages).add_attributes(attrs))
+    Ok(Response::new().add_messages(messages).add_event(event))
 }
 
 /// Withdraw liquidity from the pool.
@@ -552,12 +557,13 @@ pub fn withdraw_liquidity(
 
     CONFIG.save(deps.storage, &config)?;
 
-    Ok(Response::new().add_messages(messages).add_attributes(vec![
+    let event = Event::new("withdraw_liquidity").add_attributes(vec![
         attr("action", "withdraw_liquidity"),
         attr("sender", info.sender),
         attr("withdrawn_share", amount),
         attr("refund_assets", refund_assets.iter().join(", ")),
-    ]))
+    ]);
+    Ok(Response::new().add_messages(messages).add_event(event))
 }
 
 /// Performs an swap operation with the specified parameters. The trader must approve the
@@ -689,22 +695,20 @@ fn swap(
 
     CONFIG.save(deps.storage, &config)?;
 
-    Ok(Response::new().add_messages(messages).add_attributes(vec![
-        attr("action", "swap"),
-        attr("sender", sender),
-        attr("receiver", receiver),
-        attr("offer_asset", offer_asset_dec.info.to_string()),
-        attr("ask_asset", pools[ask_ind].info.to_string()),
-        attr("offer_amount", offer_asset.amount),
-        attr("return_amount", return_amount),
-        attr("spread_amount", spread_amount),
-        attr(
-            "commission_amount",
-            swap_result.total_fee.to_uint(ask_asset_prec)?,
-        ),
-        attr("maker_fee_amount", maker_fee),
-        attr("fee_share_amount", fee_share_amount),
-    ]))
+    let event = Event::new("swap")
+        .add_attribute("action", "swap")
+        .add_attribute("sender", sender.to_string())
+        .add_attribute("receiver", receiver.to_string())
+        .add_attribute("offer_asset", offer_asset.info.to_string())
+        .add_attribute("ask_asset", pools[ask_ind].info.to_string())
+        .add_attribute("offer_amount", offer_asset.amount.to_string())
+        .add_attribute("return_amount", return_amount.to_string())
+        .add_attribute("spread_amount", spread_amount.to_string())
+        .add_attribute("commission_amount", swap_result.total_fee.to_uint(ask_asset_prec)?.to_string())
+        .add_attribute("maker_fee_amount", maker_fee.to_string())
+        .add_attribute("fee_share_amount", fee_share_amount.to_string());
+
+    Ok(Response::new().add_messages(messages).add_event(event))
 }
 
 /// Updates the pool configuration with the specified parameters in the `params` variable.

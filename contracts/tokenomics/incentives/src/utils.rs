@@ -217,7 +217,7 @@ pub fn incentivize(
 ) -> Result<Response, ContractError> {
     let schedule = IncentivesSchedule::from_input(env, &input)?;
 
-    let mut response = Response::new();
+    let mut response = response;
     let attrs = vec![
         attr("action", "incentivize"),
         attr("lp_token", lp_token.clone()),

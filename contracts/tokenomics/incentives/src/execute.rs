@@ -204,7 +204,10 @@ fn deposit(
 
     let event = Event::new("deposit")
         .add_attribute("action", "deposit")
-        .add_attribute("sender", sender.to_string());
+        .add_attribute("sender", sender.to_string())
+        .add_attribute("lp_token", maybe_lp.info.to_string())
+        .add_attribute("user", staker.as_str())
+        .add_attribute("amount", maybe_lp.amount);
 
     Ok(response.add_event(event))
 }
@@ -250,7 +253,9 @@ fn withdraw(
 
         let event = Event::new("withdraw")
             .add_attribute("action", "withdraw")
-            .add_attribute("sender", info.sender.to_string());
+            .add_attribute("sender", info.sender.to_string())
+            .add_attribute("lp_token", lp_token_asset.to_string())
+            .add_attribute("amount", amount);
 
         Ok(response.add_message(transfer_msg).add_event(event))
     }

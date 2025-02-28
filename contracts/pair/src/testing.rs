@@ -713,8 +713,9 @@ fn withdraw_liquidity() {
     let env = mock_env();
     let info = mock_info("liquidity0000", &[]);
     let res = execute(deps.as_mut(), env, info, msg).unwrap();
-    let log_withdrawn_share = res.attributes.get(2).expect("no log");
-    let log_refund_assets = res.attributes.get(3).expect("no log");
+    let event = res.events.iter().find(|e| e.ty == "withdraw_liquidity").unwrap();
+    let log_withdrawn_share = event.attributes.get(2).expect("no log");
+    let log_refund_assets = event.attributes.get(3).expect("no log");
     let msg_refund_0 = res.messages.first().expect("no message");
     let msg_refund_1 = res.messages.get(1).expect("no message");
     let msg_burn_liquidity = res.messages.get(2).expect("no message");
@@ -949,7 +950,7 @@ fn try_native_to_token() {
     );
 
     assert_eq!(
-        res.attributes,
+        res.events.iter().find(|e| e.ty == "swap").unwrap().attributes,
         vec![
             attr("action", "swap"),
             attr("sender", "addr0000"),
@@ -1139,7 +1140,7 @@ fn try_token_to_native() {
     );
 
     assert_eq!(
-        res.attributes,
+        res.events.iter().find(|e| e.ty == "swap").unwrap().attributes,
         vec![
             attr("action", "swap"),
             attr("sender", "addr0000"),

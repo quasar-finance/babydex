@@ -374,7 +374,7 @@ pub fn provide_liquidity(
         attr("action", "provide_liquidity"),
         attr("sender", info.sender.to_string()),
         attr("receiver", receiver.to_string()),
-        attr("assets", format!("{}, {}", assets[0].info, assets[1].info)),
+        attr("assets", format!("{}, {}", assets[0], assets[1])),
         attr("share", share),
     ];
 
@@ -691,7 +691,7 @@ pub fn swap(
         attr("fee_share_amount", fee_share_amount),
     ];
 
-    let event = Event::new("execute_swap").add_attributes(attrs);
+    let event = Event::new("swap").add_attributes(attrs);
 
     Ok(Response::new()
         .add_messages(messages)

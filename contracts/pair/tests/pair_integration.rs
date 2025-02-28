@@ -198,6 +198,7 @@ fn test_provide_and_withdraw_liquidity() {
         .execute_contract(alice_address.clone(), pair_instance.clone(), &msg, &coins)
         .unwrap();
 
+    println!("{:?}", res.events[1]);
     assert_eq!(
         res.events[1].attributes[1],
         attr("action", "provide_liquidity")

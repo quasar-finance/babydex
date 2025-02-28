@@ -167,7 +167,7 @@ const main = async () => {
         },
         "auto",
         "incentivize LSD pair",
-        [{denom: "ibc/2278567FFA6D754BDD8C159CE1770D8AF27649BFB58E5132CF530460591E479D", amount: (10_000_000000).toString()}]
+        [{denom: "ibc/2278567FFA6D754BDD8C159CE1770D8AF27649BFB58E5132CF530460591E479D", amount: (10_000_000000).toString()}, {denom: "ubbn", amount: parseInt(config.incentivize_fee.fee.amount).toString()}]
     ).then(console.log)
     
     // Update config with new incentives address

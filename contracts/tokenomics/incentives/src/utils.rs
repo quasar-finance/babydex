@@ -224,6 +224,7 @@ pub fn incentivize(
         attr("start_ts", env.block.time.seconds().to_string()),
         attr("end_ts", schedule.end_ts.to_string()),
         attr("reward", schedule.reward_info.to_string()),
+        attr("rps",  schedule.rps.to_string()),
     ];
 
     let lp_token_asset = determine_asset_info(&lp_token, deps.api)?;

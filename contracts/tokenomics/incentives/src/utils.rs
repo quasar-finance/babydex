@@ -153,7 +153,7 @@ pub fn deactivate_pool(
 
 /// Removes pools from active pools if their pair type is blocked.
 pub fn deactivate_blocked_pools(deps: DepsMut, env: Env) -> Result<Response, ContractError> {
-    let mut response = Response::new();
+    let response = Response::new();
     let mut attrs = vec![];
     let mut active_pools = ACTIVE_POOLS.load(deps.storage)?;
     let mut config = CONFIG.load(deps.storage)?;

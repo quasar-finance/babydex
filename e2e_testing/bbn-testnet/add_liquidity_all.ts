@@ -6,7 +6,7 @@ import { AstroportPairConcentratedClient } from "../sdk/AstroportPairConcentrate
 import { Coin, coin } from "@cosmjs/proto-signing";
 
 // Amount to add for each token (before decimal adjustment)
-const BASE_AMOUNT = "1000";
+const BASE_AMOUNT = "10";
 
 
 // Create a map of token denom to its decimal places
@@ -48,7 +48,8 @@ const main = async () => {
             continue;
         }
 
-        console.log(`Adding liquidity to pool ${token0}-${token1}`);
+        const pairTypeString = Object.keys(pair.pair_type)[0];
+        console.log(`Adding liquidity to pool ${token0}-${token1}, ${pairTypeString}`);
         console.log(`Decimals: ${token0}=${decimals0}, ${token1}=${decimals1}`);
 
         const poolClient = new AstroportPairConcentratedClient(
@@ -74,7 +75,7 @@ const main = async () => {
 
         try {
             const response = await poolClient.provideLiquidity(
-                { assets: adjustedAssets, autoStake: true },
+                { assets: adjustedAssets, autoStake: true, minLpToReceive: "1", slippageTolerance: "50.0" },
                 "auto",
                 undefined,
                 coins

@@ -29,8 +29,8 @@ const main = async () => {
 
     // Replace with actual LP token or pool address
     const lpToken = undefined;
-    const poolAddress = "bbn19vagv7myh0006e0rwgh40c70q2zx3mqsax7ahgwvmerw6agne8dqmdta5a";
-    const amountToWithdraw = "10000000000"; // Amount of LP tokens to withdraw
+    const poolAddress = "bbn1vkh603t635w73yndx3x92f9d9ykk7etr7fs274d9q0qdeeut0qhqcsz3qd";
+    const amountToWithdraw = "2101902"; // Amount of LP tokens to withdraw
 
     const factoryClient = new AstroportFactoryClient(client, address, deployed.factory);
     let poolInfo: PoolInfo | undefined;

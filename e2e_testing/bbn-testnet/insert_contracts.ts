@@ -35,7 +35,7 @@ async function getCreatedBlock(contract_address: string): Promise<number> {
 //   // This should be replaced with the actual query to get the block height
 //   return response.; // Example block height
     // arbitrary value, but should be gotten from onchain when the contract was created
-    return 279262
+    return 401000
 }
 
 // Function to process contracts deployed by the factory
@@ -107,12 +107,12 @@ async function insertContracts(contracts: Contract[]) {
       ]);
       console.log(`Inserted contract into v1_cosmos: ${contract.address}`);
 
-      await client.query(insertHubbleContractStatusQuery, [
-        contract.internal_chain_id,
-        contract.address,
-        contract.start_height,
-      ]);
-      console.log(`Inserted/Updated contract status in hubble: ${contract.address}`);
+    //   await client.query(insertHubbleContractStatusQuery, [
+    //     contract.internal_chain_id,
+    //     contract.address,
+    //     contract.start_height,
+    //   ]);
+    //   console.log(`Inserted/Updated contract status in hubble: ${contract.address}`);
     }
   } catch (error) {
     console.error("Error inserting contracts:", error);

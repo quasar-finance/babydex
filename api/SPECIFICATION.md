@@ -91,6 +91,7 @@ The API layer needs (minimally) to serve
       * `name`: String, name of token 1
       * `reserve`: String, current reserve of token 1 in the pool
     * `fee_tier`: Integer, fee tier of the pool (if applicable)
+    * `liquitity_token`:String, Pair LP token denom
 
 **2\. `/assets` Endpoint**
 

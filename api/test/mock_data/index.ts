@@ -1,1 +1,1 @@
-export * from './chain_registry_mocks';
+export * from './contract_query_mocks';

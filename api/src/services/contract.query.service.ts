@@ -1,7 +1,11 @@
 import CosmosService from '~/services/cosmos.service';
-import { pair_info } from '../../test/mock_data';
-import { coin_response } from '../../test/mock_data/coin_response_mock';
-import { NativeToken } from '~/interfaces';
+import {
+  coin_response,
+  pair_info,
+  pool_config_concentrated,
+  pool_config_xyk, pool_response_concentrated,
+  pool_response_xyk
+} from '../../test/mock_data';
 
 const { NODE_ENV } = process.env;
 
@@ -15,19 +19,32 @@ export class MockContractQueryService implements ContractQueryService {
       return coin_response as T;
     }
 
-    if (queryMsg.hasOwnProperty('native_token')) {
-      let native_token = queryMsg as NativeToken;
-      let res = coin_response.find((item) => item.denom === native_token.native_token.denom);
-
-      if (!res) {
-        throw new Error('Could not find a native token');
-      }
-
-      return res as T;
-    }
-
     if (queryMsg.hasOwnProperty('pairs')) {
       return pair_info as T;
+    }
+
+    if (queryMsg.hasOwnProperty('pool')) {
+      if (_contractAddress == 'xyk_contract_address') {
+        return pool_response_xyk as T;
+      }
+
+      if (_contractAddress == 'concentrated_contract_address') {
+        return pool_response_concentrated as T;
+      }
+
+      throw new Error('Unknown pool contract address');
+    }
+
+    if (queryMsg.hasOwnProperty('config')) {
+      if (_contractAddress == 'xyk_contract_address') {
+        return pool_config_xyk as T;
+      }
+
+      if (_contractAddress == 'concentrated_contract_address') {
+        return pool_config_concentrated as T;
+      }
+
+      throw new Error('Unknown pool config contract address');
     }
 
     throw new Error('Not implemented');

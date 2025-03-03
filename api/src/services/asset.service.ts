@@ -1,9 +1,10 @@
-import { StrategyAsset, AssetInfo, CoinResponse, NativeToken } from '~/interfaces';
+import { AssetResponse, CoinResponse } from '~/interfaces';
 import { ContractQueryService } from '~/services/contract.query.service';
 import RedisService from '~/services/redis.service';
 import { PricingQueryService } from '~/services/pricing.query.service';
-import { getBaseAsset, getBaseAssetByDenom } from '~/utils/getMockAssets';
+import { getBaseAssetByDenom } from '~/utils/getMockAssets';
 import { Asset } from '../../@chain-registry/assetlist';
+import { ASSET_RESPONSE_CACHE_KEY } from '~/utils/constant';
 
 export default class AssetService {
 
@@ -13,73 +14,76 @@ export default class AssetService {
     private redisService: RedisService) {
   }
 
-  async getNativeTokens(chainId: string, contractAddress: string): Promise<StrategyAsset[]> {
+  async getNativeTokens(chainId: string, contractAddress: string, refresh?: Boolean): Promise<AssetResponse[]> {
     try {
-      let res: CoinResponse[] | null = await this.redisService.get<CoinResponse[] | null>(`coin_response[]_${chainId}`);
+      let res: AssetResponse[] | null;
 
-      if (!res) {
-        res = await this.contractQueryService.queryContract<CoinResponse[]>(chainId, contractAddress, {
-          native_tokens: { limit: 1000 }
-        });
+      if (!refresh) {
+        res = await this.redisService.get<AssetResponse[] | null>(`${ASSET_RESPONSE_CACHE_KEY}_${chainId}`);
 
-        if (!res) {
-          throw Error(`Coin response could not be found for chainId: ${chainId}, contractAddress: ${contractAddress}`);
+        if (res !== null && res.length > 0) {
+          return res;
         }
-
-        await this.redisService.set(`coin_response[]_${chainId}`, res);
       }
 
-      return await Promise.all(res.map((item: CoinResponse) => {
-        this.redisService.set(`coin_response_${chainId}_${item.denom}`, res);
+      const coinResponse: CoinResponse[] = await this.contractQueryService
+        .queryContract<CoinResponse[]>(chainId, contractAddress, {
+          native_tokens: { limit: 100000 }
+        });
 
-        return this.getAssetFromChainRegistry(item.denom);
-      }));
+      if (coinResponse.length === 0) {
+        throw Error(`Coin response could not be found for chainId: ${chainId}, contractAddress: ${contractAddress}`);
+      }
+
+      res = await Promise.all(
+        coinResponse.map((item: CoinResponse) => {
+          return this.getAssetFromChainRegistry(item.denom, item.decimals);
+        })
+      );
+
+      await this.redisService.set(`${ASSET_RESPONSE_CACHE_KEY}_${chainId}`, res, { EX: 300 });
+
+      return res;
     } catch (err) {
       console.log(err);
 
       throw err;
     }
-  }
-
-  async getNativeTokenByDenom(denom: string): Promise<StrategyAsset> {
-    try {
-      return this.getAssetFromChainRegistry(denom);
-    } catch (err) {
-      console.log(err);
-
-      throw err;
-    }
-  }
-
-  async getAssetByAssetInfo(assetInfo: AssetInfo): Promise<StrategyAsset> {
-    // Babylon only supports native tokens
-    assetInfo = assetInfo as NativeToken;
-    return await this.getNativeTokenByDenom(assetInfo.native_token.denom);
   }
 
   // TODO: replace when chain registry is live
-  async getAssetFromChainRegistry(denom: string): Promise<StrategyAsset> {
+  async getAssetFromChainRegistry(denom: string, decimals: number): Promise<AssetResponse> {
+    let contractAddr = '';
+    let symbol = '';
+    let type = 'native';
+    let price = { usd: 0, eur: 0 };
+    let name = '';
+    let logo_URI = '';
 
-    const asset: Asset | undefined = getBaseAssetByDenom(denom);
+    const asset: Asset | null = getBaseAssetByDenom(denom);
 
-    if (!asset) {
-      throw new Error(`Asset with denom ${denom} could not be found`);
+    if (asset) {
+      contractAddr = asset.address || contractAddr;
+      symbol = asset.symbol;
+      type = asset.type_asset || type;
+      price = await this.pricingQueryService.getCoinPrice(asset.coingecko_id);
+      name = asset.name || name;
+      logo_URI = this.determineAssetLogoURI(asset);
     }
 
-    const price = await this.pricingQueryService.getCoinPrice(asset.coingecko_id);
-    const decimals: number = asset.denom_units.reduce(
-      (acc, { exponent }) => (acc > exponent ? acc : exponent), 0);
-    const logo_URI = asset.logo_URIs?.svg || asset.logo_URIs?.png || '';
-
     return {
-      contract_addr: asset.address,
-      symbol: asset.symbol,
-      denom: asset.base,
-      type: 'native',
+      contract_addr: contractAddr,
+      symbol: symbol,
+      denom: denom,
+      type: type,
       decimals: decimals,
       price: `${price.usd}`,
-      name: asset.name,
+      name: name,
       logo_URI: logo_URI
-    } as StrategyAsset;
+    } as AssetResponse;
+  }
+
+  private determineAssetLogoURI(asset: Asset) {
+    return asset.logo_URIs?.svg || asset.logo_URIs?.png || '';
   }
 }

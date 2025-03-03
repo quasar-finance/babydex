@@ -98,7 +98,8 @@ export default {
                         name: 'Wrapped Ether',
                         reserve: '100000000000000'
                       },
-                      fee_tier: 2
+                      fee_tier: 2,
+                      liquidity_token: 'WBTC_WETH'
                     }]
                   }
                 }
@@ -153,81 +154,6 @@ export default {
         }
       }
     },
-    '/route': {
-      get: {
-        tags: ['Route'],
-        summary: 'Get the best route for a token pair',
-        description: 'Get the best route for a token pair represented as list of hops involved',
-        operationId: 'getRoute',
-        responses: {
-          '200': {
-            description: 'successful operation',
-            content: {
-              'application/json': {
-                schema: {
-                  type: 'object',
-                  properties: {
-                    'status': {
-                      'type': 'string',
-                      'enum': ['success', 'error']
-                    },
-                    'message': {
-                      'type': 'string'
-                    },
-                    'data': {
-                      'type': 'object',
-                      'items': {
-                        $ref: '#/components/schemas/route'
-                      }
-                    }
-                  },
-                  example: {
-                    'status': 'success',
-                    'message': '',
-                    'data': [{
-                      address: 'put_a_correct_address_example_here',
-                      token_in: 'WBTC',
-                      token_out: 'WETH',
-                      amount_out: '100000000000',
-                      slippage: '2'
-                    }]
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      parameters: [
-        {
-          name: 'token_in',
-          in: 'query',
-          required: true,
-          schema: {
-            type: 'string',
-            example: 'WBTC'
-          }
-        },
-        {
-          name: 'token_out',
-          in: 'query',
-          required: true,
-          schema: {
-            type: 'string',
-            example: 'WETH'
-          }
-        },
-        {
-          name: 'amount_in',
-          in: 'query',
-          required: true,
-          schema: {
-            type: 'string',
-            example: '1'
-          }
-        }
-      ]
-    }
   },
   components: {
     schemas: {
@@ -287,7 +213,10 @@ export default {
           fee_tier: {
             type: 'integer',
             format: 'int32'
-          }
+          },
+          liquidity_token: {
+            type: 'string'
+          },
         }
       },
       asset: {
@@ -317,37 +246,6 @@ export default {
             type: 'string'
           },
           logo_uri: {
-            type: 'string'
-          }
-        }
-      },
-      route: {
-        type: 'object',
-        properties: {
-          hops: {
-            type: 'array',
-            items: {
-              $ref: '#/components/schemas/hop'
-            }
-          }
-        }
-      },
-      hop: {
-        type: 'object',
-        properties: {
-          address: {
-            type: 'string'
-          },
-          token_in: {
-            type: 'string'
-          },
-          token_out: {
-            type: 'string'
-          },
-          amount_out: {
-            type: 'string'
-          },
-          slippage: {
             type: 'string'
           }
         }

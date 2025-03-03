@@ -1,6 +1,6 @@
 use cosmwasm_std::{
-    attr, ensure, wasm_execute, Addr, BankMsg, Deps, DepsMut, Env, MessageInfo, Order,
-    QuerierWrapper, ReplyOn, Response, StdError, StdResult, Storage, SubMsg, Uint128, Event,
+    attr, ensure, wasm_execute, Addr, BankMsg, Deps, DepsMut, Env, Event, MessageInfo, Order,
+    QuerierWrapper, ReplyOn, Response, StdError, StdResult, Storage, SubMsg, Uint128,
 };
 use itertools::Itertools;
 
@@ -91,12 +91,9 @@ pub fn claim_rewards(
         )?));
     }
 
-    let event = Event::new("claim_rewards")
-        .add_attributes(attrs);
+    let event = Event::new("claim_rewards").add_attributes(attrs);
 
-    Ok(Response::new()
-        .add_submessages(messages)
-        .add_event(event))
+    Ok(Response::new().add_submessages(messages).add_event(event))
 }
 
 /// Only factory can set the allocation points to zero for the specified pool.
@@ -224,7 +221,7 @@ pub fn incentivize(
         attr("start_ts", env.block.time.seconds().to_string()),
         attr("end_ts", schedule.end_ts.to_string()),
         attr("reward", schedule.reward_info.to_string()),
-        attr("rps",  schedule.rps.to_string()),
+        attr("rps", schedule.rps.to_string()),
     ];
 
     let lp_token_asset = determine_asset_info(&lp_token, deps.api)?;
@@ -342,8 +339,7 @@ pub fn incentivize_many(
         );
     }
 
-    let event = Event::new("incentivize_many")
-        .add_attribute("action", "incentivize_many");
+    let event = Event::new("incentivize_many").add_attribute("action", "incentivize_many");
 
     Ok(response.add_event(event))
 }
@@ -488,8 +484,7 @@ pub fn claim_orphaned_rewards(
         }
     }
 
-    let event = Event::new("claim_orphaned_rewards")
-        .add_attributes(attrs);
+    let event = Event::new("claim_orphaned_rewards").add_attributes(attrs);
 
     Ok(Response::new().add_submessages(messages).add_event(event))
 }

@@ -4,8 +4,8 @@ use std::vec;
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{
     attr, ensure, ensure_eq, from_json, wasm_execute, wasm_instantiate, Addr, Binary, CosmosMsg,
-    Decimal, Decimal256, DepsMut, Empty, Env, MessageInfo, Reply, Response, StdError, StdResult,
-    SubMsg, SubMsgResponse, SubMsgResult, Uint128, Event,
+    Decimal, Decimal256, DepsMut, Empty, Env, Event, MessageInfo, Reply, Response, StdError,
+    StdResult, SubMsg, SubMsgResponse, SubMsgResult, Uint128,
 };
 use cw2::set_contract_version;
 use cw20::{Cw20ExecuteMsg, Cw20ReceiveMsg, MinterResponse};
@@ -154,8 +154,7 @@ pub fn instantiate(
         INSTANTIATE_TOKEN_REPLY_ID,
     );
 
-    let event = Event::new("instantiate")
-        .add_attribute("action", "instantiate");
+    let event = Event::new("instantiate").add_attribute("action", "instantiate");
 
     Ok(Response::new().add_submessage(sub_msg).add_event(event))
 }
@@ -704,7 +703,10 @@ fn swap(
         .add_attribute("offer_amount", offer_asset.amount.to_string())
         .add_attribute("return_amount", return_amount.to_string())
         .add_attribute("spread_amount", spread_amount.to_string())
-        .add_attribute("commission_amount", swap_result.total_fee.to_uint(ask_asset_prec)?.to_string())
+        .add_attribute(
+            "commission_amount",
+            swap_result.total_fee.to_uint(ask_asset_prec)?.to_string(),
+        )
         .add_attribute("maker_fee_amount", maker_fee.to_string())
         .add_attribute("fee_share_amount", fee_share_amount.to_string());
 

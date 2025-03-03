@@ -6,9 +6,9 @@ use std::vec;
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{
     attr, ensure_eq, from_json, to_json_binary, wasm_execute, wasm_instantiate, Addr, Binary,
-    CosmosMsg, CustomMsg, CustomQuery, Decimal, Decimal256, Deps, DepsMut, Empty, Env, Fraction,
-    Isqrt, MessageInfo, QuerierWrapper, Reply, Response, StdError, StdResult, SubMsg,
-    SubMsgResponse, SubMsgResult, Uint128, Uint256, WasmMsg, Event,
+    CosmosMsg, CustomMsg, CustomQuery, Decimal, Decimal256, Deps, DepsMut, Empty, Env, Event,
+    Fraction, Isqrt, MessageInfo, QuerierWrapper, Reply, Response, StdError, StdResult, SubMsg,
+    SubMsgResponse, SubMsgResult, Uint128, Uint256, WasmMsg,
 };
 use cw2::set_contract_version;
 use cw20::{Cw20ExecuteMsg, Cw20ReceiveMsg, MinterResponse};
@@ -380,9 +380,7 @@ pub fn provide_liquidity(
 
     let event = Event::new("provide_liquidity").add_attributes(attrs);
 
-    Ok(Response::new()
-        .add_messages(messages)
-        .add_event(event))
+    Ok(Response::new().add_messages(messages).add_event(event))
 }
 
 /// Mint LP tokens for a beneficiary and auto stake the tokens in the Incentive contract (if auto staking is specified).
@@ -511,9 +509,7 @@ pub fn withdraw_liquidity(
 
     let event = Event::new("withdraw_liquidity").add_attributes(attrs);
 
-    Ok(Response::new()
-        .add_messages(messages)
-        .add_event(event))
+    Ok(Response::new().add_messages(messages).add_event(event))
 }
 
 /// Returns the amount of pool assets that correspond to an amount of LP tokens.
@@ -693,9 +689,7 @@ pub fn swap(
 
     let event = Event::new("swap").add_attributes(attrs);
 
-    Ok(Response::new()
-        .add_messages(messages)
-        .add_event(event))
+    Ok(Response::new().add_messages(messages).add_event(event))
 }
 
 /// Updates the pool configuration with the specified parameters in the `params` variable.
@@ -737,9 +731,10 @@ pub fn update_config(
 
             CONFIG.save(deps.storage, &config)?;
 
-            event = event.add_attribute("action", "enable_fee_share")
-                         .add_attribute("fee_share_bps", fee_share_bps.to_string())
-                         .add_attribute("fee_share_address", fee_share_address);
+            event = event
+                .add_attribute("action", "enable_fee_share")
+                .add_attribute("fee_share_bps", fee_share_bps.to_string())
+                .add_attribute("fee_share_address", fee_share_address);
         }
         XYKPoolUpdateParams::DisableFeeShare => {
             // Disable fee sharing for this contract by setting bps and

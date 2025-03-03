@@ -2,13 +2,13 @@ use std::collections::HashSet;
 
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
+use cosmwasm_std::Event;
 use cosmwasm_std::{
     attr, ensure, from_json, Addr, DepsMut, Env, MessageInfo, Response, StdError, StdResult,
     Uint128,
 };
 use cw_utils::one_coin;
 use itertools::Itertools;
-use cosmwasm_std::Event;
 
 use astroport::asset::{
     addr_opt_validate, determine_asset_info, validate_native_denom, Asset, AssetInfo, AssetInfoExt,
@@ -249,7 +249,9 @@ fn withdraw(
             user_info.save(deps.storage, &info.sender, &lp_token_asset)?;
         }
 
-        let transfer_msg = lp_token_asset.with_balance(amount).into_msg(info.sender.clone())?;
+        let transfer_msg = lp_token_asset
+            .with_balance(amount)
+            .into_msg(info.sender.clone())?;
 
         let event = Event::new("withdraw")
             .add_attribute("action", "withdraw")

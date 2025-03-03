@@ -3,8 +3,8 @@ use std::collections::HashSet;
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{
-    to_json_binary, Binary, Deps, DepsMut, Env, MessageInfo, Order, Reply, Response,
-    StdError, StdResult, SubMsg, SubMsgResponse, SubMsgResult, WasmMsg, Event,
+    to_json_binary, Binary, Deps, DepsMut, Env, Event, MessageInfo, Order, Reply, Response,
+    StdError, StdResult, SubMsg, SubMsgResponse, SubMsgResult, WasmMsg,
 };
 use cw2::set_contract_version;
 use cw_storage_plus::Bound;
@@ -218,8 +218,7 @@ pub fn execute_update_config(
 
     CONFIG.save(deps.storage, &config)?;
 
-    let event = Event::new("update_config")
-        .add_attribute("action", "update_config");
+    let event = Event::new("update_config").add_attribute("action", "update_config");
 
     Ok(Response::new().add_event(event))
 }
@@ -253,8 +252,7 @@ pub fn execute_update_pair_config(
         &pair_config,
     )?;
 
-    let event = Event::new("update_pair_config")
-        .add_attribute("action", "update_pair_config");
+    let event = Event::new("update_pair_config").add_attribute("action", "update_pair_config");
 
     Ok(Response::new().add_event(event))
 }

@@ -473,7 +473,11 @@ fn create_pair() {
     .unwrap();
 
     assert_eq!(
-        res.events.iter().find(|e| e.ty == "create_pair").unwrap().attributes,
+        res.events
+            .iter()
+            .find(|e| e.ty == "create_pair")
+            .unwrap()
+            .attributes,
         vec![
             attr("action", "create_pair"),
             attr("pair", "asset0000-asset0001")

@@ -15,9 +15,8 @@ controller.get('/assets', async (req: Request, res: Response, next: NextFunction
   try {
     const { chainId, contractAddress } = req.query;
     const assets = await assetService.getNativeTokens(chainId as string, contractAddress as string);
-    res.send(
+    res.status(200).send(
       {
-        status: 'success',
         data: assets
       }
     );

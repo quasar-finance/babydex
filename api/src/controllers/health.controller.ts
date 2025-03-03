@@ -7,7 +7,7 @@ const controller = Router();
 const pjson = JSON.parse(readFileSync('./package.json', 'utf-8'));
 
 controller.get('/health', (req: Request, res: Response) => {
-  res.send({
+  res.status(200).send({
     name: pjson.name,
     version: pjson.version
   });

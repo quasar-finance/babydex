@@ -10,7 +10,6 @@ export class MockPricingQueryService implements PricingQueryService {
   async getCoinPrice(_coinId?: string): Promise<{ usd: number; eur: number }> {
     return Promise.resolve({ eur: 1, usd: 2 });
   }
-
 }
 
 export class PricingQueryServiceFactory {

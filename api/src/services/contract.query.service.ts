@@ -10,11 +10,11 @@ import {
 const { NODE_ENV } = process.env;
 
 export interface ContractQueryService {
-  queryContract<T = any>(chainId: string, contractAddress: string, queryMsg: Record<string, unknown>): Promise<T>;
+  queryContract<T = any>(restUrl: string, contractAddress: string, queryMsg: Record<string, unknown>): Promise<T>;
 }
 
 export class MockContractQueryService implements ContractQueryService {
-  async queryContract<T = any>(_chainId: string, _contractAddress: string, queryMsg: Record<string, unknown>): Promise<T> {
+  async queryContract<T = any>(_restUrl: string, _contractAddress: string, queryMsg: Record<string, unknown>): Promise<T> {
     if (queryMsg.hasOwnProperty('native_tokens')) {
       return coin_response as T;
     }

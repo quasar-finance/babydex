@@ -4,6 +4,7 @@ import { Controller } from '~/interfaces/controller';
 import RedisService from '~/services/redis.service';
 import { ContractQueryServiceFactory } from '~/services/contract.query.service';
 import { PricingQueryServiceFactory } from '~/services/pricing.query.service';
+import { CONTRACT_ADDRESSES } from '~/utils/constant';
 
 const controller = Router();
 const contractQueryService = ContractQueryServiceFactory.getInstance();
@@ -13,7 +14,8 @@ const assetService = new AssetService(contractQueryService, pricingQueryService,
 
 controller.get('/assets', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { chainId, contractAddress } = req.query;
+    const { chainId } = req.query;
+    const contractAddress = CONTRACT_ADDRESSES['testnet']['coin_registry'];
     const assets = await assetService.getNativeTokens(chainId as string, contractAddress as string);
     res.status(200).send(
       {

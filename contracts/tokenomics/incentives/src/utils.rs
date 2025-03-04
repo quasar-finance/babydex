@@ -177,7 +177,7 @@ pub fn deactivate_blocked_pools(deps: DepsMut, env: Env) -> Result<Response, Con
             to_remove.push(lp_token_asset.clone());
 
             attrs.extend([
-                attr("action", "deactivate_pool"),
+                attr("action", "deactivate_blocked_pools"),
                 attr("lp_token", lp_token_asset.to_string()),
             ]);
         }

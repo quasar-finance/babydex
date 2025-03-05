@@ -1,31 +1,29 @@
-import {
-  appRouter,
-  createCallerFactory,
-  createTRPCPublicProcedure,
-  createTRPCRouter,
-} from "../config.js";
+import { createCallerFactory, createTRPCPublicProcedure, createTRPCRouter } from "../config.js";
+
+import { appRouter } from "../router.js";
 
 import type { BaseCurrency, PairInfo, PoolResponse } from "@towerfi/types";
 
 export const poolsRouter = createTRPCRouter({
   getPools: createTRPCPublicProcedure.query(async ({ ctx }) => {
     const { publicClient, contracts } = ctx;
-    const pools: PairInfo[] =
-      await publicClient.request.wasm.queryContractSmart(contracts.factory, {
+    const pools: PairInfo[] = await publicClient.request.wasm.queryContractSmart(
+      contracts.factory,
+      {
         pairs: {},
-      });
+      },
+    );
 
     const caller = createCallerFactory(appRouter)(ctx);
 
     return await Promise.all(
       pools.map(async (pool) => {
-        const info: PoolResponse =
-          await publicClient.request.wasm.queryContractSmart(
-            pool.contract_addr,
-            {
-              pool: {},
-            }
-          );
+        const info: PoolResponse = await publicClient.request.wasm.queryContractSmart(
+          pool.contract_addr,
+          {
+            pool: {},
+          },
+        );
         const [
           {
             native_token: { denom: denom1 },
@@ -53,7 +51,7 @@ export const poolsRouter = createTRPCRouter({
 
           rewards: [],
         };
-      })
+      }),
     );
   }),
 });

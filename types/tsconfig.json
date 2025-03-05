@@ -18,7 +18,8 @@
         "composite": true,
         "declarationMap": true,
         "outDir": "build",
-        "rootDir": "src"
+        "rootDir": "src",
+        "incremental": true
     },
     "include": [
         "src",

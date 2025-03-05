@@ -2,7 +2,7 @@ import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import { createRedisService } from "../services/redis.js";
 import { createCoingeckoService } from "../services/coingecko.js";
 
-import { appRouter } from "../config.js";
+import { appRouter } from "../router.js";
 
 interface Env {
   CONTRACTS: string;

@@ -20,7 +20,7 @@
   "scripts": {
     "worker:deploy": "wrangler deploy",
     "worker:dev": "wrangler dev",
-    "dev:": "tsc -w",
+    "dev": "tsc -w",
     "build": "tsc"
   },
   "devDependencies": {
@@ -33,7 +33,6 @@
     "@trpc/server": "^10.45.2",
     "ky": "^1.7.5",
     "lru-cache": "^11.0.2",
-    "redis": "^4.7.0",
     "superjson": "^2.2.2",
     "zod": "^3.24.2"
   }

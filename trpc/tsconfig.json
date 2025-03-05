@@ -19,6 +19,7 @@
         "declarationMap": true,
         "outDir": "build",
         "rootDir": "src",
+        "incremental": true
     },
     "include": [
         "src",

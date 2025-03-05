@@ -15,10 +15,20 @@ target/
 # Auto-gen
 .cargo-ok
 /scripts/.env
-*/node_modules/*
 #/scripts/package-lock.json
 /artifacts/
 /contracts/**/schema/
 /e2e/config.json
 
 **/keys/**
+
+
+# UI
+**/.wrangler
+**/.next
+**/.vercel
+**/.turbo
+**/build
+**/node_modules
+**/tsconfig.tsbuildinfo
+next-env.d.ts

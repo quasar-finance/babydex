@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Avatar from "../atoms/Avatar";
 import { Button } from "../atoms/Button";
 import { useModal } from "~/app/providers/ModalProvider";
@@ -10,7 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@heroui/react";
 import { twMerge } from "~/utils/twMerge";
 import CopyMessage from "../atoms/CopyMessage";
 import { IconCopy, IconLogout } from "@tabler/icons-react";
-import { useAccount } from "~/app/hooks/useAccount";
+import { useAccount } from "wagmi";
 
 const ConnectWallet: React.FC = () => {
   const { showModal } = useModal();
@@ -33,7 +33,7 @@ const ConnectWallet: React.FC = () => {
             </PopoverTrigger>
             <PopoverContent
               className={twMerge(
-                "min-w-[20rem] border border-tw-gray-900 bg-tw-bg rounded-xl py-2 relative overflow-hidden p-2 flex items-start flex-col gap-3"
+                "min-w-[20rem] border border-tw-gray-900 bg-tw-bg rounded-xl py-2 relative overflow-hidden p-2 flex items-start flex-col gap-3",
               )}
             >
               <h3 className="text-sm text-tw-gray-200">
@@ -48,8 +48,7 @@ const ConnectWallet: React.FC = () => {
                   />
                   <div className="flex flex-col">
                     <p className="text-xs">
-                      <span className=" text-tw-orange-400">{connector?.name}</span>
-                      {` `}connector
+                      <span className=" text-tw-orange-400">{connector?.name}</span> connector
                     </p>
                     <CopyMessage textToCopy={address || ""}>
                       <p className=" flex gap-2">

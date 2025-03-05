@@ -1,16 +1,16 @@
 "use client";
 
 import { IconChevronDown, IconSettingsFilled } from "@tabler/icons-react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../atoms/Button";
 import { ModalTypes } from "~/types/modal";
 import { useModal } from "~/app/providers/ModalProvider";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import RotateButton from "../atoms/RotateButton";
 import { mockTokens } from "~/utils/consts";
 import SwapInfoAccordion from "../molecules/Swap/SwapInfoAccordion";
-import { useAccount } from "~/app/hooks";
 import { trpc } from "~/trpc/client";
+import { useAccount } from "wagmi";
 
 const SwapComponent: React.FC = () => {
   const [fromToken, setFromToken] = useState(mockTokens[0]);
@@ -31,7 +31,11 @@ const SwapComponent: React.FC = () => {
       <div className="w-full flex-1 flex items-center justify-center bg-tw-sub-bg rounded-2xl p-2 flex-col">
         <div className="flex items-center justify-between w-full p-4">
           <p className="text-xl">Swap </p>
-          <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => showModal(ModalTypes.swap_settings, true)}>
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => showModal(ModalTypes.swap_settings, true)}
+          >
             <IconSettingsFilled className="w-5 h-5" />
           </motion.button>
         </div>
@@ -73,7 +77,12 @@ const SwapComponent: React.FC = () => {
             Connect wallet
           </Button>
         )}
-        <SwapInfoAccordion fee={1.54} minimumReceived="0.345 BTC" priceImpact={-0.034} maxSlippage={1} />
+        <SwapInfoAccordion
+          fee={1.54}
+          minimumReceived="0.345 BTC"
+          priceImpact={-0.034}
+          maxSlippage={1}
+        />
       </div>
     </div>
   );

@@ -1,23 +1,9 @@
-import { AnyRouter, initTRPC } from "@trpc/server";
-import { TRPCClientError, TRPCLink } from "@trpc/client";
+import { initTRPC } from "@trpc/server";
 import { observable } from "@trpc/server/observable";
-import { Client } from "~/types/client";
-import { BaseCurrency } from "~/types/currency";
-import { Cache } from "~/types/cache";
-import { CoingeckoServiceReturnType } from "~/services/coingecko";
+import { TRPCClientError, type TRPCLink } from "@trpc/client";
 
-export type ContextOptions = {
-  publicClient: Client<"tendermint">;
-  assets: Record<string, BaseCurrency>;
-  cacheService: Cache;
-  coingeckoService: CoingeckoServiceReturnType;
-  contracts: {
-    coinRegistry: string;
-    factory: string;
-    incentives: string;
-    router: string;
-  };
-};
+import type { AnyRouter } from "@trpc/server";
+import type { ContextOptions } from "@towerfi/trpc";
 
 export const createInnerTRPCContext = (opts: ContextOptions) => {
   return opts;

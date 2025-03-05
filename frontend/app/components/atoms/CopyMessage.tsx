@@ -1,13 +1,20 @@
 import clsx from "clsx";
-import React, { HTMLAttributes, PropsWithChildren, useState } from "react";
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { motion } from "motion/react";
 import { copyToClipboard } from "~/utils/browser";
+
+import type { HTMLAttributes, PropsWithChildren } from "react";
 
 interface Props {
   textToCopy: string;
 }
 
-const CopyMessage: React.FC<HTMLAttributes<HTMLDivElement> & PropsWithChildren<Props>> = ({ textToCopy, children, className, ...props }) => {
+const CopyMessage: React.FC<HTMLAttributes<HTMLDivElement> & PropsWithChildren<Props>> = ({
+  textToCopy,
+  children,
+  className,
+  ...props
+}) => {
   const [toolTipVisible, setToolTipVisible] = useState(false);
 
   const handlerCopy = (text: string) => {

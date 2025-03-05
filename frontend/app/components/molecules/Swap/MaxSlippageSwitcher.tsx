@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { motion } from "motion/react";
 import { twMerge } from "~/utils/twMerge";
 
 interface Props {
@@ -31,14 +31,17 @@ const MaxSlippageSwitcher: React.FC<Props> = ({ maxSlippage, setMaxSlippage, cus
     <motion.div className="bg-white/5 p-1 relative flex h-[38px] rounded-full">
       <motion.button
         onClick={handleChangeAuto}
-        className={twMerge("rounded-full px-2 transition-all duration-300", custom ? "text-white/50" : "text-tw-orange-400 bg-orange-400/10")}
+        className={twMerge(
+          "rounded-full px-2 transition-all duration-300",
+          custom ? "text-white/50" : "text-tw-orange-400 bg-orange-400/10",
+        )}
       >
         Auto
       </motion.button>
       <motion.button
         className={twMerge(
           "rounded-full flex gap-1 items-center px-2 transition-all duration-300",
-          custom ? "text-tw-orange-400 bg-orange-400/10" : "text-white/50"
+          custom ? "text-tw-orange-400 bg-orange-400/10" : "text-white/50",
         )}
       >
         <input

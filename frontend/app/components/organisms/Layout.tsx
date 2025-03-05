@@ -1,11 +1,12 @@
 "use client";
-import React, { PropsWithChildren } from "react";
 import Link from "next/link";
 import ConnectWallet from "../molecules/ConnectWallet";
 import { navLinks } from "~/utils/consts";
 import { usePathname } from "next/navigation";
 import { twMerge } from "~/utils/twMerge";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
+
+import type { PropsWithChildren } from "react";
 
 const Layout: React.FC<PropsWithChildren> = ({ children }) => {
   const pathname = usePathname();
@@ -15,7 +16,11 @@ const Layout: React.FC<PropsWithChildren> = ({ children }) => {
         <div className="flex gap-6 items-center justify-between max-w-[84.5rem] mx-auto px-2">
           <div className="flex gap-10 items-center justify-center">
             <Link href="/">
-              <img className="max-h-[2.3rem] object-cover" src="/towerfi-logo.svg" />
+              <img
+                className="max-h-[2.3rem] object-cover"
+                src="/towerfi-logo.svg"
+                alt="towerfi-logo"
+              />
             </Link>
             <motion.ul className="flex gap-4 flex-1 text-base ">
               {navLinks.map(({ label, to, isDisabled, isExternal }) => {
@@ -23,14 +28,21 @@ const Layout: React.FC<PropsWithChildren> = ({ children }) => {
                 return (
                   <li className="relative px-4" key={`navLink-${to}`}>
                     <Link
-                      className={twMerge("", !isActive && "opacity-80", isDisabled && "cursor-not-allowed")}
+                      className={twMerge(
+                        "",
+                        !isActive && "opacity-80",
+                        isDisabled && "cursor-not-allowed",
+                      )}
                       href={isDisabled ? "" : to}
                       target={isExternal ? "_blank" : ""}
                     >
                       {label}
                     </Link>
                     {isActive ? (
-                      <motion.div className="w-full h-[1px] bg-tw-orange-400 absolute bottom-[-33px] left-0" layoutId="underline" />
+                      <motion.div
+                        className="w-full h-[1px] bg-tw-orange-400 absolute bottom-[-33px] left-0"
+                        layoutId="underline"
+                      />
                     ) : null}
                   </li>
                 );

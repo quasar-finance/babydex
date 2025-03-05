@@ -1,5 +1,5 @@
 "use client";
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { createAvatar } from "@dicebear/core";
 import { identicon } from "@dicebear/collection";
 import { twMerge } from "~/utils/twMerge";

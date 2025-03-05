@@ -1,4 +1,11 @@
-import { IconAlertTriangle, IconCircleCheck, IconInfoSquare, IconLoader, IconSquareCheckFilled, IconX } from "@tabler/icons-react";
+import {
+  IconAlertTriangle,
+  IconCircleCheck,
+  IconInfoSquare,
+  IconLoader,
+  IconSquareCheckFilled,
+  IconX,
+} from "@tabler/icons-react";
 import { twMerge } from "~/utils/twMerge";
 import { Spinner } from "./Spinner";
 
@@ -41,13 +48,24 @@ const classNames = {
   info: "text-tw-info",
 };
 
-export const ToastCustom: React.FC<Props> = ({ title, description, component: Component, type, close }) => {
+export const ToastCustom: React.FC<Props> = ({
+  title,
+  description,
+  component: Component,
+  type,
+  close,
+}) => {
   const { Icon, classname: IconClassName } = Icons[type as keyof typeof Icons];
 
   return (
     <div className="bg-tw-gray-950 max-w-[19rem] md:min-w-[19rem] rounded-xl">
       <div className="p-4 border-dashed border-b-1 border-b-white/10 flex items-center justify-between w-full">
-        <div className={twMerge("flex gap-1 items-center text-sm", classNames[type as keyof typeof classNames])}>
+        <div
+          className={twMerge(
+            "flex gap-1 items-center text-sm",
+            classNames[type as keyof typeof classNames],
+          )}
+        >
           {type === "loading" ? <Spinner size="sm" /> : <Icon className={twMerge(IconClassName)} />}
           <p>{title}</p>
         </div>

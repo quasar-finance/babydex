@@ -1,4 +1,4 @@
-import _toast, { ToastOptions } from "react-hot-toast";
+import _toast, { type ToastOptions } from "react-hot-toast";
 import { ToastCustom } from "~/app/components/atoms/ToastCustom";
 
 export type ToastMsg = {
@@ -54,29 +54,60 @@ function success(toastMsg: ToastMsg = {}, options?: ToastOptions) {
 const error = (toastMsg: ToastMsg = {}, options?: ToastOptions) =>
   _toast.custom((t) => {
     const msg = { ...defaultMsgs.error, ...toastMsg };
-    return <ToastCustom close={() => _toast.dismiss(t.id)} title={msg.title as string} description={msg.description} type="error" />;
+    return (
+      <ToastCustom
+        close={() => _toast.dismiss(t.id)}
+        title={msg.title as string}
+        description={msg.description}
+        type="error"
+      />
+    );
   }, options);
 
 const warning = (toastMsg: ToastMsg = {}, options?: ToastOptions) =>
   _toast.custom((t) => {
     const msg = { ...defaultMsgs.error, ...toastMsg };
-    return <ToastCustom close={() => _toast.dismiss(t.id)} title={msg.title as string} description={msg.description} type="warning" />;
+    return (
+      <ToastCustom
+        close={() => _toast.dismiss(t.id)}
+        title={msg.title as string}
+        description={msg.description}
+        type="warning"
+      />
+    );
   }, options);
 
 const info = (toastMsg: ToastMsg = {}, options?: ToastOptions) =>
   _toast.custom((t) => {
     const msg = { ...defaultMsgs.error, ...toastMsg };
-    return <ToastCustom close={() => _toast.dismiss(t.id)} title={msg.title as string} description={msg.description} type="info" />;
+    return (
+      <ToastCustom
+        close={() => _toast.dismiss(t.id)}
+        title={msg.title as string}
+        description={msg.description}
+        type="info"
+      />
+    );
   }, options);
 
 const loading = (toastMsg: ToastMsg = {}, options?: ToastOptions) =>
   _toast.custom((t) => {
     const msg = { ...defaultMsgs.loading, ...toastMsg };
-    return <ToastCustom close={() => _toast.dismiss(t.id)} title={msg.title as string} description={msg.description} type="loading" />;
+    return (
+      <ToastCustom
+        close={() => _toast.dismiss(t.id)}
+        title={msg.title as string}
+        description={msg.description}
+        type="loading"
+      />
+    );
   }, options);
 
-const promise = async function <T>(promise: Promise<T>, toastMsgs: ToastMsgs = {}, delay?: number) {
-  const id = loading({ ...defaultMsgs.loading, ...toastMsgs?.loading }, { duration: Infinity, id: crypto.randomUUID() });
+const promise = async <T,>(promise: Promise<T>, toastMsgs: ToastMsgs = {}, delay?: number) => {
+  const id = loading(
+    { ...defaultMsgs.loading, ...toastMsgs?.loading },
+    { duration: Number.POSITIVE_INFINITY, id: crypto.randomUUID() },
+  );
 
   return promise
     .then(async (result) => {

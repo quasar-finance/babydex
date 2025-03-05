@@ -1,1 +1,0 @@
-export { ModalTypes } from "./modal";

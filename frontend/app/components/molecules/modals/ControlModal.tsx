@@ -1,13 +1,17 @@
-import React, { useMemo } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { useMemo } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import { useModal } from "~/app/providers/ModalProvider";
 import { modals } from "~/utils/modal";
 
 const ControlModal: React.FC = () => {
   const { activeModal, isModalVisible, hideModal, allowClose, modalProps } = useModal();
-  const Modal = useMemo(() => modals[activeModal as unknown as keyof typeof modals], [activeModal]);
+  const Modal: React.FC<any> = useMemo(
+    () => modals[activeModal as unknown as keyof typeof modals],
+    [activeModal],
+  );
 
-  if (!isModalVisible || !activeModal) return <AnimatePresence initial={false} mode="wait" onExitComplete={() => null} />;
+  if (!isModalVisible || !activeModal)
+    return <AnimatePresence initial={false} mode="wait" onExitComplete={() => null} />;
 
   return (
     <AnimatePresence initial={false} mode="wait" onExitComplete={() => null}>

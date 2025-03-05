@@ -4,28 +4,40 @@ export function IntlAddress(address: string): string {
   return address.slice(0, 4).concat("...") + address.substring(address.length - 6);
 }
 
-export function convertMicroDenomToDenom(amount?: number | string, decimals = 6, fixed = 2, rounded = true) {
+export function convertMicroDenomToDenom(
+  amount?: number | string,
+  decimals = 6,
+  fixed = 2,
+  rounded = true,
+) {
   if (!amount) return 0;
   if (typeof amount === "string") {
     amount = Number(amount);
   }
 
-  amount = amount / Math.pow(10, decimals);
+  amount = amount / 10 ** decimals;
 
   if (rounded) {
-    const factor = Math.pow(10, fixed);
+    const factor = 10 ** fixed;
     amount = Math.floor(amount * factor) / factor;
   }
 
-  return isNaN(amount) ? 0 : Number(amount.toFixed(fixed));
+  return Number.isNaN(amount) ? 0 : Number(amount.toFixed(fixed));
 }
 
 export function convertDenomToMicroDenom(amount: number | string, decimals = 6): string {
-  const result = BigNumber(amount).multipliedBy(new BigNumber(10).pow(decimals)).integerValue(BigNumber.ROUND_FLOOR);
+  const result = BigNumber(amount)
+    .multipliedBy(new BigNumber(10).pow(decimals))
+    .integerValue(BigNumber.ROUND_FLOOR);
   return result.isNaN() ? "0" : result.toFixed();
 }
 
-export function formatCurrency(number: number, currency: "usd" | "eur", minDigits?: number, maxDigits?: number) {
+export function formatCurrency(
+  number: number,
+  currency: "usd" | "eur",
+  minDigits?: number,
+  maxDigits?: number,
+) {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: currency,
@@ -57,13 +69,14 @@ export function nFormatter(num: number, digits: number, digitsFrom?: number) {
     { value: 1e18, symbol: "E" },
   ];
   const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
-  var item = lookup
+  const item = lookup
     .slice()
     .reverse()
-    .find(function (item) {
-      return num >= item.value;
-    });
-  return item ? (num / item.value).toFixed(item.value < (digitsFrom || 1e6) ? 0 : digits).replace(rx, "$1") + item.symbol : "0";
+    .find((item) => num >= item.value);
+  return item
+    ? (num / item.value).toFixed(item.value < (digitsFrom || 1e6) ? 0 : digits).replace(rx, "$1") +
+        item.symbol
+    : "0";
 }
 
 export function graphDateFormatter(date: string, format: "month"): string {
@@ -89,5 +102,7 @@ export const toPercentage = (num: string | number, decimals = 0): string => {
   const percentage = Number(num) * 100;
   if (percentage < 1 && percentage > 0) return `${percentage.toFixed(1)}%`;
 
-  return decimals ? `${percentage.toFixed(decimals)}%` : `${Math.floor(percentage).toFixed(decimals)}%`;
+  return decimals
+    ? `${percentage.toFixed(decimals)}%`
+    : `${Math.floor(percentage).toFixed(decimals)}%`;
 };

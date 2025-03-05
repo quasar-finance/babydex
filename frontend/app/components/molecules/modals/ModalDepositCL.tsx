@@ -1,5 +1,6 @@
-import React from "react";
 import BasicModal from "~/app/components/templates/BasicModal";
+
+import type React from "react";
 
 const ModalDepositCL: React.FC = () => {
   return (

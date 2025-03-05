@@ -1,0 +1,8 @@
+packages:
+  - "trpc"
+  - "frontend"
+  - "types"
+
+catalog:
+  "typescript": "^5.8.2"
+  "wrangler": "^3.112.0"

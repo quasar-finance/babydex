@@ -1,7 +1,8 @@
 "use client";
-import React from "react";
-import { useToast } from "~/app/hooks/useToast";
+import { useToast } from "~/app/hooks";
 import { Button } from "../atoms/Button";
+
+import type React from "react";
 
 const TestToasts: React.FC = () => {
   const { toast } = useToast();

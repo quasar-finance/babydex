@@ -1,5 +1,5 @@
 import { IconChevronDown } from "@tabler/icons-react";
-import React, { useState } from "react";
+import { useState } from "react";
 import IconCoins from "~/app/components/atoms/icons/IconCoins";
 import { twMerge } from "~/utils/twMerge";
 
@@ -17,7 +17,7 @@ const SwapInfoAccordion: React.FC<Props> = ({ fee, maxSlippage, minimumReceived,
     <div
       className={twMerge(
         "w-full flex flex-col gap-3 relative overflow-hidden transition-all duration-300 h-[1.5rem] text-white/50 text-sm cursor-pointer",
-        expanded ? "h-[6.625rem]" : "h-4"
+        expanded ? "h-[6.625rem]" : "h-4",
       )}
       onClick={() => setExpanded(!expanded)}
     >
@@ -27,7 +27,12 @@ const SwapInfoAccordion: React.FC<Props> = ({ fee, maxSlippage, minimumReceived,
           <IconCoins className="" />
           <p>Fee (0.25%)</p>
           <p className="text-white">${fee}</p>
-          <IconChevronDown className={twMerge("w-6 h-6 transition-all duration-300", expanded ? "rotate-180" : "rotate-0")} />
+          <IconChevronDown
+            className={twMerge(
+              "w-6 h-6 transition-all duration-300",
+              expanded ? "rotate-180" : "rotate-0",
+            )}
+          />
         </div>
       </div>
       <div className="flex items-center justify-between h-4">

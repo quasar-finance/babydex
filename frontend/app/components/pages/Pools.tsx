@@ -1,5 +1,4 @@
 "use client";
-import React from "react";
 import Input from "../atoms/Input";
 import { mockPools } from "~/utils/consts";
 import { Button } from "../atoms/Button";
@@ -9,6 +8,8 @@ import AssetsStacked from "../atoms/AssetsStacked";
 import { useModal } from "~/app/providers/ModalProvider";
 import { ModalTypes } from "~/types/modal";
 import { trpc } from "~/trpc/client";
+
+import type React from "react";
 
 const Pools: React.FC = () => {
   const { showModal } = useModal();
@@ -43,7 +44,7 @@ const Pools: React.FC = () => {
               key={pool.name + i}
               className={twMerge(
                 "border first:rounded-t-2xl last:rounded-b-2xl border-b-0 last:border-b-1 border-white/10 p-4 grid items-center",
-                gridClass
+                gridClass,
               )}
             >
               <div className=" flex items-center gap-3">
@@ -56,7 +57,10 @@ const Pools: React.FC = () => {
               <div className="">-</div>
               <div className="">-</div>
               <div className=" flex items-end justify-end">
-                <Button variant="flat" onPress={() => showModal(ModalTypes.deposit_lp, true, { pool })}>
+                <Button
+                  variant="flat"
+                  onPress={() => showModal(ModalTypes.deposit_lp, true, { pool })}
+                >
                   Add Liquidity
                 </Button>
               </div>

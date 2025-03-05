@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { motion } from "motion/react";
 import IconRepeatArrow from "./icons/IconRepeatArrow";
 
 interface RotateButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {}

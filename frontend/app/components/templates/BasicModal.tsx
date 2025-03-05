@@ -1,9 +1,10 @@
-import React, { PropsWithChildren, ReactNode } from "react";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { useModal } from "~/app/providers/ModalProvider";
 import { IconX } from "@tabler/icons-react";
 import { twMerge } from "~/utils/twMerge";
 import Divider from "../atoms/Divider";
+
+import type { PropsWithChildren, ReactNode } from "react";
 
 export const modalDropIn = {
   hidden: {
@@ -36,12 +37,21 @@ interface Props {
   };
 }
 
-const BasicModal: React.FC<PropsWithChildren<Props>> = ({ children, title, subtitle, classNames, separator = true }) => {
+const BasicModal: React.FC<PropsWithChildren<Props>> = ({
+  children,
+  title,
+  subtitle,
+  classNames,
+  separator = true,
+}) => {
   const { hideModal } = useModal();
   return (
     <motion.div
       onClick={(e) => e.stopPropagation()}
-      className={twMerge("rounded-xl max-w-[480px] w-full bg-tw-gray-950 flex flex-col border-1 border-white/10 relative", classNames?.wrapper)}
+      className={twMerge(
+        "rounded-xl max-w-[480px] w-full bg-tw-gray-950 flex flex-col border-1 border-white/10 relative",
+        classNames?.wrapper,
+      )}
       variants={modalDropIn}
       initial="hidden"
       animate="visible"
@@ -51,15 +61,23 @@ const BasicModal: React.FC<PropsWithChildren<Props>> = ({ children, title, subti
         className={twMerge(
           "flex justify-between w-full ",
           { "items-center p-4": (title && subtitle) || title },
-          { "items-start p-4": title && subtitle }
+          { "items-start p-4": title && subtitle },
         )}
       >
         <div className="flex flex-col gap-1">
           {title && <p>{title}</p>}
-          {typeof subtitle === "string" ? <p className="text-xs text-tw-gray-500">{subtitle}</p> : subtitle}
+          {typeof subtitle === "string" ? (
+            <p className="text-xs text-tw-gray-500">{subtitle}</p>
+          ) : (
+            subtitle
+          )}
         </div>
-        <button onClick={hideModal}>
-          <IconX className={twMerge("h-5 w-5 text-white/20", { "absolute right-4 top-4": !title && !subtitle })} />
+        <button onClick={hideModal} type="button">
+          <IconX
+            className={twMerge("h-5 w-5 text-white/20", {
+              "absolute right-4 top-4": !title && !subtitle,
+            })}
+          />
         </button>
       </div>
       {separator && <Divider />}

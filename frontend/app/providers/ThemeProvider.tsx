@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, PropsWithChildren, useEffect } from "react";
+import { useCallback, type PropsWithChildren, useEffect, createContext, useContext } from "react";
 import { useLocalStorage } from "react-use";
 import { HeroUIProvider } from "@heroui/react";
 
@@ -8,13 +8,15 @@ interface AppStatus {
   changeTheme: (curr: "dark" | "light") => void;
 }
 
-const AppContext = React.createContext<AppStatus | null>(null);
+const AppContext = createContext<AppStatus | null>(null);
 
-export const ThemeProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
+export const ThemeProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const [theme, setTheme] = useLocalStorage<"dark" | "light">("theme");
 
   useEffect(() => {
-    const systemTheme = window?.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    const systemTheme = window?.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
     setTheme(systemTheme ? systemTheme : "dark");
   }, [theme, setTheme]);
 
@@ -22,7 +24,7 @@ export const ThemeProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => 
     (curr: "dark" | "light") => {
       setTheme(curr);
     },
-    [setTheme]
+    [setTheme],
   );
 
   return (
@@ -33,7 +35,7 @@ export const ThemeProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => 
 };
 
 export const useApp = () => {
-  const context = React.useContext(AppContext);
+  const context = useContext(AppContext);
   if (!context) throw new Error("useApp must be used within a ThemeProvider");
 
   return context;

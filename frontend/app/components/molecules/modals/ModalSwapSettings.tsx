@@ -1,8 +1,9 @@
-import React from "react";
 import BasicModal from "~/app/components/templates/BasicModal";
 import Input from "~/app/components/atoms/Input";
 import { useForm } from "react-hook-form";
 import MaxSlippageSwitcher from "../Swap/MaxSlippageSwitcher";
+
+import type React from "react";
 
 const ModalSwapSettings: React.FC = () => {
   const defaultSlippage = 5.5;
@@ -23,7 +24,12 @@ const ModalSwapSettings: React.FC = () => {
         </div>
         <div className="flex items-center justify-between gap-2">
           <p>Transaction Deadline</p>
-          <Input type="text" endContent={"Minutes"} classNames={{ inputClassName: "max-w-[24px]" }} {...register("txDeadline")} />
+          <Input
+            type="text"
+            endContent={"Minutes"}
+            classNames={{ inputClassName: "max-w-[24px]" }}
+            {...register("txDeadline")}
+          />
         </div>
       </div>
     </BasicModal>

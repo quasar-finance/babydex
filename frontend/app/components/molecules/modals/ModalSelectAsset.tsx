@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import IconSearch from "~/app/components/atoms/icons/IconSearch";
+import { useState } from "react";
+
 import Input from "~/app/components/atoms/Input";
 import BasicModal from "~/app/components/templates/BasicModal";
 import { useModal } from "~/app/providers/ModalProvider";
@@ -19,7 +19,7 @@ const ModalSelectAsset: React.FC = () => {
           token.symbol.toLowerCase().includes(e.target.value.toLowerCase()) ||
           token.address.toLowerCase().includes(e.target.value.toLowerCase())
         );
-      })
+      }),
     );
   };
 

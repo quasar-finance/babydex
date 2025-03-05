@@ -1,18 +1,19 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Button } from "~/app/components/atoms/Button";
 import BasicModal from "~/app/components/templates/BasicModal";
 import { twMerge } from "~/utils/twMerge";
-import { motion } from "framer-motion";
-import { IconChevronDown, IconCoin, IconWallet } from "@tabler/icons-react";
-import { mockTokens } from "~/utils/consts";
+import { motion } from "motion/react";
+import { IconChevronDown, IconWallet } from "@tabler/icons-react";
 import IconCoins from "~/app/components/atoms/icons/IconCoins";
 import Divider from "~/app/components/atoms/Divider";
-import { PoolInfo } from "~/types/pool";
-import { useBalances, useAccount, useWalletClient, useToast } from "~/app/hooks";
+import { useToast } from "~/app/hooks";
 import { convertMicroDenomToDenom, convertDenomToMicroDenom } from "~/utils/intl";
-import Input from "~/app/components/atoms/Input";
+
 import { useForm } from "react-hook-form";
 import { execute } from "~/actions/execute";
+
+import type { PoolInfo } from "@towerfi/types";
+import { useAccount } from "wagmi";
 
 interface ModalDepositLPProps {
   pool: PoolInfo;
@@ -25,10 +26,14 @@ const ModalDepositLP: React.FC<ModalDepositLPProps> = ({ pool }) => {
   const [slipageTolerance, setSlipageTolerance] = useState("0.1");
   const [singleSideToken, setSingleSideToken] = useState(token0.symbol);
   const { address, connector } = useAccount();
-  const { data: balances = [], refetch: refreshBalances } = useBalances({ address: address as string });
+
   const { handleSubmit, register, formState, watch, setValue } = useForm();
   const { toast } = useToast();
   const { errors, isLoading, isSubmitSuccessful } = formState;
+  /*
+    const { data: balances = [], refetch: refreshBalances } = useBalances({
+      address: address as string,
+    });
 
   const { t0Balance, t1Balance } = balances.reduce(
     (acc, { denom, amount }) => {
@@ -36,8 +41,11 @@ const ModalDepositLP: React.FC<ModalDepositLPProps> = ({ pool }) => {
       if (denom === token1.denom) acc.t1Balance = amount;
       return acc;
     },
-    { t0Balance: "0", t1Balance: "0" }
+    { t0Balance: "0", t1Balance: "0" },
   );
+ */
+  const t0Balance = "0";
+  const t1Balance = "0";
 
   const onSubmit = handleSubmit(async (data) => {
     if (!connector) throw new Error("No connector found");
@@ -53,7 +61,9 @@ const ModalDepositLP: React.FC<ModalDepositLPProps> = ({ pool }) => {
               contractAddress: pool.poolAddress,
               instruction: {
                 provide_liquidity: {
-                  assets: [{ amount: tokenAmount, info: { native_token: { denom: tokenInfo.denom } } }],
+                  assets: [
+                    { amount: tokenAmount, info: { native_token: { denom: tokenInfo.denom } } },
+                  ],
                   slippage_tolerance: slipageTolerance,
                 },
               },
@@ -61,22 +71,22 @@ const ModalDepositLP: React.FC<ModalDepositLPProps> = ({ pool }) => {
             },
             userAddress: address as string,
           });
-          await refreshBalances();
+          // await refreshBalances();
         })(),
         {
           loading: {
-            title: `Depositing`,
+            title: "Depositing",
             description: `Depositing ${data[singleSideToken]} ${tokenInfo.symbol} to the pool`,
           },
           success: {
-            title: `Deposit successful`,
+            title: "Deposit successful",
             description: `Deposited ${data[singleSideToken]} ${tokenInfo.symbol} to the pool`,
           },
           error: {
-            title: `Deposit failed`,
+            title: "Deposit failed",
             description: `Failed to deposit ${data[singleSideToken]} ${tokenInfo.symbol} to the pool`,
           },
-        }
+        },
       );
     } else {
       await toast.promise(
@@ -103,22 +113,22 @@ const ModalDepositLP: React.FC<ModalDepositLPProps> = ({ pool }) => {
             },
             userAddress: address as string,
           });
-          await refreshBalances();
+          // await refreshBalances();
         })(),
         {
           loading: {
-            title: `Depositing`,
+            title: "Depositing",
             description: `Depositing ${data[token0.symbol]} ${token0.symbol} and ${data[token1.symbol]} ${token1.symbol} to the pool`,
           },
           success: {
-            title: `Deposit successful`,
+            title: "Deposit successful",
             description: `Deposited ${data[token0.symbol]} ${token0.symbol} and ${data[token1.symbol]} ${token1.symbol} to the pool`,
           },
           error: {
-            title: `Deposit failed`,
+            title: "Deposit failed",
             description: `Failed to deposit ${data[token0.symbol]} ${token0.symbol} and ${data[token1.symbol]} ${token1.symbol} to the pool`,
           },
-        }
+        },
       );
     }
   });
@@ -136,14 +146,18 @@ const ModalDepositLP: React.FC<ModalDepositLPProps> = ({ pool }) => {
                 <Button
                   variant="flat"
                   onPress={() => setSide("double")}
-                  className={twMerge("border-2 border-transparent", { " border-tw-orange-500": side.includes("double") })}
+                  className={twMerge("border-2 border-transparent", {
+                    " border-tw-orange-500": side.includes("double"),
+                  })}
                 >
                   Doubled sided
                 </Button>
                 <Button
                   variant="flat"
                   onPress={() => setSide("single")}
-                  className={twMerge("border-2 border-transparent", { " border-tw-orange-500": side.includes("single") })}
+                  className={twMerge("border-2 border-transparent", {
+                    " border-tw-orange-500": side.includes("single"),
+                  })}
                 >
                   One sided
                 </Button>
@@ -166,7 +180,7 @@ const ModalDepositLP: React.FC<ModalDepositLPProps> = ({ pool }) => {
                       {...register(token0.symbol, {
                         validate: (value) => {
                           if (value === "") return "Amount is required";
-                          if (isNaN(+value)) return "Only enter digits to bond to a vault";
+                          if (Number.isNaN(+value)) return "Only enter digits to bond to a vault";
                           if (Number(value) > Number(t0Balance)) return "Insufficient Amount";
                           if (Number(value) <= 0) return "Amount must be greater than 0";
                         },
@@ -201,7 +215,7 @@ const ModalDepositLP: React.FC<ModalDepositLPProps> = ({ pool }) => {
                         {...register(token1.symbol, {
                           validate: (value) => {
                             if (value === "") return "Amount is required";
-                            if (isNaN(+value)) return "Only enter digits to bond to a vault";
+                            if (Number.isNaN(+value)) return "Only enter digits to bond to a vault";
                             if (Number(value) > Number(t0Balance)) return "Insufficient Amount";
                             if (Number(value) <= 0) return "Amount must be greater than 0";
                           },

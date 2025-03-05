@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
 import BasicModal from "~/app/components/templates/BasicModal";
 import { Button } from "~/app/components/atoms/Button";
 import Image from "next/image";
 import { useModal } from "~/app/providers/ModalProvider";
-import { useToast } from "~/app/hooks/useToast";
-import { Connector } from "~/types/connectors";
-import { useConnectors } from "~/app/hooks";
+import { useToast } from "~/app/hooks";
+
+import type React from "react";
+import { useConnectors, type Connector } from "wagmi";
 
 function ConnectorButton({ connector, onClick }: { connector: Connector; onClick: () => void }) {
   const { name, id, isInstalled } = connector;
@@ -44,7 +44,11 @@ const ModalConnectWallet: React.FC = () => {
     <BasicModal title="Connect modal">
       <div className="grid grid-cols-2 gap-3">
         {connectors.map((connector) => (
-          <ConnectorButton key={connector.uid} connector={connector} onClick={() => connector.connect({ chainId: "bbn-test-5" })} />
+          <ConnectorButton
+            key={connector.uid}
+            connector={connector}
+            onClick={() => connector.connect()}
+          />
         ))}
       </div>
     </BasicModal>

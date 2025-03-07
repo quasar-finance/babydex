@@ -1,0 +1,63 @@
+import { relations } from "drizzle-orm/relations";
+import { blocksInV1Cosmos, transactionsInV1Cosmos, chainsInHubble, tokenInV1Cosmos, tokenPricesInV1Cosmos, eventsInV1Cosmos, contractsInV1Cosmos } from "./schema";
+
+export const transactionsInV1CosmosRelations = relations(transactionsInV1Cosmos, ({one, many}) => ({
+	blocksInV1Cosmo: one(blocksInV1Cosmos, {
+		fields: [transactionsInV1Cosmos.chainId],
+		references: [blocksInV1Cosmos.chainId]
+	}),
+	chainsInHubble: one(chainsInHubble, {
+		fields: [transactionsInV1Cosmos.chainId],
+		references: [chainsInHubble.id]
+	}),
+	eventsInV1Cosmos: many(eventsInV1Cosmos),
+}));
+
+export const blocksInV1CosmosRelations = relations(blocksInV1Cosmos, ({one, many}) => ({
+	transactionsInV1Cosmos: many(transactionsInV1Cosmos),
+	chainsInHubble: one(chainsInHubble, {
+		fields: [blocksInV1Cosmos.chainId],
+		references: [chainsInHubble.id]
+	}),
+	eventsInV1Cosmos: many(eventsInV1Cosmos),
+}));
+
+export const chainsInHubbleRelations = relations(chainsInHubble, ({many}) => ({
+	transactionsInV1Cosmos: many(transactionsInV1Cosmos),
+	blocksInV1Cosmos: many(blocksInV1Cosmos),
+	eventsInV1Cosmos: many(eventsInV1Cosmos),
+	contractsInV1Cosmos: many(contractsInV1Cosmos),
+}));
+
+export const tokenPricesInV1CosmosRelations = relations(tokenPricesInV1Cosmos, ({one}) => ({
+	tokenInV1Cosmo: one(tokenInV1Cosmos, {
+		fields: [tokenPricesInV1Cosmos.denomination],
+		references: [tokenInV1Cosmos.denomination]
+	}),
+}));
+
+export const tokenInV1CosmosRelations = relations(tokenInV1Cosmos, ({many}) => ({
+	tokenPricesInV1Cosmos: many(tokenPricesInV1Cosmos),
+}));
+
+export const eventsInV1CosmosRelations = relations(eventsInV1Cosmos, ({one}) => ({
+	blocksInV1Cosmo: one(blocksInV1Cosmos, {
+		fields: [eventsInV1Cosmos.chainId],
+		references: [blocksInV1Cosmos.chainId]
+	}),
+	chainsInHubble: one(chainsInHubble, {
+		fields: [eventsInV1Cosmos.chainId],
+		references: [chainsInHubble.id]
+	}),
+	transactionsInV1Cosmo: one(transactionsInV1Cosmos, {
+		fields: [eventsInV1Cosmos.chainId],
+		references: [transactionsInV1Cosmos.chainId]
+	}),
+}));
+
+export const contractsInV1CosmosRelations = relations(contractsInV1Cosmos, ({one}) => ({
+	chainsInHubble: one(chainsInHubble, {
+		fields: [contractsInV1Cosmos.internalChainId],
+		references: [chainsInHubble.id]
+	}),
+}));

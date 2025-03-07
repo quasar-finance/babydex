@@ -15,6 +15,8 @@
     "compression": "^1.8.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
+    "drizzle-orm": "^0.40.0",
+    "drizzle-kit": "^0.30.5",
     "express": "5.0.0",
     "express-rate-limit": "^6.11.2",
     "helmet": "^6.2.0",
@@ -22,6 +24,7 @@
     "pino": "^8.21.0",
     "pino-http": "^8.6.1",
     "pino-pretty": "^9.4.1",
+    "postgres": "^3.4.5",
     "redis": "^4.7.0",
     "superjson": "^2.2.2",
     "swagger-ui-express": "^5.0.1"

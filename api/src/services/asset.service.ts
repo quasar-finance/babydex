@@ -1,10 +1,10 @@
-import { AssetResponse, CoinResponse } from '~/interfaces';
-import { ContractQueryService } from '~/services/contract.query.service';
-import RedisService from '~/services/redis.service';
-import { PricingQueryService } from '~/services/pricing.query.service';
-import { getBaseAssetByDenom } from '~/utils/getMockAssets';
-import { Asset } from '../../@chain-registry/assetlist';
-import { ASSET_RESPONSE_CACHE_KEY } from '~/utils/constant';
+import { AssetResponse, CoinResponse } from "~/interfaces";
+import { ContractQueryService } from "~/services/contract.query.service";
+import RedisService from "~/services/redis.service";
+import { PricingQueryService } from "~/services/pricing.query.service";
+import { getBaseAssetByDenom } from "~/utils/getMockAssets";
+import { Asset } from "../../@chain-registry/assetlist";
+import { ASSET_RESPONSE_CACHE_KEY, CONTRACT_ADDRESSES } from "~/utils/constant";
 
 export default class AssetService {
 
@@ -14,7 +14,7 @@ export default class AssetService {
     private redisService: RedisService) {
   }
 
-  async getNativeTokens(chainId: string, contractAddress: string, refresh?: Boolean): Promise<AssetResponse[]> {
+  async getNativeTokens(chainId: string, refresh?: Boolean): Promise<AssetResponse[]> {
     try {
       let res: AssetResponse[] | null;
 
@@ -26,9 +26,12 @@ export default class AssetService {
         }
       }
 
+      const restUrl = this.contractQueryService.getRestUrlByChainId(chainId);
+      const contractAddress = this.contractQueryService.getContractAddressByChainId("coin_registry", chainId);
+
       const coinResponse: CoinResponse[] = await this.contractQueryService
-        .queryContract<CoinResponse[]>(chainId, contractAddress, {
-          native_tokens: { limit: 100000 }
+        .queryContract<CoinResponse[]>(restUrl, contractAddress, {
+          native_tokens: { limit: 100000 },
         });
 
       if (coinResponse.length === 0) {
@@ -38,7 +41,7 @@ export default class AssetService {
       res = await Promise.all(
         coinResponse.map((item: CoinResponse) => {
           return this.getAssetFromChainRegistry(item.denom, item.decimals);
-        })
+        }),
       );
 
       await this.redisService.set(`${ASSET_RESPONSE_CACHE_KEY}_${chainId}`, res, { EX: 300 });
@@ -53,12 +56,12 @@ export default class AssetService {
 
   // TODO: replace when chain registry is live
   async getAssetFromChainRegistry(denom: string, decimals: number): Promise<AssetResponse> {
-    let contractAddr = '';
-    let symbol = '';
-    let type = 'native';
+    let contractAddr = denom;
+    let symbol = "";
+    let type = "native";
     let price = { usd: 0, eur: 0 };
-    let name = '';
-    let logo_URI = '';
+    let name = "";
+    let logo_URI = "";
 
     const asset: Asset | null = getBaseAssetByDenom(denom);
 
@@ -79,11 +82,11 @@ export default class AssetService {
       decimals: decimals,
       price: `${price.usd}`,
       name: name,
-      logo_URI: logo_URI
+      logo_URI: logo_URI,
     } as AssetResponse;
   }
 
   private determineAssetLogoURI(asset: Asset) {
-    return asset.logo_URIs?.svg || asset.logo_URIs?.png || '';
+    return asset.logo_URIs?.svg || asset.logo_URIs?.png || "";
   }
 }

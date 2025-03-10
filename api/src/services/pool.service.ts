@@ -5,12 +5,12 @@ import {
   AssetResponse,
   NativeToken,
   PoolResponse,
-  ContractAsset, PairType, ContractConfigResponse, ContractConcentratedPoolParams, ContractXYKPoolParams
-} from '~/interfaces';
-import { ContractQueryService } from '~/services/contract.query.service';
-import AssetService from '~/services/asset.service';
-import RedisService from '~/services/redis.service';
-import { POOL_RESPONSE_CACHE_KEY } from '~/utils/constant';
+  ContractAsset, PairType, ContractConfigResponse, ContractConcentratedPoolParams, ContractXYKPoolParams,
+} from "~/interfaces";
+import { ContractQueryService } from "~/services/contract.query.service";
+import AssetService from "~/services/asset.service";
+import RedisService from "~/services/redis.service";
+import { CONTRACT_ADDRESSES, POOL_RESPONSE_CACHE_KEY } from "~/utils/constant";
 
 export default class PoolService {
   constructor(
@@ -21,7 +21,7 @@ export default class PoolService {
 
   // A pool represents a token pair which can be accessed in astrofork factory contract:
   // The message format is QueryMsg::Pairs { start_after: optional, limit: optional }
-  async getPools(chainId: string, contractAddress: string): Promise<PoolResponse[]> {
+  async getPools(chainId: string): Promise<PoolResponse[]> {
     try {
       let res: PoolResponse[] | null = await this.redisService.get<PoolResponse[] | null>(`${POOL_RESPONSE_CACHE_KEY}_${chainId}`);
 
@@ -29,9 +29,12 @@ export default class PoolService {
         return res;
       }
 
+      const restUrl = this.contractQueryService.getRestUrlByChainId(chainId);
+      const contractAddress = this.contractQueryService.getContractAddressByChainId("factory", chainId);
+
       const pair_info: PairInfo[] = await this.contractQueryService
-        .queryContract<PairInfo[]>(chainId, contractAddress, {
-          pairs: { limit: 100000 }
+        .queryContract<PairInfo[]>(restUrl, contractAddress, {
+          pairs: { limit: 100000 },
         });
 
       if (pair_info.length === 0) {
@@ -40,7 +43,7 @@ export default class PoolService {
 
       // If we have not cached the pool response yet, ensure to
       // get an uncached list of assets so we have all the latest tokens
-      const assets = await this.assetService.getNativeTokens(chainId, contractAddress, true);
+      const assets = await this.assetService.getNativeTokens(chainId, true);
 
       res = await Promise.all(
         pair_info.map(async (item: PairInfo): Promise<PoolResponse> => {
@@ -59,8 +62,8 @@ export default class PoolService {
           }
 
           const contractPoolResponse = await this.contractQueryService
-            .queryContract<ContractPoolResponse>(chainId, item.contract_addr, {
-              pool: {}
+            .queryContract<ContractPoolResponse>(restUrl, item.contract_addr, {
+              pool: {},
             });
 
           const token0_contractAsset = contractPoolResponse.assets.find((asset: ContractAsset) =>
@@ -71,7 +74,7 @@ export default class PoolService {
             (asset.info as NativeToken).native_token.denom === token1_denom);
           const token1_reserve = token1_contractAsset ? token1_contractAsset.amount : 0;
 
-          const fee_tier = await this.determineFeeTier(chainId, item.contract_addr, item.pair_type);
+          const fee_tier = await this.determineFeeTier(restUrl, item.contract_addr, item.pair_type);
 
           return {
             contract_addr: item.contract_addr,
@@ -79,18 +82,18 @@ export default class PoolService {
               contract_addr: token0.contract_addr,
               symbol: token0.symbol,
               name: token0.name,
-              reserve: token0_reserve
+              reserve: token0_reserve,
             } as PoolAsset,
             token1: {
               contract_addr: token1.contract_addr,
               symbol: token1.symbol,
               name: token1.name,
-              reserve: token1_reserve
+              reserve: token1_reserve,
             } as PoolAsset,
             fee_tier: fee_tier,
-            liquidity_token: item.liquidity_token
+            liquidity_token: item.liquidity_token,
           } as PoolResponse;
-        })
+        }),
       );
 
       await this.redisService.set(`${POOL_RESPONSE_CACHE_KEY}_${chainId}`, res, { EX: 300 });
@@ -103,10 +106,10 @@ export default class PoolService {
     }
   }
 
-  private async determineFeeTier(chainId: string, contractAddr: string, pairType: PairType): Promise<number> {
+  private async determineFeeTier(restUrl: string, contractAddr: string, pairType: PairType): Promise<number> {
     const contractPoolResponse = await this.contractQueryService
-      .queryContract<ContractConfigResponse>(chainId, contractAddr, {
-        config: {}
+      .queryContract<ContractConfigResponse>(restUrl, contractAddr, {
+        config: {},
       });
 
     if (!contractPoolResponse.params) {
@@ -115,7 +118,7 @@ export default class PoolService {
 
     const jsonParams = atob(contractPoolResponse.params);
 
-    if (pairType.hasOwnProperty('xyk')) {
+    if (pairType.hasOwnProperty("xyk")) {
       const params = JSON.parse(jsonParams) as ContractXYKPoolParams;
 
       if (!params.fee_share) {
@@ -125,12 +128,12 @@ export default class PoolService {
       return params.fee_share.bps;
     }
 
-    if (pairType.hasOwnProperty('concentrated')) {
+    if (pairType.hasOwnProperty("concentrated")) {
       const params = JSON.parse(jsonParams) as ContractConcentratedPoolParams;
 
       return params.mid_fee;
     }
 
-    throw Error('PairType neither \'xyk\' nor \'concentrated\'');
+    throw Error("PairType neither 'xyk' nor 'concentrated'");
   }
 }

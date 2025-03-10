@@ -1,7 +1,6 @@
 import { Request, Response, Router } from 'express';
 import { Controller } from '~/interfaces/controller';
 import { readFileSync } from 'fs';
-import { supabase } from '~/loaders/supabase.loader';
 
 const controller = Router();
 const pjson = JSON.parse(readFileSync('./package.json', 'utf-8'));

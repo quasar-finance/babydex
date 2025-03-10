@@ -24,9 +24,18 @@ export const blocksInV1CosmosRelations = relations(blocksInV1Cosmos, ({one, many
 
 export const chainsInHubbleRelations = relations(chainsInHubble, ({many}) => ({
 	transactionsInV1Cosmos: many(transactionsInV1Cosmos),
+	tokenInV1Cosmos: many(tokenInV1Cosmos),
 	blocksInV1Cosmos: many(blocksInV1Cosmos),
 	eventsInV1Cosmos: many(eventsInV1Cosmos),
 	contractsInV1Cosmos: many(contractsInV1Cosmos),
+}));
+
+export const tokenInV1CosmosRelations = relations(tokenInV1Cosmos, ({one, many}) => ({
+	chainsInHubble: one(chainsInHubble, {
+		fields: [tokenInV1Cosmos.chainId],
+		references: [chainsInHubble.id]
+	}),
+	tokenPricesInV1Cosmos: many(tokenPricesInV1Cosmos),
 }));
 
 export const tokenPricesInV1CosmosRelations = relations(tokenPricesInV1Cosmos, ({one}) => ({
@@ -34,10 +43,6 @@ export const tokenPricesInV1CosmosRelations = relations(tokenPricesInV1Cosmos, (
 		fields: [tokenPricesInV1Cosmos.denomination],
 		references: [tokenInV1Cosmos.denomination]
 	}),
-}));
-
-export const tokenInV1CosmosRelations = relations(tokenInV1Cosmos, ({many}) => ({
-	tokenPricesInV1Cosmos: many(tokenPricesInV1Cosmos),
 }));
 
 export const eventsInV1CosmosRelations = relations(eventsInV1Cosmos, ({one}) => ({

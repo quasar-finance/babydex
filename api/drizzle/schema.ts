@@ -1,4 +1,4 @@
-import { pgTable, pgSchema, index, foreignKey, integer, text, bigint, jsonb, timestamp, numeric } from "drizzle-orm/pg-core"
+import { pgTable, pgSchema, index, foreignKey, integer, text, bigint, jsonb, timestamp, numeric, json } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
 export const v1Cosmos = pgSchema("v1_cosmos");
@@ -33,7 +33,14 @@ export const tokenInV1Cosmos = v1Cosmos.table("token", {
 	coingeckoId: text("coingecko_id").notNull(),
 	denomination: text(),
 	tokenName: text("token_name"),
-});
+	chainId: integer("chain_id"),
+}, (table) => [
+	foreignKey({
+			columns: [table.chainId],
+			foreignColumns: [chains.id],
+			name: "token_chain_id_fkey"
+		}),
+]);
 
 export const tokenPricesInV1Cosmos = v1Cosmos.table("token_prices", {
 	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
@@ -207,6 +214,24 @@ export const withdrawLiquidityInV1Cosmos = v1Cosmos.view("withdraw_liquidity", {
 	transactionEventIndex: integer("transaction_event_index"),
 	data: jsonb(),
 }).with({"securityInvoker":"on"}).as(sql`SELECT attributes(events.*) ->> 'sender'::text AS sender, attributes(events.*) ->> 'receiver'::text AS receiver, regexp_replace(split_part(attributes(events.*) ->> 'refund_assets'::text, ', '::text, 1), '^\d+'::text, ''::text) AS token0_denom, (regexp_matches(attributes(events.*) ->> 'refund_assets'::text, '^\d+'::text))[1]::numeric AS token0_amount, regexp_replace(split_part(attributes(events.*) ->> 'refund_assets'::text, ', '::text, 2), '^\d+'::text, ''::text) AS token1_denom, (regexp_matches(split_part(attributes(events.*) ->> 'refund_assets'::text, ', '::text, 2), '^\d+'::text))[1]::numeric AS token1_amount, (attributes(events.*) ->> 'withdrawn_share'::text)::numeric AS share, attributes(events.*) ->> '_contract_address'::text AS pool_address, (attributes(events.*) ->> 'msg_index'::text)::integer AS msg_index, events.chain_id AS internal_chain_id, events.block_hash, events.height, events.index, events."time" AS "timestamp", events.transaction_hash, events.transaction_index, NULL::integer AS transaction_event_index, events.data FROM v1_cosmos.events WHERE (events.data ->> 'type'::text) = 'wasm-withdraw_liquidity'::text`);
+
+export const historicPoolYieldInV1Cosmos = v1Cosmos.view("historic_pool_yield", {	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
+	height: bigint({ mode: "number" }),
+	timestamp: timestamp({ withTimezone: true, mode: 'string' }),
+	poolAddress: text("pool_address"),
+	token0Denom: text("token0_denom"),
+	token1Denom: text("token1_denom"),
+	token0Balance: numeric("token0_balance"),
+	token1Balance: numeric("token1_balance"),
+	token0ValueUsd: numeric("token0_value_usd"),
+	token1ValueUsd: numeric("token1_value_usd"),
+	totalLiquidityUsd: numeric("total_liquidity_usd"),
+	feeTokens: json("fee_tokens"),
+	feesUsd: numeric("fees_usd"),
+	incentiveTokens: json("incentive_tokens"),
+	incentivesUsd: numeric("incentives_usd"),
+	totalEarningsUsd: numeric("total_earnings_usd"),
+}).as(sql`WITH block_data AS ( SELECT b.height, b."time" AS "timestamp", lead(b."time") OVER (ORDER BY b.height) AS next_timestamp, lead(b.height) OVER (ORDER BY b.height) AS next_height FROM v1_cosmos.blocks b ), token_prices_by_block AS ( SELECT bd_1.height, bd_1."timestamp", bd_1.next_timestamp, bd_1.next_height, EXTRACT(epoch FROM bd_1.next_timestamp - bd_1."timestamp") AS seconds_between_blocks, tp.denomination, tp.price FROM block_data bd_1 CROSS JOIN LATERAL ( SELECT DISTINCT token_prices.denomination FROM v1_cosmos.token_prices) d LEFT JOIN LATERAL ( SELECT token_prices.denomination, token_prices.price FROM v1_cosmos.token_prices WHERE token_prices.denomination = d.denomination ORDER BY (abs(EXTRACT(epoch FROM bd_1."timestamp" - token_prices.created_at))) LIMIT 1) tp ON true WHERE bd_1.next_height IS NOT NULL ), block_fees AS ( SELECT s.height, s.pool_address, s.offer_asset AS fee_token_denom, sum(s.commission_amount) AS fee_amount, sum(s.commission_amount) * COALESCE(tp.price, 0::numeric) AS fees_usd FROM v1_cosmos.swap s LEFT JOIN token_prices_by_block tp ON s.height = tp.height AND s.offer_asset = tp.denomination GROUP BY s.height, s.pool_address, s.offer_asset, tp.price ), block_incentives AS ( SELECT bp.height, i.lp_token, i.reward AS incentive_token_denom, sum(i.rewards_per_second * tp.seconds_between_blocks) AS incentive_amount, sum(i.rewards_per_second * tp.seconds_between_blocks) * COALESCE(tp.price, 0::numeric) AS incentives_usd FROM block_data bp JOIN v1_cosmos.incentivize i ON i.start_ts::numeric <= EXTRACT(epoch FROM bp."timestamp") AND i.end_ts::numeric >= EXTRACT(epoch FROM bp."timestamp") LEFT JOIN token_prices_by_block tp ON bp.height = tp.height AND i.reward = tp.denomination GROUP BY bp.height, i.lp_token, i.reward, tp.seconds_between_blocks, tp.price ), pool_info AS ( SELECT DISTINCT pool_balance.pool_address, (pool_balance.token0_denom || ':'::text) || pool_balance.token1_denom AS lp_token FROM v1_cosmos.pool_balance ), pool_liquidity AS ( SELECT h.height, a.pool_address, a.token0_denom, a.token1_denom, a.token0_balance, a.token1_balance, COALESCE(a.token0_balance, 0::numeric) * COALESCE(tp0.price, 0::numeric) AS token0_value_usd, COALESCE(a.token1_balance, 0::numeric) * COALESCE(tp1.price, 0::numeric) AS token1_value_usd, COALESCE(a.token0_balance, 0::numeric) * COALESCE(tp0.price, 0::numeric) + COALESCE(a.token1_balance, 0::numeric) * COALESCE(tp1.price, 0::numeric) AS total_liquidity_usd FROM v1_cosmos.blocks h JOIN v1_cosmos.pool_balance a ON h.height = a.height LEFT JOIN token_prices_by_block tp0 ON h.height = tp0.height AND a.token0_denom = tp0.denomination LEFT JOIN token_prices_by_block tp1 ON h.height = tp1.height AND a.token1_denom = tp1.denomination ), total_fees_by_pool AS ( SELECT block_fees.height, block_fees.pool_address, json_agg(json_build_object('denom', block_fees.fee_token_denom, 'amount', block_fees.fee_amount, 'usd_value', block_fees.fees_usd)) AS fee_tokens, sum(block_fees.fees_usd) AS total_fees_usd FROM block_fees GROUP BY block_fees.height, block_fees.pool_address ), total_incentives_by_pool AS ( SELECT bi.height, pi.pool_address, json_agg(json_build_object('denom', bi.incentive_token_denom, 'amount', bi.incentive_amount, 'usd_value', bi.incentives_usd)) AS incentive_tokens, sum(bi.incentives_usd) AS total_incentives_usd FROM block_incentives bi LEFT JOIN pool_info pi ON bi.lp_token = pi.lp_token GROUP BY bi.height, pi.pool_address ) SELECT bd.height, bd."timestamp", pl.pool_address, pl.token0_denom, pl.token1_denom, pl.token0_balance, pl.token1_balance, pl.token0_value_usd, pl.token1_value_usd, pl.total_liquidity_usd, tf.fee_tokens, COALESCE(tf.total_fees_usd, 0::numeric) AS fees_usd, ti.incentive_tokens, COALESCE(ti.total_incentives_usd, 0::numeric) AS incentives_usd, COALESCE(tf.total_fees_usd, 0::numeric) + COALESCE(ti.total_incentives_usd, 0::numeric) AS total_earnings_usd FROM block_data bd JOIN pool_liquidity pl ON bd.height = pl.height LEFT JOIN total_fees_by_pool tf ON bd.height = tf.height AND pl.pool_address = tf.pool_address LEFT JOIN total_incentives_by_pool ti ON bd.height = ti.height AND pl.pool_address = ti.pool_address WHERE bd.next_height IS NOT NULL ORDER BY bd.height, pl.pool_address`);
 
 export const poolBalanceInV1Cosmos = v1Cosmos.view("pool_balance", {	poolAddress: text("pool_address"),
 	token0Denom: text("token0_denom"),

@@ -23,7 +23,7 @@ export const trpcRouter = router({
     .query(async ({ input }) => {
       return drizzleService.select().from(addLiquidityInV1Cosmos);
     }),
-  historicPoolYieldInV1Cosmos: publicProcedure
+  historicPoolYield: publicProcedure
     .input(z.string().nullish())
     .query(async ({ input }) => {
       return drizzleService.select().from(historicPoolYieldInV1Cosmos);

@@ -10,7 +10,7 @@ import RotateButton from "../atoms/RotateButton";
 import { mockTokens } from "~/utils/consts";
 import SwapInfoAccordion from "../molecules/Swap/SwapInfoAccordion";
 import { trpc } from "~/trpc/client";
-import { useAccount } from "wagmi";
+import { useAccount } from "@cosmi/react";
 
 const SwapComponent: React.FC = () => {
   const [fromToken, setFromToken] = useState(mockTokens[0]);
@@ -18,9 +18,6 @@ const SwapComponent: React.FC = () => {
   const [_isConnected, _setIsConnected] = useState(false);
   const { isConnected } = useAccount();
   const { showModal } = useModal();
-
-  const { data } = trpc.local.pools.getPools.useQuery();
-  console.log(data);
 
   useEffect(() => {
     _setIsConnected(isConnected);

@@ -2,6 +2,9 @@ packages:
   - "trpc"
   - "frontend"
   - "types"
+packageOptions:
+  overrides:
+    "@tanstack/react-query": "^4.0.0"
 
 catalog:
   "typescript": "^5.8.2"

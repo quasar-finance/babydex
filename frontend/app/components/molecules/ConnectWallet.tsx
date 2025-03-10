@@ -10,7 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@heroui/react";
 import { twMerge } from "~/utils/twMerge";
 import CopyMessage from "../atoms/CopyMessage";
 import { IconCopy, IconLogout } from "@tabler/icons-react";
-import { useAccount } from "wagmi";
+import { useAccount } from "@cosmi/react";
 
 const ConnectWallet: React.FC = () => {
   const { showModal } = useModal();
@@ -48,7 +48,7 @@ const ConnectWallet: React.FC = () => {
                   />
                   <div className="flex flex-col">
                     <p className="text-xs">
-                      <span className=" text-tw-orange-400">{connector?.name}</span> connector
+                      <span className=" text-tw-orange-400">{connector?.name} Wallet</span>
                     </p>
                     <CopyMessage textToCopy={address || ""}>
                       <p className=" flex gap-2">

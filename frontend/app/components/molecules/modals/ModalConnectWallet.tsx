@@ -5,9 +5,11 @@ import { useModal } from "~/app/providers/ModalProvider";
 import { useToast } from "~/app/hooks";
 
 import type React from "react";
-import { useConnectors, type Connector } from "wagmi";
+import { useAccount, useConnectors } from "@cosmi/react";
+import { babylonTestnet } from "~/config/chains/babylon-testnet";
+import { useEffect } from "react";
 
-function ConnectorButton({ connector, onClick }: { connector: Connector; onClick: () => void }) {
+function ConnectorButton({ connector, onClick }: { connector: any; onClick: () => void }) {
   const { name, id, isInstalled } = connector;
 
   return (
@@ -37,8 +39,13 @@ function ConnectorButton({ connector, onClick }: { connector: Connector; onClick
 
 const ModalConnectWallet: React.FC = () => {
   const connectors = useConnectors();
+  const { isConnected } = useAccount();
   const { toast } = useToast();
   const { hideModal } = useModal();
+
+  useEffect(() => {
+    if (isConnected) hideModal();
+  }, [isConnected]);
 
   return (
     <BasicModal title="Connect modal">
@@ -47,7 +54,7 @@ const ModalConnectWallet: React.FC = () => {
           <ConnectorButton
             key={connector.uid}
             connector={connector}
-            onClick={() => connector.connect()}
+            onClick={() => connector.connect({ chainId: babylonTestnet.id })}
           />
         ))}
       </div>

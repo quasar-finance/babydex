@@ -1,5 +1,4 @@
 {
-  "esModuleInterop": true,
   "compilerOptions": {
     "skipLibCheck": true,
     "target": "es2022",

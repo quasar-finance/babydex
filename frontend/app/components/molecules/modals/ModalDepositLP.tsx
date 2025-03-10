@@ -10,10 +10,9 @@ import { useToast } from "~/app/hooks";
 import { convertMicroDenomToDenom, convertDenomToMicroDenom } from "~/utils/intl";
 
 import { useForm } from "react-hook-form";
-import { execute } from "~/actions/execute";
 
 import type { PoolInfo } from "@towerfi/types";
-import { useAccount } from "wagmi";
+import { useAccount, useBalances, useSigningClient } from "@cosmi/react";
 
 interface ModalDepositLPProps {
   pool: PoolInfo;
@@ -26,14 +25,15 @@ const ModalDepositLP: React.FC<ModalDepositLPProps> = ({ pool }) => {
   const [slipageTolerance, setSlipageTolerance] = useState("0.1");
   const [singleSideToken, setSingleSideToken] = useState(token0.symbol);
   const { address, connector } = useAccount();
+  const { data: signingClient } = useSigningClient();
 
   const { handleSubmit, register, formState, watch, setValue } = useForm();
   const { toast } = useToast();
   const { errors, isLoading, isSubmitSuccessful } = formState;
-  /*
-    const { data: balances = [], refetch: refreshBalances } = useBalances({
-      address: address as string,
-    });
+
+  const { data: balances = [], refetch: refreshBalances } = useBalances({
+    address: address as string,
+  });
 
   const { t0Balance, t1Balance } = balances.reduce(
     (acc, { denom, amount }) => {
@@ -43,23 +43,19 @@ const ModalDepositLP: React.FC<ModalDepositLPProps> = ({ pool }) => {
     },
     { t0Balance: "0", t1Balance: "0" },
   );
- */
-  const t0Balance = "0";
-  const t1Balance = "0";
 
   const onSubmit = handleSubmit(async (data) => {
-    if (!connector) throw new Error("No connector found");
+    if (!signingClient) throw new Error("No connector found");
     if (side === "single") {
       const tokenInfo = assets.find((asset) => asset.symbol === singleSideToken);
       if (!tokenInfo) throw new Error("Token not found");
       const tokenAmount = convertDenomToMicroDenom(data[singleSideToken], tokenInfo.decimals);
       await toast.promise(
         (async () => {
-          await execute({
-            connector,
-            instruction: {
-              contractAddress: pool.poolAddress,
-              instruction: {
+          await signingClient.execute({
+            execute: {
+              address: pool.poolAddress,
+              message: {
                 provide_liquidity: {
                   assets: [
                     { amount: tokenAmount, info: { native_token: { denom: tokenInfo.denom } } },
@@ -69,9 +65,9 @@ const ModalDepositLP: React.FC<ModalDepositLPProps> = ({ pool }) => {
               },
               funds: [{ denom: tokenInfo.denom, amount: tokenAmount }],
             },
-            userAddress: address as string,
+            sender: address as string,
           });
-          // await refreshBalances();
+          await refreshBalances();
         })(),
         {
           loading: {
@@ -93,11 +89,10 @@ const ModalDepositLP: React.FC<ModalDepositLPProps> = ({ pool }) => {
         (async () => {
           const token0Amount = convertDenomToMicroDenom(data[token0.symbol], token0.decimals);
           const token1Amount = convertDenomToMicroDenom(data[token1.symbol], token1.decimals);
-          await execute({
-            connector,
-            instruction: {
-              contractAddress: pool.poolAddress,
-              instruction: {
+          await signingClient.execute({
+            execute: {
+              address: pool.poolAddress,
+              message: {
                 provide_liquidity: {
                   assets: [
                     { amount: token0Amount, info: { native_token: { denom: token0.denom } } },
@@ -111,9 +106,9 @@ const ModalDepositLP: React.FC<ModalDepositLPProps> = ({ pool }) => {
                 { denom: token1.denom, amount: token1Amount },
               ],
             },
-            userAddress: address as string,
+            sender: address as string,
           });
-          // await refreshBalances();
+          await refreshBalances();
         })(),
         {
           loading: {

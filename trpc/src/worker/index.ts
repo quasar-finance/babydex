@@ -3,9 +3,11 @@ import { createRedisService } from "../services/redis.js";
 import { createCoingeckoService } from "../services/coingecko.js";
 
 import { appRouter } from "../router.js";
+import { createPublicClient, http } from "cosmi";
 
 interface Env {
   CONTRACTS: string;
+  RPC_NODE: string;
 }
 
 export default {
@@ -20,7 +22,9 @@ export default {
           cacheService,
           assets: {},
           coingeckoService: createCoingeckoService({ cacheService }),
-          publicClient: {},
+          publicClient: createPublicClient({
+            transport: http(env.RPC_NODE),
+          }),
         };
       },
       endpoint: "/trpc",

@@ -5,7 +5,7 @@ import { createCoingeckoService, createLruService } from "@towerfi/trpc";
 import type React from "react";
 import type { PropsWithChildren } from "react";
 import type { QueryClient } from "@tanstack/react-query";
-import { useConfig, usePublicClient } from "wagmi";
+import { usePublicClient } from "@cosmi/react";
 
 const cacheService = createLruService();
 const coingeckoService = createCoingeckoService({ cacheService });
@@ -15,7 +15,6 @@ interface Props {
 }
 
 export const TrpcProvider: React.FC<PropsWithChildren<Props>> = ({ children, queryClient }) => {
-  const config = useConfig();
   const publicClient = usePublicClient();
 
   return (

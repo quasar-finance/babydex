@@ -18,17 +18,15 @@ export const assetsRouter = createTRPCRouter({
 
       if (asset) return { ...asset, price };
 
-      const cachedAsset = await cacheService.getItem<WithPrice<NativeCurrency>>(
-        denom
-      );
+      const cachedAsset = await cacheService.getItem<WithPrice<NativeCurrency>>(denom);
       if (cachedAsset) return cachedAsset;
 
-      const metadata = await publicClient.request.bank
-        .denomMetadata(denom)
-        .catch(() => ({
+      const { metadata } = await publicClient.queryDenomMetadata({ denom }).catch(() => ({
+        metadata: {
           symbol: "UNKNOWN",
           denomUnits: [{ denom: "UNKNOWN", exponent: 0 }],
-        }));
+        },
+      }));
 
       const symbol = metadata.symbol.split("/").at(-1) ?? "UNKNOWN";
       const decimals = metadata.denomUnits.at(0)?.exponent ?? 0;

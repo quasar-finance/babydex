@@ -8,6 +8,8 @@
     "start": "next start"
   },
   "dependencies": {
+    "cosmi": "^0.1.0",
+    "@cosmi/react": "^0.1.0",
     "@dicebear/collection": "^9.2.2",
     "@dicebear/core": "^9.2.2",
     "@heroui/button": "^2.2.10",

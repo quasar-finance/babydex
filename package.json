@@ -10,14 +10,17 @@
     "dev:app": "turbo dev"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
     "@types/node": "^22.13.9",
     "turbo": "^2.0.11",
-    "typescript": "catalog:",
-    "@biomejs/biome": "^1.9.4"
+    "typescript": "catalog:"
   },
   "pnpm": {
     "peerDependencyRules": {
       "ignoreMissing": ["typescript", "tsup", "@biomejs/biome"]
+    },
+    "overrides": {
+      "@tanstack/react-query": "^4.0.0"
     }
   }
 }

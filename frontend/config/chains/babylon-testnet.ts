@@ -1,27 +1,32 @@
-import { Chain } from "~/types/chain";
+import { defineChain } from "@cosmi/react";
 
-export const babylonTestnet: Chain = {
+export const babylonTestnet = defineChain({
   id: "bbn-test-5",
-  name: "Babylon Testnet",
+  name: "babylontestnet",
   icon: "https://raw.githubusercontent.com/cosmos/chain-registry/master/testnets/babylontestnet/images/logo.svg",
-  ecosystem: "cosmos",
-  blockExplorers: {
-    default: {
-      url: "https://www.mintscan.io/babylon",
-      txPage: "https://www.mintscan.io/babylon/txs/${tx_hash}",
-      accountPage: "https://www.mintscan.io/babylon/account/${address}",
-    },
-  },
   nativeCurrency: {
-    denom: "ubbn",
     decimals: 6,
-    name: "Babylon Token",
+    name: "ubbn",
     symbol: "BABY",
-    type: "native",
   },
   rpcUrls: {
     default: {
       http: ["https://babylon-testnet-rpc.nodes.guru"],
     },
   },
-};
+  fees: {
+    baseFeeMultiplier: 1.4,
+  },
+  testnet: true,
+  custom: {
+    registry: {
+      assets:
+        "https://raw.githubusercontent.com/cosmos/chain-registry/refs/heads/master/testnets/babylontestnet/assetlist.json",
+      chain:
+        "https://raw.githubusercontent.com/cosmos/chain-registry/refs/heads/master/testnets/babylontestnet/chain.json",
+    },
+    gasSteps: {
+      default: 0.007,
+    },
+  },
+});

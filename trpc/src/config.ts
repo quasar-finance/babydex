@@ -2,9 +2,10 @@ import { initTRPC } from "@trpc/server";
 
 import type { BaseCurrency, Cache } from "@towerfi/types";
 import type { CoingeckoServiceReturnType } from "./services/coingecko.js";
+import type { PublicClient } from "cosmi";
 
 export type ContextOptions = {
-  publicClient: any;
+  publicClient: PublicClient;
   assets: Record<string, BaseCurrency>;
   cacheService: Cache;
   coingeckoService: CoingeckoServiceReturnType;

@@ -4,23 +4,26 @@ import { Toaster } from "react-hot-toast";
 import { ModalProvider } from "./ModalProvider";
 import { ThemeProvider } from "./ThemeProvider";
 import { TrpcProvider } from "./TrpcProvider";
-import { Web3Provider } from "./Web3Provider";
 
 import type { PropsWithChildren } from "react";
+import { CosmiProvider } from "@cosmi/react";
+import { cosmi } from "~/config/cosmi";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { retry: false, refetchOnWindowFocus: false } },
+});
 
 const AppProvider: React.FC<PropsWithChildren> = ({ children }) => {
   return (
     <QueryClientProvider client={queryClient}>
-      <Web3Provider>
+      <CosmiProvider config={cosmi}>
         <TrpcProvider queryClient={queryClient}>
           <ThemeProvider>
             <ModalProvider>{children}</ModalProvider>
             <Toaster position="bottom-right" reverseOrder />
           </ThemeProvider>
         </TrpcProvider>
-      </Web3Provider>
+      </CosmiProvider>
     </QueryClientProvider>
   );
 };

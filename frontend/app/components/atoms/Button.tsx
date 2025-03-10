@@ -42,7 +42,8 @@ export const Button = extendVariants(NextButton, {
     {
       variant: "bordered",
       color: "orange",
-      class: "bg-transparent border-tw-orange-400 text-tw-orange-400 data-[hover=true]:opacity-hover",
+      class:
+        "bg-transparent border-tw-orange-400 text-tw-orange-400 data-[hover=true]:opacity-hover",
     },
     {
       variant: "light",
@@ -57,12 +58,14 @@ export const Button = extendVariants(NextButton, {
     {
       variant: "ghost",
       color: "orange",
-      class: "border-tw-orange-400 text-tw-orange-400 data-[hover=true]:!bg-tw-orange-400 data-[hover=true]:!text-tw-bg",
+      class:
+        "border-tw-orange-400 text-tw-orange-400 data-[hover=true]:!bg-tw-orange-400 data-[hover=true]:!text-tw-bg",
     },
     {
       variant: "shadow",
       color: "orange",
-      class: "shadow-lg shadow-tw-orange-400/40 bg-tw-orange-400 text-tw-bg data-[hover=true]:opacity-hover",
+      class:
+        "shadow-lg shadow-tw-orange-400/40 bg-tw-orange-400 text-tw-bg data-[hover=true]:opacity-hover",
     },
 
     ///BLUE
@@ -95,12 +98,14 @@ export const Button = extendVariants(NextButton, {
     {
       variant: "ghost",
       color: "blue",
-      class: "border-tw-blue-600 text-tw-blue-600 data-[hover=true]:!bg-tw-blue-600 data-[hover=true]:!text-tw-bg",
+      class:
+        "border-tw-blue-600 text-tw-blue-600 data-[hover=true]:!bg-tw-blue-600 data-[hover=true]:!text-tw-bg",
     },
     {
       variant: "shadow",
       color: "blue",
-      class: "shadow-lg shadow-tw-blue-600/40 bg-tw-blue-600 text-tw-bg data-[hover=true]:opacity-hover",
+      class:
+        "shadow-lg shadow-tw-blue-600/40 bg-tw-blue-600 text-tw-bg data-[hover=true]:opacity-hover",
     },
 
     ///GREEN
@@ -133,12 +138,14 @@ export const Button = extendVariants(NextButton, {
     {
       variant: "ghost",
       color: "green",
-      class: "border-tw-green-500 text-tw-green-500 data-[hover=true]:!bg-tw-green-500 data-[hover=true]:!text-tw-bg",
+      class:
+        "border-tw-green-500 text-tw-green-500 data-[hover=true]:!bg-tw-green-500 data-[hover=true]:!text-tw-bg",
     },
     {
       variant: "shadow",
       color: "green",
-      class: "shadow-lg shadow-tw-green-500/40 bg-tw-green-500 text-tw-bg data-[hover=true]:opacity-hover",
+      class:
+        "shadow-lg shadow-tw-green-500/40 bg-tw-green-500 text-tw-bg data-[hover=true]:opacity-hover",
     },
 
     ///GRADIENT
@@ -163,12 +170,14 @@ export const Button = extendVariants(NextButton, {
     {
       variant: "flat",
       color: "gradient",
-      class: "bg-gradient-to-bl from-tw-orange-400/30 to-tw-blue-500/30 text-white/80 data-[hover=true]:opacity-hover",
+      class:
+        "bg-gradient-to-bl from-tw-orange-400/30 to-tw-blue-500/30 text-white/80 data-[hover=true]:opacity-hover",
     },
     {
       variant: "shadow",
       color: "gradient",
-      class: "shadow-lg shadow-tw-blue-500/40 bg-gradient-to-bl from-tw-orange-400 to-tw-blue-500 text-tw-bg data-[hover=true]:opacity-hover",
+      class:
+        "shadow-lg shadow-tw-blue-500/40 bg-gradient-to-bl from-tw-orange-400 to-tw-blue-500 text-tw-bg data-[hover=true]:opacity-hover",
     },
   ],
 });

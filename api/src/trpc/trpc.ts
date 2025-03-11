@@ -11,8 +11,7 @@ import {
   swapInV1Cosmos,
   withdrawLiquidityInV1Cosmos,
 } from "../../drizzle/schema";
-import { generateDrizzleFilter, generateDrizzleFilterPg } from "drizzle-query-helper";
-import { AnyTable } from "drizzle-orm";
+import { generateDrizzleFilter } from "drizzle-query-helper";
 
 const t = initTRPC.create();
 

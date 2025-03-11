@@ -3558,6 +3558,40 @@ CREATE VIEW v1_cosmos.pool_fee_periods WITH (security_invoker='on') AS
 ALTER VIEW v1_cosmos.pool_fee_periods OWNER TO postgres;
 
 --
+-- Name: pool_user_shares; Type: VIEW; Schema: v1_cosmos; Owner: postgres
+--
+
+CREATE VIEW v1_cosmos.pool_user_shares AS
+ WITH combined_liquidity_operations AS (
+         SELECT
+                CASE
+                    WHEN (add_liquidity.receiver IS NOT NULL) THEN add_liquidity.receiver
+                    ELSE add_liquidity.sender
+                END AS owner,
+            add_liquidity.pool_address,
+            add_liquidity.share AS share_amount,
+            add_liquidity."timestamp"
+           FROM v1_cosmos.add_liquidity
+        UNION ALL
+         SELECT withdraw_liquidity.sender AS owner,
+            withdraw_liquidity.pool_address,
+            (- withdraw_liquidity.share) AS share_amount,
+            withdraw_liquidity."timestamp"
+           FROM v1_cosmos.withdraw_liquidity
+        )
+ SELECT combined_liquidity_operations.pool_address,
+    combined_liquidity_operations.owner,
+    sum(combined_liquidity_operations.share_amount) AS shares_amount,
+    max(combined_liquidity_operations."timestamp") AS last_update_time
+   FROM combined_liquidity_operations
+  GROUP BY combined_liquidity_operations.pool_address, combined_liquidity_operations.owner
+ HAVING (sum(combined_liquidity_operations.share_amount) > (0)::numeric)
+  ORDER BY combined_liquidity_operations.pool_address, combined_liquidity_operations.owner;
+
+
+ALTER VIEW v1_cosmos.pool_user_shares OWNER TO postgres;
+
+--
 -- Name: token; Type: TABLE; Schema: v1_cosmos; Owner: postgres
 --
 
@@ -3567,7 +3601,8 @@ CREATE TABLE v1_cosmos.token (
     coingecko_id text NOT NULL,
     denomination text,
     token_name text,
-    chain_id integer
+    chain_id integer,
+    decimals smallint
 );
 
 
@@ -17834,8 +17869,8 @@ COPY v1_cosmos.events (chain_id, block_hash, height, transaction_hash, transacti
 -- Data for Name: token; Type: TABLE DATA; Schema: v1_cosmos; Owner: postgres
 --
 
-COPY v1_cosmos.token (id, created_at, coingecko_id, denomination, token_name, chain_id) FROM stdin;
-1	2025-03-06 14:10:58.042917+00	bitcoin	ibc/3AA6631D204C192DDB757935A4C49A0E83EEEE14AC045E8A180CCB4EE08B6196	bitcoin	1
+COPY v1_cosmos.token (id, created_at, coingecko_id, denomination, token_name, chain_id, decimals) FROM stdin;
+1	2025-03-06 14:10:58.042917+00	bitcoin	ibc/3AA6631D204C192DDB757935A4C49A0E83EEEE14AC045E8A180CCB4EE08B6196	bitcoin	1	\N
 \.
 
 
@@ -20668,6 +20703,15 @@ GRANT SELECT ON TABLE v1_cosmos.historic_pool_yield TO v1_cosmos_readonly;
 GRANT SELECT ON TABLE v1_cosmos.pool_fee_periods TO v1_cosmos_readonly;
 GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.pool_fee_periods TO authenticated;
 GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.pool_fee_periods TO service_role;
+
+
+--
+-- Name: TABLE pool_user_shares; Type: ACL; Schema: v1_cosmos; Owner: postgres
+--
+
+GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.pool_user_shares TO authenticated;
+GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.pool_user_shares TO service_role;
+GRANT SELECT ON TABLE v1_cosmos.pool_user_shares TO v1_cosmos_readonly;
 
 
 --

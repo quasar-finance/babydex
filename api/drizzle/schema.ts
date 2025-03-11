@@ -1,4 +1,4 @@
-import { pgTable, pgSchema, index, foreignKey, integer, text, bigint, jsonb, timestamp, numeric, json } from "drizzle-orm/pg-core"
+import { pgTable, pgSchema, index, foreignKey, integer, text, bigint, jsonb, timestamp, smallint, numeric, json } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
 export const v1Cosmos = pgSchema("v1_cosmos");
@@ -34,6 +34,7 @@ export const tokenInV1Cosmos = v1Cosmos.table("token", {
 	denomination: text(),
 	tokenName: text("token_name"),
 	chainId: integer("chain_id"),
+	decimals: smallint(),
 }, (table) => [
 	foreignKey({
 			columns: [table.chainId],
@@ -256,3 +257,9 @@ export const poolFeePeriodsInV1Cosmos = v1Cosmos.view("pool_fee_periods", {	pool
 	blocksInPeriod: bigint("blocks_in_period", { mode: "number" }),
 	feesPerShare: numeric("fees_per_share"),
 }).with({"securityInvoker":"on"}).as(sql`WITH share_changes AS ( SELECT pool_balance.pool_address, pool_balance.height, pool_balance.token0_balance, pool_balance.token1_balance, pool_balance.share, lag(pool_balance.share) OVER (PARTITION BY pool_balance.pool_address ORDER BY pool_balance.height) AS prev_shares, lag(pool_balance.height) OVER (PARTITION BY pool_balance.pool_address ORDER BY pool_balance.height) AS prev_height FROM v1_cosmos.pool_balance ), max_heights AS ( SELECT pool_balance.pool_address, max(pool_balance.height) AS max_height FROM v1_cosmos.pool_balance GROUP BY pool_balance.pool_address ), period_boundaries AS ( SELECT s.pool_address, CASE WHEN s.prev_shares IS NULL THEN s.height ELSE s.prev_height END AS start_height, s.height - 1 AS end_height, CASE WHEN s.prev_shares IS NULL THEN s.share ELSE s.prev_shares END AS period_shares, s.token0_balance, s.token1_balance FROM share_changes s WHERE s.prev_shares IS NULL OR s.prev_shares <> s.share UNION ALL SELECT s.pool_address, s.height AS start_height, m.max_height AS end_height, s.share AS period_shares, s.token0_balance, s.token1_balance FROM share_changes s JOIN max_heights m ON s.pool_address = m.pool_address WHERE s.height = (( SELECT max(sc.height) AS max FROM share_changes sc WHERE sc.pool_address = s.pool_address AND (sc.prev_shares IS NULL OR sc.prev_shares <> sc.share))) ), fees_by_block AS ( SELECT swap.pool_address, swap.height, sum(swap.commission_amount) AS block_fees FROM v1_cosmos.swap GROUP BY swap.pool_address, swap.height ) SELECT p.pool_address, p.start_height, p.end_height, p.period_shares, p.token0_balance, p.token1_balance, COALESCE(sum(f.block_fees), 0::numeric) AS period_fees, p.end_height - p.start_height + 1 AS blocks_in_period, COALESCE(sum(f.block_fees), 0::numeric) / NULLIF(p.period_shares, 0::numeric) AS fees_per_share FROM period_boundaries p LEFT JOIN fees_by_block f ON f.pool_address = p.pool_address AND f.height >= p.start_height AND f.height <= p.end_height GROUP BY p.pool_address, p.start_height, p.end_height, p.period_shares, p.token0_balance, p.token1_balance ORDER BY p.pool_address, p.start_height`);
+
+export const poolUserSharesInV1Cosmos = v1Cosmos.view("pool_user_shares", {	poolAddress: text("pool_address"),
+	owner: text(),
+	sharesAmount: numeric("shares_amount"),
+	lastUpdateTime: timestamp("last_update_time", { withTimezone: true, mode: 'string' }),
+}).as(sql`WITH combined_liquidity_operations AS ( SELECT CASE WHEN add_liquidity.receiver IS NOT NULL THEN add_liquidity.receiver ELSE add_liquidity.sender END AS owner, add_liquidity.pool_address, add_liquidity.share AS share_amount, add_liquidity."timestamp" FROM v1_cosmos.add_liquidity UNION ALL SELECT withdraw_liquidity.sender AS owner, withdraw_liquidity.pool_address, - withdraw_liquidity.share AS share_amount, withdraw_liquidity."timestamp" FROM v1_cosmos.withdraw_liquidity ) SELECT combined_liquidity_operations.pool_address, combined_liquidity_operations.owner, sum(combined_liquidity_operations.share_amount) AS shares_amount, max(combined_liquidity_operations."timestamp") AS last_update_time FROM combined_liquidity_operations GROUP BY combined_liquidity_operations.pool_address, combined_liquidity_operations.owner HAVING sum(combined_liquidity_operations.share_amount) > 0::numeric ORDER BY combined_liquidity_operations.pool_address, combined_liquidity_operations.owner`);

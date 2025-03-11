@@ -3381,6 +3381,30 @@ CREATE TABLE v1_cosmos.contracts (
 ALTER TABLE v1_cosmos.contracts OWNER TO postgres;
 
 --
+-- Name: token; Type: TABLE; Schema: v1_cosmos; Owner: postgres
+--
+
+CREATE TABLE v1_cosmos.token (
+    id bigint NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    coingecko_id text NOT NULL,
+    denomination text,
+    token_name text,
+    chain_id integer,
+    decimals smallint
+);
+
+
+ALTER TABLE v1_cosmos.token OWNER TO postgres;
+
+--
+-- Name: TABLE token; Type: COMMENT; Schema: v1_cosmos; Owner: postgres
+--
+
+COMMENT ON TABLE v1_cosmos.token IS 'contains the onchain representation of a token on babylon, aswell as the full token name and the coingecko id';
+
+
+--
 -- Name: historic_pool_yield; Type: VIEW; Schema: v1_cosmos; Owner: postgres
 --
 
@@ -3398,8 +3422,9 @@ CREATE VIEW v1_cosmos.historic_pool_yield AS
             bd_1.next_height,
             EXTRACT(epoch FROM (bd_1.next_timestamp - bd_1."timestamp")) AS seconds_between_blocks,
             tp.denomination,
-            tp.price
-           FROM ((block_data bd_1
+            tp.price,
+            t.decimals
+           FROM (((block_data bd_1
              CROSS JOIN LATERAL ( SELECT DISTINCT token_prices.denomination
                    FROM v1_cosmos.token_prices) d)
              LEFT JOIN LATERAL ( SELECT token_prices.denomination,
@@ -3408,26 +3433,27 @@ CREATE VIEW v1_cosmos.historic_pool_yield AS
                   WHERE (token_prices.denomination = d.denomination)
                   ORDER BY (abs(EXTRACT(epoch FROM (bd_1."timestamp" - token_prices.created_at))))
                  LIMIT 1) tp ON (true))
+             LEFT JOIN v1_cosmos.token t ON ((tp.denomination = t.denomination)))
           WHERE (bd_1.next_height IS NOT NULL)
         ), block_fees AS (
          SELECT s.height,
             s.pool_address,
             s.offer_asset AS fee_token_denom,
             sum(s.commission_amount) AS fee_amount,
-            (sum(s.commission_amount) * COALESCE(tp.price, (0)::numeric)) AS fees_usd
+            (sum(((s.commission_amount)::double precision / power((10)::double precision, (COALESCE((tp.decimals)::integer, 6))::double precision))) * (COALESCE(tp.price, (0)::numeric))::double precision) AS fees_usd
            FROM (v1_cosmos.swap s
              LEFT JOIN token_prices_by_block tp ON (((s.height = tp.height) AND (s.offer_asset = tp.denomination))))
-          GROUP BY s.height, s.pool_address, s.offer_asset, tp.price
+          GROUP BY s.height, s.pool_address, s.offer_asset, tp.price, tp.decimals
         ), block_incentives AS (
          SELECT bp.height,
             i.lp_token,
             i.reward AS incentive_token_denom,
             sum((i.rewards_per_second * tp.seconds_between_blocks)) AS incentive_amount,
-            (sum((i.rewards_per_second * tp.seconds_between_blocks)) * COALESCE(tp.price, (0)::numeric)) AS incentives_usd
+            (sum((((i.rewards_per_second * tp.seconds_between_blocks))::double precision / power((10)::double precision, (COALESCE((tp.decimals)::integer, 6))::double precision))) * (COALESCE(tp.price, (0)::numeric))::double precision) AS incentives_usd
            FROM ((block_data bp
              JOIN v1_cosmos.incentivize i ON ((((i.start_ts)::numeric <= EXTRACT(epoch FROM bp."timestamp")) AND ((i.end_ts)::numeric >= EXTRACT(epoch FROM bp."timestamp")))))
              LEFT JOIN token_prices_by_block tp ON (((bp.height = tp.height) AND (i.reward = tp.denomination))))
-          GROUP BY bp.height, i.lp_token, i.reward, tp.seconds_between_blocks, tp.price
+          GROUP BY bp.height, i.lp_token, i.reward, tp.seconds_between_blocks, tp.price, tp.decimals
         ), pool_info AS (
          SELECT DISTINCT pool_balance.pool_address,
             ((pool_balance.token0_denom || ':'::text) || pool_balance.token1_denom) AS lp_token
@@ -3439,9 +3465,9 @@ CREATE VIEW v1_cosmos.historic_pool_yield AS
             a.token1_denom,
             a.token0_balance,
             a.token1_balance,
-            (COALESCE(a.token0_balance, (0)::numeric) * COALESCE(tp0.price, (0)::numeric)) AS token0_value_usd,
-            (COALESCE(a.token1_balance, (0)::numeric) * COALESCE(tp1.price, (0)::numeric)) AS token1_value_usd,
-            ((COALESCE(a.token0_balance, (0)::numeric) * COALESCE(tp0.price, (0)::numeric)) + (COALESCE(a.token1_balance, (0)::numeric) * COALESCE(tp1.price, (0)::numeric))) AS total_liquidity_usd
+            (((COALESCE(a.token0_balance, (0)::numeric))::double precision / power((10)::double precision, (COALESCE((tp0.decimals)::integer, 6))::double precision)) * (COALESCE(tp0.price, (0)::numeric))::double precision) AS token0_value_usd,
+            (((COALESCE(a.token1_balance, (0)::numeric))::double precision / power((10)::double precision, (COALESCE((tp1.decimals)::integer, 6))::double precision)) * (COALESCE(tp1.price, (0)::numeric))::double precision) AS token1_value_usd,
+            ((((COALESCE(a.token0_balance, (0)::numeric))::double precision / power((10)::double precision, (COALESCE((tp0.decimals)::integer, 6))::double precision)) * (COALESCE(tp0.price, (0)::numeric))::double precision) + (((COALESCE(a.token1_balance, (0)::numeric))::double precision / power((10)::double precision, (COALESCE((tp1.decimals)::integer, 6))::double precision)) * (COALESCE(tp1.price, (0)::numeric))::double precision)) AS total_liquidity_usd
            FROM (((v1_cosmos.blocks h
              JOIN v1_cosmos.pool_balance a ON ((h.height = a.height)))
              LEFT JOIN token_prices_by_block tp0 ON (((h.height = tp0.height) AND (a.token0_denom = tp0.denomination))))
@@ -3473,10 +3499,10 @@ CREATE VIEW v1_cosmos.historic_pool_yield AS
     pl.token1_value_usd,
     pl.total_liquidity_usd,
     tf.fee_tokens,
-    COALESCE(tf.total_fees_usd, (0)::numeric) AS fees_usd,
+    COALESCE(tf.total_fees_usd, (0)::double precision) AS fees_usd,
     ti.incentive_tokens,
-    COALESCE(ti.total_incentives_usd, (0)::numeric) AS incentives_usd,
-    (COALESCE(tf.total_fees_usd, (0)::numeric) + COALESCE(ti.total_incentives_usd, (0)::numeric)) AS total_earnings_usd
+    COALESCE(ti.total_incentives_usd, (0)::double precision) AS incentives_usd,
+    (COALESCE(tf.total_fees_usd, (0)::double precision) + COALESCE(ti.total_incentives_usd, (0)::double precision)) AS total_earnings_usd
    FROM (((block_data bd
      JOIN pool_liquidity pl ON ((bd.height = pl.height)))
      LEFT JOIN total_fees_by_pool tf ON (((bd.height = tf.height) AND (pl.pool_address = tf.pool_address))))
@@ -3590,30 +3616,6 @@ CREATE VIEW v1_cosmos.pool_user_shares AS
 
 
 ALTER VIEW v1_cosmos.pool_user_shares OWNER TO postgres;
-
---
--- Name: token; Type: TABLE; Schema: v1_cosmos; Owner: postgres
---
-
-CREATE TABLE v1_cosmos.token (
-    id bigint NOT NULL,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    coingecko_id text NOT NULL,
-    denomination text,
-    token_name text,
-    chain_id integer,
-    decimals smallint
-);
-
-
-ALTER TABLE v1_cosmos.token OWNER TO postgres;
-
---
--- Name: TABLE token; Type: COMMENT; Schema: v1_cosmos; Owner: postgres
---
-
-COMMENT ON TABLE v1_cosmos.token IS 'contains the onchain representation of a token on babylon, aswell as the full token name and the coingecko id';
-
 
 --
 -- Name: token_id_seq; Type: SEQUENCE; Schema: v1_cosmos; Owner: postgres
@@ -17870,7 +17872,7 @@ COPY v1_cosmos.events (chain_id, block_hash, height, transaction_hash, transacti
 --
 
 COPY v1_cosmos.token (id, created_at, coingecko_id, denomination, token_name, chain_id, decimals) FROM stdin;
-1	2025-03-06 14:10:58.042917+00	bitcoin	ibc/3AA6631D204C192DDB757935A4C49A0E83EEEE14AC045E8A180CCB4EE08B6196	bitcoin	1	\N
+1	2025-03-06 14:10:58.042917+00	bitcoin	ibc/3AA6631D204C192DDB757935A4C49A0E83EEEE14AC045E8A180CCB4EE08B6196	bitcoin	1	18
 \.
 
 
@@ -20688,6 +20690,15 @@ GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos
 
 
 --
+-- Name: TABLE token; Type: ACL; Schema: v1_cosmos; Owner: postgres
+--
+
+GRANT SELECT ON TABLE v1_cosmos.token TO v1_cosmos_readonly;
+GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.token TO authenticated;
+GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.token TO service_role;
+
+
+--
 -- Name: TABLE historic_pool_yield; Type: ACL; Schema: v1_cosmos; Owner: postgres
 --
 
@@ -20712,15 +20723,6 @@ GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos
 GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.pool_user_shares TO authenticated;
 GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.pool_user_shares TO service_role;
 GRANT SELECT ON TABLE v1_cosmos.pool_user_shares TO v1_cosmos_readonly;
-
-
---
--- Name: TABLE token; Type: ACL; Schema: v1_cosmos; Owner: postgres
---
-
-GRANT SELECT ON TABLE v1_cosmos.token TO v1_cosmos_readonly;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.token TO authenticated;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.token TO service_role;
 
 
 --

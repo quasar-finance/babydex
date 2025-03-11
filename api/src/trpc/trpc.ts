@@ -6,10 +6,13 @@ import {
   historicPoolYieldInV1Cosmos,
   incentivizeInV1Cosmos,
   poolBalanceInV1Cosmos,
-  poolFeePeriodsInV1Cosmos, poolUserSharesInV1Cosmos,
+  poolFeePeriodsInV1Cosmos,
+  poolUserSharesInV1Cosmos,
   swapInV1Cosmos,
   withdrawLiquidityInV1Cosmos,
 } from "../../drizzle/schema";
+import { generateDrizzleFilter, generateDrizzleFilterPg } from "drizzle-query-helper";
+import { AnyTable } from "drizzle-orm";
 
 const t = initTRPC.create();
 
@@ -41,6 +44,13 @@ export const trpcRouter = router({
       const query = drizzleService.select().from(addLiquidityInV1Cosmos);
       const dynamicQuery = query.$dynamic();
 
+      if (filter) {
+        const drizzleFilter = generateDrizzleFilter(addLiquidityInV1Cosmos, filter);
+        if (drizzleFilter) {
+          dynamicQuery.where(drizzleFilter);
+        }
+      }
+
       return withPagination(dynamicQuery, page, limit, orderBy, orderByColumn);
 
     }),
@@ -67,6 +77,13 @@ export const trpcRouter = router({
       const query = drizzleService.select().from(historicPoolYieldInV1Cosmos);
       const dynamicQuery = query.$dynamic();
 
+      if (filter) {
+        const drizzleFilter = generateDrizzleFilter(addLiquidityInV1Cosmos, filter);
+        if (drizzleFilter) {
+          dynamicQuery.where(drizzleFilter);
+        }
+      }
+
       return withPagination(dynamicQuery, page, limit, orderBy, orderByColumn);
     }),
   incentivize: publicProcedure
@@ -91,6 +108,13 @@ export const trpcRouter = router({
 
       const query = drizzleService.select().from(incentivizeInV1Cosmos);
       const dynamicQuery = query.$dynamic();
+
+      if (filter) {
+        const drizzleFilter = generateDrizzleFilter(addLiquidityInV1Cosmos, filter);
+        if (drizzleFilter) {
+          dynamicQuery.where(drizzleFilter);
+        }
+      }
 
       return withPagination(dynamicQuery, page, limit, orderBy, orderByColumn);
     }),
@@ -117,6 +141,13 @@ export const trpcRouter = router({
       const query = drizzleService.select().from(poolBalanceInV1Cosmos);
       const dynamicQuery = query.$dynamic();
 
+      if (filter) {
+        const drizzleFilter = generateDrizzleFilter(addLiquidityInV1Cosmos, filter);
+        if (drizzleFilter) {
+          dynamicQuery.where(drizzleFilter);
+        }
+      }
+
       return withPagination(dynamicQuery, page, limit, orderBy, orderByColumn);
     }),
   poolFeePeriods: publicProcedure
@@ -141,6 +172,13 @@ export const trpcRouter = router({
 
       const query = drizzleService.select().from(poolFeePeriodsInV1Cosmos);
       const dynamicQuery = query.$dynamic();
+
+      if (filter) {
+        const drizzleFilter = generateDrizzleFilter(addLiquidityInV1Cosmos, filter);
+        if (drizzleFilter) {
+          dynamicQuery.where(drizzleFilter);
+        }
+      }
 
       return withPagination(dynamicQuery, page, limit, orderBy, orderByColumn);
     }),
@@ -167,6 +205,13 @@ export const trpcRouter = router({
       const query = drizzleService.select().from(poolUserSharesInV1Cosmos);
       const dynamicQuery = query.$dynamic();
 
+      if (filter) {
+        const drizzleFilter = generateDrizzleFilter(addLiquidityInV1Cosmos, filter);
+        if (drizzleFilter) {
+          dynamicQuery.where(drizzleFilter);
+        }
+      }
+
       return withPagination(dynamicQuery, page, limit, orderBy, orderByColumn);
     }),
   swap: publicProcedure
@@ -192,6 +237,13 @@ export const trpcRouter = router({
       const query = drizzleService.select().from(swapInV1Cosmos);
       const dynamicQuery = query.$dynamic();
 
+      if (filter) {
+        const drizzleFilter = generateDrizzleFilter(addLiquidityInV1Cosmos, filter);
+        if (drizzleFilter) {
+          dynamicQuery.where(drizzleFilter);
+        }
+      }
+
       return withPagination(dynamicQuery, page, limit, orderBy, orderByColumn);
     }),
   withdrawLiquidity: publicProcedure
@@ -216,6 +268,13 @@ export const trpcRouter = router({
 
       const query = drizzleService.select().from(withdrawLiquidityInV1Cosmos);
       const dynamicQuery = query.$dynamic();
+
+      if (filter) {
+        const drizzleFilter = generateDrizzleFilter(addLiquidityInV1Cosmos, filter);
+        if (drizzleFilter) {
+          dynamicQuery.where(drizzleFilter);
+        }
+      }
 
       return withPagination(dynamicQuery, page, limit, orderBy, orderByColumn);
     }),

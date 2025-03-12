@@ -2,6 +2,7 @@ import { createTRPCRouter, createTRPCPublicProcedure } from "./config.js";
 import { userRouter } from "./routers/user.js";
 import { poolsRouter } from "./routers/pools.js";
 import { assetsRouter } from "./routers/assets.js";
+import {indexerRouter} from "./routers/indexer.js";
 
 export const edgeRouter = createTRPCRouter({
   user: userRouter,
@@ -13,6 +14,7 @@ export const edgeRouter = createTRPCRouter({
 export const localRouter = createTRPCRouter({
   pools: poolsRouter,
   assets: assetsRouter,
+  indexer: indexerRouter,
 });
 
 export const appRouter = createTRPCRouter({

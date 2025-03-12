@@ -24,14 +24,19 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250303.0",
     "@towerfi/types": "workspace:^",
+    "@types/pg": "^8.11.11",
+    "drizzle-kit": "^0.30.5",
     "typescript": "catalog:",
     "wrangler": "catalog:"
   },
   "dependencies": {
     "@trpc/server": "^10.45.2",
     "cosmi": "^0.1.0",
+    "drizzle-orm": "^0.40.0",
+    "drizzle-query-helper": "^1.4.0",
     "ky": "^1.7.5",
     "lru-cache": "^11.0.2",
+    "pg": "^8.13.3",
     "superjson": "^2.2.2",
     "zod": "^3.24.2"
   }

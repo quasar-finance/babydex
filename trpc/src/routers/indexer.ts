@@ -7,7 +7,6 @@ const input = z.object({
     orderByColumn: z.string().nullish(), // PgColumn | SQL | SQL.Aliased,
     page: z.number().min(1).nullish(),
     limit: z.number().min(1).max(100).nullish(),
-    filter: z.string().nullish(),
 }).nullish();
 
 export const indexerRouter = createTRPCRouter(

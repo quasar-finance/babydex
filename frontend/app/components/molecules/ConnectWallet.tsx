@@ -27,7 +27,7 @@ const ConnectWallet: React.FC = () => {
         <>
           <Popover placement="bottom" showArrow offset={10}>
             <PopoverTrigger>
-              <Button variant="flat">
+              <Button color="secondary">
                 <Avatar seed={address || ""} className="w-4 h-4" /> {IntlAddress(address || "")}
               </Button>
             </PopoverTrigger>

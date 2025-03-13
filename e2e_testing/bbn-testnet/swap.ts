@@ -37,12 +37,12 @@ const main = async () => {
     const { client, address } = await getClientAndAddress();
 
     const routerAddress = deployed.router;
-    const baseOfferAmount = "10";
+    const baseOfferAmount = "12";
     // insane slippage because test pools
     const baseMinimumReceive = "5";
 
-    const token0 = "ibc/2278567FFA6D754BDD8C159CE1770D8AF27649BFB58E5132CF530460591E479D";
-    const token1 = "ibc/241F1FFE4117C31D7DFC2A91C026F083FCEB6868C169BA5002FF0B3E17B88EDF";
+    const token0 = "ibc/3AA6631D204C192DDB757935A4C49A0E83EEEE14AC045E8A180CCB4EE08B6196";
+    const token1 = "ibc/4BF4FFBF2B84A71627E009ABFD6A870AA6424D6BA9B419D81F446FA80D3AE655";
 
     const decimals0 = getTokenDecimals(token0);
     const decimals1 = getTokenDecimals(token1);
@@ -51,7 +51,7 @@ const main = async () => {
     const minimumReceive = adjustAmount(baseMinimumReceive, decimals1);
 
     const factoryClient = new AstroportFactoryClient(client, address, deployed.factory);
-    const pairAddress = await findPairAddress(factoryClient, token0, token1);
+    const pairAddress = "bbn1e40kslczvwzset7c20p92pg3hzhuesmsw7x4suwd53ylxjfk6e5sw8j642" // await findPairAddress(factoryClient, token0, token1);
 
     if (!pairAddress) {
         console.error("Pair not found for the given token denoms.");
@@ -77,7 +77,7 @@ const main = async () => {
     try {
         const response = await routerClient.executeSwapOperations(
             {
-                maxSpread: "0.1",
+                maxSpread: "0.3",
                 minimumReceive,
                 operations: [swapOperation],
                 to: address

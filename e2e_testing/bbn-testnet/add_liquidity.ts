@@ -44,16 +44,16 @@ async function findPoolByTokens(
 const main = async () => {
     const {client, address} = await getClientAndAddress();
     
-    const token0 = "ibc/2278567FFA6D754BDD8C159CE1770D8AF27649BFB58E5132CF530460591E479D";
-    const token1 = "ibc/241F1FFE4117C31D7DFC2A91C026F083FCEB6868C169BA5002FF0B3E17B88EDF";
+    const token0 = "ibc/3AA6631D204C192DDB757935A4C49A0E83EEEE14AC045E8A180CCB4EE08B6196";
+    const token1 = "ibc/4BF4FFBF2B84A71627E009ABFD6A870AA6424D6BA9B419D81F446FA80D3AE655";
 
-    const factoryClient = new AstroportFactoryClient(client, address, deployed.factory);
-    const poolInfo = await findPoolByTokens(factoryClient, token0, token1);
+    // const factoryClient = new AstroportFactoryClient(client, address, deployed.factory);
+    // const poolInfo = await findPoolByTokens(factoryClient, token0, token1);
 
-    console.log(poolInfo);
+    // console.log(poolInfo);
 
-    if (poolInfo) {
-        const poolClient = new AstroportPairConcentratedClient(client, address, poolInfo.contractAddr)
+    // if (poolInfo) {
+        const poolClient = new AstroportPairConcentratedClient(client, address, "bbn1e40kslczvwzset7c20p92pg3hzhuesmsw7x4suwd53ylxjfk6e5sw8j642")
 
         const assets = [
             {
@@ -62,7 +62,7 @@ const main = async () => {
                         denom: token0
                     }
                 },
-                amount: "1000000000000000000000"
+                amount: "1000000000000000000000000"
             },
             {
                 info: {
@@ -70,7 +70,7 @@ const main = async () => {
                         denom: token1
                     }
                 },
-                amount: "1000000000"
+                amount: "1000000000000000000000000"
             }
         ];
         const coins: Coin[] = assets.map((asset => { return coin(asset.amount, asset.info.native_token.denom)}));
@@ -82,9 +82,9 @@ const main = async () => {
             coins
         );
         console.log("Provide liquidity response:", response);
-    } else {
-        console.error("Pool not found for the given tokens.");
-    }
+    // } else {
+    //     console.error("Pool not found for the given tokens.");
+    // }
 }
 
 main();

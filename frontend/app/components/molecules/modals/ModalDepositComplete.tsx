@@ -3,12 +3,13 @@ import BasicModal from "~/app/components/templates/BasicModal";
 import type React from "react";
 import { Button } from "../../atoms/Button";
 import { useModal } from "~/app/providers/ModalProvider";
+import { convertMicroDenomToDenom } from "~/utils/intl";
 
 const ModalDepositCompleted: React.FC = () => {
   const { hideModal, modalProps } = useModal();
 
   const { tokens = [] } = modalProps ?? {};
-  const [token1, token2 = null] = tokens;
+  const [token0, token1 = null] = tokens;
 
   return (
     <BasicModal
@@ -31,9 +32,22 @@ const ModalDepositCompleted: React.FC = () => {
           <p className="text-medium text-center font-light text-white/60">
             You have successfully deposited
           </p>
-          <div className="flex gap-2">
-            token 1<span>and</span>
-            token 2
+          <div className="flex items-center justify-center gap-1">
+            <div className="flex items-center justify-center gap-1">
+              <img src={token0?.logoURI} alt={token0?.symbol} className="w-5 h-5" />
+              <p>{convertMicroDenomToDenom(token0?.amount)}</p>
+              <p className="text-white">{token0?.symbol}</p>
+            </div>
+            {tokens.length > 0 && (
+              <>
+                <p>and</p>
+                <div className="flex items-center justify-center gap-1">
+                  <img src={token1?.logoURI} alt={token1?.symbol} className="w-5 h-5" />
+                  <p>{convertMicroDenomToDenom(token1?.amount)}</p>
+                  <p className="text-white">{token1?.symbol}</p>
+                </div>
+              </>
+            )}
           </div>
           <Button fullWidth onClick={hideModal}>
             Continue

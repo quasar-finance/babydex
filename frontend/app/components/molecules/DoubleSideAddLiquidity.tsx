@@ -6,6 +6,8 @@ import { convertDenomToMicroDenom, convertMicroDenomToDenom } from "~/utils/intl
 import { useToast } from "~/app/hooks";
 import { IconWallet } from "@tabler/icons-react";
 import { trpc } from "~/trpc/client";
+import { useModal } from "~/app/providers/ModalProvider";
+import { ModalTypes } from "~/types/modal";
 
 interface Props {
   pool: PoolInfo;
@@ -19,6 +21,7 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, slipageTolerance
   const { register, watch, setValue, handleSubmit } = useForm();
   const { data: signingClient } = useSigningClient();
   const [token0, token1] = pool.assets;
+  const { showModal } = useModal();
 
   const token0Amount = watch(token0.symbol, "");
   const token1Amount = watch(token1.symbol, "");
@@ -72,6 +75,12 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, slipageTolerance
       });
       toast.dismiss(id);
       await refreshBalances();
+      showModal(ModalTypes.deposit_completed, true, {
+        tokens: [
+          { amount: token0Amount, ...token0 },
+          { amount: token1Amount, ...token1 },
+        ],
+      });
     } catch (error) {
       toast.error({
         title: "Deposit failed",

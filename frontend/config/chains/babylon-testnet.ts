@@ -26,7 +26,7 @@ export const babylonTestnet = defineChain({
         "https://raw.githubusercontent.com/cosmos/chain-registry/refs/heads/master/testnets/babylontestnet/chain.json",
     },
     gasSteps: {
-      default: 0.007,
+      default: 0.01,
     },
   },
 });

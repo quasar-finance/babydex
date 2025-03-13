@@ -7,7 +7,8 @@ import { convertDenomToMicroDenom, convertMicroDenomToDenom } from "~/utils/intl
 import { useState } from "react";
 import { useAccount, useBalances, useSigningClient } from "@cosmi/react";
 import { useToast } from "~/app/hooks";
-
+import { useModal } from "~/app/providers/ModalProvider";
+import { ModalTypes } from "~/types/modal";
 interface Props {
   pool: PoolInfo;
   slipageTolerance: string;
@@ -21,6 +22,7 @@ export const SingleSideAddLiquidity: React.FC<Props> = ({ pool, slipageTolerance
   const { data: signingClient } = useSigningClient();
   const { register, watch, setValue, handleSubmit } = useForm();
   const { assets } = pool;
+  const { showModal } = useModal();
 
   const asset = assets[selectedToken];
 
@@ -35,40 +37,36 @@ export const SingleSideAddLiquidity: React.FC<Props> = ({ pool, slipageTolerance
     try {
       if (!signingClient) throw new Error("we couldn't submit the tx");
       setLoading(true);
+
+      const id = toast.loading({
+        title: "Depositing",
+        description: `Depositing ${data[asset.symbol]} ${asset.symbol} to the pool`,
+      });
+
       const tokenAmount = convertDenomToMicroDenom(data[asset.symbol], asset.decimals);
-      await toast.promise(
-        (async () => {
-          await signingClient.execute({
-            execute: {
-              address: pool.poolAddress,
-              message: {
-                provide_liquidity: {
-                  assets: [{ amount: tokenAmount, info: { native_token: { denom: asset.denom } } }],
-                  slippage_tolerance: slipageTolerance,
-                },
-              },
-              funds: [{ denom: asset.denom, amount: tokenAmount }],
+      await signingClient.execute({
+        execute: {
+          address: pool.poolAddress,
+          message: {
+            provide_liquidity: {
+              assets: [{ amount: tokenAmount, info: { native_token: { denom: asset.denom } } }],
+              slippage_tolerance: slipageTolerance,
             },
-            sender: address as string,
-          });
-          await refreshBalances();
-        })(),
-        {
-          loading: {
-            title: "Depositing",
-            description: `Depositing ${data[asset.symbol]} ${asset.symbol} to the pool`,
           },
-          success: {
-            title: "Deposit successful",
-            description: `Deposited ${data[asset.symbol]} ${asset.symbol} to the pool`,
-          },
-          error: {
-            title: "Deposit failed",
-            description: `Failed to deposit ${data[asset.symbol]} ${asset.symbol} to the pool`,
-          },
+          funds: [{ denom: asset.denom, amount: tokenAmount }],
         },
-      );
+        sender: address as string,
+      });
+      toast.dismiss(id);
+      await refreshBalances();
+      showModal(ModalTypes.deposit_completed, true, {
+        tokens: [{ amount: tokenAmount, ...asset }],
+      });
     } catch (error) {
+      toast.error({
+        title: "Deposit failed",
+        description: `Failed to deposit ${data[asset.symbol]} ${asset.symbol} to the pool`,
+      });
     } finally {
       setLoading(false);
     }

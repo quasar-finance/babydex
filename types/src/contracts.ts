@@ -6,6 +6,19 @@ export type PoolResponse = {
   total_share: Uint128;
 };
 
+export type ConfigResponse = {
+  block_time_last: number;
+  factory_addr: Addr;
+  owner: Addr;
+  params?: string | null;
+};
+
+export type CumulativePricesResponse = {
+  assets: Asset[];
+  cumulative_prices: [AssetInfo, AssetInfo, Uint128][];
+  total_share: Uint128;
+};
+
 export type Asset = {
   amount: Uint128;
   info: AssetInfo;

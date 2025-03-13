@@ -26,9 +26,9 @@ export type NativeCurrency = Simplify<
   }
 >;
 
-export type ERC20Currency = Simplify<
+export type CW20Currency = Simplify<
   BaseCurrency & {
-    readonly type: "erc-20";
+    readonly type: "cw-20";
     readonly contractAddress: string;
   }
 >;
@@ -48,4 +48,4 @@ export type IBCCurrency = Simplify<
 
 export type FeeCurrency = WithGasPriceStep<NativeCurrency | IBCCurrency>;
 
-export type Currency = NativeCurrency | ERC20Currency | IBCCurrency;
+export type Currency = NativeCurrency | CW20Currency | IBCCurrency;

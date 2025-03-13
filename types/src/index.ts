@@ -4,7 +4,7 @@ export type {
   BaseCurrency,
   WithPrice,
   Currency,
-  ERC20Currency,
+  CW20Currency,
   FeeCurrency,
   IBCCurrency,
   NativeCurrency,
@@ -21,4 +21,6 @@ export type {
   PairType,
   PoolResponse,
   Uint128,
+  ConfigResponse,
+  CumulativePricesResponse,
 } from "./contracts.js";

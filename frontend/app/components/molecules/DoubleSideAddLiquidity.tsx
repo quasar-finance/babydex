@@ -1,0 +1,164 @@
+import { useForm } from "react-hook-form";
+import type { PoolInfo } from "@towerfi/types";
+import type React from "react";
+import { useAccount, useBalances, useSigningClient } from "@cosmi/react";
+import { convertDenomToMicroDenom, convertMicroDenomToDenom } from "~/utils/intl";
+import { useToast } from "~/app/hooks";
+import { IconWallet } from "@tabler/icons-react";
+import { trpc } from "~/trpc/client";
+
+interface Props {
+  pool: PoolInfo;
+  slipageTolerance: string;
+  setLoading: (loading: boolean) => void;
+}
+
+export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, slipageTolerance, setLoading }) => {
+  const { toast } = useToast();
+  const { address } = useAccount();
+  const { register, watch, setValue, handleSubmit } = useForm();
+  const { data: signingClient } = useSigningClient();
+  const [token0, token1] = pool.assets;
+
+  const token0Amount = watch(token0.symbol, "");
+  const token1Amount = watch(token1.symbol, "");
+
+  const { data: balances = [], refetch: refreshBalances } = useBalances({
+    address: address as string,
+  });
+
+  const { data: optimalRatio = 1 } = trpc.local.pools.getOptimalRatio.useQuery({
+    address: pool.poolAddress,
+  });
+
+  const { t0Balance, t1Balance } = balances.reduce(
+    (acc, { denom, amount }) => {
+      if (denom === token0.denom) acc.t0Balance = amount;
+      if (denom === token1.denom) acc.t1Balance = amount;
+      return acc;
+    },
+    { t0Balance: "0", t1Balance: "0" },
+  );
+
+  const onSubmit = handleSubmit(async (data) => {
+    try {
+      if (!signingClient) throw new Error("we couldn't submit the tx");
+      setLoading(true);
+      const id = toast.loading({
+        title: "Depositing",
+        description: `Depositing ${data[token0.symbol]} ${token0.symbol} and ${data[token1.symbol]} ${token1.symbol} to the pool`,
+      });
+
+      const token0Amount = convertDenomToMicroDenom(data[token0.symbol], token0.decimals);
+      const token1Amount = convertDenomToMicroDenom(data[token1.symbol], token1.decimals);
+      await signingClient.execute({
+        execute: {
+          address: pool.poolAddress,
+          message: {
+            provide_liquidity: {
+              assets: [
+                { amount: token0Amount, info: { native_token: { denom: token0.denom } } },
+                { amount: token1Amount, info: { native_token: { denom: token1.denom } } },
+              ],
+              slippage_tolerance: slipageTolerance,
+            },
+          },
+          funds: [
+            { denom: token0.denom, amount: token0Amount },
+            { denom: token1.denom, amount: token1Amount },
+          ],
+        },
+        sender: address as string,
+      });
+      toast.dismiss(id);
+      await refreshBalances();
+    } catch (error) {
+      toast.error({
+        title: "Deposit failed",
+        description: `Failed to deposit ${data[token0.symbol]} ${token0.symbol} and ${data[token1.symbol]} ${token1.symbol} to the pool`,
+      });
+    } finally {
+      setLoading(false);
+    }
+  });
+
+  return (
+    <form id="addLiquidity" onSubmit={onSubmit} className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 bg-white/5 w-full rounded-xl p-4 flex-1">
+        <div className="w-full flex gap-4 items-center justify-between">
+          <div className="flex items-center gap-2 p-2 pr-3 bg-white/5 rounded-full w-fit">
+            <img src={token0.logoURI} alt={token0.symbol} className="w-7 h-7" />
+            <p>{token0.symbol}</p>
+          </div>
+          <input
+            className="text-2xl w-fit bg-transparent text-right"
+            placeholder="0"
+            {...register(token0.symbol, {
+              validate: (value) => {
+                if (value === "") return "Amount is required";
+                if (Number.isNaN(+value)) return "Only enter digits to bond to a vault";
+                if (Number(value) > Number(t0Balance)) return "Insufficient Amount";
+                if (Number(value) <= 0) return "Amount must be greater than 0";
+              },
+            })}
+            value={token0Amount}
+            onChange={({ target }) => {
+              const regex = /^\d+(\.\d{0,18})?$/;
+              if (target.value === "" || regex.test(target.value)) {
+                setValue(token0.symbol, target.value, { shouldValidate: true });
+                setValue(token1.symbol, Number(target.value) * optimalRatio, {
+                  shouldValidate: true,
+                });
+              }
+            }}
+          />
+        </div>
+        <div className="flex gap-2 items-center justify-between text-white/50 text-xs">
+          <div className="flex gap-1 items-center">
+            <IconWallet className="h-4 w-4" />
+            <p>{convertMicroDenomToDenom(t0Balance, token0.decimals)}</p>
+          </div>
+          <p>$0</p>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-4 bg-white/5 w-full rounded-xl p-4 flex-1">
+        <div className="w-full flex gap-4 items-center justify-between">
+          <div className="flex items-center gap-2 p-2 pr-3 bg-white/5 rounded-full w-fit">
+            <img src={token1.logoURI} alt={token1.symbol} className="w-7 h-7" />
+            <p>{token1.symbol}</p>
+          </div>
+          <input
+            className="text-2xl w-fit bg-transparent text-right"
+            placeholder="0"
+            {...register(token1.symbol, {
+              validate: (value) => {
+                if (value === "") return "Amount is required";
+                if (Number.isNaN(+value)) return "Only enter digits to bond to a vault";
+                if (Number(value) > Number(t0Balance)) return "Insufficient Amount";
+                if (Number(value) <= 0) return "Amount must be greater than 0";
+              },
+            })}
+            value={token1Amount}
+            onChange={({ target }) => {
+              const regex = /^\d+(\.\d{0,18})?$/;
+              if (target.value === "" || regex.test(target.value)) {
+                setValue(token1.symbol, target.value, { shouldValidate: true });
+                setValue(token0.symbol, Number(target.value) / optimalRatio, {
+                  shouldValidate: true,
+                });
+              }
+            }}
+          />
+        </div>
+        <div className="flex gap-2 items-center justify-between text-white/50 text-xs">
+          <div className="flex gap-1 items-center">
+            <IconWallet className="h-4 w-4" />
+            <p>{convertMicroDenomToDenom(t1Balance, token1.decimals)}</p>
+          </div>
+          <p>$0</p>
+        </div>
+      </div>
+    </form>
+  );
+};

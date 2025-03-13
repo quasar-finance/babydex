@@ -68,62 +68,6 @@ const Pools: React.FC = () => {
           ))}
         </div>
       </div>
-
-      {/*  <div className="overflow-x-scroll scrollbar-none ">
-        <table className="w-full text-white text-left">
-          <thead>
-            <tr className=" text-xs text-white/50 font-normal">
-              <th className="px-4 pb-2">Pool</th>
-              <th className="px-4 pb-2">TVL</th>
-              <th className="px-4 pb-2">APR</th>
-              <th className="px-4 pb-2">Volume 24h</th>
-              <th className="px-4 pb-2">Fees 24h</th>
-              <th className="px-4 pb-2"></th>
-            </tr>
-          </thead>
-          <tbody className="first:border-red-500 last:rounded-b-2xl">
-            {mockPools.map((pool) => (
-              <tr key={pool.id} className="rounded-2xl border border-white/10 p-4">
-                <td className=" flex items-center">
-                  {pool.pairs.map((pair, index) => (
-                    <img key={index} src={pair.image} alt={pair.symbol} className="w-6 h-6 rounded-full" />
-                  ))}
-                  <span>{pool.name}</span>
-                </td>
-                <td className="">{pool.TVL}</td>
-                <td className="">{pool.APR}</td>
-                <td className="">{pool.Volume24h}</td>
-                <td className="">{pool.Fees24h}</td>
-                <td className=" flex items-end justify-end">
-                  <Button variant="flat">Add Liquidity</Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div> */}
-
-      {/* <Table aria-label="Example table with dynamic content" classNames={classNames}>
-        <TableHeader>
-          {columns.map((column) => (
-            <TableColumn key={column}>{column}</TableColumn>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {mockPools.map((pool) => (
-            <TableRow key="test">
-              <TableCell>{pool.name}</TableCell>
-              <TableCell>{pool.TVL}</TableCell>
-              <TableCell>{pool.APR}</TableCell>
-              <TableCell>{pool.Volume24h}</TableCell>
-              <TableCell>{pool.Fees24h}</TableCell>
-              <TableCell>
-                <Button variant="flat">Add Liquidity</Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table> */}
     </div>
   );
 };

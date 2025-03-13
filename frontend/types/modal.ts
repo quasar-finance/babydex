@@ -4,4 +4,5 @@ export enum ModalTypes {
   select_asset = "select-asset",
   deposit_lp = "deposit-lp",
   deposit_cl = "deposit-cl",
+  deposit_completed = "deposit-completed",
 }

@@ -5,6 +5,7 @@ import { twMerge } from "~/utils/twMerge";
 import Divider from "../atoms/Divider";
 
 import type { PropsWithChildren, ReactNode } from "react";
+import FlexibleContainer from "../atoms/FlexibleContainer";
 
 export const modalDropIn = {
   hidden: {
@@ -31,6 +32,7 @@ interface Props {
   title?: string;
   subtitle?: string | ReactNode;
   separator?: boolean;
+  showClose?: boolean;
   classNames?: {
     container?: string;
     wrapper?: string;
@@ -43,46 +45,51 @@ const BasicModal: React.FC<PropsWithChildren<Props>> = ({
   subtitle,
   classNames,
   separator = true,
+  showClose = true,
 }) => {
   const { hideModal } = useModal();
   return (
-    <motion.div
-      onClick={(e) => e.stopPropagation()}
-      className={twMerge(
-        "rounded-xl max-w-[480px] w-full bg-tw-gray-950 flex flex-col border-1 border-white/10 relative",
-        classNames?.wrapper,
-      )}
-      variants={modalDropIn}
-      initial="hidden"
-      animate="visible"
-      exit="exit"
-    >
-      <div
+    <FlexibleContainer>
+      <motion.div
+        onClick={(e) => e.stopPropagation()}
         className={twMerge(
-          "flex justify-between w-full ",
-          { "items-center p-4": (title && subtitle) || title },
-          { "items-start p-4": title && subtitle },
+          "rounded-xl max-w-[480px] w-full bg-tw-gray-950 flex flex-col border-1 border-white/10 relative",
+          classNames?.wrapper,
         )}
+        variants={modalDropIn}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
       >
-        <div className="flex flex-col gap-1">
-          {title && <p>{title}</p>}
-          {typeof subtitle === "string" ? (
-            <p className="text-xs text-tw-gray-500">{subtitle}</p>
-          ) : (
-            subtitle
+        <div
+          className={twMerge(
+            "flex justify-between w-full ",
+            { "items-center p-4": (title && subtitle) || title },
+            { "items-start p-4": title && subtitle },
+          )}
+        >
+          <div className="flex flex-col gap-1">
+            {title && <p>{title}</p>}
+            {typeof subtitle === "string" ? (
+              <p className="text-xs text-tw-gray-500">{subtitle}</p>
+            ) : (
+              subtitle
+            )}
+          </div>
+          {showClose && (
+            <button onClick={hideModal} type="button">
+              <IconX
+                className={twMerge("h-5 w-5 text-white/20", {
+                  "absolute right-4 top-4": !title && !subtitle,
+                })}
+              />
+            </button>
           )}
         </div>
-        <button onClick={hideModal} type="button">
-          <IconX
-            className={twMerge("h-5 w-5 text-white/20", {
-              "absolute right-4 top-4": !title && !subtitle,
-            })}
-          />
-        </button>
-      </div>
-      {separator && <Divider />}
-      <div className={twMerge("p-4", classNames?.container)}>{children}</div>
-    </motion.div>
+        {separator && <Divider />}
+        <div className={twMerge("p-4", classNames?.container)}>{children}</div>
+      </motion.div>
+    </FlexibleContainer>
   );
 };
 

@@ -11,7 +11,7 @@ import type { PropsWithChildren } from "react";
 const Layout: React.FC<PropsWithChildren> = ({ children }) => {
   const pathname = usePathname();
   return (
-    <main className="relative flex flex-col items-center justify-center max-w-screen min-h-screen gap-8 ">
+    <main className="relative flex flex-col items-center justify-center max-w-screen min-h-screen gap-8">
       <nav className="sticky top-0 w-full border-b-1 border-b-white/10 pt-4 pb-6 backdrop-blur-lg z-50 ">
         <div className="flex gap-6 items-center justify-between max-w-[84.5rem] mx-auto px-2">
           <div className="flex gap-10 items-center justify-center">

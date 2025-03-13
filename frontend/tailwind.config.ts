@@ -9,6 +9,10 @@ export default {
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./node_modules/@heroui/theme/dist/components/(button|spinner|ripple).js",
   ],
+  safelist: [
+    { pattern: /^-ml-(1|2|3|4|5|6|7|8|9|10|12|16|20|24|32|40|48|56|64)$/ },
+    { pattern: /^z-(\d+)$/ },
+  ],
   theme: {
     extend: {
       fontFamily: {

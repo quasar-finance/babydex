@@ -3,22 +3,40 @@
 @tailwind utilities;
 
 :root {
-  --background: theme(colors.tw-bg);
-  --foregroung: theme(colors.tw-foreground);
-}
-
-@theme {
-  --spacing: 1px;
+  --background: #F7F5EB;
+  --foreground: #0F0F0F;
+  --scrollbarColor: #f8f9fa;
+  --scrollbar-width: 8px;
+  --scrollbar-bg-color: #191919;
+  --scrollbar-thumb-color: rgba(238, 173, 33, 0.5);
+  --scrollbar-thumb-hover-color: rgba(238, 173, 33, 1);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: theme(colors.tw-bg);
-    --foreground: theme(colors.tw-foreground);
+    --background: #0F0F0F;
+    --foreground: #F7F5EB;
+    --scrollbar-bg-color: #191919;
+  --scrollbar-thumb-color: rgba(238, 173, 33, 0.5);
+  --scrollbar-thumb-hover-color: rgba(238, 173, 33, 1);
   }
 }
 
 @layer base {
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  @apply font-inter;
+  letter-spacing: 0.02em;
+}
+
   input[type="number"]::-webkit-inner-spin-button,
   input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;
@@ -29,54 +47,34 @@
   input:focus {
     outline: none;
   }
-}
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-  font-family: theme("fontFamily.inter");
-}
+  ::-moz-selection {
+    color: black;
+    background-color: #f3c751;
+  }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-}
+  ::selection {
+    color: black;
+    background-color: #f3c751;
+  }
 
-::-moz-selection {
-  color: black;
-  background: theme("colors.tw-orange.300");
-}
+  ::-webkit-scrollbar {
+    width: var(--scrollbar-width);
+    background-color: var(--scrollbar-bg-color);
+  }
 
-::selection {
-  color: black;
-  background: theme("colors.tw-orange.300");
-}
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb-color);
+    border-radius: 10px;
+    transition: all 0.3s;
+  }
 
-.ml--1 {
-  margin-left: -1rem;
-  z-index: 9;
-}
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--scrollbar-thumb-hover-color);
+  }
 
-.ml--2 {
-  margin-left: -1rem;
-  z-index: 8;
-}
-
-.ml--3 {
-  margin-left: -1rem;
-  z-index: 7;
-}
-
-.img-select-none {
-  -webkit-user-drag: none;
-  -khtml-user-drag: none;
-  -moz-user-drag: none;
-  -o-user-drag: none;
-  user-drag: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -o-user-select: none;
-  user-select: none;
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb-color) var(--scrollbar-bg-color);
+  }
 }

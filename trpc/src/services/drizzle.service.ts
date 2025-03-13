@@ -42,7 +42,6 @@ const viewNameMapping = {
 export function buildQuery(viewName: string, input?: {
     orderBy?: "asc" | "desc" | null | undefined;
     limit?: number | null | undefined;
-    filter?: string | null | undefined;
     orderByColumn?: string | null | undefined;
     page?: number | null | undefined;
 } | null) {
@@ -58,14 +57,6 @@ export function buildQuery(viewName: string, input?: {
     const orderByColumn = input?.orderByColumn;
     const page = input?.page ?? 1;
     const limit = input?.limit ?? 50;
-    const filter = input?.filter ?? null;
-
-    if (filter) {
-        const drizzleFilter = generateDrizzleFilter(viewNameValue, filter);
-        if (drizzleFilter) {
-            dynamicQuery.where(drizzleFilter);
-        }
-    }
 
     return withPagination(dynamicQuery, page, limit, orderBy, orderByColumn);
 }

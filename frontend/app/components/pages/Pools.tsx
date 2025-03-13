@@ -10,24 +10,22 @@ import { ModalTypes } from "~/types/modal";
 import { trpc } from "~/trpc/client";
 
 import type React from "react";
+import PoolsSkeleton from "../molecules/skeletons/PoolsSkeleton";
 
 const Pools: React.FC = () => {
   const { showModal } = useModal();
-  const { data: pools = [] } = trpc.local.pools.getPools.useQuery();
+  const { data: pools = [], isLoading } = trpc.local.pools.getPools.useQuery();
 
-  const gridClass = "grid-cols-[2fr_1fr_1fr_1fr_1fr_2fr]";
+  const gridClass = "grid-cols-[2fr_1fr_1fr_1fr_1fr_2fr] gap-3";
 
   return (
-    <div className="flex flex-col gap-8 px-4">
+    <div className="flex flex-col gap-8 px-4 pb-20">
       <div className="flex gap-3 justify-between items-center">
         <h1 className="text-xl">Pools</h1>
         <div className="flex gap-3 h-[42px] items-center px-2">
           <Input isSearch placeholder="Search" />
         </div>
       </div>
-      {/* <div className="flex flex-col rounded-xl border border-white/10">
-        <PoolsTableHeader />
-      </div> */}
 
       <div className="flex flex-col gap-3 grays">
         <div className={twMerge("grid  px-4 text-xs text-white/50", gridClass)}>
@@ -38,7 +36,9 @@ const Pools: React.FC = () => {
           <p>Fees 24h</p>
           <p></p>
         </div>
-        <div className="">
+
+        <div>
+          {isLoading && <PoolsSkeleton className={gridClass} />}
           {pools.map((pool, i) => (
             <div
               key={pool.name + i}
@@ -47,15 +47,17 @@ const Pools: React.FC = () => {
                 gridClass,
               )}
             >
-              <div className=" flex items-center gap-3">
-                <AssetsStacked assets={pool.assets} />
-                <span>{pool.name}</span>
+              <div className=" flex items-center  justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <AssetsStacked assets={pool.assets} />
+                  <span>{pool.name}</span>
+                </div>
                 <Pill>0,3%</Pill>
               </div>
-              <div className="">{pool.poolLiquidity}</div>
-              <div className="">-</div>
-              <div className="">-</div>
-              <div className="">-</div>
+              <div>{pool.poolLiquidity}</div>
+              <div>-</div>
+              <div>-</div>
+              <div>-</div>
               <div className=" flex items-end justify-end">
                 <Button
                   variant="flat"

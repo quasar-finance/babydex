@@ -48,7 +48,7 @@ export class Indexer {
         }));
     }
 
-    public queryView(viewName: string, input?: {
+    public async queryView(viewName: string, input?: {
         orderBy?: "asc" | "desc" | null | undefined;
         limit?: number | null | undefined;
         orderByColumn?: string | null | undefined;

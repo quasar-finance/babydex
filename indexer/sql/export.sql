@@ -18,49 +18,39 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Name: auth; Type: SCHEMA; Schema: -; Owner: supabase_admin
+-- Name: auth; Type: SCHEMA; Schema: -; Owner: -
 --
 
 CREATE SCHEMA auth;
 
 
-ALTER SCHEMA auth OWNER TO supabase_admin;
-
 --
--- Name: extensions; Type: SCHEMA; Schema: -; Owner: postgres
+-- Name: extensions; Type: SCHEMA; Schema: -; Owner: -
 --
 
 CREATE SCHEMA extensions;
 
 
-ALTER SCHEMA extensions OWNER TO postgres;
-
 --
--- Name: graphql; Type: SCHEMA; Schema: -; Owner: supabase_admin
+-- Name: graphql; Type: SCHEMA; Schema: -; Owner: -
 --
 
 CREATE SCHEMA graphql;
 
 
-ALTER SCHEMA graphql OWNER TO supabase_admin;
-
 --
--- Name: graphql_public; Type: SCHEMA; Schema: -; Owner: supabase_admin
+-- Name: graphql_public; Type: SCHEMA; Schema: -; Owner: -
 --
 
 CREATE SCHEMA graphql_public;
 
 
-ALTER SCHEMA graphql_public OWNER TO supabase_admin;
-
 --
--- Name: hubble; Type: SCHEMA; Schema: -; Owner: postgres
+-- Name: hubble; Type: SCHEMA; Schema: -; Owner: -
 --
 
 CREATE SCHEMA hubble;
 
-
-ALTER SCHEMA hubble OWNER TO postgres;
 
 --
 -- Name: pg_net; Type: EXTENSION; Schema: -; Owner: -
@@ -70,29 +60,25 @@ CREATE EXTENSION IF NOT EXISTS pg_net WITH SCHEMA extensions;
 
 
 --
--- Name: EXTENSION pg_net; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION pg_net; Type: COMMENT; Schema: -; Owner: -
 --
 
 COMMENT ON EXTENSION pg_net IS 'Async HTTP';
 
 
 --
--- Name: pgbouncer; Type: SCHEMA; Schema: -; Owner: pgbouncer
+-- Name: pgbouncer; Type: SCHEMA; Schema: -; Owner: -
 --
 
 CREATE SCHEMA pgbouncer;
 
 
-ALTER SCHEMA pgbouncer OWNER TO pgbouncer;
-
 --
--- Name: pgsodium; Type: SCHEMA; Schema: -; Owner: supabase_admin
+-- Name: pgsodium; Type: SCHEMA; Schema: -; Owner: -
 --
 
 CREATE SCHEMA pgsodium;
 
-
-ALTER SCHEMA pgsodium OWNER TO supabase_admin;
 
 --
 -- Name: pgsodium; Type: EXTENSION; Schema: -; Owner: -
@@ -102,83 +88,67 @@ CREATE EXTENSION IF NOT EXISTS pgsodium WITH SCHEMA pgsodium;
 
 
 --
--- Name: EXTENSION pgsodium; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION pgsodium; Type: COMMENT; Schema: -; Owner: -
 --
 
 COMMENT ON EXTENSION pgsodium IS 'Pgsodium is a modern cryptography library for Postgres.';
 
 
 --
--- Name: realtime; Type: SCHEMA; Schema: -; Owner: supabase_admin
+-- Name: realtime; Type: SCHEMA; Schema: -; Owner: -
 --
 
 CREATE SCHEMA realtime;
 
 
-ALTER SCHEMA realtime OWNER TO supabase_admin;
-
 --
--- Name: storage; Type: SCHEMA; Schema: -; Owner: supabase_admin
+-- Name: storage; Type: SCHEMA; Schema: -; Owner: -
 --
 
 CREATE SCHEMA storage;
 
 
-ALTER SCHEMA storage OWNER TO supabase_admin;
-
 --
--- Name: supabase_functions; Type: SCHEMA; Schema: -; Owner: supabase_admin
+-- Name: supabase_functions; Type: SCHEMA; Schema: -; Owner: -
 --
 
 CREATE SCHEMA supabase_functions;
 
 
-ALTER SCHEMA supabase_functions OWNER TO supabase_admin;
-
 --
--- Name: supabase_migrations; Type: SCHEMA; Schema: -; Owner: postgres
+-- Name: supabase_migrations; Type: SCHEMA; Schema: -; Owner: -
 --
 
 CREATE SCHEMA supabase_migrations;
 
 
-ALTER SCHEMA supabase_migrations OWNER TO postgres;
-
 --
--- Name: v1_aptos; Type: SCHEMA; Schema: -; Owner: postgres
+-- Name: v1_aptos; Type: SCHEMA; Schema: -; Owner: -
 --
 
 CREATE SCHEMA v1_aptos;
 
 
-ALTER SCHEMA v1_aptos OWNER TO postgres;
-
 --
--- Name: v1_cosmos; Type: SCHEMA; Schema: -; Owner: postgres
+-- Name: v1_cosmos; Type: SCHEMA; Schema: -; Owner: -
 --
 
 CREATE SCHEMA v1_cosmos;
 
 
-ALTER SCHEMA v1_cosmos OWNER TO postgres;
-
 --
--- Name: v1_evm; Type: SCHEMA; Schema: -; Owner: postgres
+-- Name: v1_evm; Type: SCHEMA; Schema: -; Owner: -
 --
 
 CREATE SCHEMA v1_evm;
 
 
-ALTER SCHEMA v1_evm OWNER TO postgres;
-
 --
--- Name: vault; Type: SCHEMA; Schema: -; Owner: supabase_admin
+-- Name: vault; Type: SCHEMA; Schema: -; Owner: -
 --
 
 CREATE SCHEMA vault;
 
-
-ALTER SCHEMA vault OWNER TO supabase_admin;
 
 --
 -- Name: pg_graphql; Type: EXTENSION; Schema: -; Owner: -
@@ -188,7 +158,7 @@ CREATE EXTENSION IF NOT EXISTS pg_graphql WITH SCHEMA graphql;
 
 
 --
--- Name: EXTENSION pg_graphql; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION pg_graphql; Type: COMMENT; Schema: -; Owner: -
 --
 
 COMMENT ON EXTENSION pg_graphql IS 'pg_graphql: GraphQL support';
@@ -202,7 +172,7 @@ CREATE EXTENSION IF NOT EXISTS pg_stat_statements WITH SCHEMA extensions;
 
 
 --
--- Name: EXTENSION pg_stat_statements; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION pg_stat_statements; Type: COMMENT; Schema: -; Owner: -
 --
 
 COMMENT ON EXTENSION pg_stat_statements IS 'track planning and execution statistics of all SQL statements executed';
@@ -216,7 +186,7 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA extensions;
 
 
 --
--- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: -
 --
 
 COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
@@ -230,7 +200,7 @@ CREATE EXTENSION IF NOT EXISTS pgjwt WITH SCHEMA extensions;
 
 
 --
--- Name: EXTENSION pgjwt; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION pgjwt; Type: COMMENT; Schema: -; Owner: -
 --
 
 COMMENT ON EXTENSION pgjwt IS 'JSON Web Token API for Postgresql';
@@ -244,7 +214,7 @@ CREATE EXTENSION IF NOT EXISTS supabase_vault WITH SCHEMA vault;
 
 
 --
--- Name: EXTENSION supabase_vault; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION supabase_vault; Type: COMMENT; Schema: -; Owner: -
 --
 
 COMMENT ON EXTENSION supabase_vault IS 'Supabase Vault Extension';
@@ -258,14 +228,14 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA extensions;
 
 
 --
--- Name: EXTENSION "uuid-ossp"; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION "uuid-ossp"; Type: COMMENT; Schema: -; Owner: -
 --
 
 COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UUIDs)';
 
 
 --
--- Name: aal_level; Type: TYPE; Schema: auth; Owner: supabase_auth_admin
+-- Name: aal_level; Type: TYPE; Schema: auth; Owner: -
 --
 
 CREATE TYPE auth.aal_level AS ENUM (
@@ -275,10 +245,8 @@ CREATE TYPE auth.aal_level AS ENUM (
 );
 
 
-ALTER TYPE auth.aal_level OWNER TO supabase_auth_admin;
-
 --
--- Name: code_challenge_method; Type: TYPE; Schema: auth; Owner: supabase_auth_admin
+-- Name: code_challenge_method; Type: TYPE; Schema: auth; Owner: -
 --
 
 CREATE TYPE auth.code_challenge_method AS ENUM (
@@ -287,10 +255,8 @@ CREATE TYPE auth.code_challenge_method AS ENUM (
 );
 
 
-ALTER TYPE auth.code_challenge_method OWNER TO supabase_auth_admin;
-
 --
--- Name: factor_status; Type: TYPE; Schema: auth; Owner: supabase_auth_admin
+-- Name: factor_status; Type: TYPE; Schema: auth; Owner: -
 --
 
 CREATE TYPE auth.factor_status AS ENUM (
@@ -299,10 +265,8 @@ CREATE TYPE auth.factor_status AS ENUM (
 );
 
 
-ALTER TYPE auth.factor_status OWNER TO supabase_auth_admin;
-
 --
--- Name: factor_type; Type: TYPE; Schema: auth; Owner: supabase_auth_admin
+-- Name: factor_type; Type: TYPE; Schema: auth; Owner: -
 --
 
 CREATE TYPE auth.factor_type AS ENUM (
@@ -312,10 +276,8 @@ CREATE TYPE auth.factor_type AS ENUM (
 );
 
 
-ALTER TYPE auth.factor_type OWNER TO supabase_auth_admin;
-
 --
--- Name: one_time_token_type; Type: TYPE; Schema: auth; Owner: supabase_auth_admin
+-- Name: one_time_token_type; Type: TYPE; Schema: auth; Owner: -
 --
 
 CREATE TYPE auth.one_time_token_type AS ENUM (
@@ -328,10 +290,8 @@ CREATE TYPE auth.one_time_token_type AS ENUM (
 );
 
 
-ALTER TYPE auth.one_time_token_type OWNER TO supabase_auth_admin;
-
 --
--- Name: action; Type: TYPE; Schema: realtime; Owner: supabase_admin
+-- Name: action; Type: TYPE; Schema: realtime; Owner: -
 --
 
 CREATE TYPE realtime.action AS ENUM (
@@ -343,10 +303,8 @@ CREATE TYPE realtime.action AS ENUM (
 );
 
 
-ALTER TYPE realtime.action OWNER TO supabase_admin;
-
 --
--- Name: equality_op; Type: TYPE; Schema: realtime; Owner: supabase_admin
+-- Name: equality_op; Type: TYPE; Schema: realtime; Owner: -
 --
 
 CREATE TYPE realtime.equality_op AS ENUM (
@@ -360,10 +318,8 @@ CREATE TYPE realtime.equality_op AS ENUM (
 );
 
 
-ALTER TYPE realtime.equality_op OWNER TO supabase_admin;
-
 --
--- Name: user_defined_filter; Type: TYPE; Schema: realtime; Owner: supabase_admin
+-- Name: user_defined_filter; Type: TYPE; Schema: realtime; Owner: -
 --
 
 CREATE TYPE realtime.user_defined_filter AS (
@@ -373,10 +329,8 @@ CREATE TYPE realtime.user_defined_filter AS (
 );
 
 
-ALTER TYPE realtime.user_defined_filter OWNER TO supabase_admin;
-
 --
--- Name: wal_column; Type: TYPE; Schema: realtime; Owner: supabase_admin
+-- Name: wal_column; Type: TYPE; Schema: realtime; Owner: -
 --
 
 CREATE TYPE realtime.wal_column AS (
@@ -389,10 +343,8 @@ CREATE TYPE realtime.wal_column AS (
 );
 
 
-ALTER TYPE realtime.wal_column OWNER TO supabase_admin;
-
 --
--- Name: wal_rls; Type: TYPE; Schema: realtime; Owner: supabase_admin
+-- Name: wal_rls; Type: TYPE; Schema: realtime; Owner: -
 --
 
 CREATE TYPE realtime.wal_rls AS (
@@ -403,10 +355,8 @@ CREATE TYPE realtime.wal_rls AS (
 );
 
 
-ALTER TYPE realtime.wal_rls OWNER TO supabase_admin;
-
 --
--- Name: email(); Type: FUNCTION; Schema: auth; Owner: supabase_auth_admin
+-- Name: email(); Type: FUNCTION; Schema: auth; Owner: -
 --
 
 CREATE FUNCTION auth.email() RETURNS text
@@ -420,17 +370,15 @@ CREATE FUNCTION auth.email() RETURNS text
 $$;
 
 
-ALTER FUNCTION auth.email() OWNER TO supabase_auth_admin;
-
 --
--- Name: FUNCTION email(); Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+-- Name: FUNCTION email(); Type: COMMENT; Schema: auth; Owner: -
 --
 
 COMMENT ON FUNCTION auth.email() IS 'Deprecated. Use auth.jwt() -> ''email'' instead.';
 
 
 --
--- Name: jwt(); Type: FUNCTION; Schema: auth; Owner: supabase_auth_admin
+-- Name: jwt(); Type: FUNCTION; Schema: auth; Owner: -
 --
 
 CREATE FUNCTION auth.jwt() RETURNS jsonb
@@ -444,10 +392,8 @@ CREATE FUNCTION auth.jwt() RETURNS jsonb
 $$;
 
 
-ALTER FUNCTION auth.jwt() OWNER TO supabase_auth_admin;
-
 --
--- Name: role(); Type: FUNCTION; Schema: auth; Owner: supabase_auth_admin
+-- Name: role(); Type: FUNCTION; Schema: auth; Owner: -
 --
 
 CREATE FUNCTION auth.role() RETURNS text
@@ -461,17 +407,15 @@ CREATE FUNCTION auth.role() RETURNS text
 $$;
 
 
-ALTER FUNCTION auth.role() OWNER TO supabase_auth_admin;
-
 --
--- Name: FUNCTION role(); Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+-- Name: FUNCTION role(); Type: COMMENT; Schema: auth; Owner: -
 --
 
 COMMENT ON FUNCTION auth.role() IS 'Deprecated. Use auth.jwt() -> ''role'' instead.';
 
 
 --
--- Name: uid(); Type: FUNCTION; Schema: auth; Owner: supabase_auth_admin
+-- Name: uid(); Type: FUNCTION; Schema: auth; Owner: -
 --
 
 CREATE FUNCTION auth.uid() RETURNS uuid
@@ -485,17 +429,15 @@ CREATE FUNCTION auth.uid() RETURNS uuid
 $$;
 
 
-ALTER FUNCTION auth.uid() OWNER TO supabase_auth_admin;
-
 --
--- Name: FUNCTION uid(); Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+-- Name: FUNCTION uid(); Type: COMMENT; Schema: auth; Owner: -
 --
 
 COMMENT ON FUNCTION auth.uid() IS 'Deprecated. Use auth.jwt() -> ''sub'' instead.';
 
 
 --
--- Name: grant_pg_cron_access(); Type: FUNCTION; Schema: extensions; Owner: postgres
+-- Name: grant_pg_cron_access(); Type: FUNCTION; Schema: extensions; Owner: -
 --
 
 CREATE FUNCTION extensions.grant_pg_cron_access() RETURNS event_trigger
@@ -531,17 +473,15 @@ END;
 $$;
 
 
-ALTER FUNCTION extensions.grant_pg_cron_access() OWNER TO postgres;
-
 --
--- Name: FUNCTION grant_pg_cron_access(); Type: COMMENT; Schema: extensions; Owner: postgres
+-- Name: FUNCTION grant_pg_cron_access(); Type: COMMENT; Schema: extensions; Owner: -
 --
 
 COMMENT ON FUNCTION extensions.grant_pg_cron_access() IS 'Grants access to pg_cron';
 
 
 --
--- Name: grant_pg_graphql_access(); Type: FUNCTION; Schema: extensions; Owner: supabase_admin
+-- Name: grant_pg_graphql_access(); Type: FUNCTION; Schema: extensions; Owner: -
 --
 
 CREATE FUNCTION extensions.grant_pg_graphql_access() RETURNS event_trigger
@@ -598,17 +538,15 @@ END;
 $_$;
 
 
-ALTER FUNCTION extensions.grant_pg_graphql_access() OWNER TO supabase_admin;
-
 --
--- Name: FUNCTION grant_pg_graphql_access(); Type: COMMENT; Schema: extensions; Owner: supabase_admin
+-- Name: FUNCTION grant_pg_graphql_access(); Type: COMMENT; Schema: extensions; Owner: -
 --
 
 COMMENT ON FUNCTION extensions.grant_pg_graphql_access() IS 'Grants access to pg_graphql';
 
 
 --
--- Name: grant_pg_net_access(); Type: FUNCTION; Schema: extensions; Owner: postgres
+-- Name: grant_pg_net_access(); Type: FUNCTION; Schema: extensions; Owner: -
 --
 
 CREATE FUNCTION extensions.grant_pg_net_access() RETURNS event_trigger
@@ -649,17 +587,15 @@ CREATE FUNCTION extensions.grant_pg_net_access() RETURNS event_trigger
   $$;
 
 
-ALTER FUNCTION extensions.grant_pg_net_access() OWNER TO postgres;
-
 --
--- Name: FUNCTION grant_pg_net_access(); Type: COMMENT; Schema: extensions; Owner: postgres
+-- Name: FUNCTION grant_pg_net_access(); Type: COMMENT; Schema: extensions; Owner: -
 --
 
 COMMENT ON FUNCTION extensions.grant_pg_net_access() IS 'Grants access to pg_net';
 
 
 --
--- Name: pgrst_ddl_watch(); Type: FUNCTION; Schema: extensions; Owner: supabase_admin
+-- Name: pgrst_ddl_watch(); Type: FUNCTION; Schema: extensions; Owner: -
 --
 
 CREATE FUNCTION extensions.pgrst_ddl_watch() RETURNS event_trigger
@@ -691,10 +627,8 @@ BEGIN
 END; $$;
 
 
-ALTER FUNCTION extensions.pgrst_ddl_watch() OWNER TO supabase_admin;
-
 --
--- Name: pgrst_drop_watch(); Type: FUNCTION; Schema: extensions; Owner: supabase_admin
+-- Name: pgrst_drop_watch(); Type: FUNCTION; Schema: extensions; Owner: -
 --
 
 CREATE FUNCTION extensions.pgrst_drop_watch() RETURNS event_trigger
@@ -724,10 +658,8 @@ BEGIN
 END; $$;
 
 
-ALTER FUNCTION extensions.pgrst_drop_watch() OWNER TO supabase_admin;
-
 --
--- Name: set_graphql_placeholder(); Type: FUNCTION; Schema: extensions; Owner: supabase_admin
+-- Name: set_graphql_placeholder(); Type: FUNCTION; Schema: extensions; Owner: -
 --
 
 CREATE FUNCTION extensions.set_graphql_placeholder() RETURNS event_trigger
@@ -783,17 +715,15 @@ CREATE FUNCTION extensions.set_graphql_placeholder() RETURNS event_trigger
 $_$;
 
 
-ALTER FUNCTION extensions.set_graphql_placeholder() OWNER TO supabase_admin;
-
 --
--- Name: FUNCTION set_graphql_placeholder(); Type: COMMENT; Schema: extensions; Owner: supabase_admin
+-- Name: FUNCTION set_graphql_placeholder(); Type: COMMENT; Schema: extensions; Owner: -
 --
 
 COMMENT ON FUNCTION extensions.set_graphql_placeholder() IS 'Reintroduces placeholder function for graphql_public.graphql';
 
 
 --
--- Name: update_updated_at_column(); Type: FUNCTION; Schema: hubble; Owner: postgres
+-- Name: update_updated_at_column(); Type: FUNCTION; Schema: hubble; Owner: -
 --
 
 CREATE FUNCTION hubble.update_updated_at_column() RETURNS trigger
@@ -806,10 +736,8 @@ END;
 $$;
 
 
-ALTER FUNCTION hubble.update_updated_at_column() OWNER TO postgres;
-
 --
--- Name: get_auth(text); Type: FUNCTION; Schema: pgbouncer; Owner: postgres
+-- Name: get_auth(text); Type: FUNCTION; Schema: pgbouncer; Owner: -
 --
 
 CREATE FUNCTION pgbouncer.get_auth(p_usename text) RETURNS TABLE(username text, password text)
@@ -825,14 +753,12 @@ END;
 $$;
 
 
-ALTER FUNCTION pgbouncer.get_auth(p_usename text) OWNER TO postgres;
-
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
 
 --
--- Name: events; Type: TABLE; Schema: v1_cosmos; Owner: postgres
+-- Name: events; Type: TABLE; Schema: v1_cosmos; Owner: -
 --
 
 CREATE TABLE v1_cosmos.events (
@@ -848,17 +774,15 @@ CREATE TABLE v1_cosmos.events (
 );
 
 
-ALTER TABLE v1_cosmos.events OWNER TO postgres;
-
 --
--- Name: TABLE events; Type: COMMENT; Schema: v1_cosmos; Owner: postgres
+-- Name: TABLE events; Type: COMMENT; Schema: v1_cosmos; Owner: -
 --
 
 COMMENT ON TABLE v1_cosmos.events IS 'DEPRECATED: use V1';
 
 
 --
--- Name: attributes(v1_cosmos.events); Type: FUNCTION; Schema: public; Owner: postgres
+-- Name: attributes(v1_cosmos.events); Type: FUNCTION; Schema: public; Owner: -
 --
 
 CREATE FUNCTION public.attributes(v1_cosmos.events) RETURNS jsonb
@@ -872,10 +796,8 @@ CREATE FUNCTION public.attributes(v1_cosmos.events) RETURNS jsonb
 $_$;
 
 
-ALTER FUNCTION public.attributes(v1_cosmos.events) OWNER TO postgres;
-
 --
--- Name: insert_pool_and_blockfix(text, text, bigint); Type: FUNCTION; Schema: public; Owner: postgres
+-- Name: insert_pool_and_blockfix(text, text, bigint); Type: FUNCTION; Schema: public; Owner: -
 --
 
 CREATE FUNCTION public.insert_pool_and_blockfix(p_address text, p_internal_chain_id text, p_height bigint) RETURNS jsonb
@@ -945,10 +867,8 @@ END;
 $$;
 
 
-ALTER FUNCTION public.insert_pool_and_blockfix(p_address text, p_internal_chain_id text, p_height bigint) OWNER TO postgres;
-
 --
--- Name: apply_rls(jsonb, integer); Type: FUNCTION; Schema: realtime; Owner: supabase_admin
+-- Name: apply_rls(jsonb, integer); Type: FUNCTION; Schema: realtime; Owner: -
 --
 
 CREATE FUNCTION realtime.apply_rls(wal jsonb, max_record_bytes integer DEFAULT (1024 * 1024)) RETURNS SETOF realtime.wal_rls
@@ -1252,10 +1172,8 @@ end;
 $$;
 
 
-ALTER FUNCTION realtime.apply_rls(wal jsonb, max_record_bytes integer) OWNER TO supabase_admin;
-
 --
--- Name: broadcast_changes(text, text, text, text, text, record, record, text); Type: FUNCTION; Schema: realtime; Owner: supabase_admin
+-- Name: broadcast_changes(text, text, text, text, text, record, record, text); Type: FUNCTION; Schema: realtime; Owner: -
 --
 
 CREATE FUNCTION realtime.broadcast_changes(topic_name text, event_name text, operation text, table_name text, table_schema text, new record, old record, level text DEFAULT 'ROW'::text) RETURNS void
@@ -1283,10 +1201,8 @@ END;
 $$;
 
 
-ALTER FUNCTION realtime.broadcast_changes(topic_name text, event_name text, operation text, table_name text, table_schema text, new record, old record, level text) OWNER TO supabase_admin;
-
 --
--- Name: build_prepared_statement_sql(text, regclass, realtime.wal_column[]); Type: FUNCTION; Schema: realtime; Owner: supabase_admin
+-- Name: build_prepared_statement_sql(text, regclass, realtime.wal_column[]); Type: FUNCTION; Schema: realtime; Owner: -
 --
 
 CREATE FUNCTION realtime.build_prepared_statement_sql(prepared_statement_name text, entity regclass, columns realtime.wal_column[]) RETURNS text
@@ -1318,10 +1234,8 @@ CREATE FUNCTION realtime.build_prepared_statement_sql(prepared_statement_name te
       $$;
 
 
-ALTER FUNCTION realtime.build_prepared_statement_sql(prepared_statement_name text, entity regclass, columns realtime.wal_column[]) OWNER TO supabase_admin;
-
 --
--- Name: cast(text, regtype); Type: FUNCTION; Schema: realtime; Owner: supabase_admin
+-- Name: cast(text, regtype); Type: FUNCTION; Schema: realtime; Owner: -
 --
 
 CREATE FUNCTION realtime."cast"(val text, type_ regtype) RETURNS jsonb
@@ -1336,10 +1250,8 @@ CREATE FUNCTION realtime."cast"(val text, type_ regtype) RETURNS jsonb
     $$;
 
 
-ALTER FUNCTION realtime."cast"(val text, type_ regtype) OWNER TO supabase_admin;
-
 --
--- Name: check_equality_op(realtime.equality_op, regtype, text, text); Type: FUNCTION; Schema: realtime; Owner: supabase_admin
+-- Name: check_equality_op(realtime.equality_op, regtype, text, text); Type: FUNCTION; Schema: realtime; Owner: -
 --
 
 CREATE FUNCTION realtime.check_equality_op(op realtime.equality_op, type_ regtype, val_1 text, val_2 text) RETURNS boolean
@@ -1377,10 +1289,8 @@ CREATE FUNCTION realtime.check_equality_op(op realtime.equality_op, type_ regtyp
       $$;
 
 
-ALTER FUNCTION realtime.check_equality_op(op realtime.equality_op, type_ regtype, val_1 text, val_2 text) OWNER TO supabase_admin;
-
 --
--- Name: is_visible_through_filters(realtime.wal_column[], realtime.user_defined_filter[]); Type: FUNCTION; Schema: realtime; Owner: supabase_admin
+-- Name: is_visible_through_filters(realtime.wal_column[], realtime.user_defined_filter[]); Type: FUNCTION; Schema: realtime; Owner: -
 --
 
 CREATE FUNCTION realtime.is_visible_through_filters(columns realtime.wal_column[], filters realtime.user_defined_filter[]) RETURNS boolean
@@ -1415,10 +1325,8 @@ CREATE FUNCTION realtime.is_visible_through_filters(columns realtime.wal_column[
     $_$;
 
 
-ALTER FUNCTION realtime.is_visible_through_filters(columns realtime.wal_column[], filters realtime.user_defined_filter[]) OWNER TO supabase_admin;
-
 --
--- Name: list_changes(name, name, integer, integer); Type: FUNCTION; Schema: realtime; Owner: supabase_admin
+-- Name: list_changes(name, name, integer, integer); Type: FUNCTION; Schema: realtime; Owner: -
 --
 
 CREATE FUNCTION realtime.list_changes(publication name, slot_name name, max_changes integer, max_record_bytes integer) RETURNS SETOF realtime.wal_rls
@@ -1483,10 +1391,8 @@ CREATE FUNCTION realtime.list_changes(publication name, slot_name name, max_chan
     $$;
 
 
-ALTER FUNCTION realtime.list_changes(publication name, slot_name name, max_changes integer, max_record_bytes integer) OWNER TO supabase_admin;
-
 --
--- Name: quote_wal2json(regclass); Type: FUNCTION; Schema: realtime; Owner: supabase_admin
+-- Name: quote_wal2json(regclass); Type: FUNCTION; Schema: realtime; Owner: -
 --
 
 CREATE FUNCTION realtime.quote_wal2json(entity regclass) RETURNS text
@@ -1523,10 +1429,8 @@ CREATE FUNCTION realtime.quote_wal2json(entity regclass) RETURNS text
     $$;
 
 
-ALTER FUNCTION realtime.quote_wal2json(entity regclass) OWNER TO supabase_admin;
-
 --
--- Name: send(jsonb, text, text, boolean); Type: FUNCTION; Schema: realtime; Owner: supabase_admin
+-- Name: send(jsonb, text, text, boolean); Type: FUNCTION; Schema: realtime; Owner: -
 --
 
 CREATE FUNCTION realtime.send(payload jsonb, event text, topic text, private boolean DEFAULT true) RETURNS void
@@ -1558,10 +1462,8 @@ END;
 $$;
 
 
-ALTER FUNCTION realtime.send(payload jsonb, event text, topic text, private boolean) OWNER TO supabase_admin;
-
 --
--- Name: subscription_check_filters(); Type: FUNCTION; Schema: realtime; Owner: supabase_admin
+-- Name: subscription_check_filters(); Type: FUNCTION; Schema: realtime; Owner: -
 --
 
 CREATE FUNCTION realtime.subscription_check_filters() RETURNS trigger
@@ -1634,10 +1536,8 @@ CREATE FUNCTION realtime.subscription_check_filters() RETURNS trigger
     $$;
 
 
-ALTER FUNCTION realtime.subscription_check_filters() OWNER TO supabase_admin;
-
 --
--- Name: to_regrole(text); Type: FUNCTION; Schema: realtime; Owner: supabase_admin
+-- Name: to_regrole(text); Type: FUNCTION; Schema: realtime; Owner: -
 --
 
 CREATE FUNCTION realtime.to_regrole(role_name text) RETURNS regrole
@@ -1645,10 +1545,8 @@ CREATE FUNCTION realtime.to_regrole(role_name text) RETURNS regrole
     AS $$ select role_name::regrole $$;
 
 
-ALTER FUNCTION realtime.to_regrole(role_name text) OWNER TO supabase_admin;
-
 --
--- Name: topic(); Type: FUNCTION; Schema: realtime; Owner: supabase_realtime_admin
+-- Name: topic(); Type: FUNCTION; Schema: realtime; Owner: -
 --
 
 CREATE FUNCTION realtime.topic() RETURNS text
@@ -1658,10 +1556,8 @@ select nullif(current_setting('realtime.topic', true), '')::text;
 $$;
 
 
-ALTER FUNCTION realtime.topic() OWNER TO supabase_realtime_admin;
-
 --
--- Name: can_insert_object(text, text, uuid, jsonb); Type: FUNCTION; Schema: storage; Owner: supabase_storage_admin
+-- Name: can_insert_object(text, text, uuid, jsonb); Type: FUNCTION; Schema: storage; Owner: -
 --
 
 CREATE FUNCTION storage.can_insert_object(bucketid text, name text, owner uuid, metadata jsonb) RETURNS void
@@ -1677,10 +1573,8 @@ END
 $$;
 
 
-ALTER FUNCTION storage.can_insert_object(bucketid text, name text, owner uuid, metadata jsonb) OWNER TO supabase_storage_admin;
-
 --
--- Name: extension(text); Type: FUNCTION; Schema: storage; Owner: supabase_storage_admin
+-- Name: extension(text); Type: FUNCTION; Schema: storage; Owner: -
 --
 
 CREATE FUNCTION storage.extension(name text) RETURNS text
@@ -1698,10 +1592,8 @@ END
 $$;
 
 
-ALTER FUNCTION storage.extension(name text) OWNER TO supabase_storage_admin;
-
 --
--- Name: filename(text); Type: FUNCTION; Schema: storage; Owner: supabase_storage_admin
+-- Name: filename(text); Type: FUNCTION; Schema: storage; Owner: -
 --
 
 CREATE FUNCTION storage.filename(name text) RETURNS text
@@ -1716,10 +1608,8 @@ END
 $$;
 
 
-ALTER FUNCTION storage.filename(name text) OWNER TO supabase_storage_admin;
-
 --
--- Name: foldername(text); Type: FUNCTION; Schema: storage; Owner: supabase_storage_admin
+-- Name: foldername(text); Type: FUNCTION; Schema: storage; Owner: -
 --
 
 CREATE FUNCTION storage.foldername(name text) RETURNS text[]
@@ -1734,10 +1624,8 @@ END
 $$;
 
 
-ALTER FUNCTION storage.foldername(name text) OWNER TO supabase_storage_admin;
-
 --
--- Name: get_size_by_bucket(); Type: FUNCTION; Schema: storage; Owner: supabase_storage_admin
+-- Name: get_size_by_bucket(); Type: FUNCTION; Schema: storage; Owner: -
 --
 
 CREATE FUNCTION storage.get_size_by_bucket() RETURNS TABLE(size bigint, bucket_id text)
@@ -1752,10 +1640,8 @@ END
 $$;
 
 
-ALTER FUNCTION storage.get_size_by_bucket() OWNER TO supabase_storage_admin;
-
 --
--- Name: list_multipart_uploads_with_delimiter(text, text, text, integer, text, text); Type: FUNCTION; Schema: storage; Owner: supabase_storage_admin
+-- Name: list_multipart_uploads_with_delimiter(text, text, text, integer, text, text); Type: FUNCTION; Schema: storage; Owner: -
 --
 
 CREATE FUNCTION storage.list_multipart_uploads_with_delimiter(bucket_id text, prefix_param text, delimiter_param text, max_keys integer DEFAULT 100, next_key_token text DEFAULT ''::text, next_upload_token text DEFAULT ''::text) RETURNS TABLE(key text, id text, created_at timestamp with time zone)
@@ -1800,10 +1686,8 @@ END;
 $_$;
 
 
-ALTER FUNCTION storage.list_multipart_uploads_with_delimiter(bucket_id text, prefix_param text, delimiter_param text, max_keys integer, next_key_token text, next_upload_token text) OWNER TO supabase_storage_admin;
-
 --
--- Name: list_objects_with_delimiter(text, text, text, integer, text, text); Type: FUNCTION; Schema: storage; Owner: supabase_storage_admin
+-- Name: list_objects_with_delimiter(text, text, text, integer, text, text); Type: FUNCTION; Schema: storage; Owner: -
 --
 
 CREATE FUNCTION storage.list_objects_with_delimiter(bucket_id text, prefix_param text, delimiter_param text, max_keys integer DEFAULT 100, start_after text DEFAULT ''::text, next_token text DEFAULT ''::text) RETURNS TABLE(name text, id uuid, metadata jsonb, updated_at timestamp with time zone)
@@ -1846,10 +1730,8 @@ END;
 $_$;
 
 
-ALTER FUNCTION storage.list_objects_with_delimiter(bucket_id text, prefix_param text, delimiter_param text, max_keys integer, start_after text, next_token text) OWNER TO supabase_storage_admin;
-
 --
--- Name: operation(); Type: FUNCTION; Schema: storage; Owner: supabase_storage_admin
+-- Name: operation(); Type: FUNCTION; Schema: storage; Owner: -
 --
 
 CREATE FUNCTION storage.operation() RETURNS text
@@ -1861,10 +1743,8 @@ END;
 $$;
 
 
-ALTER FUNCTION storage.operation() OWNER TO supabase_storage_admin;
-
 --
--- Name: search(text, text, integer, integer, integer, text, text, text); Type: FUNCTION; Schema: storage; Owner: supabase_storage_admin
+-- Name: search(text, text, integer, integer, integer, text, text, text); Type: FUNCTION; Schema: storage; Owner: -
 --
 
 CREATE FUNCTION storage.search(prefix text, bucketname text, limits integer DEFAULT 100, levels integer DEFAULT 1, offsets integer DEFAULT 0, search text DEFAULT ''::text, sortcolumn text DEFAULT 'name'::text, sortorder text DEFAULT 'asc'::text) RETURNS TABLE(name text, id uuid, updated_at timestamp with time zone, created_at timestamp with time zone, last_accessed_at timestamp with time zone, metadata jsonb)
@@ -1932,10 +1812,8 @@ end;
 $_$;
 
 
-ALTER FUNCTION storage.search(prefix text, bucketname text, limits integer, levels integer, offsets integer, search text, sortcolumn text, sortorder text) OWNER TO supabase_storage_admin;
-
 --
--- Name: update_updated_at_column(); Type: FUNCTION; Schema: storage; Owner: supabase_storage_admin
+-- Name: update_updated_at_column(); Type: FUNCTION; Schema: storage; Owner: -
 --
 
 CREATE FUNCTION storage.update_updated_at_column() RETURNS trigger
@@ -1948,10 +1826,8 @@ END;
 $$;
 
 
-ALTER FUNCTION storage.update_updated_at_column() OWNER TO supabase_storage_admin;
-
 --
--- Name: http_request(); Type: FUNCTION; Schema: supabase_functions; Owner: supabase_functions_admin
+-- Name: http_request(); Type: FUNCTION; Schema: supabase_functions; Owner: -
 --
 
 CREATE FUNCTION supabase_functions.http_request() RETURNS trigger
@@ -2031,10 +1907,8 @@ CREATE FUNCTION supabase_functions.http_request() RETURNS trigger
   $$;
 
 
-ALTER FUNCTION supabase_functions.http_request() OWNER TO supabase_functions_admin;
-
 --
--- Name: insert_pool_and_blockfix(text, integer, bigint); Type: FUNCTION; Schema: v1_cosmos; Owner: postgres
+-- Name: insert_pool_and_blockfix(text, integer, bigint); Type: FUNCTION; Schema: v1_cosmos; Owner: -
 --
 
 CREATE FUNCTION v1_cosmos.insert_pool_and_blockfix(p_address text, p_internal_chain_id integer, p_height bigint) RETURNS jsonb
@@ -2099,10 +1973,8 @@ END;
 $$;
 
 
-ALTER FUNCTION v1_cosmos.insert_pool_and_blockfix(p_address text, p_internal_chain_id integer, p_height bigint) OWNER TO postgres;
-
 --
--- Name: secrets_encrypt_secret_secret(); Type: FUNCTION; Schema: vault; Owner: supabase_admin
+-- Name: secrets_encrypt_secret_secret(); Type: FUNCTION; Schema: vault; Owner: -
 --
 
 CREATE FUNCTION vault.secrets_encrypt_secret_secret() RETURNS trigger
@@ -2123,10 +1995,8 @@ CREATE FUNCTION vault.secrets_encrypt_secret_secret() RETURNS trigger
 		$$;
 
 
-ALTER FUNCTION vault.secrets_encrypt_secret_secret() OWNER TO supabase_admin;
-
 --
--- Name: audit_log_entries; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
+-- Name: audit_log_entries; Type: TABLE; Schema: auth; Owner: -
 --
 
 CREATE TABLE auth.audit_log_entries (
@@ -2138,17 +2008,15 @@ CREATE TABLE auth.audit_log_entries (
 );
 
 
-ALTER TABLE auth.audit_log_entries OWNER TO supabase_auth_admin;
-
 --
--- Name: TABLE audit_log_entries; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+-- Name: TABLE audit_log_entries; Type: COMMENT; Schema: auth; Owner: -
 --
 
 COMMENT ON TABLE auth.audit_log_entries IS 'Auth: Audit trail for user actions.';
 
 
 --
--- Name: flow_state; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
+-- Name: flow_state; Type: TABLE; Schema: auth; Owner: -
 --
 
 CREATE TABLE auth.flow_state (
@@ -2167,17 +2035,15 @@ CREATE TABLE auth.flow_state (
 );
 
 
-ALTER TABLE auth.flow_state OWNER TO supabase_auth_admin;
-
 --
--- Name: TABLE flow_state; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+-- Name: TABLE flow_state; Type: COMMENT; Schema: auth; Owner: -
 --
 
 COMMENT ON TABLE auth.flow_state IS 'stores metadata for pkce logins';
 
 
 --
--- Name: identities; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
+-- Name: identities; Type: TABLE; Schema: auth; Owner: -
 --
 
 CREATE TABLE auth.identities (
@@ -2193,24 +2059,22 @@ CREATE TABLE auth.identities (
 );
 
 
-ALTER TABLE auth.identities OWNER TO supabase_auth_admin;
-
 --
--- Name: TABLE identities; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+-- Name: TABLE identities; Type: COMMENT; Schema: auth; Owner: -
 --
 
 COMMENT ON TABLE auth.identities IS 'Auth: Stores identities associated to a user.';
 
 
 --
--- Name: COLUMN identities.email; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+-- Name: COLUMN identities.email; Type: COMMENT; Schema: auth; Owner: -
 --
 
 COMMENT ON COLUMN auth.identities.email IS 'Auth: Email is a generated column that references the optional email property in the identity_data';
 
 
 --
--- Name: instances; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
+-- Name: instances; Type: TABLE; Schema: auth; Owner: -
 --
 
 CREATE TABLE auth.instances (
@@ -2222,17 +2086,15 @@ CREATE TABLE auth.instances (
 );
 
 
-ALTER TABLE auth.instances OWNER TO supabase_auth_admin;
-
 --
--- Name: TABLE instances; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+-- Name: TABLE instances; Type: COMMENT; Schema: auth; Owner: -
 --
 
 COMMENT ON TABLE auth.instances IS 'Auth: Manages users across multiple sites.';
 
 
 --
--- Name: mfa_amr_claims; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
+-- Name: mfa_amr_claims; Type: TABLE; Schema: auth; Owner: -
 --
 
 CREATE TABLE auth.mfa_amr_claims (
@@ -2244,17 +2106,15 @@ CREATE TABLE auth.mfa_amr_claims (
 );
 
 
-ALTER TABLE auth.mfa_amr_claims OWNER TO supabase_auth_admin;
-
 --
--- Name: TABLE mfa_amr_claims; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+-- Name: TABLE mfa_amr_claims; Type: COMMENT; Schema: auth; Owner: -
 --
 
 COMMENT ON TABLE auth.mfa_amr_claims IS 'auth: stores authenticator method reference claims for multi factor authentication';
 
 
 --
--- Name: mfa_challenges; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
+-- Name: mfa_challenges; Type: TABLE; Schema: auth; Owner: -
 --
 
 CREATE TABLE auth.mfa_challenges (
@@ -2268,17 +2128,15 @@ CREATE TABLE auth.mfa_challenges (
 );
 
 
-ALTER TABLE auth.mfa_challenges OWNER TO supabase_auth_admin;
-
 --
--- Name: TABLE mfa_challenges; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+-- Name: TABLE mfa_challenges; Type: COMMENT; Schema: auth; Owner: -
 --
 
 COMMENT ON TABLE auth.mfa_challenges IS 'auth: stores metadata about challenge requests made';
 
 
 --
--- Name: mfa_factors; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
+-- Name: mfa_factors; Type: TABLE; Schema: auth; Owner: -
 --
 
 CREATE TABLE auth.mfa_factors (
@@ -2297,17 +2155,15 @@ CREATE TABLE auth.mfa_factors (
 );
 
 
-ALTER TABLE auth.mfa_factors OWNER TO supabase_auth_admin;
-
 --
--- Name: TABLE mfa_factors; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+-- Name: TABLE mfa_factors; Type: COMMENT; Schema: auth; Owner: -
 --
 
 COMMENT ON TABLE auth.mfa_factors IS 'auth: stores metadata about factors';
 
 
 --
--- Name: one_time_tokens; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
+-- Name: one_time_tokens; Type: TABLE; Schema: auth; Owner: -
 --
 
 CREATE TABLE auth.one_time_tokens (
@@ -2322,10 +2178,8 @@ CREATE TABLE auth.one_time_tokens (
 );
 
 
-ALTER TABLE auth.one_time_tokens OWNER TO supabase_auth_admin;
-
 --
--- Name: refresh_tokens; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
+-- Name: refresh_tokens; Type: TABLE; Schema: auth; Owner: -
 --
 
 CREATE TABLE auth.refresh_tokens (
@@ -2341,17 +2195,15 @@ CREATE TABLE auth.refresh_tokens (
 );
 
 
-ALTER TABLE auth.refresh_tokens OWNER TO supabase_auth_admin;
-
 --
--- Name: TABLE refresh_tokens; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+-- Name: TABLE refresh_tokens; Type: COMMENT; Schema: auth; Owner: -
 --
 
 COMMENT ON TABLE auth.refresh_tokens IS 'Auth: Store of tokens used to refresh JWT tokens once they expire.';
 
 
 --
--- Name: refresh_tokens_id_seq; Type: SEQUENCE; Schema: auth; Owner: supabase_auth_admin
+-- Name: refresh_tokens_id_seq; Type: SEQUENCE; Schema: auth; Owner: -
 --
 
 CREATE SEQUENCE auth.refresh_tokens_id_seq
@@ -2362,17 +2214,15 @@ CREATE SEQUENCE auth.refresh_tokens_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE auth.refresh_tokens_id_seq OWNER TO supabase_auth_admin;
-
 --
--- Name: refresh_tokens_id_seq; Type: SEQUENCE OWNED BY; Schema: auth; Owner: supabase_auth_admin
+-- Name: refresh_tokens_id_seq; Type: SEQUENCE OWNED BY; Schema: auth; Owner: -
 --
 
 ALTER SEQUENCE auth.refresh_tokens_id_seq OWNED BY auth.refresh_tokens.id;
 
 
 --
--- Name: saml_providers; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
+-- Name: saml_providers; Type: TABLE; Schema: auth; Owner: -
 --
 
 CREATE TABLE auth.saml_providers (
@@ -2391,17 +2241,15 @@ CREATE TABLE auth.saml_providers (
 );
 
 
-ALTER TABLE auth.saml_providers OWNER TO supabase_auth_admin;
-
 --
--- Name: TABLE saml_providers; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+-- Name: TABLE saml_providers; Type: COMMENT; Schema: auth; Owner: -
 --
 
 COMMENT ON TABLE auth.saml_providers IS 'Auth: Manages SAML Identity Provider connections.';
 
 
 --
--- Name: saml_relay_states; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
+-- Name: saml_relay_states; Type: TABLE; Schema: auth; Owner: -
 --
 
 CREATE TABLE auth.saml_relay_states (
@@ -2417,17 +2265,15 @@ CREATE TABLE auth.saml_relay_states (
 );
 
 
-ALTER TABLE auth.saml_relay_states OWNER TO supabase_auth_admin;
-
 --
--- Name: TABLE saml_relay_states; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+-- Name: TABLE saml_relay_states; Type: COMMENT; Schema: auth; Owner: -
 --
 
 COMMENT ON TABLE auth.saml_relay_states IS 'Auth: Contains SAML Relay State information for each Service Provider initiated login.';
 
 
 --
--- Name: schema_migrations; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
+-- Name: schema_migrations; Type: TABLE; Schema: auth; Owner: -
 --
 
 CREATE TABLE auth.schema_migrations (
@@ -2435,17 +2281,15 @@ CREATE TABLE auth.schema_migrations (
 );
 
 
-ALTER TABLE auth.schema_migrations OWNER TO supabase_auth_admin;
-
 --
--- Name: TABLE schema_migrations; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+-- Name: TABLE schema_migrations; Type: COMMENT; Schema: auth; Owner: -
 --
 
 COMMENT ON TABLE auth.schema_migrations IS 'Auth: Manages updates to the auth system.';
 
 
 --
--- Name: sessions; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
+-- Name: sessions; Type: TABLE; Schema: auth; Owner: -
 --
 
 CREATE TABLE auth.sessions (
@@ -2463,24 +2307,22 @@ CREATE TABLE auth.sessions (
 );
 
 
-ALTER TABLE auth.sessions OWNER TO supabase_auth_admin;
-
 --
--- Name: TABLE sessions; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+-- Name: TABLE sessions; Type: COMMENT; Schema: auth; Owner: -
 --
 
 COMMENT ON TABLE auth.sessions IS 'Auth: Stores session data associated to a user.';
 
 
 --
--- Name: COLUMN sessions.not_after; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+-- Name: COLUMN sessions.not_after; Type: COMMENT; Schema: auth; Owner: -
 --
 
 COMMENT ON COLUMN auth.sessions.not_after IS 'Auth: Not after is a nullable column that contains a timestamp after which the session should be regarded as expired.';
 
 
 --
--- Name: sso_domains; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
+-- Name: sso_domains; Type: TABLE; Schema: auth; Owner: -
 --
 
 CREATE TABLE auth.sso_domains (
@@ -2493,17 +2335,15 @@ CREATE TABLE auth.sso_domains (
 );
 
 
-ALTER TABLE auth.sso_domains OWNER TO supabase_auth_admin;
-
 --
--- Name: TABLE sso_domains; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+-- Name: TABLE sso_domains; Type: COMMENT; Schema: auth; Owner: -
 --
 
 COMMENT ON TABLE auth.sso_domains IS 'Auth: Manages SSO email address domain mapping to an SSO Identity Provider.';
 
 
 --
--- Name: sso_providers; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
+-- Name: sso_providers; Type: TABLE; Schema: auth; Owner: -
 --
 
 CREATE TABLE auth.sso_providers (
@@ -2515,24 +2355,22 @@ CREATE TABLE auth.sso_providers (
 );
 
 
-ALTER TABLE auth.sso_providers OWNER TO supabase_auth_admin;
-
 --
--- Name: TABLE sso_providers; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+-- Name: TABLE sso_providers; Type: COMMENT; Schema: auth; Owner: -
 --
 
 COMMENT ON TABLE auth.sso_providers IS 'Auth: Manages SSO identity provider information; see saml_providers for SAML.';
 
 
 --
--- Name: COLUMN sso_providers.resource_id; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+-- Name: COLUMN sso_providers.resource_id; Type: COMMENT; Schema: auth; Owner: -
 --
 
 COMMENT ON COLUMN auth.sso_providers.resource_id IS 'Auth: Uniquely identifies a SSO provider according to a user-chosen resource ID (case insensitive), useful in infrastructure as code.';
 
 
 --
--- Name: users; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
+-- Name: users; Type: TABLE; Schema: auth; Owner: -
 --
 
 CREATE TABLE auth.users (
@@ -2575,24 +2413,22 @@ CREATE TABLE auth.users (
 );
 
 
-ALTER TABLE auth.users OWNER TO supabase_auth_admin;
-
 --
--- Name: TABLE users; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+-- Name: TABLE users; Type: COMMENT; Schema: auth; Owner: -
 --
 
 COMMENT ON TABLE auth.users IS 'Auth: Stores user login data within a secure schema.';
 
 
 --
--- Name: COLUMN users.is_sso_user; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+-- Name: COLUMN users.is_sso_user; Type: COMMENT; Schema: auth; Owner: -
 --
 
 COMMENT ON COLUMN auth.users.is_sso_user IS 'Auth: Set this column to true when the account comes from SSO. These accounts can have duplicate emails.';
 
 
 --
--- Name: assets; Type: TABLE; Schema: hubble; Owner: postgres
+-- Name: assets; Type: TABLE; Schema: hubble; Owner: -
 --
 
 CREATE TABLE hubble.assets (
@@ -2607,10 +2443,8 @@ CREATE TABLE hubble.assets (
 );
 
 
-ALTER TABLE hubble.assets OWNER TO postgres;
-
 --
--- Name: block_fix; Type: TABLE; Schema: hubble; Owner: postgres
+-- Name: block_fix; Type: TABLE; Schema: hubble; Owner: -
 --
 
 CREATE TABLE hubble.block_fix (
@@ -2622,10 +2456,8 @@ CREATE TABLE hubble.block_fix (
 );
 
 
-ALTER TABLE hubble.block_fix OWNER TO postgres;
-
 --
--- Name: block_status; Type: TABLE; Schema: hubble; Owner: postgres
+-- Name: block_status; Type: TABLE; Schema: hubble; Owner: -
 --
 
 CREATE TABLE hubble.block_status (
@@ -2638,10 +2470,8 @@ CREATE TABLE hubble.block_status (
 );
 
 
-ALTER TABLE hubble.block_status OWNER TO postgres;
-
 --
--- Name: chains; Type: TABLE; Schema: hubble; Owner: postgres
+-- Name: chains; Type: TABLE; Schema: hubble; Owner: -
 --
 
 CREATE TABLE hubble.chains (
@@ -2661,17 +2491,15 @@ CREATE TABLE hubble.chains (
 );
 
 
-ALTER TABLE hubble.chains OWNER TO postgres;
-
 --
--- Name: COLUMN chains.execution; Type: COMMENT; Schema: hubble; Owner: postgres
+-- Name: COLUMN chains.execution; Type: COMMENT; Schema: hubble; Owner: -
 --
 
 COMMENT ON COLUMN hubble.chains.execution IS 'Execution chain indicator, which implies that there is also a beacon chain.';
 
 
 --
--- Name: chains_id_seq; Type: SEQUENCE; Schema: hubble; Owner: postgres
+-- Name: chains_id_seq; Type: SEQUENCE; Schema: hubble; Owner: -
 --
 
 CREATE SEQUENCE hubble.chains_id_seq
@@ -2683,17 +2511,15 @@ CREATE SEQUENCE hubble.chains_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE hubble.chains_id_seq OWNER TO postgres;
-
 --
--- Name: chains_id_seq; Type: SEQUENCE OWNED BY; Schema: hubble; Owner: postgres
+-- Name: chains_id_seq; Type: SEQUENCE OWNED BY; Schema: hubble; Owner: -
 --
 
 ALTER SEQUENCE hubble.chains_id_seq OWNED BY hubble.chains.id;
 
 
 --
--- Name: clients; Type: TABLE; Schema: hubble; Owner: postgres
+-- Name: clients; Type: TABLE; Schema: hubble; Owner: -
 --
 
 CREATE TABLE hubble.clients (
@@ -2703,10 +2529,8 @@ CREATE TABLE hubble.clients (
 );
 
 
-ALTER TABLE hubble.clients OWNER TO postgres;
-
 --
--- Name: consensus_heights; Type: TABLE; Schema: hubble; Owner: postgres
+-- Name: consensus_heights; Type: TABLE; Schema: hubble; Owner: -
 --
 
 CREATE TABLE hubble.consensus_heights (
@@ -2716,10 +2540,8 @@ CREATE TABLE hubble.consensus_heights (
 );
 
 
-ALTER TABLE hubble.consensus_heights OWNER TO postgres;
-
 --
--- Name: contract_status; Type: TABLE; Schema: hubble; Owner: postgres
+-- Name: contract_status; Type: TABLE; Schema: hubble; Owner: -
 --
 
 CREATE TABLE hubble.contract_status (
@@ -2732,10 +2554,8 @@ CREATE TABLE hubble.contract_status (
 );
 
 
-ALTER TABLE hubble.contract_status OWNER TO postgres;
-
 --
--- Name: indexer_status; Type: TABLE; Schema: hubble; Owner: postgres
+-- Name: indexer_status; Type: TABLE; Schema: hubble; Owner: -
 --
 
 CREATE TABLE hubble.indexer_status (
@@ -2747,10 +2567,8 @@ CREATE TABLE hubble.indexer_status (
 );
 
 
-ALTER TABLE hubble.indexer_status OWNER TO postgres;
-
 --
--- Name: token_source_representations; Type: TABLE; Schema: hubble; Owner: postgres
+-- Name: token_source_representations; Type: TABLE; Schema: hubble; Owner: -
 --
 
 CREATE TABLE hubble.token_source_representations (
@@ -2766,10 +2584,8 @@ CREATE TABLE hubble.token_source_representations (
 );
 
 
-ALTER TABLE hubble.token_source_representations OWNER TO postgres;
-
 --
--- Name: token_sources; Type: TABLE; Schema: hubble; Owner: postgres
+-- Name: token_sources; Type: TABLE; Schema: hubble; Owner: -
 --
 
 CREATE TABLE hubble.token_sources (
@@ -2783,10 +2599,8 @@ CREATE TABLE hubble.token_sources (
 );
 
 
-ALTER TABLE hubble.token_sources OWNER TO postgres;
-
 --
--- Name: token_sources_id_seq; Type: SEQUENCE; Schema: hubble; Owner: postgres
+-- Name: token_sources_id_seq; Type: SEQUENCE; Schema: hubble; Owner: -
 --
 
 CREATE SEQUENCE hubble.token_sources_id_seq
@@ -2798,17 +2612,15 @@ CREATE SEQUENCE hubble.token_sources_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE hubble.token_sources_id_seq OWNER TO postgres;
-
 --
--- Name: token_sources_id_seq; Type: SEQUENCE OWNED BY; Schema: hubble; Owner: postgres
+-- Name: token_sources_id_seq; Type: SEQUENCE OWNED BY; Schema: hubble; Owner: -
 --
 
 ALTER SEQUENCE hubble.token_sources_id_seq OWNED BY hubble.token_sources.id;
 
 
 --
--- Name: add_liquidity; Type: VIEW; Schema: v1_cosmos; Owner: postgres
+-- Name: add_liquidity; Type: VIEW; Schema: v1_cosmos; Owner: -
 --
 
 CREATE VIEW v1_cosmos.add_liquidity WITH (security_invoker='on') AS
@@ -2834,10 +2646,8 @@ CREATE VIEW v1_cosmos.add_liquidity WITH (security_invoker='on') AS
   WHERE ((events.data ->> 'type'::text) = 'wasm-provide_liquidity'::text);
 
 
-ALTER VIEW v1_cosmos.add_liquidity OWNER TO postgres;
-
 --
--- Name: blocks; Type: TABLE; Schema: v1_cosmos; Owner: postgres
+-- Name: blocks; Type: TABLE; Schema: v1_cosmos; Owner: -
 --
 
 CREATE TABLE v1_cosmos.blocks (
@@ -2849,17 +2659,15 @@ CREATE TABLE v1_cosmos.blocks (
 );
 
 
-ALTER TABLE v1_cosmos.blocks OWNER TO postgres;
-
 --
--- Name: TABLE blocks; Type: COMMENT; Schema: v1_cosmos; Owner: postgres
+-- Name: TABLE blocks; Type: COMMENT; Schema: v1_cosmos; Owner: -
 --
 
 COMMENT ON TABLE v1_cosmos.blocks IS 'DEPRECATED: use V1';
 
 
 --
--- Name: incentivize; Type: VIEW; Schema: v1_cosmos; Owner: postgres
+-- Name: incentivize; Type: VIEW; Schema: v1_cosmos; Owner: -
 --
 
 CREATE VIEW v1_cosmos.incentivize WITH (security_invoker='on') AS
@@ -2882,10 +2690,8 @@ CREATE VIEW v1_cosmos.incentivize WITH (security_invoker='on') AS
   WHERE ((events.data ->> 'type'::text) = 'wasm-incentivize'::text);
 
 
-ALTER VIEW v1_cosmos.incentivize OWNER TO postgres;
-
 --
--- Name: swap; Type: VIEW; Schema: v1_cosmos; Owner: postgres
+-- Name: swap; Type: VIEW; Schema: v1_cosmos; Owner: -
 --
 
 CREATE VIEW v1_cosmos.swap WITH (security_invoker='on') AS
@@ -2914,10 +2720,8 @@ CREATE VIEW v1_cosmos.swap WITH (security_invoker='on') AS
   WHERE ((events.data ->> 'type'::text) = 'wasm-swap'::text);
 
 
-ALTER VIEW v1_cosmos.swap OWNER TO postgres;
-
 --
--- Name: withdraw_liquidity; Type: VIEW; Schema: v1_cosmos; Owner: postgres
+-- Name: withdraw_liquidity; Type: VIEW; Schema: v1_cosmos; Owner: -
 --
 
 CREATE VIEW v1_cosmos.withdraw_liquidity WITH (security_invoker='on') AS
@@ -2943,10 +2747,8 @@ CREATE VIEW v1_cosmos.withdraw_liquidity WITH (security_invoker='on') AS
   WHERE ((events.data ->> 'type'::text) = 'wasm-withdraw_liquidity'::text);
 
 
-ALTER VIEW v1_cosmos.withdraw_liquidity OWNER TO postgres;
-
 --
--- Name: pool_balance; Type: VIEW; Schema: v1_cosmos; Owner: postgres
+-- Name: pool_balance; Type: VIEW; Schema: v1_cosmos; Owner: -
 --
 
 CREATE VIEW v1_cosmos.pool_balance WITH (security_invoker='on') AS
@@ -3026,10 +2828,8 @@ CREATE VIEW v1_cosmos.pool_balance WITH (security_invoker='on') AS
           WHERE ((swap_totals.pool_address = h.pool_address) AND (swap_totals.height <= h.height)))))));
 
 
-ALTER VIEW v1_cosmos.pool_balance OWNER TO postgres;
-
 --
--- Name: token_prices; Type: TABLE; Schema: v1_cosmos; Owner: postgres
+-- Name: token_prices; Type: TABLE; Schema: v1_cosmos; Owner: -
 --
 
 CREATE TABLE v1_cosmos.token_prices (
@@ -3041,10 +2841,8 @@ CREATE TABLE v1_cosmos.token_prices (
 );
 
 
-ALTER TABLE v1_cosmos.token_prices OWNER TO postgres;
-
 --
--- Name: historic_pool_yield; Type: VIEW; Schema: public; Owner: postgres
+-- Name: historic_pool_yield; Type: VIEW; Schema: public; Owner: -
 --
 
 CREATE VIEW public.historic_pool_yield AS
@@ -3148,10 +2946,8 @@ CREATE VIEW public.historic_pool_yield AS
   ORDER BY bd.height, pl.pool_address;
 
 
-ALTER VIEW public.historic_pool_yield OWNER TO postgres;
-
 --
--- Name: messages; Type: TABLE; Schema: realtime; Owner: supabase_realtime_admin
+-- Name: messages; Type: TABLE; Schema: realtime; Owner: -
 --
 
 CREATE TABLE realtime.messages (
@@ -3167,10 +2963,8 @@ CREATE TABLE realtime.messages (
 PARTITION BY RANGE (inserted_at);
 
 
-ALTER TABLE realtime.messages OWNER TO supabase_realtime_admin;
-
 --
--- Name: schema_migrations; Type: TABLE; Schema: realtime; Owner: supabase_admin
+-- Name: schema_migrations; Type: TABLE; Schema: realtime; Owner: -
 --
 
 CREATE TABLE realtime.schema_migrations (
@@ -3179,10 +2973,8 @@ CREATE TABLE realtime.schema_migrations (
 );
 
 
-ALTER TABLE realtime.schema_migrations OWNER TO supabase_admin;
-
 --
--- Name: subscription; Type: TABLE; Schema: realtime; Owner: supabase_admin
+-- Name: subscription; Type: TABLE; Schema: realtime; Owner: -
 --
 
 CREATE TABLE realtime.subscription (
@@ -3196,10 +2988,8 @@ CREATE TABLE realtime.subscription (
 );
 
 
-ALTER TABLE realtime.subscription OWNER TO supabase_admin;
-
 --
--- Name: subscription_id_seq; Type: SEQUENCE; Schema: realtime; Owner: supabase_admin
+-- Name: subscription_id_seq; Type: SEQUENCE; Schema: realtime; Owner: -
 --
 
 ALTER TABLE realtime.subscription ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
@@ -3213,7 +3003,7 @@ ALTER TABLE realtime.subscription ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTI
 
 
 --
--- Name: buckets; Type: TABLE; Schema: storage; Owner: supabase_storage_admin
+-- Name: buckets; Type: TABLE; Schema: storage; Owner: -
 --
 
 CREATE TABLE storage.buckets (
@@ -3230,17 +3020,15 @@ CREATE TABLE storage.buckets (
 );
 
 
-ALTER TABLE storage.buckets OWNER TO supabase_storage_admin;
-
 --
--- Name: COLUMN buckets.owner; Type: COMMENT; Schema: storage; Owner: supabase_storage_admin
+-- Name: COLUMN buckets.owner; Type: COMMENT; Schema: storage; Owner: -
 --
 
 COMMENT ON COLUMN storage.buckets.owner IS 'Field is deprecated, use owner_id instead';
 
 
 --
--- Name: migrations; Type: TABLE; Schema: storage; Owner: supabase_storage_admin
+-- Name: migrations; Type: TABLE; Schema: storage; Owner: -
 --
 
 CREATE TABLE storage.migrations (
@@ -3251,10 +3039,8 @@ CREATE TABLE storage.migrations (
 );
 
 
-ALTER TABLE storage.migrations OWNER TO supabase_storage_admin;
-
 --
--- Name: objects; Type: TABLE; Schema: storage; Owner: supabase_storage_admin
+-- Name: objects; Type: TABLE; Schema: storage; Owner: -
 --
 
 CREATE TABLE storage.objects (
@@ -3273,17 +3059,15 @@ CREATE TABLE storage.objects (
 );
 
 
-ALTER TABLE storage.objects OWNER TO supabase_storage_admin;
-
 --
--- Name: COLUMN objects.owner; Type: COMMENT; Schema: storage; Owner: supabase_storage_admin
+-- Name: COLUMN objects.owner; Type: COMMENT; Schema: storage; Owner: -
 --
 
 COMMENT ON COLUMN storage.objects.owner IS 'Field is deprecated, use owner_id instead';
 
 
 --
--- Name: s3_multipart_uploads; Type: TABLE; Schema: storage; Owner: supabase_storage_admin
+-- Name: s3_multipart_uploads; Type: TABLE; Schema: storage; Owner: -
 --
 
 CREATE TABLE storage.s3_multipart_uploads (
@@ -3299,10 +3083,8 @@ CREATE TABLE storage.s3_multipart_uploads (
 );
 
 
-ALTER TABLE storage.s3_multipart_uploads OWNER TO supabase_storage_admin;
-
 --
--- Name: s3_multipart_uploads_parts; Type: TABLE; Schema: storage; Owner: supabase_storage_admin
+-- Name: s3_multipart_uploads_parts; Type: TABLE; Schema: storage; Owner: -
 --
 
 CREATE TABLE storage.s3_multipart_uploads_parts (
@@ -3319,10 +3101,8 @@ CREATE TABLE storage.s3_multipart_uploads_parts (
 );
 
 
-ALTER TABLE storage.s3_multipart_uploads_parts OWNER TO supabase_storage_admin;
-
 --
--- Name: hooks; Type: TABLE; Schema: supabase_functions; Owner: supabase_functions_admin
+-- Name: hooks; Type: TABLE; Schema: supabase_functions; Owner: -
 --
 
 CREATE TABLE supabase_functions.hooks (
@@ -3334,17 +3114,15 @@ CREATE TABLE supabase_functions.hooks (
 );
 
 
-ALTER TABLE supabase_functions.hooks OWNER TO supabase_functions_admin;
-
 --
--- Name: TABLE hooks; Type: COMMENT; Schema: supabase_functions; Owner: supabase_functions_admin
+-- Name: TABLE hooks; Type: COMMENT; Schema: supabase_functions; Owner: -
 --
 
 COMMENT ON TABLE supabase_functions.hooks IS 'Supabase Functions Hooks: Audit trail for triggered hooks.';
 
 
 --
--- Name: hooks_id_seq; Type: SEQUENCE; Schema: supabase_functions; Owner: supabase_functions_admin
+-- Name: hooks_id_seq; Type: SEQUENCE; Schema: supabase_functions; Owner: -
 --
 
 CREATE SEQUENCE supabase_functions.hooks_id_seq
@@ -3355,17 +3133,15 @@ CREATE SEQUENCE supabase_functions.hooks_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE supabase_functions.hooks_id_seq OWNER TO supabase_functions_admin;
-
 --
--- Name: hooks_id_seq; Type: SEQUENCE OWNED BY; Schema: supabase_functions; Owner: supabase_functions_admin
+-- Name: hooks_id_seq; Type: SEQUENCE OWNED BY; Schema: supabase_functions; Owner: -
 --
 
 ALTER SEQUENCE supabase_functions.hooks_id_seq OWNED BY supabase_functions.hooks.id;
 
 
 --
--- Name: migrations; Type: TABLE; Schema: supabase_functions; Owner: supabase_functions_admin
+-- Name: migrations; Type: TABLE; Schema: supabase_functions; Owner: -
 --
 
 CREATE TABLE supabase_functions.migrations (
@@ -3374,10 +3150,8 @@ CREATE TABLE supabase_functions.migrations (
 );
 
 
-ALTER TABLE supabase_functions.migrations OWNER TO supabase_functions_admin;
-
 --
--- Name: schema_migrations; Type: TABLE; Schema: supabase_migrations; Owner: postgres
+-- Name: schema_migrations; Type: TABLE; Schema: supabase_migrations; Owner: -
 --
 
 CREATE TABLE supabase_migrations.schema_migrations (
@@ -3387,10 +3161,8 @@ CREATE TABLE supabase_migrations.schema_migrations (
 );
 
 
-ALTER TABLE supabase_migrations.schema_migrations OWNER TO postgres;
-
 --
--- Name: seed_files; Type: TABLE; Schema: supabase_migrations; Owner: postgres
+-- Name: seed_files; Type: TABLE; Schema: supabase_migrations; Owner: -
 --
 
 CREATE TABLE supabase_migrations.seed_files (
@@ -3399,10 +3171,8 @@ CREATE TABLE supabase_migrations.seed_files (
 );
 
 
-ALTER TABLE supabase_migrations.seed_files OWNER TO postgres;
-
 --
--- Name: blocks; Type: TABLE; Schema: v1_aptos; Owner: postgres
+-- Name: blocks; Type: TABLE; Schema: v1_aptos; Owner: -
 --
 
 CREATE TABLE v1_aptos.blocks (
@@ -3417,10 +3187,8 @@ CREATE TABLE v1_aptos.blocks (
 );
 
 
-ALTER TABLE v1_aptos.blocks OWNER TO postgres;
-
 --
--- Name: events; Type: TABLE; Schema: v1_aptos; Owner: postgres
+-- Name: events; Type: TABLE; Schema: v1_aptos; Owner: -
 --
 
 CREATE TABLE v1_aptos.events (
@@ -3439,10 +3207,8 @@ CREATE TABLE v1_aptos.events (
 );
 
 
-ALTER TABLE v1_aptos.events OWNER TO postgres;
-
 --
--- Name: transactions; Type: TABLE; Schema: v1_aptos; Owner: postgres
+-- Name: transactions; Type: TABLE; Schema: v1_aptos; Owner: -
 --
 
 CREATE TABLE v1_aptos.transactions (
@@ -3456,10 +3222,8 @@ CREATE TABLE v1_aptos.transactions (
 );
 
 
-ALTER TABLE v1_aptos.transactions OWNER TO postgres;
-
 --
--- Name: channel_open_ack; Type: VIEW; Schema: v1_aptos; Owner: postgres
+-- Name: channel_open_ack; Type: VIEW; Schema: v1_aptos; Owner: -
 --
 
 CREATE VIEW v1_aptos.channel_open_ack AS
@@ -3487,10 +3251,8 @@ CREATE VIEW v1_aptos.channel_open_ack AS
   WHERE (SUBSTRING(event.type FROM (POSITION(('::'::text) IN (event.type)) + 2)) = 'ibc::ChannelOpenAck'::text);
 
 
-ALTER VIEW v1_aptos.channel_open_ack OWNER TO postgres;
-
 --
--- Name: channel_open_init; Type: VIEW; Schema: v1_aptos; Owner: postgres
+-- Name: channel_open_init; Type: VIEW; Schema: v1_aptos; Owner: -
 --
 
 CREATE VIEW v1_aptos.channel_open_init AS
@@ -3518,10 +3280,8 @@ CREATE VIEW v1_aptos.channel_open_init AS
   WHERE (SUBSTRING(event.type FROM (POSITION(('::'::text) IN (event.type)) + 2)) = 'ibc::ChannelOpenInit'::text);
 
 
-ALTER VIEW v1_aptos.channel_open_init OWNER TO postgres;
-
 --
--- Name: client_created_event; Type: VIEW; Schema: v1_aptos; Owner: postgres
+-- Name: client_created_event; Type: VIEW; Schema: v1_aptos; Owner: -
 --
 
 CREATE VIEW v1_aptos.client_created_event AS
@@ -3548,10 +3308,8 @@ CREATE VIEW v1_aptos.client_created_event AS
   WHERE (SUBSTRING(event.type FROM (POSITION(('::'::text) IN (event.type)) + 2)) = 'ibc::ClientCreatedEvent'::text);
 
 
-ALTER VIEW v1_aptos.client_created_event OWNER TO postgres;
-
 --
--- Name: client_updated; Type: VIEW; Schema: v1_aptos; Owner: postgres
+-- Name: client_updated; Type: VIEW; Schema: v1_aptos; Owner: -
 --
 
 CREATE VIEW v1_aptos.client_updated AS
@@ -3578,10 +3336,8 @@ CREATE VIEW v1_aptos.client_updated AS
   WHERE (SUBSTRING(event.type FROM (POSITION(('::'::text) IN (event.type)) + 2)) = 'ibc::ClientUpdated'::text);
 
 
-ALTER VIEW v1_aptos.client_updated OWNER TO postgres;
-
 --
--- Name: connection_open_ack; Type: VIEW; Schema: v1_aptos; Owner: postgres
+-- Name: connection_open_ack; Type: VIEW; Schema: v1_aptos; Owner: -
 --
 
 CREATE VIEW v1_aptos.connection_open_ack AS
@@ -3608,10 +3364,8 @@ CREATE VIEW v1_aptos.connection_open_ack AS
   WHERE (SUBSTRING(event.type FROM (POSITION(('::'::text) IN (event.type)) + 2)) = 'ibc::ConnectionOpenAck'::text);
 
 
-ALTER VIEW v1_aptos.connection_open_ack OWNER TO postgres;
-
 --
--- Name: connection_open_init; Type: VIEW; Schema: v1_aptos; Owner: postgres
+-- Name: connection_open_init; Type: VIEW; Schema: v1_aptos; Owner: -
 --
 
 CREATE VIEW v1_aptos.connection_open_init AS
@@ -3637,10 +3391,8 @@ CREATE VIEW v1_aptos.connection_open_init AS
   WHERE (SUBSTRING(event.type FROM (POSITION(('::'::text) IN (event.type)) + 2)) = 'ibc::ConnectionOpenInit'::text);
 
 
-ALTER VIEW v1_aptos.connection_open_init OWNER TO postgres;
-
 --
--- Name: contracts; Type: TABLE; Schema: v1_aptos; Owner: postgres
+-- Name: contracts; Type: TABLE; Schema: v1_aptos; Owner: -
 --
 
 CREATE TABLE v1_aptos.contracts (
@@ -3654,10 +3406,8 @@ CREATE TABLE v1_aptos.contracts (
 );
 
 
-ALTER TABLE v1_aptos.contracts OWNER TO postgres;
-
 --
--- Name: contracts; Type: TABLE; Schema: v1_cosmos; Owner: postgres
+-- Name: contracts; Type: TABLE; Schema: v1_cosmos; Owner: -
 --
 
 CREATE TABLE v1_cosmos.contracts (
@@ -3671,10 +3421,8 @@ CREATE TABLE v1_cosmos.contracts (
 );
 
 
-ALTER TABLE v1_cosmos.contracts OWNER TO postgres;
-
 --
--- Name: token; Type: TABLE; Schema: v1_cosmos; Owner: postgres
+-- Name: token; Type: TABLE; Schema: v1_cosmos; Owner: -
 --
 
 CREATE TABLE v1_cosmos.token (
@@ -3688,17 +3436,15 @@ CREATE TABLE v1_cosmos.token (
 );
 
 
-ALTER TABLE v1_cosmos.token OWNER TO postgres;
-
 --
--- Name: TABLE token; Type: COMMENT; Schema: v1_cosmos; Owner: postgres
+-- Name: TABLE token; Type: COMMENT; Schema: v1_cosmos; Owner: -
 --
 
 COMMENT ON TABLE v1_cosmos.token IS 'contains the onchain representation of a token on babylon, aswell as the full token name and the coingecko id';
 
 
 --
--- Name: historic_pool_yield; Type: VIEW; Schema: v1_cosmos; Owner: postgres
+-- Name: historic_pool_yield; Type: VIEW; Schema: v1_cosmos; Owner: -
 --
 
 CREATE VIEW v1_cosmos.historic_pool_yield AS
@@ -3804,10 +3550,8 @@ CREATE VIEW v1_cosmos.historic_pool_yield AS
   ORDER BY bd.height, pl.pool_address;
 
 
-ALTER VIEW v1_cosmos.historic_pool_yield OWNER TO postgres;
-
 --
--- Name: pool_fee_periods; Type: VIEW; Schema: v1_cosmos; Owner: postgres
+-- Name: pool_fee_periods; Type: VIEW; Schema: v1_cosmos; Owner: -
 --
 
 CREATE VIEW v1_cosmos.pool_fee_periods WITH (security_invoker='on') AS
@@ -3874,10 +3618,8 @@ CREATE VIEW v1_cosmos.pool_fee_periods WITH (security_invoker='on') AS
   ORDER BY p.pool_address, p.start_height;
 
 
-ALTER VIEW v1_cosmos.pool_fee_periods OWNER TO postgres;
-
 --
--- Name: pool_user_shares; Type: VIEW; Schema: v1_cosmos; Owner: postgres
+-- Name: pool_user_shares; Type: VIEW; Schema: v1_cosmos; Owner: -
 --
 
 CREATE VIEW v1_cosmos.pool_user_shares AS
@@ -3908,10 +3650,8 @@ CREATE VIEW v1_cosmos.pool_user_shares AS
   ORDER BY combined_liquidity_operations.pool_address, combined_liquidity_operations.owner;
 
 
-ALTER VIEW v1_cosmos.pool_user_shares OWNER TO postgres;
-
 --
--- Name: pools; Type: VIEW; Schema: v1_cosmos; Owner: postgres
+-- Name: pools; Type: VIEW; Schema: v1_cosmos; Owner: -
 --
 
 CREATE VIEW v1_cosmos.pools AS
@@ -3965,10 +3705,8 @@ CREATE VIEW v1_cosmos.pools AS
      JOIN register r ON ((cp.transaction_hash = r.transaction_hash)));
 
 
-ALTER VIEW v1_cosmos.pools OWNER TO postgres;
-
 --
--- Name: token_id_seq; Type: SEQUENCE; Schema: v1_cosmos; Owner: postgres
+-- Name: token_id_seq; Type: SEQUENCE; Schema: v1_cosmos; Owner: -
 --
 
 ALTER TABLE v1_cosmos.token ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
@@ -3982,7 +3720,7 @@ ALTER TABLE v1_cosmos.token ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY
 
 
 --
--- Name: token_prices_id_seq; Type: SEQUENCE; Schema: v1_cosmos; Owner: postgres
+-- Name: token_prices_id_seq; Type: SEQUENCE; Schema: v1_cosmos; Owner: -
 --
 
 ALTER TABLE v1_cosmos.token_prices ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
@@ -3996,7 +3734,7 @@ ALTER TABLE v1_cosmos.token_prices ALTER COLUMN id ADD GENERATED BY DEFAULT AS I
 
 
 --
--- Name: transactions; Type: TABLE; Schema: v1_cosmos; Owner: postgres
+-- Name: transactions; Type: TABLE; Schema: v1_cosmos; Owner: -
 --
 
 CREATE TABLE v1_cosmos.transactions (
@@ -4009,17 +3747,15 @@ CREATE TABLE v1_cosmos.transactions (
 );
 
 
-ALTER TABLE v1_cosmos.transactions OWNER TO postgres;
-
 --
--- Name: TABLE transactions; Type: COMMENT; Schema: v1_cosmos; Owner: postgres
+-- Name: TABLE transactions; Type: COMMENT; Schema: v1_cosmos; Owner: -
 --
 
 COMMENT ON TABLE v1_cosmos.transactions IS 'DEPRECATED: use V1';
 
 
 --
--- Name: logs_sync; Type: TABLE; Schema: v1_evm; Owner: postgres
+-- Name: logs_sync; Type: TABLE; Schema: v1_evm; Owner: -
 --
 
 CREATE TABLE v1_evm.logs_sync (
@@ -4036,10 +3772,8 @@ CREATE TABLE v1_evm.logs_sync (
 );
 
 
-ALTER TABLE v1_evm.logs_sync OWNER TO postgres;
-
 --
--- Name: acknowledge_packet; Type: VIEW; Schema: v1_evm; Owner: postgres
+-- Name: acknowledge_packet; Type: VIEW; Schema: v1_evm; Owner: -
 --
 
 CREATE VIEW v1_evm.acknowledge_packet AS
@@ -4068,10 +3802,8 @@ CREATE VIEW v1_evm.acknowledge_packet AS
   WHERE ((evm.log_to_jsonb ->> 'name'::text) = 'AcknowledgePacket'::text);
 
 
-ALTER VIEW v1_evm.acknowledge_packet OWNER TO postgres;
-
 --
--- Name: channel_open_ack; Type: VIEW; Schema: v1_evm; Owner: postgres
+-- Name: channel_open_ack; Type: VIEW; Schema: v1_evm; Owner: -
 --
 
 CREATE VIEW v1_evm.channel_open_ack AS
@@ -4095,10 +3827,8 @@ CREATE VIEW v1_evm.channel_open_ack AS
   WHERE ((evm.log_to_jsonb ->> 'name'::text) = 'ChannelOpenAck'::text);
 
 
-ALTER VIEW v1_evm.channel_open_ack OWNER TO postgres;
-
 --
--- Name: channel_open_confirm; Type: VIEW; Schema: v1_evm; Owner: postgres
+-- Name: channel_open_confirm; Type: VIEW; Schema: v1_evm; Owner: -
 --
 
 CREATE VIEW v1_evm.channel_open_confirm AS
@@ -4122,10 +3852,8 @@ CREATE VIEW v1_evm.channel_open_confirm AS
   WHERE ((evm.log_to_jsonb ->> 'name'::text) = 'ChannelOpenConfirm'::text);
 
 
-ALTER VIEW v1_evm.channel_open_confirm OWNER TO postgres;
-
 --
--- Name: channel_open_init; Type: VIEW; Schema: v1_evm; Owner: postgres
+-- Name: channel_open_init; Type: VIEW; Schema: v1_evm; Owner: -
 --
 
 CREATE VIEW v1_evm.channel_open_init AS
@@ -4149,10 +3877,8 @@ CREATE VIEW v1_evm.channel_open_init AS
   WHERE ((evm.log_to_jsonb ->> 'name'::text) = 'ChannelOpenInit'::text);
 
 
-ALTER VIEW v1_evm.channel_open_init OWNER TO postgres;
-
 --
--- Name: channel_open_try; Type: VIEW; Schema: v1_evm; Owner: postgres
+-- Name: channel_open_try; Type: VIEW; Schema: v1_evm; Owner: -
 --
 
 CREATE VIEW v1_evm.channel_open_try AS
@@ -4177,10 +3903,8 @@ CREATE VIEW v1_evm.channel_open_try AS
   WHERE ((evm.log_to_jsonb ->> 'name'::text) = 'ChannelOpenTry'::text);
 
 
-ALTER VIEW v1_evm.channel_open_try OWNER TO postgres;
-
 --
--- Name: client_created; Type: VIEW; Schema: v1_evm; Owner: postgres
+-- Name: client_created; Type: VIEW; Schema: v1_evm; Owner: -
 --
 
 CREATE VIEW v1_evm.client_created AS
@@ -4200,10 +3924,8 @@ CREATE VIEW v1_evm.client_created AS
   WHERE ((evm.log_to_jsonb ->> 'name'::text) = 'ClientCreated'::text);
 
 
-ALTER VIEW v1_evm.client_created OWNER TO postgres;
-
 --
--- Name: client_registered; Type: VIEW; Schema: v1_evm; Owner: postgres
+-- Name: client_registered; Type: VIEW; Schema: v1_evm; Owner: -
 --
 
 CREATE VIEW v1_evm.client_registered AS
@@ -4224,10 +3946,8 @@ CREATE VIEW v1_evm.client_registered AS
   WHERE ((evm.log_to_jsonb ->> 'name'::text) = 'ClientRegistered'::text);
 
 
-ALTER VIEW v1_evm.client_registered OWNER TO postgres;
-
 --
--- Name: client_updated; Type: VIEW; Schema: v1_evm; Owner: postgres
+-- Name: client_updated; Type: VIEW; Schema: v1_evm; Owner: -
 --
 
 CREATE VIEW v1_evm.client_updated AS
@@ -4249,10 +3969,8 @@ CREATE VIEW v1_evm.client_updated AS
   WHERE ((evm.log_to_jsonb ->> 'name'::text) = 'ClientUpdated'::text);
 
 
-ALTER VIEW v1_evm.client_updated OWNER TO postgres;
-
 --
--- Name: connection_open_ack; Type: VIEW; Schema: v1_evm; Owner: postgres
+-- Name: connection_open_ack; Type: VIEW; Schema: v1_evm; Owner: -
 --
 
 CREATE VIEW v1_evm.connection_open_ack AS
@@ -4275,10 +3993,8 @@ CREATE VIEW v1_evm.connection_open_ack AS
   WHERE ((evm.log_to_jsonb ->> 'name'::text) = 'ConnectionOpenAck'::text);
 
 
-ALTER VIEW v1_evm.connection_open_ack OWNER TO postgres;
-
 --
--- Name: connection_open_confirm; Type: VIEW; Schema: v1_evm; Owner: postgres
+-- Name: connection_open_confirm; Type: VIEW; Schema: v1_evm; Owner: -
 --
 
 CREATE VIEW v1_evm.connection_open_confirm AS
@@ -4301,10 +4017,8 @@ CREATE VIEW v1_evm.connection_open_confirm AS
   WHERE ((evm.log_to_jsonb ->> 'name'::text) = 'ConnectionOpenConfirm'::text);
 
 
-ALTER VIEW v1_evm.connection_open_confirm OWNER TO postgres;
-
 --
--- Name: connection_open_init; Type: VIEW; Schema: v1_evm; Owner: postgres
+-- Name: connection_open_init; Type: VIEW; Schema: v1_evm; Owner: -
 --
 
 CREATE VIEW v1_evm.connection_open_init AS
@@ -4326,10 +4040,8 @@ CREATE VIEW v1_evm.connection_open_init AS
   WHERE ((evm.log_to_jsonb ->> 'name'::text) = 'ConnectionOpenInit'::text);
 
 
-ALTER VIEW v1_evm.connection_open_init OWNER TO postgres;
-
 --
--- Name: connection_open_try; Type: VIEW; Schema: v1_evm; Owner: postgres
+-- Name: connection_open_try; Type: VIEW; Schema: v1_evm; Owner: -
 --
 
 CREATE VIEW v1_evm.connection_open_try AS
@@ -4352,10 +4064,8 @@ CREATE VIEW v1_evm.connection_open_try AS
   WHERE ((evm.log_to_jsonb ->> 'name'::text) = 'ConnectionOpenTry'::text);
 
 
-ALTER VIEW v1_evm.connection_open_try OWNER TO postgres;
-
 --
--- Name: contracts; Type: TABLE; Schema: v1_evm; Owner: postgres
+-- Name: contracts; Type: TABLE; Schema: v1_evm; Owner: -
 --
 
 CREATE TABLE v1_evm.contracts (
@@ -4372,10 +4082,8 @@ CREATE TABLE v1_evm.contracts (
 );
 
 
-ALTER TABLE v1_evm.contracts OWNER TO postgres;
-
 --
--- Name: logs; Type: TABLE; Schema: v1_evm; Owner: postgres
+-- Name: logs; Type: TABLE; Schema: v1_evm; Owner: -
 --
 
 CREATE TABLE v1_evm.logs (
@@ -4387,10 +4095,8 @@ CREATE TABLE v1_evm.logs (
 );
 
 
-ALTER TABLE v1_evm.logs OWNER TO postgres;
-
 --
--- Name: recv_packet; Type: VIEW; Schema: v1_evm; Owner: postgres
+-- Name: recv_packet; Type: VIEW; Schema: v1_evm; Owner: -
 --
 
 CREATE VIEW v1_evm.recv_packet AS
@@ -4419,10 +4125,8 @@ CREATE VIEW v1_evm.recv_packet AS
   WHERE ((evm.log_to_jsonb ->> 'name'::text) = 'RecvPacket'::text);
 
 
-ALTER VIEW v1_evm.recv_packet OWNER TO postgres;
-
 --
--- Name: send_packet; Type: VIEW; Schema: v1_evm; Owner: postgres
+-- Name: send_packet; Type: VIEW; Schema: v1_evm; Owner: -
 --
 
 CREATE VIEW v1_evm.send_packet AS
@@ -4448,10 +4152,8 @@ CREATE VIEW v1_evm.send_packet AS
   WHERE ((evm.log_to_jsonb ->> 'name'::text) = 'SendPacket'::text);
 
 
-ALTER VIEW v1_evm.send_packet OWNER TO postgres;
-
 --
--- Name: ucs1_denom_created; Type: VIEW; Schema: v1_evm; Owner: postgres
+-- Name: ucs1_denom_created; Type: VIEW; Schema: v1_evm; Owner: -
 --
 
 CREATE VIEW v1_evm.ucs1_denom_created AS
@@ -4474,10 +4176,8 @@ CREATE VIEW v1_evm.ucs1_denom_created AS
   WHERE ((evm.log_to_jsonb ->> 'name'::text) = 'DenomCreated'::text);
 
 
-ALTER VIEW v1_evm.ucs1_denom_created OWNER TO postgres;
-
 --
--- Name: ucs1_received; Type: VIEW; Schema: v1_evm; Owner: postgres
+-- Name: ucs1_received; Type: VIEW; Schema: v1_evm; Owner: -
 --
 
 CREATE VIEW v1_evm.ucs1_received AS
@@ -4503,10 +4203,8 @@ CREATE VIEW v1_evm.ucs1_received AS
   WHERE ((evm.log_to_jsonb ->> 'name'::text) = 'Received'::text);
 
 
-ALTER VIEW v1_evm.ucs1_received OWNER TO postgres;
-
 --
--- Name: ucs1_sent; Type: VIEW; Schema: v1_evm; Owner: postgres
+-- Name: ucs1_sent; Type: VIEW; Schema: v1_evm; Owner: -
 --
 
 CREATE VIEW v1_evm.ucs1_sent AS
@@ -4532,10 +4230,8 @@ CREATE VIEW v1_evm.ucs1_sent AS
   WHERE ((evm.log_to_jsonb ->> 'name'::text) = 'Sent'::text);
 
 
-ALTER VIEW v1_evm.ucs1_sent OWNER TO postgres;
-
 --
--- Name: write_acknowledgement; Type: VIEW; Schema: v1_evm; Owner: postgres
+-- Name: write_acknowledgement; Type: VIEW; Schema: v1_evm; Owner: -
 --
 
 CREATE VIEW v1_evm.write_acknowledgement AS
@@ -4563,10 +4259,8 @@ CREATE VIEW v1_evm.write_acknowledgement AS
   WHERE ((evm.log_to_jsonb ->> 'name'::text) = 'WriteAcknowledgement'::text);
 
 
-ALTER VIEW v1_evm.write_acknowledgement OWNER TO postgres;
-
 --
--- Name: decrypted_secrets; Type: VIEW; Schema: vault; Owner: supabase_admin
+-- Name: decrypted_secrets; Type: VIEW; Schema: vault; Owner: -
 --
 
 CREATE VIEW vault.decrypted_secrets AS
@@ -4589,38 +4283,36 @@ CREATE VIEW vault.decrypted_secrets AS
    FROM vault.secrets;
 
 
-ALTER VIEW vault.decrypted_secrets OWNER TO supabase_admin;
-
 --
--- Name: refresh_tokens id; Type: DEFAULT; Schema: auth; Owner: supabase_auth_admin
+-- Name: refresh_tokens id; Type: DEFAULT; Schema: auth; Owner: -
 --
 
 ALTER TABLE ONLY auth.refresh_tokens ALTER COLUMN id SET DEFAULT nextval('auth.refresh_tokens_id_seq'::regclass);
 
 
 --
--- Name: chains id; Type: DEFAULT; Schema: hubble; Owner: postgres
+-- Name: chains id; Type: DEFAULT; Schema: hubble; Owner: -
 --
 
 ALTER TABLE ONLY hubble.chains ALTER COLUMN id SET DEFAULT nextval('hubble.chains_id_seq'::regclass);
 
 
 --
--- Name: token_sources id; Type: DEFAULT; Schema: hubble; Owner: postgres
+-- Name: token_sources id; Type: DEFAULT; Schema: hubble; Owner: -
 --
 
 ALTER TABLE ONLY hubble.token_sources ALTER COLUMN id SET DEFAULT nextval('hubble.token_sources_id_seq'::regclass);
 
 
 --
--- Name: hooks id; Type: DEFAULT; Schema: supabase_functions; Owner: supabase_functions_admin
+-- Name: hooks id; Type: DEFAULT; Schema: supabase_functions; Owner: -
 --
 
 ALTER TABLE ONLY supabase_functions.hooks ALTER COLUMN id SET DEFAULT nextval('supabase_functions.hooks_id_seq'::regclass);
 
 
 --
--- Data for Name: audit_log_entries; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+-- Data for Name: audit_log_entries; Type: TABLE DATA; Schema: auth; Owner: -
 --
 
 COPY auth.audit_log_entries (instance_id, id, payload, created_at, ip_address) FROM stdin;
@@ -4628,7 +4320,7 @@ COPY auth.audit_log_entries (instance_id, id, payload, created_at, ip_address) F
 
 
 --
--- Data for Name: flow_state; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+-- Data for Name: flow_state; Type: TABLE DATA; Schema: auth; Owner: -
 --
 
 COPY auth.flow_state (id, user_id, auth_code, code_challenge_method, code_challenge, provider_type, provider_access_token, provider_refresh_token, created_at, updated_at, authentication_method, auth_code_issued_at) FROM stdin;
@@ -4636,7 +4328,7 @@ COPY auth.flow_state (id, user_id, auth_code, code_challenge_method, code_challe
 
 
 --
--- Data for Name: identities; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+-- Data for Name: identities; Type: TABLE DATA; Schema: auth; Owner: -
 --
 
 COPY auth.identities (provider_id, user_id, identity_data, provider, last_sign_in_at, created_at, updated_at, id) FROM stdin;
@@ -4644,7 +4336,7 @@ COPY auth.identities (provider_id, user_id, identity_data, provider, last_sign_i
 
 
 --
--- Data for Name: instances; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+-- Data for Name: instances; Type: TABLE DATA; Schema: auth; Owner: -
 --
 
 COPY auth.instances (id, uuid, raw_base_config, created_at, updated_at) FROM stdin;
@@ -4652,7 +4344,7 @@ COPY auth.instances (id, uuid, raw_base_config, created_at, updated_at) FROM std
 
 
 --
--- Data for Name: mfa_amr_claims; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+-- Data for Name: mfa_amr_claims; Type: TABLE DATA; Schema: auth; Owner: -
 --
 
 COPY auth.mfa_amr_claims (session_id, created_at, updated_at, authentication_method, id) FROM stdin;
@@ -4660,7 +4352,7 @@ COPY auth.mfa_amr_claims (session_id, created_at, updated_at, authentication_met
 
 
 --
--- Data for Name: mfa_challenges; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+-- Data for Name: mfa_challenges; Type: TABLE DATA; Schema: auth; Owner: -
 --
 
 COPY auth.mfa_challenges (id, factor_id, created_at, verified_at, ip_address, otp_code, web_authn_session_data) FROM stdin;
@@ -4668,7 +4360,7 @@ COPY auth.mfa_challenges (id, factor_id, created_at, verified_at, ip_address, ot
 
 
 --
--- Data for Name: mfa_factors; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+-- Data for Name: mfa_factors; Type: TABLE DATA; Schema: auth; Owner: -
 --
 
 COPY auth.mfa_factors (id, user_id, friendly_name, factor_type, status, created_at, updated_at, secret, phone, last_challenged_at, web_authn_credential, web_authn_aaguid) FROM stdin;
@@ -4676,7 +4368,7 @@ COPY auth.mfa_factors (id, user_id, friendly_name, factor_type, status, created_
 
 
 --
--- Data for Name: one_time_tokens; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+-- Data for Name: one_time_tokens; Type: TABLE DATA; Schema: auth; Owner: -
 --
 
 COPY auth.one_time_tokens (id, user_id, token_type, token_hash, relates_to, created_at, updated_at) FROM stdin;
@@ -4684,7 +4376,7 @@ COPY auth.one_time_tokens (id, user_id, token_type, token_hash, relates_to, crea
 
 
 --
--- Data for Name: refresh_tokens; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+-- Data for Name: refresh_tokens; Type: TABLE DATA; Schema: auth; Owner: -
 --
 
 COPY auth.refresh_tokens (instance_id, id, token, user_id, revoked, created_at, updated_at, parent, session_id) FROM stdin;
@@ -4692,7 +4384,7 @@ COPY auth.refresh_tokens (instance_id, id, token, user_id, revoked, created_at, 
 
 
 --
--- Data for Name: saml_providers; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+-- Data for Name: saml_providers; Type: TABLE DATA; Schema: auth; Owner: -
 --
 
 COPY auth.saml_providers (id, sso_provider_id, entity_id, metadata_xml, metadata_url, attribute_mapping, created_at, updated_at, name_id_format) FROM stdin;
@@ -4700,7 +4392,7 @@ COPY auth.saml_providers (id, sso_provider_id, entity_id, metadata_xml, metadata
 
 
 --
--- Data for Name: saml_relay_states; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+-- Data for Name: saml_relay_states; Type: TABLE DATA; Schema: auth; Owner: -
 --
 
 COPY auth.saml_relay_states (id, sso_provider_id, request_id, for_email, redirect_to, created_at, updated_at, flow_state_id) FROM stdin;
@@ -4708,7 +4400,7 @@ COPY auth.saml_relay_states (id, sso_provider_id, request_id, for_email, redirec
 
 
 --
--- Data for Name: schema_migrations; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+-- Data for Name: schema_migrations; Type: TABLE DATA; Schema: auth; Owner: -
 --
 
 COPY auth.schema_migrations (version) FROM stdin;
@@ -4777,7 +4469,7 @@ COPY auth.schema_migrations (version) FROM stdin;
 
 
 --
--- Data for Name: sessions; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+-- Data for Name: sessions; Type: TABLE DATA; Schema: auth; Owner: -
 --
 
 COPY auth.sessions (id, user_id, created_at, updated_at, factor_id, aal, not_after, refreshed_at, user_agent, ip, tag) FROM stdin;
@@ -4785,7 +4477,7 @@ COPY auth.sessions (id, user_id, created_at, updated_at, factor_id, aal, not_aft
 
 
 --
--- Data for Name: sso_domains; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+-- Data for Name: sso_domains; Type: TABLE DATA; Schema: auth; Owner: -
 --
 
 COPY auth.sso_domains (id, sso_provider_id, domain, created_at, updated_at) FROM stdin;
@@ -4793,7 +4485,7 @@ COPY auth.sso_domains (id, sso_provider_id, domain, created_at, updated_at) FROM
 
 
 --
--- Data for Name: sso_providers; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+-- Data for Name: sso_providers; Type: TABLE DATA; Schema: auth; Owner: -
 --
 
 COPY auth.sso_providers (id, resource_id, created_at, updated_at) FROM stdin;
@@ -4801,7 +4493,7 @@ COPY auth.sso_providers (id, resource_id, created_at, updated_at) FROM stdin;
 
 
 --
--- Data for Name: users; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+-- Data for Name: users; Type: TABLE DATA; Schema: auth; Owner: -
 --
 
 COPY auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, invited_at, confirmation_token, confirmation_sent_at, recovery_token, recovery_sent_at, email_change_token_new, email_change, email_change_sent_at, last_sign_in_at, raw_app_meta_data, raw_user_meta_data, is_super_admin, created_at, updated_at, phone, phone_confirmed_at, phone_change, phone_change_token, phone_change_sent_at, email_change_token_current, email_change_confirm_status, banned_until, reauthentication_token, reauthentication_sent_at, is_sso_user, deleted_at, is_anonymous) FROM stdin;
@@ -4809,7 +4501,7 @@ COPY auth.users (instance_id, id, aud, role, email, encrypted_password, email_co
 
 
 --
--- Data for Name: assets; Type: TABLE DATA; Schema: hubble; Owner: postgres
+-- Data for Name: assets; Type: TABLE DATA; Schema: hubble; Owner: -
 --
 
 COPY hubble.assets (chain_id, denom, display_symbol, decimals, logo_uri, display_name, gas_token, source) FROM stdin;
@@ -4817,7 +4509,7 @@ COPY hubble.assets (chain_id, denom, display_symbol, decimals, logo_uri, display
 
 
 --
--- Data for Name: block_fix; Type: TABLE DATA; Schema: hubble; Owner: postgres
+-- Data for Name: block_fix; Type: TABLE DATA; Schema: hubble; Owner: -
 --
 
 COPY hubble.block_fix (indexer_id, start_height, end_height, created_at, updated_at) FROM stdin;
@@ -4833,7 +4525,7 @@ testnet	503831	510947	2025-03-14 14:51:59.766648+00	2025-03-14 14:51:59.766648+0
 
 
 --
--- Data for Name: block_status; Type: TABLE DATA; Schema: hubble; Owner: postgres
+-- Data for Name: block_status; Type: TABLE DATA; Schema: hubble; Owner: -
 --
 
 COPY hubble.block_status (indexer_id, height, hash, "timestamp", created_at, updated_at) FROM stdin;
@@ -16768,6 +16460,20 @@ testnet	511006	1ee8bc77b42ff5602588ba7ea4f308f7052178fc5b01b822ac816a9fbca0413e	
 testnet	511008	25f1f6f310e2477f8bd9be8ad57f049ddcd3d333ff58a9c333dade323574265d	2025-03-14 15:03:39.440849+00	2025-03-14 15:03:55.070127+00	2025-03-14 15:03:55.070127+00
 testnet	511010	c00a6beff0fa97e7ba8d02e0332bcb707247479f26cdba47c098e00b62a280a3	2025-03-14 15:04:01.946538+00	2025-03-14 15:04:32.019651+00	2025-03-14 15:04:32.019651+00
 testnet	511012	3786d4635b883ab65c2a4ce7bb2b90040a1e65c06c60bef59db48777be4a5119	2025-03-14 15:04:28.282896+00	2025-03-14 15:05:04.365735+00	2025-03-14 15:05:04.365735+00
+testnet	511014	6e007b84e3b3eec9a2199b2de461626c4dbf09d37b29e3737799eb84fda3c454	2025-03-14 15:04:55.887073+00	2025-03-14 15:05:43.996043+00	2025-03-14 15:05:43.996043+00
+testnet	511015	056c8a2a3233749646488a5bd722e974930c68df4f40215ff3d8af5ecb946f2a	2025-03-14 15:05:08.33436+00	2025-03-14 15:05:47.638323+00	2025-03-14 15:05:47.638323+00
+testnet	511016	ddf4a5ba8d4239030e012383aa591f28d99359c631a32395d60e17bbe46492e3	2025-03-14 15:05:20.99336+00	2025-03-14 15:05:49.666098+00	2025-03-14 15:05:49.666098+00
+testnet	511018	5cb300d0de60484af3c9bd9ac69b91554af5ce24a1e62849592a2639f3798703	2025-03-14 15:05:46.397285+00	2025-03-14 15:06:26.058242+00	2025-03-14 15:06:26.058242+00
+testnet	511019	34ec6d5ebd550763ba014b3d9eca2ea2353615bc6a293e6a22e9cd0a0c28fa5f	2025-03-14 15:05:59.739577+00	2025-03-14 15:06:26.943748+00	2025-03-14 15:06:26.943748+00
+testnet	511020	85235f3e190bd0e6c9096185146e8c6e0dd14aacb9055081f12c4fbc3fca5cb0	2025-03-14 15:06:12.415094+00	2025-03-14 15:06:47.242296+00	2025-03-14 15:06:47.242296+00
+testnet	511026	f5250a903b18390d2a84864b581087b55ac4d4b3d02b98ebc10e1874bfd4bb73	2025-03-14 15:08:14.413381+00	2025-03-14 15:08:49.955762+00	2025-03-14 15:08:49.955762+00
+testnet	511029	6314c951cbd4c6f21d7f71962a8b7e9fdd841560f850732a1922f5af5e7a0570	2025-03-14 15:08:53.361443+00	2025-03-14 15:09:08.975774+00	2025-03-14 15:09:08.975774+00
+testnet	511031	76ffe1285f1852a338b71f23383695f051c98750fa1a04b697b31e8813fba315	2025-03-14 15:09:16.687226+00	2025-03-14 15:09:32.177875+00	2025-03-14 15:09:32.177875+00
+testnet	511042	414c144345516defdeed8aa2b6a3f5f1491c33855eadef214d540a256951d53c	2025-03-14 15:11:38.729282+00	2025-03-14 15:11:55.076799+00	2025-03-14 15:11:55.076799+00
+testnet	511043	643cfb885ec8bedcbcaa22d05f35b7cca901c7aa9cacca2b8de056955803aaf8	2025-03-14 15:11:49.774178+00	2025-03-14 15:12:06.713857+00	2025-03-14 15:12:06.713857+00
+testnet	511049	e7a6ce179efdb45070dedcf5dc0dc7f8b4d29603c5c9558272f997f2ea5fd1cf	2025-03-14 15:12:56.188493+00	2025-03-14 15:13:11.443578+00	2025-03-14 15:13:11.443578+00
+testnet	511051	3968b7e28a213942693a58149d60cd9e260dd886c6ebf86b40d3e6bc41543fcc	2025-03-14 15:13:17.934616+00	2025-03-14 15:13:36.256604+00	2025-03-14 15:13:36.256604+00
+testnet	511053	dba1066123fa9766b632cd8448435adebbed0ced2a17371feb0e70b30a365a6d	2025-03-14 15:13:39.423634+00	2025-03-14 15:13:53.114235+00	2025-03-14 15:13:53.114235+00
 testnet	432268	c4c2202eee2d03dab4e901f3ba3b15a31aff9cdcd53ff07bb2afe8c09bfc4ed1	2025-03-04 08:05:10.979935+00	2025-03-04 08:13:02.291313+00	2025-03-04 08:13:02.291313+00
 testnet	432271	818c356cba61f048eacaa28a8a472a1c8681c86d27fbae8ab8b491988fedc88f	2025-03-04 08:05:44.057666+00	2025-03-04 08:13:03.034605+00	2025-03-04 08:13:03.034605+00
 testnet	432273	2f92d13ef2c96dcf64e9083ce928b71a7fe1af1a9b47110ef0a6a7a578549f8f	2025-03-04 08:06:06.149246+00	2025-03-04 08:13:03.565342+00	2025-03-04 08:13:03.565342+00
@@ -16984,6 +16690,21 @@ testnet	511002	77a85c423556331703e9cbdc0f5c8df609baae12b1d8c0e7f41f48d6f6321db9	
 testnet	511003	3abeec1de626a8f0a978199271f9184ec4840a2e1879f924481b6495e1cf3977	2025-03-14 15:02:37.19346+00	2025-03-14 15:03:04.224412+00	2025-03-14 15:03:04.224412+00
 testnet	511005	f15f134f2f4426ab78219ead81183effeaa14e7b7591043b3e4b72d076ea7aec	2025-03-14 15:02:59.72607+00	2025-03-14 15:03:25.735418+00	2025-03-14 15:03:25.735418+00
 testnet	511011	2c131baa3213fe005a7b6c4e726d300b50f612b4a4de9456f9eef8713ff21719	2025-03-14 15:04:13.722151+00	2025-03-14 15:04:34.815585+00	2025-03-14 15:04:34.815585+00
+testnet	511013	d591c0b10aaf85db61076f9c09f2db1268813eee7a626f9259b91eae99e652f4	2025-03-14 15:04:44.510096+00	2025-03-14 15:05:13.003235+00	2025-03-14 15:05:13.003235+00
+testnet	511022	a24eb2d313dc0bfb799dc38e3650e366dbcf69af7e74c2cb376e7f6093f992cc	2025-03-14 15:06:39.879116+00	2025-03-14 15:07:17.754386+00	2025-03-14 15:07:17.754386+00
+testnet	511023	1dbb71927f8aaa5a720e40feb58adc340f48690f44aa3ff8d6ca50b3f985f0df	2025-03-14 15:06:58.455987+00	2025-03-14 15:07:36.661429+00	2025-03-14 15:07:36.661429+00
+testnet	511024	b763777412ee704b77814a28d373bdc7622b4299892633b92eb7f9cc8aa61659	2025-03-14 15:07:31.475605+00	2025-03-14 15:08:30.367623+00	2025-03-14 15:08:30.367623+00
+testnet	511025	fb756999fad9006fab69cdeb87f4a6436809f2a01a69c5a540c1e7afa8e1167d	2025-03-14 15:07:53.597051+00	2025-03-14 15:08:48.626654+00	2025-03-14 15:08:48.626654+00
+testnet	511028	d97ea0c127c23c85f61d5aafe0844b8086070eb64d7bbe8bf27976fb1f4d9a16	2025-03-14 15:08:37.441624+00	2025-03-14 15:09:03.156707+00	2025-03-14 15:09:03.156707+00
+testnet	511030	406f5fcf13f7af722fae3f0e1c9b74154e23c08a05673dd7901a0ff92d83a6c1	2025-03-14 15:09:05.278383+00	2025-03-14 15:09:31.748809+00	2025-03-14 15:09:31.748809+00
+testnet	511032	6be68cdf5029e481a03e02cc69366c9805e402fea8676271ce3b902a73f633f5	2025-03-14 15:09:28.527014+00	2025-03-14 15:09:57.233391+00	2025-03-14 15:09:57.233391+00
+testnet	511033	989b9b9f17ff93d6a7f03950eef3a1aab3e90f1fda76b2fe9dbde73d8d8139c1	2025-03-14 15:09:45.592955+00	2025-03-14 15:10:21.200033+00	2025-03-14 15:10:21.200033+00
+testnet	511037	6257f3ac7e1dd1e263085bfc55eb24ed5ae1054db9ffa2fc4ac5eed1d83b5c72	2025-03-14 15:10:36.960521+00	2025-03-14 15:11:15.110207+00	2025-03-14 15:11:15.110207+00
+testnet	511038	60696a75acb9a43533ae8ab3a57bd3fb5c43ca53a72395de03ca53b9178826e8	2025-03-14 15:10:48.92626+00	2025-03-14 15:11:22.152172+00	2025-03-14 15:11:22.152172+00
+testnet	511039	63f3542a6844cebd06bea8bc70fdb5b73ce26b3212507989ec024252a052dfd5	2025-03-14 15:11:00.242563+00	2025-03-14 15:11:39.100709+00	2025-03-14 15:11:39.100709+00
+testnet	511040	3b291258a27a983b45cf7b547a46ec500859abbac5e6d6ca803ab39233c3f839	2025-03-14 15:11:11.941903+00	2025-03-14 15:11:41.846765+00	2025-03-14 15:11:41.846765+00
+testnet	511041	534b897a1fe5b6debad6e7293205ed211e4f8c786dd52180a2721c33b4b356ea	2025-03-14 15:11:25.392982+00	2025-03-14 15:11:42.612708+00	2025-03-14 15:11:42.612708+00
+testnet	511048	f8d875edb5fc3c817a972aec6409aa23b152b9b98043a71ced0e16cb86ba097b	2025-03-14 15:12:45.148044+00	2025-03-14 15:13:00.921248+00	2025-03-14 15:13:00.921248+00
 testnet	450412	649c5510facd2e8b3171419ba995f09253c4fba3687f8d2b2f0fc01079580b70	2025-03-06 15:59:05.177354+00	2025-03-06 15:59:19.893861+00	2025-03-06 15:59:19.893861+00
 testnet	450413	7dc22605d775b0441291419ba1338aa17cf4db02444d0e4c649d1c27167c4f7c	2025-03-06 15:59:16.20879+00	2025-03-06 15:59:31.044888+00	2025-03-06 15:59:31.044888+00
 testnet	450416	06f208a1a2b13bad0cbd12e64a7939bb5226e3c053ab039a15e08332c6b6eaa5	2025-03-06 15:59:45.409936+00	2025-03-06 16:00:00.80702+00	2025-03-06 16:00:00.80702+00
@@ -17474,6 +17195,12 @@ testnet	511000	4041d361ed71c6398743ef8e0984edd001e8cad784017ec5d0fd22a91dc11d16	
 testnet	511001	93ce7ccbf4f8035dd45320bf346d2e7654dc26593c0c3c7d95c8682422a31a9c	2025-03-14 15:02:16.288356+00	2025-03-14 15:02:46.728287+00	2025-03-14 15:02:46.728287+00
 testnet	511007	7358942ec3c650d31e994ab3bd856a54f2a2edaa8dcd8d50114be787750f3ede	2025-03-14 15:03:22.763679+00	2025-03-14 15:03:47.698973+00	2025-03-14 15:03:47.698973+00
 testnet	511009	1f512ac6a9797ae59f8ded06cf3b1fa51ca7cba19d60a72f799b75e6490a96b6	2025-03-14 15:03:50.582608+00	2025-03-14 15:04:23.110068+00	2025-03-14 15:04:23.110068+00
+testnet	511017	d07349985ea3f0aa1245564abf8bb9780f57c31ba59f9cf97f394ca73424b366	2025-03-14 15:05:32.671695+00	2025-03-14 15:05:58.886591+00	2025-03-14 15:05:58.886591+00
+testnet	511021	bee09da8bb16088f45507e10c2dff382f3b0e9883fce0aa93094cc6d63455af4	2025-03-14 15:06:28.457962+00	2025-03-14 15:06:59.559314+00	2025-03-14 15:06:59.559314+00
+testnet	511027	304d88fd33335137841fb02176fa35e6859bdcd4cfae921c86e51f8d3700a584	2025-03-14 15:08:26.027955+00	2025-03-14 15:09:00.321696+00	2025-03-14 15:09:00.321696+00
+testnet	511034	87cb39889296457c3e0a11f7f928e50b69add1324f3a5836dd167d45d44f602e	2025-03-14 15:09:57.48954+00	2025-03-14 15:10:28.094467+00	2025-03-14 15:10:28.094467+00
+testnet	511035	c2498f3beb1b52b7a0641382ba0eb508002c3ab9f404ff4a84764c87adb6614a	2025-03-14 15:10:13.987577+00	2025-03-14 15:10:53.500566+00	2025-03-14 15:10:53.500566+00
+testnet	511036	10355c81de74ae2a24f3dec5f9309c2854d921d956402e8cbbc7715654d6ca16	2025-03-14 15:10:25.550863+00	2025-03-14 15:10:54.317567+00	2025-03-14 15:10:54.317567+00
 testnet	452060	39ca587247b894c2ac7b3d41acf413f6cc8eb32f59fafaa26b27c4c4e6e45c8e	2025-03-06 21:03:39.932397+00	2025-03-06 21:03:50.9627+00	2025-03-06 21:03:50.9627+00
 testnet	452062	946796990452996186d9cd8c75f766c97b2a1122fc1bd32034551c73e93cd851	2025-03-06 21:03:57.513748+00	2025-03-06 21:04:08.228236+00	2025-03-06 21:04:08.228236+00
 testnet	452063	e773d31f69afa9358cc3700e05fb14ab2b8c8d10d206db27f63b528c9bde6435	2025-03-06 21:04:03.49794+00	2025-03-06 21:04:23.787809+00	2025-03-06 21:04:23.787809+00
@@ -18106,6 +17833,12 @@ testnet	510734	64c9f303e842e047510e1c4b2147b814128f1921048f23047b2da7e69c72e43a	
 testnet	510735	cce073b9b31d0e7c79e724055f056e3daa26ff0962b1156f78987c3ae72bedec	2025-03-14 14:10:54.827248+00	2025-03-14 14:11:07.435002+00	2025-03-14 14:11:07.435002+00
 testnet	510740	403eafa15db706ac44ba9d332deca2dfbe0745086078501c4ffec9e99dd19f0a	2025-03-14 14:11:45.529156+00	2025-03-14 14:11:59.502526+00	2025-03-14 14:11:59.502526+00
 testnet	510743	d23988d9d9a2c4787247de971b22ee124c0feeafa30606e4e049ddbbaca74e66	2025-03-14 14:12:18.803969+00	2025-03-14 14:12:31.618621+00	2025-03-14 14:12:31.618621+00
+testnet	511044	f0eb3f172336f721596b379711a7cb1d3da585494a210f3bd39598321bfdd67a	2025-03-14 15:12:00.906061+00	2025-03-14 15:12:13.276784+00	2025-03-14 15:12:13.276784+00
+testnet	511045	cb19f2bd8bb345e821ebc295bf0c595faa30b3605ea0085bb06427d48c07b47a	2025-03-14 15:12:11.849799+00	2025-03-14 15:12:27.850349+00	2025-03-14 15:12:27.850349+00
+testnet	511046	d6c3e2a82609481b84ed89d40f98946f22dbc823b6ff86b5b54ab9db59150ab0	2025-03-14 15:12:22.886987+00	2025-03-14 15:12:37.205919+00	2025-03-14 15:12:37.205919+00
+testnet	511047	d7e9ba7d43a09bb2b62110bbb715d1b9c0ae9470bdb28178fc21e8383812babf	2025-03-14 15:12:33.891847+00	2025-03-14 15:12:48.513938+00	2025-03-14 15:12:48.513938+00
+testnet	511050	546da0c8dff343fb8bab1a347cae451b3e2956586171aed808f269e0fd576f22	2025-03-14 15:13:07.057881+00	2025-03-14 15:13:20.505045+00	2025-03-14 15:13:20.505045+00
+testnet	511052	4b99d1fe756dde6fcb7d39f207de87ae1025ecfbe73e1fa9214ef897a08a61f4	2025-03-14 15:13:33.527608+00	2025-03-14 15:13:40.739386+00	2025-03-14 15:13:40.739386+00
 testnet	452579	485a7b2392dc1f91ecc8b20d124adae20ae30d5e0b4ba5b809af19f06873ef6c	2025-03-06 22:39:57.440447+00	2025-03-06 22:40:15.056924+00	2025-03-06 22:40:15.056924+00
 testnet	452581	bdcb2f416e661a18693b077c0d4505d722953e544d2a1a234a1067023e1d9986	2025-03-06 22:40:19.549993+00	2025-03-06 22:40:34.678935+00	2025-03-06 22:40:34.678935+00
 testnet	452585	82715fe54994c9ed2674fc0c52dfcce000591a72e790db2616708d95bf3d01a7	2025-03-06 22:41:03.586151+00	2025-03-06 22:41:26.274567+00	2025-03-06 22:41:26.274567+00
@@ -19150,7 +18883,7 @@ testnet	510937	d3144c48fb8df57a9c80b2e5ad26b2cda69026ca3c37cfe7c56ee83127bfb0a7	
 
 
 --
--- Data for Name: chains; Type: TABLE DATA; Schema: hubble; Owner: postgres
+-- Data for Name: chains; Type: TABLE DATA; Schema: hubble; Owner: -
 --
 
 COPY hubble.chains (id, chain_id, display_name, testnet, max_tip_age_seconds, rpc_type, addr_prefix, enabled, logo_uri, enabled_staging, execution, indexer_id, max_mapped_execution_height_gap) FROM stdin;
@@ -19159,7 +18892,7 @@ COPY hubble.chains (id, chain_id, display_name, testnet, max_tip_age_seconds, rp
 
 
 --
--- Data for Name: clients; Type: TABLE DATA; Schema: hubble; Owner: postgres
+-- Data for Name: clients; Type: TABLE DATA; Schema: hubble; Owner: -
 --
 
 COPY hubble.clients (chain_id, client_id, counterparty_chain_id) FROM stdin;
@@ -19167,7 +18900,7 @@ COPY hubble.clients (chain_id, client_id, counterparty_chain_id) FROM stdin;
 
 
 --
--- Data for Name: consensus_heights; Type: TABLE DATA; Schema: hubble; Owner: postgres
+-- Data for Name: consensus_heights; Type: TABLE DATA; Schema: hubble; Owner: -
 --
 
 COPY hubble.consensus_heights (chain_id, execution_height, consensus_height) FROM stdin;
@@ -19175,7 +18908,7 @@ COPY hubble.consensus_heights (chain_id, execution_height, consensus_height) FRO
 
 
 --
--- Data for Name: contract_status; Type: TABLE DATA; Schema: hubble; Owner: postgres
+-- Data for Name: contract_status; Type: TABLE DATA; Schema: hubble; Owner: -
 --
 
 COPY hubble.contract_status (internal_chain_id, address, height, "timestamp", created_at, updated_at) FROM stdin;
@@ -19183,16 +18916,16 @@ COPY hubble.contract_status (internal_chain_id, address, height, "timestamp", cr
 
 
 --
--- Data for Name: indexer_status; Type: TABLE DATA; Schema: hubble; Owner: postgres
+-- Data for Name: indexer_status; Type: TABLE DATA; Schema: hubble; Owner: -
 --
 
 COPY hubble.indexer_status (indexer_id, height, "timestamp", created_at, updated_at) FROM stdin;
-testnet	511012	2025-03-14 15:04:28.282896+00	2025-02-28 11:32:23.581114+00	2025-03-14 15:05:04.365735+00
+testnet	511053	2025-03-14 15:13:39.423634+00	2025-02-28 11:32:23.581114+00	2025-03-14 15:13:53.114235+00
 \.
 
 
 --
--- Data for Name: token_source_representations; Type: TABLE DATA; Schema: hubble; Owner: postgres
+-- Data for Name: token_source_representations; Type: TABLE DATA; Schema: hubble; Owner: -
 --
 
 COPY hubble.token_source_representations (token_source_id, internal_chain_id, address, symbol, name, decimals, logo_uri, created_at, updated_at) FROM stdin;
@@ -19200,7 +18933,7 @@ COPY hubble.token_source_representations (token_source_id, internal_chain_id, ad
 
 
 --
--- Data for Name: token_sources; Type: TABLE DATA; Schema: hubble; Owner: postgres
+-- Data for Name: token_sources; Type: TABLE DATA; Schema: hubble; Owner: -
 --
 
 COPY hubble.token_sources (id, source_uri, name, logo_uri, enabled, created_at, updated_at) FROM stdin;
@@ -19208,7 +18941,7 @@ COPY hubble.token_sources (id, source_uri, name, logo_uri, enabled, created_at, 
 
 
 --
--- Data for Name: key; Type: TABLE DATA; Schema: pgsodium; Owner: supabase_admin
+-- Data for Name: key; Type: TABLE DATA; Schema: pgsodium; Owner: -
 --
 
 COPY pgsodium.key (id, status, created, expires, key_type, key_id, key_context, name, associated_data, raw_key, raw_key_nonce, parent_key, comment, user_data) FROM stdin;
@@ -19216,7 +18949,7 @@ COPY pgsodium.key (id, status, created, expires, key_type, key_id, key_context, 
 
 
 --
--- Data for Name: schema_migrations; Type: TABLE DATA; Schema: realtime; Owner: supabase_admin
+-- Data for Name: schema_migrations; Type: TABLE DATA; Schema: realtime; Owner: -
 --
 
 COPY realtime.schema_migrations (version, inserted_at) FROM stdin;
@@ -19284,7 +19017,7 @@ COPY realtime.schema_migrations (version, inserted_at) FROM stdin;
 
 
 --
--- Data for Name: subscription; Type: TABLE DATA; Schema: realtime; Owner: supabase_admin
+-- Data for Name: subscription; Type: TABLE DATA; Schema: realtime; Owner: -
 --
 
 COPY realtime.subscription (id, subscription_id, entity, filters, claims, created_at) FROM stdin;
@@ -19292,7 +19025,7 @@ COPY realtime.subscription (id, subscription_id, entity, filters, claims, create
 
 
 --
--- Data for Name: buckets; Type: TABLE DATA; Schema: storage; Owner: supabase_storage_admin
+-- Data for Name: buckets; Type: TABLE DATA; Schema: storage; Owner: -
 --
 
 COPY storage.buckets (id, name, owner, created_at, updated_at, public, avif_autodetection, file_size_limit, allowed_mime_types, owner_id) FROM stdin;
@@ -19300,7 +19033,7 @@ COPY storage.buckets (id, name, owner, created_at, updated_at, public, avif_auto
 
 
 --
--- Data for Name: migrations; Type: TABLE DATA; Schema: storage; Owner: supabase_storage_admin
+-- Data for Name: migrations; Type: TABLE DATA; Schema: storage; Owner: -
 --
 
 COPY storage.migrations (id, name, hash, executed_at) FROM stdin;
@@ -19334,7 +19067,7 @@ COPY storage.migrations (id, name, hash, executed_at) FROM stdin;
 
 
 --
--- Data for Name: objects; Type: TABLE DATA; Schema: storage; Owner: supabase_storage_admin
+-- Data for Name: objects; Type: TABLE DATA; Schema: storage; Owner: -
 --
 
 COPY storage.objects (id, bucket_id, name, owner, created_at, updated_at, last_accessed_at, metadata, version, owner_id, user_metadata) FROM stdin;
@@ -19342,7 +19075,7 @@ COPY storage.objects (id, bucket_id, name, owner, created_at, updated_at, last_a
 
 
 --
--- Data for Name: s3_multipart_uploads; Type: TABLE DATA; Schema: storage; Owner: supabase_storage_admin
+-- Data for Name: s3_multipart_uploads; Type: TABLE DATA; Schema: storage; Owner: -
 --
 
 COPY storage.s3_multipart_uploads (id, in_progress_size, upload_signature, bucket_id, key, version, owner_id, created_at, user_metadata) FROM stdin;
@@ -19350,7 +19083,7 @@ COPY storage.s3_multipart_uploads (id, in_progress_size, upload_signature, bucke
 
 
 --
--- Data for Name: s3_multipart_uploads_parts; Type: TABLE DATA; Schema: storage; Owner: supabase_storage_admin
+-- Data for Name: s3_multipart_uploads_parts; Type: TABLE DATA; Schema: storage; Owner: -
 --
 
 COPY storage.s3_multipart_uploads_parts (id, upload_id, size, part_number, bucket_id, key, etag, owner_id, version, created_at) FROM stdin;
@@ -19358,7 +19091,7 @@ COPY storage.s3_multipart_uploads_parts (id, upload_id, size, part_number, bucke
 
 
 --
--- Data for Name: hooks; Type: TABLE DATA; Schema: supabase_functions; Owner: supabase_functions_admin
+-- Data for Name: hooks; Type: TABLE DATA; Schema: supabase_functions; Owner: -
 --
 
 COPY supabase_functions.hooks (id, hook_table_id, hook_name, created_at, request_id) FROM stdin;
@@ -19366,7 +19099,7 @@ COPY supabase_functions.hooks (id, hook_table_id, hook_name, created_at, request
 
 
 --
--- Data for Name: migrations; Type: TABLE DATA; Schema: supabase_functions; Owner: supabase_functions_admin
+-- Data for Name: migrations; Type: TABLE DATA; Schema: supabase_functions; Owner: -
 --
 
 COPY supabase_functions.migrations (version, inserted_at) FROM stdin;
@@ -19376,7 +19109,7 @@ initial	2025-03-11 16:22:28.085009+00
 
 
 --
--- Data for Name: schema_migrations; Type: TABLE DATA; Schema: supabase_migrations; Owner: postgres
+-- Data for Name: schema_migrations; Type: TABLE DATA; Schema: supabase_migrations; Owner: -
 --
 
 COPY supabase_migrations.schema_migrations (version, statements, name) FROM stdin;
@@ -19384,7 +19117,7 @@ COPY supabase_migrations.schema_migrations (version, statements, name) FROM stdi
 
 
 --
--- Data for Name: seed_files; Type: TABLE DATA; Schema: supabase_migrations; Owner: postgres
+-- Data for Name: seed_files; Type: TABLE DATA; Schema: supabase_migrations; Owner: -
 --
 
 COPY supabase_migrations.seed_files (path, hash) FROM stdin;
@@ -19392,7 +19125,7 @@ COPY supabase_migrations.seed_files (path, hash) FROM stdin;
 
 
 --
--- Data for Name: blocks; Type: TABLE DATA; Schema: v1_aptos; Owner: postgres
+-- Data for Name: blocks; Type: TABLE DATA; Schema: v1_aptos; Owner: -
 --
 
 COPY v1_aptos.blocks (internal_chain_id, block_hash, height, "timestamp", first_version, last_version, created_at, updated_at) FROM stdin;
@@ -19400,7 +19133,7 @@ COPY v1_aptos.blocks (internal_chain_id, block_hash, height, "timestamp", first_
 
 
 --
--- Data for Name: contracts; Type: TABLE DATA; Schema: v1_aptos; Owner: postgres
+-- Data for Name: contracts; Type: TABLE DATA; Schema: v1_aptos; Owner: -
 --
 
 COPY v1_aptos.contracts (internal_chain_id, address, start_height, end_height, description, created_at, updated_at) FROM stdin;
@@ -19408,7 +19141,7 @@ COPY v1_aptos.contracts (internal_chain_id, address, start_height, end_height, d
 
 
 --
--- Data for Name: events; Type: TABLE DATA; Schema: v1_aptos; Owner: postgres
+-- Data for Name: events; Type: TABLE DATA; Schema: v1_aptos; Owner: -
 --
 
 COPY v1_aptos.events (internal_chain_id, height, version, sequence_number, creation_number, index, transaction_event_index, account_address, type, data, created_at, updated_at) FROM stdin;
@@ -19416,7 +19149,7 @@ COPY v1_aptos.events (internal_chain_id, height, version, sequence_number, creat
 
 
 --
--- Data for Name: transactions; Type: TABLE DATA; Schema: v1_aptos; Owner: postgres
+-- Data for Name: transactions; Type: TABLE DATA; Schema: v1_aptos; Owner: -
 --
 
 COPY v1_aptos.transactions (internal_chain_id, height, version, transaction_hash, transaction_index, created_at, updated_at) FROM stdin;
@@ -19424,7 +19157,7 @@ COPY v1_aptos.transactions (internal_chain_id, height, version, transaction_hash
 
 
 --
--- Data for Name: blocks; Type: TABLE DATA; Schema: v1_cosmos; Owner: postgres
+-- Data for Name: blocks; Type: TABLE DATA; Schema: v1_cosmos; Owner: -
 --
 
 COPY v1_cosmos.blocks (chain_id, hash, height, "time", data) FROM stdin;
@@ -19489,7 +19222,7 @@ COPY v1_cosmos.blocks (chain_id, hash, height, "time", data) FROM stdin;
 
 
 --
--- Data for Name: contracts; Type: TABLE DATA; Schema: v1_cosmos; Owner: postgres
+-- Data for Name: contracts; Type: TABLE DATA; Schema: v1_cosmos; Owner: -
 --
 
 COPY v1_cosmos.contracts (internal_chain_id, address, start_height, end_height, description, created_at, updated_at) FROM stdin;
@@ -19523,7 +19256,7 @@ COPY v1_cosmos.contracts (internal_chain_id, address, start_height, end_height, 
 
 
 --
--- Data for Name: events; Type: TABLE DATA; Schema: v1_cosmos; Owner: postgres
+-- Data for Name: events; Type: TABLE DATA; Schema: v1_cosmos; Owner: -
 --
 
 COPY v1_cosmos.events (chain_id, block_hash, height, transaction_hash, transaction_index, index, data, "time", created_at) FROM stdin;
@@ -19735,7 +19468,7 @@ COPY v1_cosmos.events (chain_id, block_hash, height, transaction_hash, transacti
 
 
 --
--- Data for Name: token; Type: TABLE DATA; Schema: v1_cosmos; Owner: postgres
+-- Data for Name: token; Type: TABLE DATA; Schema: v1_cosmos; Owner: -
 --
 
 COPY v1_cosmos.token (id, created_at, coingecko_id, denomination, token_name, chain_id, decimals) FROM stdin;
@@ -19744,7 +19477,7 @@ COPY v1_cosmos.token (id, created_at, coingecko_id, denomination, token_name, ch
 
 
 --
--- Data for Name: token_prices; Type: TABLE DATA; Schema: v1_cosmos; Owner: postgres
+-- Data for Name: token_prices; Type: TABLE DATA; Schema: v1_cosmos; Owner: -
 --
 
 COPY v1_cosmos.token_prices (id, created_at, denomination, price, last_updated_at) FROM stdin;
@@ -19754,7 +19487,7 @@ COPY v1_cosmos.token_prices (id, created_at, denomination, price, last_updated_a
 
 
 --
--- Data for Name: transactions; Type: TABLE DATA; Schema: v1_cosmos; Owner: postgres
+-- Data for Name: transactions; Type: TABLE DATA; Schema: v1_cosmos; Owner: -
 --
 
 COPY v1_cosmos.transactions (chain_id, block_hash, height, data, hash, index) FROM stdin;
@@ -19819,7 +19552,7 @@ COPY v1_cosmos.transactions (chain_id, block_hash, height, data, hash, index) FR
 
 
 --
--- Data for Name: contracts; Type: TABLE DATA; Schema: v1_evm; Owner: postgres
+-- Data for Name: contracts; Type: TABLE DATA; Schema: v1_evm; Owner: -
 --
 
 COPY v1_evm.contracts (internal_chain_id, address, abi, start_height, end_height, version, description, created_at, updated_at, upgrade_transaction_hash) FROM stdin;
@@ -19827,7 +19560,7 @@ COPY v1_evm.contracts (internal_chain_id, address, abi, start_height, end_height
 
 
 --
--- Data for Name: logs; Type: TABLE DATA; Schema: v1_evm; Owner: postgres
+-- Data for Name: logs; Type: TABLE DATA; Schema: v1_evm; Owner: -
 --
 
 COPY v1_evm.logs (chain_id, block_hash, height, "time", data) FROM stdin;
@@ -19835,7 +19568,7 @@ COPY v1_evm.logs (chain_id, block_hash, height, "time", data) FROM stdin;
 
 
 --
--- Data for Name: logs_sync; Type: TABLE DATA; Schema: v1_evm; Owner: postgres
+-- Data for Name: logs_sync; Type: TABLE DATA; Schema: v1_evm; Owner: -
 --
 
 COPY v1_evm.logs_sync (internal_chain_id, block_hash, height, log_index, "timestamp", transaction_hash, transaction_index, transaction_log_index, raw_log, log_to_jsonb) FROM stdin;
@@ -19843,7 +19576,7 @@ COPY v1_evm.logs_sync (internal_chain_id, block_hash, height, log_index, "timest
 
 
 --
--- Data for Name: secrets; Type: TABLE DATA; Schema: vault; Owner: supabase_admin
+-- Data for Name: secrets; Type: TABLE DATA; Schema: vault; Owner: -
 --
 
 COPY vault.secrets (id, name, description, secret, key_id, nonce, created_at, updated_at) FROM stdin;
@@ -19851,63 +19584,63 @@ COPY vault.secrets (id, name, description, secret, key_id, nonce, created_at, up
 
 
 --
--- Name: refresh_tokens_id_seq; Type: SEQUENCE SET; Schema: auth; Owner: supabase_auth_admin
+-- Name: refresh_tokens_id_seq; Type: SEQUENCE SET; Schema: auth; Owner: -
 --
 
 SELECT pg_catalog.setval('auth.refresh_tokens_id_seq', 1, false);
 
 
 --
--- Name: chains_id_seq; Type: SEQUENCE SET; Schema: hubble; Owner: postgres
+-- Name: chains_id_seq; Type: SEQUENCE SET; Schema: hubble; Owner: -
 --
 
 SELECT pg_catalog.setval('hubble.chains_id_seq', 1, true);
 
 
 --
--- Name: token_sources_id_seq; Type: SEQUENCE SET; Schema: hubble; Owner: postgres
+-- Name: token_sources_id_seq; Type: SEQUENCE SET; Schema: hubble; Owner: -
 --
 
 SELECT pg_catalog.setval('hubble.token_sources_id_seq', 1, false);
 
 
 --
--- Name: key_key_id_seq; Type: SEQUENCE SET; Schema: pgsodium; Owner: supabase_admin
+-- Name: key_key_id_seq; Type: SEQUENCE SET; Schema: pgsodium; Owner: -
 --
 
 SELECT pg_catalog.setval('pgsodium.key_key_id_seq', 1, false);
 
 
 --
--- Name: subscription_id_seq; Type: SEQUENCE SET; Schema: realtime; Owner: supabase_admin
+-- Name: subscription_id_seq; Type: SEQUENCE SET; Schema: realtime; Owner: -
 --
 
 SELECT pg_catalog.setval('realtime.subscription_id_seq', 1, false);
 
 
 --
--- Name: hooks_id_seq; Type: SEQUENCE SET; Schema: supabase_functions; Owner: supabase_functions_admin
+-- Name: hooks_id_seq; Type: SEQUENCE SET; Schema: supabase_functions; Owner: -
 --
 
 SELECT pg_catalog.setval('supabase_functions.hooks_id_seq', 1, false);
 
 
 --
--- Name: token_id_seq; Type: SEQUENCE SET; Schema: v1_cosmos; Owner: postgres
+-- Name: token_id_seq; Type: SEQUENCE SET; Schema: v1_cosmos; Owner: -
 --
 
 SELECT pg_catalog.setval('v1_cosmos.token_id_seq', 1, true);
 
 
 --
--- Name: token_prices_id_seq; Type: SEQUENCE SET; Schema: v1_cosmos; Owner: postgres
+-- Name: token_prices_id_seq; Type: SEQUENCE SET; Schema: v1_cosmos; Owner: -
 --
 
 SELECT pg_catalog.setval('v1_cosmos.token_prices_id_seq', 2, true);
 
 
 --
--- Name: mfa_amr_claims amr_id_pk; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+-- Name: mfa_amr_claims amr_id_pk; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
 ALTER TABLE ONLY auth.mfa_amr_claims
@@ -19915,7 +19648,7 @@ ALTER TABLE ONLY auth.mfa_amr_claims
 
 
 --
--- Name: audit_log_entries audit_log_entries_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+-- Name: audit_log_entries audit_log_entries_pkey; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
 ALTER TABLE ONLY auth.audit_log_entries
@@ -19923,7 +19656,7 @@ ALTER TABLE ONLY auth.audit_log_entries
 
 
 --
--- Name: flow_state flow_state_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+-- Name: flow_state flow_state_pkey; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
 ALTER TABLE ONLY auth.flow_state
@@ -19931,7 +19664,7 @@ ALTER TABLE ONLY auth.flow_state
 
 
 --
--- Name: identities identities_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+-- Name: identities identities_pkey; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
 ALTER TABLE ONLY auth.identities
@@ -19939,7 +19672,7 @@ ALTER TABLE ONLY auth.identities
 
 
 --
--- Name: identities identities_provider_id_provider_unique; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+-- Name: identities identities_provider_id_provider_unique; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
 ALTER TABLE ONLY auth.identities
@@ -19947,7 +19680,7 @@ ALTER TABLE ONLY auth.identities
 
 
 --
--- Name: instances instances_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+-- Name: instances instances_pkey; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
 ALTER TABLE ONLY auth.instances
@@ -19955,7 +19688,7 @@ ALTER TABLE ONLY auth.instances
 
 
 --
--- Name: mfa_amr_claims mfa_amr_claims_session_id_authentication_method_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+-- Name: mfa_amr_claims mfa_amr_claims_session_id_authentication_method_pkey; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
 ALTER TABLE ONLY auth.mfa_amr_claims
@@ -19963,7 +19696,7 @@ ALTER TABLE ONLY auth.mfa_amr_claims
 
 
 --
--- Name: mfa_challenges mfa_challenges_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+-- Name: mfa_challenges mfa_challenges_pkey; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
 ALTER TABLE ONLY auth.mfa_challenges
@@ -19971,7 +19704,7 @@ ALTER TABLE ONLY auth.mfa_challenges
 
 
 --
--- Name: mfa_factors mfa_factors_last_challenged_at_key; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+-- Name: mfa_factors mfa_factors_last_challenged_at_key; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
 ALTER TABLE ONLY auth.mfa_factors
@@ -19979,7 +19712,7 @@ ALTER TABLE ONLY auth.mfa_factors
 
 
 --
--- Name: mfa_factors mfa_factors_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+-- Name: mfa_factors mfa_factors_pkey; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
 ALTER TABLE ONLY auth.mfa_factors
@@ -19987,7 +19720,7 @@ ALTER TABLE ONLY auth.mfa_factors
 
 
 --
--- Name: one_time_tokens one_time_tokens_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+-- Name: one_time_tokens one_time_tokens_pkey; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
 ALTER TABLE ONLY auth.one_time_tokens
@@ -19995,7 +19728,7 @@ ALTER TABLE ONLY auth.one_time_tokens
 
 
 --
--- Name: refresh_tokens refresh_tokens_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+-- Name: refresh_tokens refresh_tokens_pkey; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
 ALTER TABLE ONLY auth.refresh_tokens
@@ -20003,7 +19736,7 @@ ALTER TABLE ONLY auth.refresh_tokens
 
 
 --
--- Name: refresh_tokens refresh_tokens_token_unique; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+-- Name: refresh_tokens refresh_tokens_token_unique; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
 ALTER TABLE ONLY auth.refresh_tokens
@@ -20011,7 +19744,7 @@ ALTER TABLE ONLY auth.refresh_tokens
 
 
 --
--- Name: saml_providers saml_providers_entity_id_key; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+-- Name: saml_providers saml_providers_entity_id_key; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
 ALTER TABLE ONLY auth.saml_providers
@@ -20019,7 +19752,7 @@ ALTER TABLE ONLY auth.saml_providers
 
 
 --
--- Name: saml_providers saml_providers_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+-- Name: saml_providers saml_providers_pkey; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
 ALTER TABLE ONLY auth.saml_providers
@@ -20027,7 +19760,7 @@ ALTER TABLE ONLY auth.saml_providers
 
 
 --
--- Name: saml_relay_states saml_relay_states_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+-- Name: saml_relay_states saml_relay_states_pkey; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
 ALTER TABLE ONLY auth.saml_relay_states
@@ -20035,7 +19768,7 @@ ALTER TABLE ONLY auth.saml_relay_states
 
 
 --
--- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+-- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
 ALTER TABLE ONLY auth.schema_migrations
@@ -20043,7 +19776,7 @@ ALTER TABLE ONLY auth.schema_migrations
 
 
 --
--- Name: sessions sessions_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+-- Name: sessions sessions_pkey; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
 ALTER TABLE ONLY auth.sessions
@@ -20051,7 +19784,7 @@ ALTER TABLE ONLY auth.sessions
 
 
 --
--- Name: sso_domains sso_domains_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+-- Name: sso_domains sso_domains_pkey; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
 ALTER TABLE ONLY auth.sso_domains
@@ -20059,7 +19792,7 @@ ALTER TABLE ONLY auth.sso_domains
 
 
 --
--- Name: sso_providers sso_providers_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+-- Name: sso_providers sso_providers_pkey; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
 ALTER TABLE ONLY auth.sso_providers
@@ -20067,7 +19800,7 @@ ALTER TABLE ONLY auth.sso_providers
 
 
 --
--- Name: users users_phone_key; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+-- Name: users users_phone_key; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
 ALTER TABLE ONLY auth.users
@@ -20075,7 +19808,7 @@ ALTER TABLE ONLY auth.users
 
 
 --
--- Name: users users_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
 ALTER TABLE ONLY auth.users
@@ -20083,7 +19816,7 @@ ALTER TABLE ONLY auth.users
 
 
 --
--- Name: assets assets_pkey; Type: CONSTRAINT; Schema: hubble; Owner: postgres
+-- Name: assets assets_pkey; Type: CONSTRAINT; Schema: hubble; Owner: -
 --
 
 ALTER TABLE ONLY hubble.assets
@@ -20091,7 +19824,7 @@ ALTER TABLE ONLY hubble.assets
 
 
 --
--- Name: block_status block_status_pkey; Type: CONSTRAINT; Schema: hubble; Owner: postgres
+-- Name: block_status block_status_pkey; Type: CONSTRAINT; Schema: hubble; Owner: -
 --
 
 ALTER TABLE ONLY hubble.block_status
@@ -20099,7 +19832,7 @@ ALTER TABLE ONLY hubble.block_status
 
 
 --
--- Name: indexer_status chain_status_pkey; Type: CONSTRAINT; Schema: hubble; Owner: postgres
+-- Name: indexer_status chain_status_pkey; Type: CONSTRAINT; Schema: hubble; Owner: -
 --
 
 ALTER TABLE ONLY hubble.indexer_status
@@ -20107,7 +19840,7 @@ ALTER TABLE ONLY hubble.indexer_status
 
 
 --
--- Name: chains chains_display_name_key; Type: CONSTRAINT; Schema: hubble; Owner: postgres
+-- Name: chains chains_display_name_key; Type: CONSTRAINT; Schema: hubble; Owner: -
 --
 
 ALTER TABLE ONLY hubble.chains
@@ -20115,7 +19848,7 @@ ALTER TABLE ONLY hubble.chains
 
 
 --
--- Name: chains chains_pkey; Type: CONSTRAINT; Schema: hubble; Owner: postgres
+-- Name: chains chains_pkey; Type: CONSTRAINT; Schema: hubble; Owner: -
 --
 
 ALTER TABLE ONLY hubble.chains
@@ -20123,7 +19856,7 @@ ALTER TABLE ONLY hubble.chains
 
 
 --
--- Name: clients clients_pkey; Type: CONSTRAINT; Schema: hubble; Owner: postgres
+-- Name: clients clients_pkey; Type: CONSTRAINT; Schema: hubble; Owner: -
 --
 
 ALTER TABLE ONLY hubble.clients
@@ -20131,7 +19864,7 @@ ALTER TABLE ONLY hubble.clients
 
 
 --
--- Name: consensus_heights consensus_heights_pkey; Type: CONSTRAINT; Schema: hubble; Owner: postgres
+-- Name: consensus_heights consensus_heights_pkey; Type: CONSTRAINT; Schema: hubble; Owner: -
 --
 
 ALTER TABLE ONLY hubble.consensus_heights
@@ -20139,7 +19872,7 @@ ALTER TABLE ONLY hubble.consensus_heights
 
 
 --
--- Name: contract_status contract_status_pkey; Type: CONSTRAINT; Schema: hubble; Owner: postgres
+-- Name: contract_status contract_status_pkey; Type: CONSTRAINT; Schema: hubble; Owner: -
 --
 
 ALTER TABLE ONLY hubble.contract_status
@@ -20147,7 +19880,7 @@ ALTER TABLE ONLY hubble.contract_status
 
 
 --
--- Name: token_source_representations token_source_representations_pk; Type: CONSTRAINT; Schema: hubble; Owner: postgres
+-- Name: token_source_representations token_source_representations_pk; Type: CONSTRAINT; Schema: hubble; Owner: -
 --
 
 ALTER TABLE ONLY hubble.token_source_representations
@@ -20155,7 +19888,7 @@ ALTER TABLE ONLY hubble.token_source_representations
 
 
 --
--- Name: token_sources token_sources_pkey; Type: CONSTRAINT; Schema: hubble; Owner: postgres
+-- Name: token_sources token_sources_pkey; Type: CONSTRAINT; Schema: hubble; Owner: -
 --
 
 ALTER TABLE ONLY hubble.token_sources
@@ -20163,7 +19896,7 @@ ALTER TABLE ONLY hubble.token_sources
 
 
 --
--- Name: messages messages_pkey; Type: CONSTRAINT; Schema: realtime; Owner: supabase_realtime_admin
+-- Name: messages messages_pkey; Type: CONSTRAINT; Schema: realtime; Owner: -
 --
 
 ALTER TABLE ONLY realtime.messages
@@ -20171,7 +19904,7 @@ ALTER TABLE ONLY realtime.messages
 
 
 --
--- Name: subscription pk_subscription; Type: CONSTRAINT; Schema: realtime; Owner: supabase_admin
+-- Name: subscription pk_subscription; Type: CONSTRAINT; Schema: realtime; Owner: -
 --
 
 ALTER TABLE ONLY realtime.subscription
@@ -20179,7 +19912,7 @@ ALTER TABLE ONLY realtime.subscription
 
 
 --
--- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: realtime; Owner: supabase_admin
+-- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: realtime; Owner: -
 --
 
 ALTER TABLE ONLY realtime.schema_migrations
@@ -20187,7 +19920,7 @@ ALTER TABLE ONLY realtime.schema_migrations
 
 
 --
--- Name: buckets buckets_pkey; Type: CONSTRAINT; Schema: storage; Owner: supabase_storage_admin
+-- Name: buckets buckets_pkey; Type: CONSTRAINT; Schema: storage; Owner: -
 --
 
 ALTER TABLE ONLY storage.buckets
@@ -20195,7 +19928,7 @@ ALTER TABLE ONLY storage.buckets
 
 
 --
--- Name: migrations migrations_name_key; Type: CONSTRAINT; Schema: storage; Owner: supabase_storage_admin
+-- Name: migrations migrations_name_key; Type: CONSTRAINT; Schema: storage; Owner: -
 --
 
 ALTER TABLE ONLY storage.migrations
@@ -20203,7 +19936,7 @@ ALTER TABLE ONLY storage.migrations
 
 
 --
--- Name: migrations migrations_pkey; Type: CONSTRAINT; Schema: storage; Owner: supabase_storage_admin
+-- Name: migrations migrations_pkey; Type: CONSTRAINT; Schema: storage; Owner: -
 --
 
 ALTER TABLE ONLY storage.migrations
@@ -20211,7 +19944,7 @@ ALTER TABLE ONLY storage.migrations
 
 
 --
--- Name: objects objects_pkey; Type: CONSTRAINT; Schema: storage; Owner: supabase_storage_admin
+-- Name: objects objects_pkey; Type: CONSTRAINT; Schema: storage; Owner: -
 --
 
 ALTER TABLE ONLY storage.objects
@@ -20219,7 +19952,7 @@ ALTER TABLE ONLY storage.objects
 
 
 --
--- Name: s3_multipart_uploads_parts s3_multipart_uploads_parts_pkey; Type: CONSTRAINT; Schema: storage; Owner: supabase_storage_admin
+-- Name: s3_multipart_uploads_parts s3_multipart_uploads_parts_pkey; Type: CONSTRAINT; Schema: storage; Owner: -
 --
 
 ALTER TABLE ONLY storage.s3_multipart_uploads_parts
@@ -20227,7 +19960,7 @@ ALTER TABLE ONLY storage.s3_multipart_uploads_parts
 
 
 --
--- Name: s3_multipart_uploads s3_multipart_uploads_pkey; Type: CONSTRAINT; Schema: storage; Owner: supabase_storage_admin
+-- Name: s3_multipart_uploads s3_multipart_uploads_pkey; Type: CONSTRAINT; Schema: storage; Owner: -
 --
 
 ALTER TABLE ONLY storage.s3_multipart_uploads
@@ -20235,7 +19968,7 @@ ALTER TABLE ONLY storage.s3_multipart_uploads
 
 
 --
--- Name: hooks hooks_pkey; Type: CONSTRAINT; Schema: supabase_functions; Owner: supabase_functions_admin
+-- Name: hooks hooks_pkey; Type: CONSTRAINT; Schema: supabase_functions; Owner: -
 --
 
 ALTER TABLE ONLY supabase_functions.hooks
@@ -20243,7 +19976,7 @@ ALTER TABLE ONLY supabase_functions.hooks
 
 
 --
--- Name: migrations migrations_pkey; Type: CONSTRAINT; Schema: supabase_functions; Owner: supabase_functions_admin
+-- Name: migrations migrations_pkey; Type: CONSTRAINT; Schema: supabase_functions; Owner: -
 --
 
 ALTER TABLE ONLY supabase_functions.migrations
@@ -20251,7 +19984,7 @@ ALTER TABLE ONLY supabase_functions.migrations
 
 
 --
--- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: supabase_migrations; Owner: postgres
+-- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: supabase_migrations; Owner: -
 --
 
 ALTER TABLE ONLY supabase_migrations.schema_migrations
@@ -20259,7 +19992,7 @@ ALTER TABLE ONLY supabase_migrations.schema_migrations
 
 
 --
--- Name: seed_files seed_files_pkey; Type: CONSTRAINT; Schema: supabase_migrations; Owner: postgres
+-- Name: seed_files seed_files_pkey; Type: CONSTRAINT; Schema: supabase_migrations; Owner: -
 --
 
 ALTER TABLE ONLY supabase_migrations.seed_files
@@ -20267,7 +20000,7 @@ ALTER TABLE ONLY supabase_migrations.seed_files
 
 
 --
--- Name: blocks blocks_pk; Type: CONSTRAINT; Schema: v1_aptos; Owner: postgres
+-- Name: blocks blocks_pk; Type: CONSTRAINT; Schema: v1_aptos; Owner: -
 --
 
 ALTER TABLE ONLY v1_aptos.blocks
@@ -20275,7 +20008,7 @@ ALTER TABLE ONLY v1_aptos.blocks
 
 
 --
--- Name: blocks blocks_pkey; Type: CONSTRAINT; Schema: v1_aptos; Owner: postgres
+-- Name: blocks blocks_pkey; Type: CONSTRAINT; Schema: v1_aptos; Owner: -
 --
 
 ALTER TABLE ONLY v1_aptos.blocks
@@ -20283,7 +20016,7 @@ ALTER TABLE ONLY v1_aptos.blocks
 
 
 --
--- Name: contracts contracts_pkey; Type: CONSTRAINT; Schema: v1_aptos; Owner: postgres
+-- Name: contracts contracts_pkey; Type: CONSTRAINT; Schema: v1_aptos; Owner: -
 --
 
 ALTER TABLE ONLY v1_aptos.contracts
@@ -20291,7 +20024,7 @@ ALTER TABLE ONLY v1_aptos.contracts
 
 
 --
--- Name: events events_pkey; Type: CONSTRAINT; Schema: v1_aptos; Owner: postgres
+-- Name: events events_pkey; Type: CONSTRAINT; Schema: v1_aptos; Owner: -
 --
 
 ALTER TABLE ONLY v1_aptos.events
@@ -20299,7 +20032,7 @@ ALTER TABLE ONLY v1_aptos.events
 
 
 --
--- Name: transactions transactions_pkey; Type: CONSTRAINT; Schema: v1_aptos; Owner: postgres
+-- Name: transactions transactions_pkey; Type: CONSTRAINT; Schema: v1_aptos; Owner: -
 --
 
 ALTER TABLE ONLY v1_aptos.transactions
@@ -20307,7 +20040,7 @@ ALTER TABLE ONLY v1_aptos.transactions
 
 
 --
--- Name: blocks blocks_pkey; Type: CONSTRAINT; Schema: v1_cosmos; Owner: postgres
+-- Name: blocks blocks_pkey; Type: CONSTRAINT; Schema: v1_cosmos; Owner: -
 --
 
 ALTER TABLE ONLY v1_cosmos.blocks
@@ -20315,7 +20048,7 @@ ALTER TABLE ONLY v1_cosmos.blocks
 
 
 --
--- Name: contracts contracts_pkey; Type: CONSTRAINT; Schema: v1_cosmos; Owner: postgres
+-- Name: contracts contracts_pkey; Type: CONSTRAINT; Schema: v1_cosmos; Owner: -
 --
 
 ALTER TABLE ONLY v1_cosmos.contracts
@@ -20323,7 +20056,7 @@ ALTER TABLE ONLY v1_cosmos.contracts
 
 
 --
--- Name: events events_pkey; Type: CONSTRAINT; Schema: v1_cosmos; Owner: postgres
+-- Name: events events_pkey; Type: CONSTRAINT; Schema: v1_cosmos; Owner: -
 --
 
 ALTER TABLE ONLY v1_cosmos.events
@@ -20331,7 +20064,7 @@ ALTER TABLE ONLY v1_cosmos.events
 
 
 --
--- Name: token token_denomination_key; Type: CONSTRAINT; Schema: v1_cosmos; Owner: postgres
+-- Name: token token_denomination_key; Type: CONSTRAINT; Schema: v1_cosmos; Owner: -
 --
 
 ALTER TABLE ONLY v1_cosmos.token
@@ -20339,7 +20072,7 @@ ALTER TABLE ONLY v1_cosmos.token
 
 
 --
--- Name: token token_pkey; Type: CONSTRAINT; Schema: v1_cosmos; Owner: postgres
+-- Name: token token_pkey; Type: CONSTRAINT; Schema: v1_cosmos; Owner: -
 --
 
 ALTER TABLE ONLY v1_cosmos.token
@@ -20347,7 +20080,7 @@ ALTER TABLE ONLY v1_cosmos.token
 
 
 --
--- Name: token_prices token_prices_pkey; Type: CONSTRAINT; Schema: v1_cosmos; Owner: postgres
+-- Name: token_prices token_prices_pkey; Type: CONSTRAINT; Schema: v1_cosmos; Owner: -
 --
 
 ALTER TABLE ONLY v1_cosmos.token_prices
@@ -20355,7 +20088,7 @@ ALTER TABLE ONLY v1_cosmos.token_prices
 
 
 --
--- Name: transactions transactions_pkey; Type: CONSTRAINT; Schema: v1_cosmos; Owner: postgres
+-- Name: transactions transactions_pkey; Type: CONSTRAINT; Schema: v1_cosmos; Owner: -
 --
 
 ALTER TABLE ONLY v1_cosmos.transactions
@@ -20363,7 +20096,7 @@ ALTER TABLE ONLY v1_cosmos.transactions
 
 
 --
--- Name: contracts contracts_pkey; Type: CONSTRAINT; Schema: v1_evm; Owner: postgres
+-- Name: contracts contracts_pkey; Type: CONSTRAINT; Schema: v1_evm; Owner: -
 --
 
 ALTER TABLE ONLY v1_evm.contracts
@@ -20371,7 +20104,7 @@ ALTER TABLE ONLY v1_evm.contracts
 
 
 --
--- Name: logs logs_copy_pkey; Type: CONSTRAINT; Schema: v1_evm; Owner: postgres
+-- Name: logs logs_copy_pkey; Type: CONSTRAINT; Schema: v1_evm; Owner: -
 --
 
 ALTER TABLE ONLY v1_evm.logs
@@ -20379,609 +20112,609 @@ ALTER TABLE ONLY v1_evm.logs
 
 
 --
--- Name: audit_logs_instance_id_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: audit_logs_instance_id_idx; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE INDEX audit_logs_instance_id_idx ON auth.audit_log_entries USING btree (instance_id);
 
 
 --
--- Name: confirmation_token_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: confirmation_token_idx; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE UNIQUE INDEX confirmation_token_idx ON auth.users USING btree (confirmation_token) WHERE ((confirmation_token)::text !~ '^[0-9 ]*$'::text);
 
 
 --
--- Name: email_change_token_current_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: email_change_token_current_idx; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE UNIQUE INDEX email_change_token_current_idx ON auth.users USING btree (email_change_token_current) WHERE ((email_change_token_current)::text !~ '^[0-9 ]*$'::text);
 
 
 --
--- Name: email_change_token_new_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: email_change_token_new_idx; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE UNIQUE INDEX email_change_token_new_idx ON auth.users USING btree (email_change_token_new) WHERE ((email_change_token_new)::text !~ '^[0-9 ]*$'::text);
 
 
 --
--- Name: factor_id_created_at_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: factor_id_created_at_idx; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE INDEX factor_id_created_at_idx ON auth.mfa_factors USING btree (user_id, created_at);
 
 
 --
--- Name: flow_state_created_at_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: flow_state_created_at_idx; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE INDEX flow_state_created_at_idx ON auth.flow_state USING btree (created_at DESC);
 
 
 --
--- Name: identities_email_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: identities_email_idx; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE INDEX identities_email_idx ON auth.identities USING btree (email text_pattern_ops);
 
 
 --
--- Name: INDEX identities_email_idx; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+-- Name: INDEX identities_email_idx; Type: COMMENT; Schema: auth; Owner: -
 --
 
 COMMENT ON INDEX auth.identities_email_idx IS 'Auth: Ensures indexed queries on the email column';
 
 
 --
--- Name: identities_user_id_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: identities_user_id_idx; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE INDEX identities_user_id_idx ON auth.identities USING btree (user_id);
 
 
 --
--- Name: idx_auth_code; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: idx_auth_code; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE INDEX idx_auth_code ON auth.flow_state USING btree (auth_code);
 
 
 --
--- Name: idx_user_id_auth_method; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: idx_user_id_auth_method; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE INDEX idx_user_id_auth_method ON auth.flow_state USING btree (user_id, authentication_method);
 
 
 --
--- Name: mfa_challenge_created_at_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: mfa_challenge_created_at_idx; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE INDEX mfa_challenge_created_at_idx ON auth.mfa_challenges USING btree (created_at DESC);
 
 
 --
--- Name: mfa_factors_user_friendly_name_unique; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: mfa_factors_user_friendly_name_unique; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE UNIQUE INDEX mfa_factors_user_friendly_name_unique ON auth.mfa_factors USING btree (friendly_name, user_id) WHERE (TRIM(BOTH FROM friendly_name) <> ''::text);
 
 
 --
--- Name: mfa_factors_user_id_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: mfa_factors_user_id_idx; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE INDEX mfa_factors_user_id_idx ON auth.mfa_factors USING btree (user_id);
 
 
 --
--- Name: one_time_tokens_relates_to_hash_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: one_time_tokens_relates_to_hash_idx; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE INDEX one_time_tokens_relates_to_hash_idx ON auth.one_time_tokens USING hash (relates_to);
 
 
 --
--- Name: one_time_tokens_token_hash_hash_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: one_time_tokens_token_hash_hash_idx; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE INDEX one_time_tokens_token_hash_hash_idx ON auth.one_time_tokens USING hash (token_hash);
 
 
 --
--- Name: one_time_tokens_user_id_token_type_key; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: one_time_tokens_user_id_token_type_key; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE UNIQUE INDEX one_time_tokens_user_id_token_type_key ON auth.one_time_tokens USING btree (user_id, token_type);
 
 
 --
--- Name: reauthentication_token_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: reauthentication_token_idx; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE UNIQUE INDEX reauthentication_token_idx ON auth.users USING btree (reauthentication_token) WHERE ((reauthentication_token)::text !~ '^[0-9 ]*$'::text);
 
 
 --
--- Name: recovery_token_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: recovery_token_idx; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE UNIQUE INDEX recovery_token_idx ON auth.users USING btree (recovery_token) WHERE ((recovery_token)::text !~ '^[0-9 ]*$'::text);
 
 
 --
--- Name: refresh_tokens_instance_id_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: refresh_tokens_instance_id_idx; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE INDEX refresh_tokens_instance_id_idx ON auth.refresh_tokens USING btree (instance_id);
 
 
 --
--- Name: refresh_tokens_instance_id_user_id_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: refresh_tokens_instance_id_user_id_idx; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE INDEX refresh_tokens_instance_id_user_id_idx ON auth.refresh_tokens USING btree (instance_id, user_id);
 
 
 --
--- Name: refresh_tokens_parent_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: refresh_tokens_parent_idx; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE INDEX refresh_tokens_parent_idx ON auth.refresh_tokens USING btree (parent);
 
 
 --
--- Name: refresh_tokens_session_id_revoked_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: refresh_tokens_session_id_revoked_idx; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE INDEX refresh_tokens_session_id_revoked_idx ON auth.refresh_tokens USING btree (session_id, revoked);
 
 
 --
--- Name: refresh_tokens_updated_at_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: refresh_tokens_updated_at_idx; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE INDEX refresh_tokens_updated_at_idx ON auth.refresh_tokens USING btree (updated_at DESC);
 
 
 --
--- Name: saml_providers_sso_provider_id_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: saml_providers_sso_provider_id_idx; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE INDEX saml_providers_sso_provider_id_idx ON auth.saml_providers USING btree (sso_provider_id);
 
 
 --
--- Name: saml_relay_states_created_at_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: saml_relay_states_created_at_idx; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE INDEX saml_relay_states_created_at_idx ON auth.saml_relay_states USING btree (created_at DESC);
 
 
 --
--- Name: saml_relay_states_for_email_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: saml_relay_states_for_email_idx; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE INDEX saml_relay_states_for_email_idx ON auth.saml_relay_states USING btree (for_email);
 
 
 --
--- Name: saml_relay_states_sso_provider_id_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: saml_relay_states_sso_provider_id_idx; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE INDEX saml_relay_states_sso_provider_id_idx ON auth.saml_relay_states USING btree (sso_provider_id);
 
 
 --
--- Name: sessions_not_after_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: sessions_not_after_idx; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE INDEX sessions_not_after_idx ON auth.sessions USING btree (not_after DESC);
 
 
 --
--- Name: sessions_user_id_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: sessions_user_id_idx; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE INDEX sessions_user_id_idx ON auth.sessions USING btree (user_id);
 
 
 --
--- Name: sso_domains_domain_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: sso_domains_domain_idx; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE UNIQUE INDEX sso_domains_domain_idx ON auth.sso_domains USING btree (lower(domain));
 
 
 --
--- Name: sso_domains_sso_provider_id_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: sso_domains_sso_provider_id_idx; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE INDEX sso_domains_sso_provider_id_idx ON auth.sso_domains USING btree (sso_provider_id);
 
 
 --
--- Name: sso_providers_resource_id_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: sso_providers_resource_id_idx; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE UNIQUE INDEX sso_providers_resource_id_idx ON auth.sso_providers USING btree (lower(resource_id));
 
 
 --
--- Name: unique_phone_factor_per_user; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: unique_phone_factor_per_user; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE UNIQUE INDEX unique_phone_factor_per_user ON auth.mfa_factors USING btree (user_id, phone);
 
 
 --
--- Name: user_id_created_at_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: user_id_created_at_idx; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE INDEX user_id_created_at_idx ON auth.sessions USING btree (user_id, created_at);
 
 
 --
--- Name: users_email_partial_key; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: users_email_partial_key; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE UNIQUE INDEX users_email_partial_key ON auth.users USING btree (email) WHERE (is_sso_user = false);
 
 
 --
--- Name: INDEX users_email_partial_key; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+-- Name: INDEX users_email_partial_key; Type: COMMENT; Schema: auth; Owner: -
 --
 
 COMMENT ON INDEX auth.users_email_partial_key IS 'Auth: A partial unique index that applies only when is_sso_user is false';
 
 
 --
--- Name: users_instance_id_email_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: users_instance_id_email_idx; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE INDEX users_instance_id_email_idx ON auth.users USING btree (instance_id, lower((email)::text));
 
 
 --
--- Name: users_instance_id_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: users_instance_id_idx; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE INDEX users_instance_id_idx ON auth.users USING btree (instance_id);
 
 
 --
--- Name: users_is_anonymous_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+-- Name: users_is_anonymous_idx; Type: INDEX; Schema: auth; Owner: -
 --
 
 CREATE INDEX users_is_anonymous_idx ON auth.users USING btree (is_anonymous);
 
 
 --
--- Name: chains_chain_id_idx; Type: INDEX; Schema: hubble; Owner: postgres
+-- Name: chains_chain_id_idx; Type: INDEX; Schema: hubble; Owner: -
 --
 
 CREATE INDEX chains_chain_id_idx ON hubble.chains USING btree (chain_id) INCLUDE (id);
 
 
 --
--- Name: ix_realtime_subscription_entity; Type: INDEX; Schema: realtime; Owner: supabase_admin
+-- Name: ix_realtime_subscription_entity; Type: INDEX; Schema: realtime; Owner: -
 --
 
 CREATE INDEX ix_realtime_subscription_entity ON realtime.subscription USING btree (entity);
 
 
 --
--- Name: subscription_subscription_id_entity_filters_key; Type: INDEX; Schema: realtime; Owner: supabase_admin
+-- Name: subscription_subscription_id_entity_filters_key; Type: INDEX; Schema: realtime; Owner: -
 --
 
 CREATE UNIQUE INDEX subscription_subscription_id_entity_filters_key ON realtime.subscription USING btree (subscription_id, entity, filters);
 
 
 --
--- Name: bname; Type: INDEX; Schema: storage; Owner: supabase_storage_admin
+-- Name: bname; Type: INDEX; Schema: storage; Owner: -
 --
 
 CREATE UNIQUE INDEX bname ON storage.buckets USING btree (name);
 
 
 --
--- Name: bucketid_objname; Type: INDEX; Schema: storage; Owner: supabase_storage_admin
+-- Name: bucketid_objname; Type: INDEX; Schema: storage; Owner: -
 --
 
 CREATE UNIQUE INDEX bucketid_objname ON storage.objects USING btree (bucket_id, name);
 
 
 --
--- Name: idx_multipart_uploads_list; Type: INDEX; Schema: storage; Owner: supabase_storage_admin
+-- Name: idx_multipart_uploads_list; Type: INDEX; Schema: storage; Owner: -
 --
 
 CREATE INDEX idx_multipart_uploads_list ON storage.s3_multipart_uploads USING btree (bucket_id, key, created_at);
 
 
 --
--- Name: idx_objects_bucket_id_name; Type: INDEX; Schema: storage; Owner: supabase_storage_admin
+-- Name: idx_objects_bucket_id_name; Type: INDEX; Schema: storage; Owner: -
 --
 
 CREATE INDEX idx_objects_bucket_id_name ON storage.objects USING btree (bucket_id, name COLLATE "C");
 
 
 --
--- Name: name_prefix_search; Type: INDEX; Schema: storage; Owner: supabase_storage_admin
+-- Name: name_prefix_search; Type: INDEX; Schema: storage; Owner: -
 --
 
 CREATE INDEX name_prefix_search ON storage.objects USING btree (name text_pattern_ops);
 
 
 --
--- Name: supabase_functions_hooks_h_table_id_h_name_idx; Type: INDEX; Schema: supabase_functions; Owner: supabase_functions_admin
+-- Name: supabase_functions_hooks_h_table_id_h_name_idx; Type: INDEX; Schema: supabase_functions; Owner: -
 --
 
 CREATE INDEX supabase_functions_hooks_h_table_id_h_name_idx ON supabase_functions.hooks USING btree (hook_table_id, hook_name);
 
 
 --
--- Name: supabase_functions_hooks_request_id_idx; Type: INDEX; Schema: supabase_functions; Owner: supabase_functions_admin
+-- Name: supabase_functions_hooks_request_id_idx; Type: INDEX; Schema: supabase_functions; Owner: -
 --
 
 CREATE INDEX supabase_functions_hooks_request_id_idx ON supabase_functions.hooks USING btree (request_id);
 
 
 --
--- Name: blocks_internal_chain_id_versions_index; Type: INDEX; Schema: v1_aptos; Owner: postgres
+-- Name: blocks_internal_chain_id_versions_index; Type: INDEX; Schema: v1_aptos; Owner: -
 --
 
 CREATE INDEX blocks_internal_chain_id_versions_index ON v1_aptos.blocks USING btree (internal_chain_id, first_version, last_version);
 
 
 --
--- Name: event_type_height; Type: INDEX; Schema: v1_aptos; Owner: postgres
+-- Name: event_type_height; Type: INDEX; Schema: v1_aptos; Owner: -
 --
 
 CREATE INDEX event_type_height ON v1_aptos.events USING btree (SUBSTRING(type FROM (POSITION(('::'::text) IN (type)) + 2)), height);
 
 
 --
--- Name: idx_blocks_first_version; Type: INDEX; Schema: v1_aptos; Owner: postgres
+-- Name: idx_blocks_first_version; Type: INDEX; Schema: v1_aptos; Owner: -
 --
 
 CREATE INDEX idx_blocks_first_version ON v1_aptos.blocks USING btree (internal_chain_id, first_version);
 
 
 --
--- Name: idx_blocks_height; Type: INDEX; Schema: v1_aptos; Owner: postgres
+-- Name: idx_blocks_height; Type: INDEX; Schema: v1_aptos; Owner: -
 --
 
 CREATE INDEX idx_blocks_height ON v1_aptos.blocks USING btree (internal_chain_id, height);
 
 
 --
--- Name: idx_blocks_last_version; Type: INDEX; Schema: v1_aptos; Owner: postgres
+-- Name: idx_blocks_last_version; Type: INDEX; Schema: v1_aptos; Owner: -
 --
 
 CREATE INDEX idx_blocks_last_version ON v1_aptos.blocks USING btree (internal_chain_id, last_version);
 
 
 --
--- Name: idx_events_first_version; Type: INDEX; Schema: v1_aptos; Owner: postgres
+-- Name: idx_events_first_version; Type: INDEX; Schema: v1_aptos; Owner: -
 --
 
 CREATE INDEX idx_events_first_version ON v1_aptos.events USING btree (internal_chain_id, version, transaction_event_index);
 
 
 --
--- Name: idx_events_height; Type: INDEX; Schema: v1_aptos; Owner: postgres
+-- Name: idx_events_height; Type: INDEX; Schema: v1_aptos; Owner: -
 --
 
 CREATE INDEX idx_events_height ON v1_aptos.events USING btree (internal_chain_id, height);
 
 
 --
--- Name: idx_transactions_first_version; Type: INDEX; Schema: v1_aptos; Owner: postgres
+-- Name: idx_transactions_first_version; Type: INDEX; Schema: v1_aptos; Owner: -
 --
 
 CREATE INDEX idx_transactions_first_version ON v1_aptos.transactions USING btree (internal_chain_id, version);
 
 
 --
--- Name: idx_transactions_height; Type: INDEX; Schema: v1_aptos; Owner: postgres
+-- Name: idx_transactions_height; Type: INDEX; Schema: v1_aptos; Owner: -
 --
 
 CREATE INDEX idx_transactions_height ON v1_aptos.transactions USING btree (internal_chain_id, height);
 
 
 --
--- Name: idx_transactions_last_version; Type: INDEX; Schema: v1_aptos; Owner: postgres
+-- Name: idx_transactions_last_version; Type: INDEX; Schema: v1_aptos; Owner: -
 --
 
 CREATE INDEX idx_transactions_last_version ON v1_aptos.transactions USING btree (internal_chain_id, transaction_hash);
 
 
 --
--- Name: events_recv_packet_by_chain_destination_channel_sequence_idx; Type: INDEX; Schema: v1_cosmos; Owner: postgres
+-- Name: events_recv_packet_by_chain_destination_channel_sequence_idx; Type: INDEX; Schema: v1_cosmos; Owner: -
 --
 
 CREATE INDEX events_recv_packet_by_chain_destination_channel_sequence_idx ON v1_cosmos.events USING btree (chain_id, ((public.attributes(events.*) ->> 'packet_dst_channel'::text)), (((public.attributes(events.*) ->> 'packet_sequence'::text))::numeric)) WHERE ((data ->> 'type'::text) = 'recv_packet'::text);
 
 
 --
--- Name: events_send_packet_by_chain_id_tx_hash_msg_index_idx; Type: INDEX; Schema: v1_cosmos; Owner: postgres
+-- Name: events_send_packet_by_chain_id_tx_hash_msg_index_idx; Type: INDEX; Schema: v1_cosmos; Owner: -
 --
 
 CREATE INDEX events_send_packet_by_chain_id_tx_hash_msg_index_idx ON v1_cosmos.events USING btree (chain_id, transaction_hash, (((public.attributes(events.*) ->> 'msg_index'::text))::integer)) WHERE ((data ->> 'type'::text) = 'send_packet'::text);
 
 
 --
--- Name: events_send_packet_by_time_idx; Type: INDEX; Schema: v1_cosmos; Owner: postgres
+-- Name: events_send_packet_by_time_idx; Type: INDEX; Schema: v1_cosmos; Owner: -
 --
 
 CREATE INDEX events_send_packet_by_time_idx ON v1_cosmos.events USING btree ("time" DESC) WHERE ((data ->> 'type'::text) = 'send_packet'::text);
 
 
 --
--- Name: events_send_packet_by_tx_hash_msg_index_idx; Type: INDEX; Schema: v1_cosmos; Owner: postgres
+-- Name: events_send_packet_by_tx_hash_msg_index_idx; Type: INDEX; Schema: v1_cosmos; Owner: -
 --
 
 CREATE INDEX events_send_packet_by_tx_hash_msg_index_idx ON v1_cosmos.events USING btree (transaction_hash, (((public.attributes(events.*) ->> 'msg_index'::text))::integer)) WHERE ((data ->> 'type'::text) = 'send_packet'::text);
 
 
 --
--- Name: events_transaction_hash_int4_idx; Type: INDEX; Schema: v1_cosmos; Owner: postgres
+-- Name: events_transaction_hash_int4_idx; Type: INDEX; Schema: v1_cosmos; Owner: -
 --
 
 CREATE INDEX events_transaction_hash_int4_idx ON v1_cosmos.events USING btree (transaction_hash, (((public.attributes(events.*) ->> 'msg_index'::text))::integer));
 
 
 --
--- Name: events_update_client_by_chain_id_revision_height_idx; Type: INDEX; Schema: v1_cosmos; Owner: postgres
+-- Name: events_update_client_by_chain_id_revision_height_idx; Type: INDEX; Schema: v1_cosmos; Owner: -
 --
 
 CREATE INDEX events_update_client_by_chain_id_revision_height_idx ON v1_cosmos.events USING btree (chain_id, ((split_part((public.attributes(events.*) ->> 'consensus_heights'::text), '-'::text, 2))::numeric)) WHERE ((data ->> 'type'::text) = 'update_client'::text);
 
 
 --
--- Name: events_wasm_ibc_transfer_by_time_idx; Type: INDEX; Schema: v1_cosmos; Owner: postgres
+-- Name: events_wasm_ibc_transfer_by_time_idx; Type: INDEX; Schema: v1_cosmos; Owner: -
 --
 
 CREATE INDEX events_wasm_ibc_transfer_by_time_idx ON v1_cosmos.events USING btree ("time" DESC) WHERE (((data ->> 'type'::text) = 'wasm-ibc_transfer'::text) AND ((public.attributes(events.*) ->> 'assets'::text) IS NOT NULL));
 
 
 --
--- Name: idx_blocks_height; Type: INDEX; Schema: v1_cosmos; Owner: postgres
+-- Name: idx_blocks_height; Type: INDEX; Schema: v1_cosmos; Owner: -
 --
 
 CREATE INDEX idx_blocks_height ON v1_cosmos.blocks USING btree (chain_id, height);
 
 
 --
--- Name: idx_events_height; Type: INDEX; Schema: v1_cosmos; Owner: postgres
+-- Name: idx_events_height; Type: INDEX; Schema: v1_cosmos; Owner: -
 --
 
 CREATE INDEX idx_events_height ON v1_cosmos.events USING btree (chain_id, height);
 
 
 --
--- Name: idx_events_height_desc; Type: INDEX; Schema: v1_cosmos; Owner: postgres
+-- Name: idx_events_height_desc; Type: INDEX; Schema: v1_cosmos; Owner: -
 --
 
 CREATE INDEX idx_events_height_desc ON v1_cosmos.events USING btree (chain_id, height DESC);
 
 
 --
--- Name: idx_events_type; Type: INDEX; Schema: v1_cosmos; Owner: postgres
+-- Name: idx_events_type; Type: INDEX; Schema: v1_cosmos; Owner: -
 --
 
 CREATE INDEX idx_events_type ON v1_cosmos.events USING btree (((data ->> 'type'::text)));
 
 
 --
--- Name: transactions_chain_id_height; Type: INDEX; Schema: v1_cosmos; Owner: postgres
+-- Name: transactions_chain_id_height; Type: INDEX; Schema: v1_cosmos; Owner: -
 --
 
 CREATE INDEX transactions_chain_id_height ON v1_cosmos.transactions USING btree (chain_id, height DESC);
 
 
 --
--- Name: logs_chain_height_ids; Type: INDEX; Schema: v1_evm; Owner: postgres
+-- Name: logs_chain_height_ids; Type: INDEX; Schema: v1_evm; Owner: -
 --
 
 CREATE UNIQUE INDEX logs_chain_height_ids ON v1_evm.logs USING btree (chain_id, height);
 
 
 --
--- Name: logs_sync_chain_id_height_index; Type: INDEX; Schema: v1_evm; Owner: postgres
+-- Name: logs_sync_chain_id_height_index; Type: INDEX; Schema: v1_evm; Owner: -
 --
 
 CREATE INDEX logs_sync_chain_id_height_index ON v1_evm.logs_sync USING btree (internal_chain_id, height DESC);
 
 
 --
--- Name: block_fix update_timestamp; Type: TRIGGER; Schema: hubble; Owner: postgres
+-- Name: block_fix update_timestamp; Type: TRIGGER; Schema: hubble; Owner: -
 --
 
 CREATE TRIGGER update_timestamp BEFORE UPDATE ON hubble.block_fix FOR EACH ROW EXECUTE FUNCTION hubble.update_updated_at_column();
 
 
 --
--- Name: block_status update_timestamp; Type: TRIGGER; Schema: hubble; Owner: postgres
+-- Name: block_status update_timestamp; Type: TRIGGER; Schema: hubble; Owner: -
 --
 
 CREATE TRIGGER update_timestamp BEFORE UPDATE ON hubble.block_status FOR EACH ROW EXECUTE FUNCTION hubble.update_updated_at_column();
 
 
 --
--- Name: contract_status update_timestamp; Type: TRIGGER; Schema: hubble; Owner: postgres
+-- Name: contract_status update_timestamp; Type: TRIGGER; Schema: hubble; Owner: -
 --
 
 CREATE TRIGGER update_timestamp BEFORE UPDATE ON hubble.contract_status FOR EACH ROW EXECUTE FUNCTION hubble.update_updated_at_column();
 
 
 --
--- Name: indexer_status update_timestamp; Type: TRIGGER; Schema: hubble; Owner: postgres
+-- Name: indexer_status update_timestamp; Type: TRIGGER; Schema: hubble; Owner: -
 --
 
 CREATE TRIGGER update_timestamp BEFORE UPDATE ON hubble.indexer_status FOR EACH ROW EXECUTE FUNCTION hubble.update_updated_at_column();
 
 
 --
--- Name: token_source_representations update_timestamp; Type: TRIGGER; Schema: hubble; Owner: postgres
+-- Name: token_source_representations update_timestamp; Type: TRIGGER; Schema: hubble; Owner: -
 --
 
 CREATE TRIGGER update_timestamp BEFORE UPDATE ON hubble.token_source_representations FOR EACH ROW EXECUTE FUNCTION hubble.update_updated_at_column();
 
 
 --
--- Name: token_sources update_timestamp; Type: TRIGGER; Schema: hubble; Owner: postgres
+-- Name: token_sources update_timestamp; Type: TRIGGER; Schema: hubble; Owner: -
 --
 
 CREATE TRIGGER update_timestamp BEFORE UPDATE ON hubble.token_sources FOR EACH ROW EXECUTE FUNCTION hubble.update_updated_at_column();
 
 
 --
--- Name: subscription tr_check_filters; Type: TRIGGER; Schema: realtime; Owner: supabase_admin
+-- Name: subscription tr_check_filters; Type: TRIGGER; Schema: realtime; Owner: -
 --
 
 CREATE TRIGGER tr_check_filters BEFORE INSERT OR UPDATE ON realtime.subscription FOR EACH ROW EXECUTE FUNCTION realtime.subscription_check_filters();
 
 
 --
--- Name: objects update_objects_updated_at; Type: TRIGGER; Schema: storage; Owner: supabase_storage_admin
+-- Name: objects update_objects_updated_at; Type: TRIGGER; Schema: storage; Owner: -
 --
 
 CREATE TRIGGER update_objects_updated_at BEFORE UPDATE ON storage.objects FOR EACH ROW EXECUTE FUNCTION storage.update_updated_at_column();
 
 
 --
--- Name: blocks update_timestamp; Type: TRIGGER; Schema: v1_aptos; Owner: postgres
+-- Name: blocks update_timestamp; Type: TRIGGER; Schema: v1_aptos; Owner: -
 --
 
 CREATE TRIGGER update_timestamp BEFORE UPDATE ON v1_aptos.blocks FOR EACH ROW EXECUTE FUNCTION hubble.update_updated_at_column();
 
 
 --
--- Name: contracts update_timestamp; Type: TRIGGER; Schema: v1_aptos; Owner: postgres
+-- Name: contracts update_timestamp; Type: TRIGGER; Schema: v1_aptos; Owner: -
 --
 
 CREATE TRIGGER update_timestamp BEFORE UPDATE ON v1_aptos.contracts FOR EACH ROW EXECUTE FUNCTION hubble.update_updated_at_column();
 
 
 --
--- Name: events update_timestamp; Type: TRIGGER; Schema: v1_aptos; Owner: postgres
+-- Name: events update_timestamp; Type: TRIGGER; Schema: v1_aptos; Owner: -
 --
 
 CREATE TRIGGER update_timestamp BEFORE UPDATE ON v1_aptos.events FOR EACH ROW EXECUTE FUNCTION hubble.update_updated_at_column();
 
 
 --
--- Name: transactions update_timestamp; Type: TRIGGER; Schema: v1_aptos; Owner: postgres
+-- Name: transactions update_timestamp; Type: TRIGGER; Schema: v1_aptos; Owner: -
 --
 
 CREATE TRIGGER update_timestamp BEFORE UPDATE ON v1_aptos.transactions FOR EACH ROW EXECUTE FUNCTION hubble.update_updated_at_column();
 
 
 --
--- Name: identities identities_user_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+-- Name: identities identities_user_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: -
 --
 
 ALTER TABLE ONLY auth.identities
@@ -20989,7 +20722,7 @@ ALTER TABLE ONLY auth.identities
 
 
 --
--- Name: mfa_amr_claims mfa_amr_claims_session_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+-- Name: mfa_amr_claims mfa_amr_claims_session_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: -
 --
 
 ALTER TABLE ONLY auth.mfa_amr_claims
@@ -20997,7 +20730,7 @@ ALTER TABLE ONLY auth.mfa_amr_claims
 
 
 --
--- Name: mfa_challenges mfa_challenges_auth_factor_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+-- Name: mfa_challenges mfa_challenges_auth_factor_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: -
 --
 
 ALTER TABLE ONLY auth.mfa_challenges
@@ -21005,7 +20738,7 @@ ALTER TABLE ONLY auth.mfa_challenges
 
 
 --
--- Name: mfa_factors mfa_factors_user_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+-- Name: mfa_factors mfa_factors_user_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: -
 --
 
 ALTER TABLE ONLY auth.mfa_factors
@@ -21013,7 +20746,7 @@ ALTER TABLE ONLY auth.mfa_factors
 
 
 --
--- Name: one_time_tokens one_time_tokens_user_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+-- Name: one_time_tokens one_time_tokens_user_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: -
 --
 
 ALTER TABLE ONLY auth.one_time_tokens
@@ -21021,7 +20754,7 @@ ALTER TABLE ONLY auth.one_time_tokens
 
 
 --
--- Name: refresh_tokens refresh_tokens_session_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+-- Name: refresh_tokens refresh_tokens_session_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: -
 --
 
 ALTER TABLE ONLY auth.refresh_tokens
@@ -21029,7 +20762,7 @@ ALTER TABLE ONLY auth.refresh_tokens
 
 
 --
--- Name: saml_providers saml_providers_sso_provider_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+-- Name: saml_providers saml_providers_sso_provider_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: -
 --
 
 ALTER TABLE ONLY auth.saml_providers
@@ -21037,7 +20770,7 @@ ALTER TABLE ONLY auth.saml_providers
 
 
 --
--- Name: saml_relay_states saml_relay_states_flow_state_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+-- Name: saml_relay_states saml_relay_states_flow_state_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: -
 --
 
 ALTER TABLE ONLY auth.saml_relay_states
@@ -21045,7 +20778,7 @@ ALTER TABLE ONLY auth.saml_relay_states
 
 
 --
--- Name: saml_relay_states saml_relay_states_sso_provider_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+-- Name: saml_relay_states saml_relay_states_sso_provider_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: -
 --
 
 ALTER TABLE ONLY auth.saml_relay_states
@@ -21053,7 +20786,7 @@ ALTER TABLE ONLY auth.saml_relay_states
 
 
 --
--- Name: sessions sessions_user_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+-- Name: sessions sessions_user_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: -
 --
 
 ALTER TABLE ONLY auth.sessions
@@ -21061,7 +20794,7 @@ ALTER TABLE ONLY auth.sessions
 
 
 --
--- Name: sso_domains sso_domains_sso_provider_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+-- Name: sso_domains sso_domains_sso_provider_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: -
 --
 
 ALTER TABLE ONLY auth.sso_domains
@@ -21069,7 +20802,7 @@ ALTER TABLE ONLY auth.sso_domains
 
 
 --
--- Name: assets assets_chain_id_fkey; Type: FK CONSTRAINT; Schema: hubble; Owner: postgres
+-- Name: assets assets_chain_id_fkey; Type: FK CONSTRAINT; Schema: hubble; Owner: -
 --
 
 ALTER TABLE ONLY hubble.assets
@@ -21077,7 +20810,7 @@ ALTER TABLE ONLY hubble.assets
 
 
 --
--- Name: clients clients_chain_id_fkey; Type: FK CONSTRAINT; Schema: hubble; Owner: postgres
+-- Name: clients clients_chain_id_fkey; Type: FK CONSTRAINT; Schema: hubble; Owner: -
 --
 
 ALTER TABLE ONLY hubble.clients
@@ -21085,7 +20818,7 @@ ALTER TABLE ONLY hubble.clients
 
 
 --
--- Name: consensus_heights consensus_heights_chain_id_fkey; Type: FK CONSTRAINT; Schema: hubble; Owner: postgres
+-- Name: consensus_heights consensus_heights_chain_id_fkey; Type: FK CONSTRAINT; Schema: hubble; Owner: -
 --
 
 ALTER TABLE ONLY hubble.consensus_heights
@@ -21093,7 +20826,7 @@ ALTER TABLE ONLY hubble.consensus_heights
 
 
 --
--- Name: contract_status fk_internal_chain_id; Type: FK CONSTRAINT; Schema: hubble; Owner: postgres
+-- Name: contract_status fk_internal_chain_id; Type: FK CONSTRAINT; Schema: hubble; Owner: -
 --
 
 ALTER TABLE ONLY hubble.contract_status
@@ -21101,7 +20834,7 @@ ALTER TABLE ONLY hubble.contract_status
 
 
 --
--- Name: token_source_representations token_source_representations_chains_id_fk; Type: FK CONSTRAINT; Schema: hubble; Owner: postgres
+-- Name: token_source_representations token_source_representations_chains_id_fk; Type: FK CONSTRAINT; Schema: hubble; Owner: -
 --
 
 ALTER TABLE ONLY hubble.token_source_representations
@@ -21109,7 +20842,7 @@ ALTER TABLE ONLY hubble.token_source_representations
 
 
 --
--- Name: token_source_representations token_source_representations_token_sources_id_fk; Type: FK CONSTRAINT; Schema: hubble; Owner: postgres
+-- Name: token_source_representations token_source_representations_token_sources_id_fk; Type: FK CONSTRAINT; Schema: hubble; Owner: -
 --
 
 ALTER TABLE ONLY hubble.token_source_representations
@@ -21117,7 +20850,7 @@ ALTER TABLE ONLY hubble.token_source_representations
 
 
 --
--- Name: objects objects_bucketId_fkey; Type: FK CONSTRAINT; Schema: storage; Owner: supabase_storage_admin
+-- Name: objects objects_bucketId_fkey; Type: FK CONSTRAINT; Schema: storage; Owner: -
 --
 
 ALTER TABLE ONLY storage.objects
@@ -21125,7 +20858,7 @@ ALTER TABLE ONLY storage.objects
 
 
 --
--- Name: s3_multipart_uploads s3_multipart_uploads_bucket_id_fkey; Type: FK CONSTRAINT; Schema: storage; Owner: supabase_storage_admin
+-- Name: s3_multipart_uploads s3_multipart_uploads_bucket_id_fkey; Type: FK CONSTRAINT; Schema: storage; Owner: -
 --
 
 ALTER TABLE ONLY storage.s3_multipart_uploads
@@ -21133,7 +20866,7 @@ ALTER TABLE ONLY storage.s3_multipart_uploads
 
 
 --
--- Name: s3_multipart_uploads_parts s3_multipart_uploads_parts_bucket_id_fkey; Type: FK CONSTRAINT; Schema: storage; Owner: supabase_storage_admin
+-- Name: s3_multipart_uploads_parts s3_multipart_uploads_parts_bucket_id_fkey; Type: FK CONSTRAINT; Schema: storage; Owner: -
 --
 
 ALTER TABLE ONLY storage.s3_multipart_uploads_parts
@@ -21141,7 +20874,7 @@ ALTER TABLE ONLY storage.s3_multipart_uploads_parts
 
 
 --
--- Name: s3_multipart_uploads_parts s3_multipart_uploads_parts_upload_id_fkey; Type: FK CONSTRAINT; Schema: storage; Owner: supabase_storage_admin
+-- Name: s3_multipart_uploads_parts s3_multipart_uploads_parts_upload_id_fkey; Type: FK CONSTRAINT; Schema: storage; Owner: -
 --
 
 ALTER TABLE ONLY storage.s3_multipart_uploads_parts
@@ -21149,7 +20882,7 @@ ALTER TABLE ONLY storage.s3_multipart_uploads_parts
 
 
 --
--- Name: blocks blocks_internal_chain_id_fkey; Type: FK CONSTRAINT; Schema: v1_aptos; Owner: postgres
+-- Name: blocks blocks_internal_chain_id_fkey; Type: FK CONSTRAINT; Schema: v1_aptos; Owner: -
 --
 
 ALTER TABLE ONLY v1_aptos.blocks
@@ -21157,7 +20890,7 @@ ALTER TABLE ONLY v1_aptos.blocks
 
 
 --
--- Name: contracts contracts_chain_id_fkey; Type: FK CONSTRAINT; Schema: v1_aptos; Owner: postgres
+-- Name: contracts contracts_chain_id_fkey; Type: FK CONSTRAINT; Schema: v1_aptos; Owner: -
 --
 
 ALTER TABLE ONLY v1_aptos.contracts
@@ -21165,7 +20898,7 @@ ALTER TABLE ONLY v1_aptos.contracts
 
 
 --
--- Name: events events_internal_chain_id_fkey; Type: FK CONSTRAINT; Schema: v1_aptos; Owner: postgres
+-- Name: events events_internal_chain_id_fkey; Type: FK CONSTRAINT; Schema: v1_aptos; Owner: -
 --
 
 ALTER TABLE ONLY v1_aptos.events
@@ -21173,7 +20906,7 @@ ALTER TABLE ONLY v1_aptos.events
 
 
 --
--- Name: events events_transactions_internal_chain_id_height_sequence_fk; Type: FK CONSTRAINT; Schema: v1_aptos; Owner: postgres
+-- Name: events events_transactions_internal_chain_id_height_sequence_fk; Type: FK CONSTRAINT; Schema: v1_aptos; Owner: -
 --
 
 ALTER TABLE ONLY v1_aptos.events
@@ -21181,7 +20914,7 @@ ALTER TABLE ONLY v1_aptos.events
 
 
 --
--- Name: transactions transactions_blocks_internal_chain_id_height_fk; Type: FK CONSTRAINT; Schema: v1_aptos; Owner: postgres
+-- Name: transactions transactions_blocks_internal_chain_id_height_fk; Type: FK CONSTRAINT; Schema: v1_aptos; Owner: -
 --
 
 ALTER TABLE ONLY v1_aptos.transactions
@@ -21189,7 +20922,7 @@ ALTER TABLE ONLY v1_aptos.transactions
 
 
 --
--- Name: transactions transactions_internal_chain_id_fkey; Type: FK CONSTRAINT; Schema: v1_aptos; Owner: postgres
+-- Name: transactions transactions_internal_chain_id_fkey; Type: FK CONSTRAINT; Schema: v1_aptos; Owner: -
 --
 
 ALTER TABLE ONLY v1_aptos.transactions
@@ -21197,7 +20930,7 @@ ALTER TABLE ONLY v1_aptos.transactions
 
 
 --
--- Name: blocks blocks_chain_id_fkey; Type: FK CONSTRAINT; Schema: v1_cosmos; Owner: postgres
+-- Name: blocks blocks_chain_id_fkey; Type: FK CONSTRAINT; Schema: v1_cosmos; Owner: -
 --
 
 ALTER TABLE ONLY v1_cosmos.blocks
@@ -21205,7 +20938,7 @@ ALTER TABLE ONLY v1_cosmos.blocks
 
 
 --
--- Name: contracts contracts_chain_id_fkey; Type: FK CONSTRAINT; Schema: v1_cosmos; Owner: postgres
+-- Name: contracts contracts_chain_id_fkey; Type: FK CONSTRAINT; Schema: v1_cosmos; Owner: -
 --
 
 ALTER TABLE ONLY v1_cosmos.contracts
@@ -21213,7 +20946,7 @@ ALTER TABLE ONLY v1_cosmos.contracts
 
 
 --
--- Name: events events_chain_id_block_hash_fkey; Type: FK CONSTRAINT; Schema: v1_cosmos; Owner: postgres
+-- Name: events events_chain_id_block_hash_fkey; Type: FK CONSTRAINT; Schema: v1_cosmos; Owner: -
 --
 
 ALTER TABLE ONLY v1_cosmos.events
@@ -21221,7 +20954,7 @@ ALTER TABLE ONLY v1_cosmos.events
 
 
 --
--- Name: events events_chain_id_fkey; Type: FK CONSTRAINT; Schema: v1_cosmos; Owner: postgres
+-- Name: events events_chain_id_fkey; Type: FK CONSTRAINT; Schema: v1_cosmos; Owner: -
 --
 
 ALTER TABLE ONLY v1_cosmos.events
@@ -21229,7 +20962,7 @@ ALTER TABLE ONLY v1_cosmos.events
 
 
 --
--- Name: events events_chain_id_transaction_hash_fkey; Type: FK CONSTRAINT; Schema: v1_cosmos; Owner: postgres
+-- Name: events events_chain_id_transaction_hash_fkey; Type: FK CONSTRAINT; Schema: v1_cosmos; Owner: -
 --
 
 ALTER TABLE ONLY v1_cosmos.events
@@ -21237,7 +20970,7 @@ ALTER TABLE ONLY v1_cosmos.events
 
 
 --
--- Name: token token_chain_id_fkey; Type: FK CONSTRAINT; Schema: v1_cosmos; Owner: postgres
+-- Name: token token_chain_id_fkey; Type: FK CONSTRAINT; Schema: v1_cosmos; Owner: -
 --
 
 ALTER TABLE ONLY v1_cosmos.token
@@ -21245,7 +20978,7 @@ ALTER TABLE ONLY v1_cosmos.token
 
 
 --
--- Name: token_prices token_prices_denomination_fkey; Type: FK CONSTRAINT; Schema: v1_cosmos; Owner: postgres
+-- Name: token_prices token_prices_denomination_fkey; Type: FK CONSTRAINT; Schema: v1_cosmos; Owner: -
 --
 
 ALTER TABLE ONLY v1_cosmos.token_prices
@@ -21253,7 +20986,7 @@ ALTER TABLE ONLY v1_cosmos.token_prices
 
 
 --
--- Name: transactions transactions_block_hash_chain_id_fkey; Type: FK CONSTRAINT; Schema: v1_cosmos; Owner: postgres
+-- Name: transactions transactions_block_hash_chain_id_fkey; Type: FK CONSTRAINT; Schema: v1_cosmos; Owner: -
 --
 
 ALTER TABLE ONLY v1_cosmos.transactions
@@ -21261,7 +20994,7 @@ ALTER TABLE ONLY v1_cosmos.transactions
 
 
 --
--- Name: transactions transactions_chain_id_fkey; Type: FK CONSTRAINT; Schema: v1_cosmos; Owner: postgres
+-- Name: transactions transactions_chain_id_fkey; Type: FK CONSTRAINT; Schema: v1_cosmos; Owner: -
 --
 
 ALTER TABLE ONLY v1_cosmos.transactions
@@ -21269,7 +21002,7 @@ ALTER TABLE ONLY v1_cosmos.transactions
 
 
 --
--- Name: contracts contracts_internal_chain_id_fkey; Type: FK CONSTRAINT; Schema: v1_evm; Owner: postgres
+-- Name: contracts contracts_internal_chain_id_fkey; Type: FK CONSTRAINT; Schema: v1_evm; Owner: -
 --
 
 ALTER TABLE ONLY v1_evm.contracts
@@ -21277,7 +21010,7 @@ ALTER TABLE ONLY v1_evm.contracts
 
 
 --
--- Name: logs logs_copy_chain_id_fkey; Type: FK CONSTRAINT; Schema: v1_evm; Owner: postgres
+-- Name: logs logs_copy_chain_id_fkey; Type: FK CONSTRAINT; Schema: v1_evm; Owner: -
 --
 
 ALTER TABLE ONLY v1_evm.logs
@@ -21285,1945 +21018,158 @@ ALTER TABLE ONLY v1_evm.logs
 
 
 --
--- Name: audit_log_entries; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
+-- Name: audit_log_entries; Type: ROW SECURITY; Schema: auth; Owner: -
 --
 
 ALTER TABLE auth.audit_log_entries ENABLE ROW LEVEL SECURITY;
 
 --
--- Name: flow_state; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
+-- Name: flow_state; Type: ROW SECURITY; Schema: auth; Owner: -
 --
 
 ALTER TABLE auth.flow_state ENABLE ROW LEVEL SECURITY;
 
 --
--- Name: identities; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
+-- Name: identities; Type: ROW SECURITY; Schema: auth; Owner: -
 --
 
 ALTER TABLE auth.identities ENABLE ROW LEVEL SECURITY;
 
 --
--- Name: instances; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
+-- Name: instances; Type: ROW SECURITY; Schema: auth; Owner: -
 --
 
 ALTER TABLE auth.instances ENABLE ROW LEVEL SECURITY;
 
 --
--- Name: mfa_amr_claims; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
+-- Name: mfa_amr_claims; Type: ROW SECURITY; Schema: auth; Owner: -
 --
 
 ALTER TABLE auth.mfa_amr_claims ENABLE ROW LEVEL SECURITY;
 
 --
--- Name: mfa_challenges; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
+-- Name: mfa_challenges; Type: ROW SECURITY; Schema: auth; Owner: -
 --
 
 ALTER TABLE auth.mfa_challenges ENABLE ROW LEVEL SECURITY;
 
 --
--- Name: mfa_factors; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
+-- Name: mfa_factors; Type: ROW SECURITY; Schema: auth; Owner: -
 --
 
 ALTER TABLE auth.mfa_factors ENABLE ROW LEVEL SECURITY;
 
 --
--- Name: one_time_tokens; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
+-- Name: one_time_tokens; Type: ROW SECURITY; Schema: auth; Owner: -
 --
 
 ALTER TABLE auth.one_time_tokens ENABLE ROW LEVEL SECURITY;
 
 --
--- Name: refresh_tokens; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
+-- Name: refresh_tokens; Type: ROW SECURITY; Schema: auth; Owner: -
 --
 
 ALTER TABLE auth.refresh_tokens ENABLE ROW LEVEL SECURITY;
 
 --
--- Name: saml_providers; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
+-- Name: saml_providers; Type: ROW SECURITY; Schema: auth; Owner: -
 --
 
 ALTER TABLE auth.saml_providers ENABLE ROW LEVEL SECURITY;
 
 --
--- Name: saml_relay_states; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
+-- Name: saml_relay_states; Type: ROW SECURITY; Schema: auth; Owner: -
 --
 
 ALTER TABLE auth.saml_relay_states ENABLE ROW LEVEL SECURITY;
 
 --
--- Name: schema_migrations; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
+-- Name: schema_migrations; Type: ROW SECURITY; Schema: auth; Owner: -
 --
 
 ALTER TABLE auth.schema_migrations ENABLE ROW LEVEL SECURITY;
 
 --
--- Name: sessions; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
+-- Name: sessions; Type: ROW SECURITY; Schema: auth; Owner: -
 --
 
 ALTER TABLE auth.sessions ENABLE ROW LEVEL SECURITY;
 
 --
--- Name: sso_domains; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
+-- Name: sso_domains; Type: ROW SECURITY; Schema: auth; Owner: -
 --
 
 ALTER TABLE auth.sso_domains ENABLE ROW LEVEL SECURITY;
 
 --
--- Name: sso_providers; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
+-- Name: sso_providers; Type: ROW SECURITY; Schema: auth; Owner: -
 --
 
 ALTER TABLE auth.sso_providers ENABLE ROW LEVEL SECURITY;
 
 --
--- Name: users; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
+-- Name: users; Type: ROW SECURITY; Schema: auth; Owner: -
 --
 
 ALTER TABLE auth.users ENABLE ROW LEVEL SECURITY;
 
 --
--- Name: messages; Type: ROW SECURITY; Schema: realtime; Owner: supabase_realtime_admin
+-- Name: messages; Type: ROW SECURITY; Schema: realtime; Owner: -
 --
 
 ALTER TABLE realtime.messages ENABLE ROW LEVEL SECURITY;
 
 --
--- Name: buckets; Type: ROW SECURITY; Schema: storage; Owner: supabase_storage_admin
+-- Name: buckets; Type: ROW SECURITY; Schema: storage; Owner: -
 --
 
 ALTER TABLE storage.buckets ENABLE ROW LEVEL SECURITY;
 
 --
--- Name: migrations; Type: ROW SECURITY; Schema: storage; Owner: supabase_storage_admin
+-- Name: migrations; Type: ROW SECURITY; Schema: storage; Owner: -
 --
 
 ALTER TABLE storage.migrations ENABLE ROW LEVEL SECURITY;
 
 --
--- Name: objects; Type: ROW SECURITY; Schema: storage; Owner: supabase_storage_admin
+-- Name: objects; Type: ROW SECURITY; Schema: storage; Owner: -
 --
 
 ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
 
 --
--- Name: s3_multipart_uploads; Type: ROW SECURITY; Schema: storage; Owner: supabase_storage_admin
+-- Name: s3_multipart_uploads; Type: ROW SECURITY; Schema: storage; Owner: -
 --
 
 ALTER TABLE storage.s3_multipart_uploads ENABLE ROW LEVEL SECURITY;
 
 --
--- Name: s3_multipart_uploads_parts; Type: ROW SECURITY; Schema: storage; Owner: supabase_storage_admin
+-- Name: s3_multipart_uploads_parts; Type: ROW SECURITY; Schema: storage; Owner: -
 --
 
 ALTER TABLE storage.s3_multipart_uploads_parts ENABLE ROW LEVEL SECURITY;
 
 --
--- Name: token; Type: ROW SECURITY; Schema: v1_cosmos; Owner: postgres
+-- Name: token; Type: ROW SECURITY; Schema: v1_cosmos; Owner: -
 --
 
 ALTER TABLE v1_cosmos.token ENABLE ROW LEVEL SECURITY;
 
 --
--- Name: token_prices; Type: ROW SECURITY; Schema: v1_cosmos; Owner: postgres
+-- Name: token_prices; Type: ROW SECURITY; Schema: v1_cosmos; Owner: -
 --
 
 ALTER TABLE v1_cosmos.token_prices ENABLE ROW LEVEL SECURITY;
 
 --
--- Name: supabase_realtime; Type: PUBLICATION; Schema: -; Owner: postgres
+-- Name: supabase_realtime; Type: PUBLICATION; Schema: -; Owner: -
 --
 
 CREATE PUBLICATION supabase_realtime WITH (publish = 'insert, update, delete, truncate');
 
 
-ALTER PUBLICATION supabase_realtime OWNER TO postgres;
-
 --
--- Name: SCHEMA auth; Type: ACL; Schema: -; Owner: supabase_admin
---
-
-GRANT USAGE ON SCHEMA auth TO anon;
-GRANT USAGE ON SCHEMA auth TO authenticated;
-GRANT USAGE ON SCHEMA auth TO service_role;
-GRANT ALL ON SCHEMA auth TO supabase_auth_admin;
-GRANT ALL ON SCHEMA auth TO dashboard_user;
-GRANT ALL ON SCHEMA auth TO postgres;
-
-
---
--- Name: SCHEMA extensions; Type: ACL; Schema: -; Owner: postgres
---
-
-GRANT USAGE ON SCHEMA extensions TO anon;
-GRANT USAGE ON SCHEMA extensions TO authenticated;
-GRANT USAGE ON SCHEMA extensions TO service_role;
-GRANT ALL ON SCHEMA extensions TO dashboard_user;
-
-
---
--- Name: SCHEMA hubble; Type: ACL; Schema: -; Owner: postgres
---
-
-GRANT USAGE ON SCHEMA hubble TO authenticated;
-GRANT USAGE ON SCHEMA hubble TO service_role;
-
-
---
--- Name: SCHEMA net; Type: ACL; Schema: -; Owner: supabase_admin
---
-
-GRANT USAGE ON SCHEMA net TO supabase_functions_admin;
-GRANT USAGE ON SCHEMA net TO postgres;
-GRANT USAGE ON SCHEMA net TO anon;
-GRANT USAGE ON SCHEMA net TO authenticated;
-GRANT USAGE ON SCHEMA net TO service_role;
-
-
---
--- Name: SCHEMA public; Type: ACL; Schema: -; Owner: pg_database_owner
---
-
-GRANT USAGE ON SCHEMA public TO postgres;
-GRANT USAGE ON SCHEMA public TO anon;
-GRANT USAGE ON SCHEMA public TO authenticated;
-GRANT USAGE ON SCHEMA public TO service_role;
-
-
---
--- Name: SCHEMA realtime; Type: ACL; Schema: -; Owner: supabase_admin
---
-
-GRANT USAGE ON SCHEMA realtime TO postgres;
-GRANT USAGE ON SCHEMA realtime TO anon;
-GRANT USAGE ON SCHEMA realtime TO authenticated;
-GRANT USAGE ON SCHEMA realtime TO service_role;
-GRANT ALL ON SCHEMA realtime TO supabase_realtime_admin;
-
-
---
--- Name: SCHEMA storage; Type: ACL; Schema: -; Owner: supabase_admin
---
-
-GRANT ALL ON SCHEMA storage TO postgres;
-GRANT USAGE ON SCHEMA storage TO anon;
-GRANT USAGE ON SCHEMA storage TO authenticated;
-GRANT USAGE ON SCHEMA storage TO service_role;
-GRANT ALL ON SCHEMA storage TO supabase_storage_admin;
-GRANT ALL ON SCHEMA storage TO dashboard_user;
-
-
---
--- Name: SCHEMA supabase_functions; Type: ACL; Schema: -; Owner: supabase_admin
---
-
-GRANT USAGE ON SCHEMA supabase_functions TO postgres;
-GRANT USAGE ON SCHEMA supabase_functions TO anon;
-GRANT USAGE ON SCHEMA supabase_functions TO authenticated;
-GRANT USAGE ON SCHEMA supabase_functions TO service_role;
-GRANT ALL ON SCHEMA supabase_functions TO supabase_functions_admin;
-
-
---
--- Name: SCHEMA v1_cosmos; Type: ACL; Schema: -; Owner: postgres
---
-
-GRANT USAGE ON SCHEMA v1_cosmos TO v1_cosmos_readonly;
-GRANT USAGE ON SCHEMA v1_cosmos TO authenticated;
-GRANT USAGE ON SCHEMA v1_cosmos TO service_role;
-
-
---
--- Name: FUNCTION email(); Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
-
-GRANT ALL ON FUNCTION auth.email() TO dashboard_user;
-
-
---
--- Name: FUNCTION jwt(); Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
-
-GRANT ALL ON FUNCTION auth.jwt() TO postgres;
-GRANT ALL ON FUNCTION auth.jwt() TO dashboard_user;
-
-
---
--- Name: FUNCTION role(); Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
-
-GRANT ALL ON FUNCTION auth.role() TO dashboard_user;
-
-
---
--- Name: FUNCTION uid(); Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
-
-GRANT ALL ON FUNCTION auth.uid() TO dashboard_user;
-
-
---
--- Name: FUNCTION algorithm_sign(signables text, secret text, algorithm text); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.algorithm_sign(signables text, secret text, algorithm text) FROM postgres;
-GRANT ALL ON FUNCTION extensions.algorithm_sign(signables text, secret text, algorithm text) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.algorithm_sign(signables text, secret text, algorithm text) TO dashboard_user;
-
-
---
--- Name: FUNCTION armor(bytea); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.armor(bytea) FROM postgres;
-GRANT ALL ON FUNCTION extensions.armor(bytea) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.armor(bytea) TO dashboard_user;
-
-
---
--- Name: FUNCTION armor(bytea, text[], text[]); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.armor(bytea, text[], text[]) FROM postgres;
-GRANT ALL ON FUNCTION extensions.armor(bytea, text[], text[]) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.armor(bytea, text[], text[]) TO dashboard_user;
-
-
---
--- Name: FUNCTION crypt(text, text); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.crypt(text, text) FROM postgres;
-GRANT ALL ON FUNCTION extensions.crypt(text, text) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.crypt(text, text) TO dashboard_user;
-
-
---
--- Name: FUNCTION dearmor(text); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.dearmor(text) FROM postgres;
-GRANT ALL ON FUNCTION extensions.dearmor(text) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.dearmor(text) TO dashboard_user;
-
-
---
--- Name: FUNCTION decrypt(bytea, bytea, text); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.decrypt(bytea, bytea, text) FROM postgres;
-GRANT ALL ON FUNCTION extensions.decrypt(bytea, bytea, text) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.decrypt(bytea, bytea, text) TO dashboard_user;
-
-
---
--- Name: FUNCTION decrypt_iv(bytea, bytea, bytea, text); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.decrypt_iv(bytea, bytea, bytea, text) FROM postgres;
-GRANT ALL ON FUNCTION extensions.decrypt_iv(bytea, bytea, bytea, text) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.decrypt_iv(bytea, bytea, bytea, text) TO dashboard_user;
-
-
---
--- Name: FUNCTION digest(bytea, text); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.digest(bytea, text) FROM postgres;
-GRANT ALL ON FUNCTION extensions.digest(bytea, text) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.digest(bytea, text) TO dashboard_user;
-
-
---
--- Name: FUNCTION digest(text, text); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.digest(text, text) FROM postgres;
-GRANT ALL ON FUNCTION extensions.digest(text, text) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.digest(text, text) TO dashboard_user;
-
-
---
--- Name: FUNCTION encrypt(bytea, bytea, text); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.encrypt(bytea, bytea, text) FROM postgres;
-GRANT ALL ON FUNCTION extensions.encrypt(bytea, bytea, text) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.encrypt(bytea, bytea, text) TO dashboard_user;
-
-
---
--- Name: FUNCTION encrypt_iv(bytea, bytea, bytea, text); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.encrypt_iv(bytea, bytea, bytea, text) FROM postgres;
-GRANT ALL ON FUNCTION extensions.encrypt_iv(bytea, bytea, bytea, text) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.encrypt_iv(bytea, bytea, bytea, text) TO dashboard_user;
-
-
---
--- Name: FUNCTION gen_random_bytes(integer); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.gen_random_bytes(integer) FROM postgres;
-GRANT ALL ON FUNCTION extensions.gen_random_bytes(integer) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.gen_random_bytes(integer) TO dashboard_user;
-
-
---
--- Name: FUNCTION gen_random_uuid(); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.gen_random_uuid() FROM postgres;
-GRANT ALL ON FUNCTION extensions.gen_random_uuid() TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.gen_random_uuid() TO dashboard_user;
-
-
---
--- Name: FUNCTION gen_salt(text); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.gen_salt(text) FROM postgres;
-GRANT ALL ON FUNCTION extensions.gen_salt(text) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.gen_salt(text) TO dashboard_user;
-
-
---
--- Name: FUNCTION gen_salt(text, integer); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.gen_salt(text, integer) FROM postgres;
-GRANT ALL ON FUNCTION extensions.gen_salt(text, integer) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.gen_salt(text, integer) TO dashboard_user;
-
-
---
--- Name: FUNCTION grant_pg_cron_access(); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.grant_pg_cron_access() FROM postgres;
-GRANT ALL ON FUNCTION extensions.grant_pg_cron_access() TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.grant_pg_cron_access() TO dashboard_user;
-
-
---
--- Name: FUNCTION grant_pg_graphql_access(); Type: ACL; Schema: extensions; Owner: supabase_admin
---
-
-GRANT ALL ON FUNCTION extensions.grant_pg_graphql_access() TO postgres WITH GRANT OPTION;
-
-
---
--- Name: FUNCTION grant_pg_net_access(); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.grant_pg_net_access() FROM postgres;
-GRANT ALL ON FUNCTION extensions.grant_pg_net_access() TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.grant_pg_net_access() TO dashboard_user;
-
-
---
--- Name: FUNCTION hmac(bytea, bytea, text); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.hmac(bytea, bytea, text) FROM postgres;
-GRANT ALL ON FUNCTION extensions.hmac(bytea, bytea, text) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.hmac(bytea, bytea, text) TO dashboard_user;
-
-
---
--- Name: FUNCTION hmac(text, text, text); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.hmac(text, text, text) FROM postgres;
-GRANT ALL ON FUNCTION extensions.hmac(text, text, text) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.hmac(text, text, text) TO dashboard_user;
-
-
---
--- Name: FUNCTION pg_stat_statements(showtext boolean, OUT userid oid, OUT dbid oid, OUT toplevel boolean, OUT queryid bigint, OUT query text, OUT plans bigint, OUT total_plan_time double precision, OUT min_plan_time double precision, OUT max_plan_time double precision, OUT mean_plan_time double precision, OUT stddev_plan_time double precision, OUT calls bigint, OUT total_exec_time double precision, OUT min_exec_time double precision, OUT max_exec_time double precision, OUT mean_exec_time double precision, OUT stddev_exec_time double precision, OUT rows bigint, OUT shared_blks_hit bigint, OUT shared_blks_read bigint, OUT shared_blks_dirtied bigint, OUT shared_blks_written bigint, OUT local_blks_hit bigint, OUT local_blks_read bigint, OUT local_blks_dirtied bigint, OUT local_blks_written bigint, OUT temp_blks_read bigint, OUT temp_blks_written bigint, OUT blk_read_time double precision, OUT blk_write_time double precision, OUT temp_blk_read_time double precision, OUT temp_blk_write_time double precision, OUT wal_records bigint, OUT wal_fpi bigint, OUT wal_bytes numeric, OUT jit_functions bigint, OUT jit_generation_time double precision, OUT jit_inlining_count bigint, OUT jit_inlining_time double precision, OUT jit_optimization_count bigint, OUT jit_optimization_time double precision, OUT jit_emission_count bigint, OUT jit_emission_time double precision); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.pg_stat_statements(showtext boolean, OUT userid oid, OUT dbid oid, OUT toplevel boolean, OUT queryid bigint, OUT query text, OUT plans bigint, OUT total_plan_time double precision, OUT min_plan_time double precision, OUT max_plan_time double precision, OUT mean_plan_time double precision, OUT stddev_plan_time double precision, OUT calls bigint, OUT total_exec_time double precision, OUT min_exec_time double precision, OUT max_exec_time double precision, OUT mean_exec_time double precision, OUT stddev_exec_time double precision, OUT rows bigint, OUT shared_blks_hit bigint, OUT shared_blks_read bigint, OUT shared_blks_dirtied bigint, OUT shared_blks_written bigint, OUT local_blks_hit bigint, OUT local_blks_read bigint, OUT local_blks_dirtied bigint, OUT local_blks_written bigint, OUT temp_blks_read bigint, OUT temp_blks_written bigint, OUT blk_read_time double precision, OUT blk_write_time double precision, OUT temp_blk_read_time double precision, OUT temp_blk_write_time double precision, OUT wal_records bigint, OUT wal_fpi bigint, OUT wal_bytes numeric, OUT jit_functions bigint, OUT jit_generation_time double precision, OUT jit_inlining_count bigint, OUT jit_inlining_time double precision, OUT jit_optimization_count bigint, OUT jit_optimization_time double precision, OUT jit_emission_count bigint, OUT jit_emission_time double precision) FROM postgres;
-GRANT ALL ON FUNCTION extensions.pg_stat_statements(showtext boolean, OUT userid oid, OUT dbid oid, OUT toplevel boolean, OUT queryid bigint, OUT query text, OUT plans bigint, OUT total_plan_time double precision, OUT min_plan_time double precision, OUT max_plan_time double precision, OUT mean_plan_time double precision, OUT stddev_plan_time double precision, OUT calls bigint, OUT total_exec_time double precision, OUT min_exec_time double precision, OUT max_exec_time double precision, OUT mean_exec_time double precision, OUT stddev_exec_time double precision, OUT rows bigint, OUT shared_blks_hit bigint, OUT shared_blks_read bigint, OUT shared_blks_dirtied bigint, OUT shared_blks_written bigint, OUT local_blks_hit bigint, OUT local_blks_read bigint, OUT local_blks_dirtied bigint, OUT local_blks_written bigint, OUT temp_blks_read bigint, OUT temp_blks_written bigint, OUT blk_read_time double precision, OUT blk_write_time double precision, OUT temp_blk_read_time double precision, OUT temp_blk_write_time double precision, OUT wal_records bigint, OUT wal_fpi bigint, OUT wal_bytes numeric, OUT jit_functions bigint, OUT jit_generation_time double precision, OUT jit_inlining_count bigint, OUT jit_inlining_time double precision, OUT jit_optimization_count bigint, OUT jit_optimization_time double precision, OUT jit_emission_count bigint, OUT jit_emission_time double precision) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.pg_stat_statements(showtext boolean, OUT userid oid, OUT dbid oid, OUT toplevel boolean, OUT queryid bigint, OUT query text, OUT plans bigint, OUT total_plan_time double precision, OUT min_plan_time double precision, OUT max_plan_time double precision, OUT mean_plan_time double precision, OUT stddev_plan_time double precision, OUT calls bigint, OUT total_exec_time double precision, OUT min_exec_time double precision, OUT max_exec_time double precision, OUT mean_exec_time double precision, OUT stddev_exec_time double precision, OUT rows bigint, OUT shared_blks_hit bigint, OUT shared_blks_read bigint, OUT shared_blks_dirtied bigint, OUT shared_blks_written bigint, OUT local_blks_hit bigint, OUT local_blks_read bigint, OUT local_blks_dirtied bigint, OUT local_blks_written bigint, OUT temp_blks_read bigint, OUT temp_blks_written bigint, OUT blk_read_time double precision, OUT blk_write_time double precision, OUT temp_blk_read_time double precision, OUT temp_blk_write_time double precision, OUT wal_records bigint, OUT wal_fpi bigint, OUT wal_bytes numeric, OUT jit_functions bigint, OUT jit_generation_time double precision, OUT jit_inlining_count bigint, OUT jit_inlining_time double precision, OUT jit_optimization_count bigint, OUT jit_optimization_time double precision, OUT jit_emission_count bigint, OUT jit_emission_time double precision) TO dashboard_user;
-
-
---
--- Name: FUNCTION pg_stat_statements_info(OUT dealloc bigint, OUT stats_reset timestamp with time zone); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.pg_stat_statements_info(OUT dealloc bigint, OUT stats_reset timestamp with time zone) FROM postgres;
-GRANT ALL ON FUNCTION extensions.pg_stat_statements_info(OUT dealloc bigint, OUT stats_reset timestamp with time zone) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.pg_stat_statements_info(OUT dealloc bigint, OUT stats_reset timestamp with time zone) TO dashboard_user;
-
-
---
--- Name: FUNCTION pg_stat_statements_reset(userid oid, dbid oid, queryid bigint); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.pg_stat_statements_reset(userid oid, dbid oid, queryid bigint) FROM postgres;
-GRANT ALL ON FUNCTION extensions.pg_stat_statements_reset(userid oid, dbid oid, queryid bigint) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.pg_stat_statements_reset(userid oid, dbid oid, queryid bigint) TO dashboard_user;
-
-
---
--- Name: FUNCTION pgp_armor_headers(text, OUT key text, OUT value text); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.pgp_armor_headers(text, OUT key text, OUT value text) FROM postgres;
-GRANT ALL ON FUNCTION extensions.pgp_armor_headers(text, OUT key text, OUT value text) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.pgp_armor_headers(text, OUT key text, OUT value text) TO dashboard_user;
-
-
---
--- Name: FUNCTION pgp_key_id(bytea); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.pgp_key_id(bytea) FROM postgres;
-GRANT ALL ON FUNCTION extensions.pgp_key_id(bytea) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.pgp_key_id(bytea) TO dashboard_user;
-
-
---
--- Name: FUNCTION pgp_pub_decrypt(bytea, bytea); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.pgp_pub_decrypt(bytea, bytea) FROM postgres;
-GRANT ALL ON FUNCTION extensions.pgp_pub_decrypt(bytea, bytea) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.pgp_pub_decrypt(bytea, bytea) TO dashboard_user;
-
-
---
--- Name: FUNCTION pgp_pub_decrypt(bytea, bytea, text); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.pgp_pub_decrypt(bytea, bytea, text) FROM postgres;
-GRANT ALL ON FUNCTION extensions.pgp_pub_decrypt(bytea, bytea, text) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.pgp_pub_decrypt(bytea, bytea, text) TO dashboard_user;
-
-
---
--- Name: FUNCTION pgp_pub_decrypt(bytea, bytea, text, text); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.pgp_pub_decrypt(bytea, bytea, text, text) FROM postgres;
-GRANT ALL ON FUNCTION extensions.pgp_pub_decrypt(bytea, bytea, text, text) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.pgp_pub_decrypt(bytea, bytea, text, text) TO dashboard_user;
-
-
---
--- Name: FUNCTION pgp_pub_decrypt_bytea(bytea, bytea); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.pgp_pub_decrypt_bytea(bytea, bytea) FROM postgres;
-GRANT ALL ON FUNCTION extensions.pgp_pub_decrypt_bytea(bytea, bytea) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.pgp_pub_decrypt_bytea(bytea, bytea) TO dashboard_user;
-
-
---
--- Name: FUNCTION pgp_pub_decrypt_bytea(bytea, bytea, text); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.pgp_pub_decrypt_bytea(bytea, bytea, text) FROM postgres;
-GRANT ALL ON FUNCTION extensions.pgp_pub_decrypt_bytea(bytea, bytea, text) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.pgp_pub_decrypt_bytea(bytea, bytea, text) TO dashboard_user;
-
-
---
--- Name: FUNCTION pgp_pub_decrypt_bytea(bytea, bytea, text, text); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.pgp_pub_decrypt_bytea(bytea, bytea, text, text) FROM postgres;
-GRANT ALL ON FUNCTION extensions.pgp_pub_decrypt_bytea(bytea, bytea, text, text) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.pgp_pub_decrypt_bytea(bytea, bytea, text, text) TO dashboard_user;
-
-
---
--- Name: FUNCTION pgp_pub_encrypt(text, bytea); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.pgp_pub_encrypt(text, bytea) FROM postgres;
-GRANT ALL ON FUNCTION extensions.pgp_pub_encrypt(text, bytea) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.pgp_pub_encrypt(text, bytea) TO dashboard_user;
-
-
---
--- Name: FUNCTION pgp_pub_encrypt(text, bytea, text); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.pgp_pub_encrypt(text, bytea, text) FROM postgres;
-GRANT ALL ON FUNCTION extensions.pgp_pub_encrypt(text, bytea, text) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.pgp_pub_encrypt(text, bytea, text) TO dashboard_user;
-
-
---
--- Name: FUNCTION pgp_pub_encrypt_bytea(bytea, bytea); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.pgp_pub_encrypt_bytea(bytea, bytea) FROM postgres;
-GRANT ALL ON FUNCTION extensions.pgp_pub_encrypt_bytea(bytea, bytea) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.pgp_pub_encrypt_bytea(bytea, bytea) TO dashboard_user;
-
-
---
--- Name: FUNCTION pgp_pub_encrypt_bytea(bytea, bytea, text); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.pgp_pub_encrypt_bytea(bytea, bytea, text) FROM postgres;
-GRANT ALL ON FUNCTION extensions.pgp_pub_encrypt_bytea(bytea, bytea, text) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.pgp_pub_encrypt_bytea(bytea, bytea, text) TO dashboard_user;
-
-
---
--- Name: FUNCTION pgp_sym_decrypt(bytea, text); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.pgp_sym_decrypt(bytea, text) FROM postgres;
-GRANT ALL ON FUNCTION extensions.pgp_sym_decrypt(bytea, text) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.pgp_sym_decrypt(bytea, text) TO dashboard_user;
-
-
---
--- Name: FUNCTION pgp_sym_decrypt(bytea, text, text); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.pgp_sym_decrypt(bytea, text, text) FROM postgres;
-GRANT ALL ON FUNCTION extensions.pgp_sym_decrypt(bytea, text, text) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.pgp_sym_decrypt(bytea, text, text) TO dashboard_user;
-
-
---
--- Name: FUNCTION pgp_sym_decrypt_bytea(bytea, text); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.pgp_sym_decrypt_bytea(bytea, text) FROM postgres;
-GRANT ALL ON FUNCTION extensions.pgp_sym_decrypt_bytea(bytea, text) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.pgp_sym_decrypt_bytea(bytea, text) TO dashboard_user;
-
-
---
--- Name: FUNCTION pgp_sym_decrypt_bytea(bytea, text, text); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.pgp_sym_decrypt_bytea(bytea, text, text) FROM postgres;
-GRANT ALL ON FUNCTION extensions.pgp_sym_decrypt_bytea(bytea, text, text) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.pgp_sym_decrypt_bytea(bytea, text, text) TO dashboard_user;
-
-
---
--- Name: FUNCTION pgp_sym_encrypt(text, text); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.pgp_sym_encrypt(text, text) FROM postgres;
-GRANT ALL ON FUNCTION extensions.pgp_sym_encrypt(text, text) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.pgp_sym_encrypt(text, text) TO dashboard_user;
-
-
---
--- Name: FUNCTION pgp_sym_encrypt(text, text, text); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.pgp_sym_encrypt(text, text, text) FROM postgres;
-GRANT ALL ON FUNCTION extensions.pgp_sym_encrypt(text, text, text) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.pgp_sym_encrypt(text, text, text) TO dashboard_user;
-
-
---
--- Name: FUNCTION pgp_sym_encrypt_bytea(bytea, text); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.pgp_sym_encrypt_bytea(bytea, text) FROM postgres;
-GRANT ALL ON FUNCTION extensions.pgp_sym_encrypt_bytea(bytea, text) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.pgp_sym_encrypt_bytea(bytea, text) TO dashboard_user;
-
-
---
--- Name: FUNCTION pgp_sym_encrypt_bytea(bytea, text, text); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.pgp_sym_encrypt_bytea(bytea, text, text) FROM postgres;
-GRANT ALL ON FUNCTION extensions.pgp_sym_encrypt_bytea(bytea, text, text) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.pgp_sym_encrypt_bytea(bytea, text, text) TO dashboard_user;
-
-
---
--- Name: FUNCTION pgrst_ddl_watch(); Type: ACL; Schema: extensions; Owner: supabase_admin
---
-
-GRANT ALL ON FUNCTION extensions.pgrst_ddl_watch() TO postgres WITH GRANT OPTION;
-
-
---
--- Name: FUNCTION pgrst_drop_watch(); Type: ACL; Schema: extensions; Owner: supabase_admin
---
-
-GRANT ALL ON FUNCTION extensions.pgrst_drop_watch() TO postgres WITH GRANT OPTION;
-
-
---
--- Name: FUNCTION set_graphql_placeholder(); Type: ACL; Schema: extensions; Owner: supabase_admin
---
-
-GRANT ALL ON FUNCTION extensions.set_graphql_placeholder() TO postgres WITH GRANT OPTION;
-
-
---
--- Name: FUNCTION sign(payload json, secret text, algorithm text); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.sign(payload json, secret text, algorithm text) FROM postgres;
-GRANT ALL ON FUNCTION extensions.sign(payload json, secret text, algorithm text) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.sign(payload json, secret text, algorithm text) TO dashboard_user;
-
-
---
--- Name: FUNCTION try_cast_double(inp text); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.try_cast_double(inp text) FROM postgres;
-GRANT ALL ON FUNCTION extensions.try_cast_double(inp text) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.try_cast_double(inp text) TO dashboard_user;
-
-
---
--- Name: FUNCTION url_decode(data text); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.url_decode(data text) FROM postgres;
-GRANT ALL ON FUNCTION extensions.url_decode(data text) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.url_decode(data text) TO dashboard_user;
-
-
---
--- Name: FUNCTION url_encode(data bytea); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.url_encode(data bytea) FROM postgres;
-GRANT ALL ON FUNCTION extensions.url_encode(data bytea) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.url_encode(data bytea) TO dashboard_user;
-
-
---
--- Name: FUNCTION uuid_generate_v1(); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.uuid_generate_v1() FROM postgres;
-GRANT ALL ON FUNCTION extensions.uuid_generate_v1() TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.uuid_generate_v1() TO dashboard_user;
-
-
---
--- Name: FUNCTION uuid_generate_v1mc(); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.uuid_generate_v1mc() FROM postgres;
-GRANT ALL ON FUNCTION extensions.uuid_generate_v1mc() TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.uuid_generate_v1mc() TO dashboard_user;
-
-
---
--- Name: FUNCTION uuid_generate_v3(namespace uuid, name text); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.uuid_generate_v3(namespace uuid, name text) FROM postgres;
-GRANT ALL ON FUNCTION extensions.uuid_generate_v3(namespace uuid, name text) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.uuid_generate_v3(namespace uuid, name text) TO dashboard_user;
-
-
---
--- Name: FUNCTION uuid_generate_v4(); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.uuid_generate_v4() FROM postgres;
-GRANT ALL ON FUNCTION extensions.uuid_generate_v4() TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.uuid_generate_v4() TO dashboard_user;
-
-
---
--- Name: FUNCTION uuid_generate_v5(namespace uuid, name text); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.uuid_generate_v5(namespace uuid, name text) FROM postgres;
-GRANT ALL ON FUNCTION extensions.uuid_generate_v5(namespace uuid, name text) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.uuid_generate_v5(namespace uuid, name text) TO dashboard_user;
-
-
---
--- Name: FUNCTION uuid_nil(); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.uuid_nil() FROM postgres;
-GRANT ALL ON FUNCTION extensions.uuid_nil() TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.uuid_nil() TO dashboard_user;
-
-
---
--- Name: FUNCTION uuid_ns_dns(); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.uuid_ns_dns() FROM postgres;
-GRANT ALL ON FUNCTION extensions.uuid_ns_dns() TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.uuid_ns_dns() TO dashboard_user;
-
-
---
--- Name: FUNCTION uuid_ns_oid(); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.uuid_ns_oid() FROM postgres;
-GRANT ALL ON FUNCTION extensions.uuid_ns_oid() TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.uuid_ns_oid() TO dashboard_user;
-
-
---
--- Name: FUNCTION uuid_ns_url(); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.uuid_ns_url() FROM postgres;
-GRANT ALL ON FUNCTION extensions.uuid_ns_url() TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.uuid_ns_url() TO dashboard_user;
-
-
---
--- Name: FUNCTION uuid_ns_x500(); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.uuid_ns_x500() FROM postgres;
-GRANT ALL ON FUNCTION extensions.uuid_ns_x500() TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.uuid_ns_x500() TO dashboard_user;
-
-
---
--- Name: FUNCTION verify(token text, secret text, algorithm text); Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extensions.verify(token text, secret text, algorithm text) FROM postgres;
-GRANT ALL ON FUNCTION extensions.verify(token text, secret text, algorithm text) TO postgres WITH GRANT OPTION;
-GRANT ALL ON FUNCTION extensions.verify(token text, secret text, algorithm text) TO dashboard_user;
-
-
---
--- Name: FUNCTION graphql("operationName" text, query text, variables jsonb, extensions jsonb); Type: ACL; Schema: graphql_public; Owner: supabase_admin
---
-
-GRANT ALL ON FUNCTION graphql_public.graphql("operationName" text, query text, variables jsonb, extensions jsonb) TO postgres;
-GRANT ALL ON FUNCTION graphql_public.graphql("operationName" text, query text, variables jsonb, extensions jsonb) TO anon;
-GRANT ALL ON FUNCTION graphql_public.graphql("operationName" text, query text, variables jsonb, extensions jsonb) TO authenticated;
-GRANT ALL ON FUNCTION graphql_public.graphql("operationName" text, query text, variables jsonb, extensions jsonb) TO service_role;
-
-
---
--- Name: FUNCTION update_updated_at_column(); Type: ACL; Schema: hubble; Owner: postgres
---
-
-GRANT ALL ON FUNCTION hubble.update_updated_at_column() TO authenticated;
-GRANT ALL ON FUNCTION hubble.update_updated_at_column() TO service_role;
-
-
---
--- Name: FUNCTION get_auth(p_usename text); Type: ACL; Schema: pgbouncer; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION pgbouncer.get_auth(p_usename text) FROM PUBLIC;
-GRANT ALL ON FUNCTION pgbouncer.get_auth(p_usename text) TO pgbouncer;
-
-
---
--- Name: FUNCTION crypto_aead_det_decrypt(message bytea, additional bytea, key_uuid uuid, nonce bytea); Type: ACL; Schema: pgsodium; Owner: pgsodium_keymaker
---
-
-GRANT ALL ON FUNCTION pgsodium.crypto_aead_det_decrypt(message bytea, additional bytea, key_uuid uuid, nonce bytea) TO service_role;
-
-
---
--- Name: FUNCTION crypto_aead_det_encrypt(message bytea, additional bytea, key_uuid uuid, nonce bytea); Type: ACL; Schema: pgsodium; Owner: pgsodium_keymaker
---
-
-GRANT ALL ON FUNCTION pgsodium.crypto_aead_det_encrypt(message bytea, additional bytea, key_uuid uuid, nonce bytea) TO service_role;
-
-
---
--- Name: FUNCTION crypto_aead_det_keygen(); Type: ACL; Schema: pgsodium; Owner: supabase_admin
---
-
-GRANT ALL ON FUNCTION pgsodium.crypto_aead_det_keygen() TO service_role;
-
-
---
--- Name: TABLE events; Type: ACL; Schema: v1_cosmos; Owner: postgres
---
-
-GRANT SELECT ON TABLE v1_cosmos.events TO v1_cosmos_readonly;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.events TO authenticated;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.events TO service_role;
-
-
---
--- Name: FUNCTION attributes(v1_cosmos.events); Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON FUNCTION public.attributes(v1_cosmos.events) TO anon;
-GRANT ALL ON FUNCTION public.attributes(v1_cosmos.events) TO authenticated;
-GRANT ALL ON FUNCTION public.attributes(v1_cosmos.events) TO service_role;
-
-
---
--- Name: FUNCTION insert_pool_and_blockfix(p_address text, p_internal_chain_id text, p_height bigint); Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON FUNCTION public.insert_pool_and_blockfix(p_address text, p_internal_chain_id text, p_height bigint) TO anon;
-GRANT ALL ON FUNCTION public.insert_pool_and_blockfix(p_address text, p_internal_chain_id text, p_height bigint) TO authenticated;
-GRANT ALL ON FUNCTION public.insert_pool_and_blockfix(p_address text, p_internal_chain_id text, p_height bigint) TO service_role;
-
-
---
--- Name: FUNCTION apply_rls(wal jsonb, max_record_bytes integer); Type: ACL; Schema: realtime; Owner: supabase_admin
---
-
-GRANT ALL ON FUNCTION realtime.apply_rls(wal jsonb, max_record_bytes integer) TO postgres;
-GRANT ALL ON FUNCTION realtime.apply_rls(wal jsonb, max_record_bytes integer) TO dashboard_user;
-GRANT ALL ON FUNCTION realtime.apply_rls(wal jsonb, max_record_bytes integer) TO anon;
-GRANT ALL ON FUNCTION realtime.apply_rls(wal jsonb, max_record_bytes integer) TO authenticated;
-GRANT ALL ON FUNCTION realtime.apply_rls(wal jsonb, max_record_bytes integer) TO service_role;
-GRANT ALL ON FUNCTION realtime.apply_rls(wal jsonb, max_record_bytes integer) TO supabase_realtime_admin;
-
-
---
--- Name: FUNCTION broadcast_changes(topic_name text, event_name text, operation text, table_name text, table_schema text, new record, old record, level text); Type: ACL; Schema: realtime; Owner: supabase_admin
---
-
-GRANT ALL ON FUNCTION realtime.broadcast_changes(topic_name text, event_name text, operation text, table_name text, table_schema text, new record, old record, level text) TO postgres;
-GRANT ALL ON FUNCTION realtime.broadcast_changes(topic_name text, event_name text, operation text, table_name text, table_schema text, new record, old record, level text) TO dashboard_user;
-
-
---
--- Name: FUNCTION build_prepared_statement_sql(prepared_statement_name text, entity regclass, columns realtime.wal_column[]); Type: ACL; Schema: realtime; Owner: supabase_admin
---
-
-GRANT ALL ON FUNCTION realtime.build_prepared_statement_sql(prepared_statement_name text, entity regclass, columns realtime.wal_column[]) TO postgres;
-GRANT ALL ON FUNCTION realtime.build_prepared_statement_sql(prepared_statement_name text, entity regclass, columns realtime.wal_column[]) TO dashboard_user;
-GRANT ALL ON FUNCTION realtime.build_prepared_statement_sql(prepared_statement_name text, entity regclass, columns realtime.wal_column[]) TO anon;
-GRANT ALL ON FUNCTION realtime.build_prepared_statement_sql(prepared_statement_name text, entity regclass, columns realtime.wal_column[]) TO authenticated;
-GRANT ALL ON FUNCTION realtime.build_prepared_statement_sql(prepared_statement_name text, entity regclass, columns realtime.wal_column[]) TO service_role;
-GRANT ALL ON FUNCTION realtime.build_prepared_statement_sql(prepared_statement_name text, entity regclass, columns realtime.wal_column[]) TO supabase_realtime_admin;
-
-
---
--- Name: FUNCTION "cast"(val text, type_ regtype); Type: ACL; Schema: realtime; Owner: supabase_admin
---
-
-GRANT ALL ON FUNCTION realtime."cast"(val text, type_ regtype) TO postgres;
-GRANT ALL ON FUNCTION realtime."cast"(val text, type_ regtype) TO dashboard_user;
-GRANT ALL ON FUNCTION realtime."cast"(val text, type_ regtype) TO anon;
-GRANT ALL ON FUNCTION realtime."cast"(val text, type_ regtype) TO authenticated;
-GRANT ALL ON FUNCTION realtime."cast"(val text, type_ regtype) TO service_role;
-GRANT ALL ON FUNCTION realtime."cast"(val text, type_ regtype) TO supabase_realtime_admin;
-
-
---
--- Name: FUNCTION check_equality_op(op realtime.equality_op, type_ regtype, val_1 text, val_2 text); Type: ACL; Schema: realtime; Owner: supabase_admin
---
-
-GRANT ALL ON FUNCTION realtime.check_equality_op(op realtime.equality_op, type_ regtype, val_1 text, val_2 text) TO postgres;
-GRANT ALL ON FUNCTION realtime.check_equality_op(op realtime.equality_op, type_ regtype, val_1 text, val_2 text) TO dashboard_user;
-GRANT ALL ON FUNCTION realtime.check_equality_op(op realtime.equality_op, type_ regtype, val_1 text, val_2 text) TO anon;
-GRANT ALL ON FUNCTION realtime.check_equality_op(op realtime.equality_op, type_ regtype, val_1 text, val_2 text) TO authenticated;
-GRANT ALL ON FUNCTION realtime.check_equality_op(op realtime.equality_op, type_ regtype, val_1 text, val_2 text) TO service_role;
-GRANT ALL ON FUNCTION realtime.check_equality_op(op realtime.equality_op, type_ regtype, val_1 text, val_2 text) TO supabase_realtime_admin;
-
-
---
--- Name: FUNCTION is_visible_through_filters(columns realtime.wal_column[], filters realtime.user_defined_filter[]); Type: ACL; Schema: realtime; Owner: supabase_admin
---
-
-GRANT ALL ON FUNCTION realtime.is_visible_through_filters(columns realtime.wal_column[], filters realtime.user_defined_filter[]) TO postgres;
-GRANT ALL ON FUNCTION realtime.is_visible_through_filters(columns realtime.wal_column[], filters realtime.user_defined_filter[]) TO dashboard_user;
-GRANT ALL ON FUNCTION realtime.is_visible_through_filters(columns realtime.wal_column[], filters realtime.user_defined_filter[]) TO anon;
-GRANT ALL ON FUNCTION realtime.is_visible_through_filters(columns realtime.wal_column[], filters realtime.user_defined_filter[]) TO authenticated;
-GRANT ALL ON FUNCTION realtime.is_visible_through_filters(columns realtime.wal_column[], filters realtime.user_defined_filter[]) TO service_role;
-GRANT ALL ON FUNCTION realtime.is_visible_through_filters(columns realtime.wal_column[], filters realtime.user_defined_filter[]) TO supabase_realtime_admin;
-
-
---
--- Name: FUNCTION list_changes(publication name, slot_name name, max_changes integer, max_record_bytes integer); Type: ACL; Schema: realtime; Owner: supabase_admin
---
-
-GRANT ALL ON FUNCTION realtime.list_changes(publication name, slot_name name, max_changes integer, max_record_bytes integer) TO postgres;
-GRANT ALL ON FUNCTION realtime.list_changes(publication name, slot_name name, max_changes integer, max_record_bytes integer) TO dashboard_user;
-GRANT ALL ON FUNCTION realtime.list_changes(publication name, slot_name name, max_changes integer, max_record_bytes integer) TO anon;
-GRANT ALL ON FUNCTION realtime.list_changes(publication name, slot_name name, max_changes integer, max_record_bytes integer) TO authenticated;
-GRANT ALL ON FUNCTION realtime.list_changes(publication name, slot_name name, max_changes integer, max_record_bytes integer) TO service_role;
-GRANT ALL ON FUNCTION realtime.list_changes(publication name, slot_name name, max_changes integer, max_record_bytes integer) TO supabase_realtime_admin;
-
-
---
--- Name: FUNCTION quote_wal2json(entity regclass); Type: ACL; Schema: realtime; Owner: supabase_admin
---
-
-GRANT ALL ON FUNCTION realtime.quote_wal2json(entity regclass) TO postgres;
-GRANT ALL ON FUNCTION realtime.quote_wal2json(entity regclass) TO dashboard_user;
-GRANT ALL ON FUNCTION realtime.quote_wal2json(entity regclass) TO anon;
-GRANT ALL ON FUNCTION realtime.quote_wal2json(entity regclass) TO authenticated;
-GRANT ALL ON FUNCTION realtime.quote_wal2json(entity regclass) TO service_role;
-GRANT ALL ON FUNCTION realtime.quote_wal2json(entity regclass) TO supabase_realtime_admin;
-
-
---
--- Name: FUNCTION send(payload jsonb, event text, topic text, private boolean); Type: ACL; Schema: realtime; Owner: supabase_admin
---
-
-GRANT ALL ON FUNCTION realtime.send(payload jsonb, event text, topic text, private boolean) TO postgres;
-GRANT ALL ON FUNCTION realtime.send(payload jsonb, event text, topic text, private boolean) TO dashboard_user;
-
-
---
--- Name: FUNCTION subscription_check_filters(); Type: ACL; Schema: realtime; Owner: supabase_admin
---
-
-GRANT ALL ON FUNCTION realtime.subscription_check_filters() TO postgres;
-GRANT ALL ON FUNCTION realtime.subscription_check_filters() TO dashboard_user;
-GRANT ALL ON FUNCTION realtime.subscription_check_filters() TO anon;
-GRANT ALL ON FUNCTION realtime.subscription_check_filters() TO authenticated;
-GRANT ALL ON FUNCTION realtime.subscription_check_filters() TO service_role;
-GRANT ALL ON FUNCTION realtime.subscription_check_filters() TO supabase_realtime_admin;
-
-
---
--- Name: FUNCTION to_regrole(role_name text); Type: ACL; Schema: realtime; Owner: supabase_admin
---
-
-GRANT ALL ON FUNCTION realtime.to_regrole(role_name text) TO postgres;
-GRANT ALL ON FUNCTION realtime.to_regrole(role_name text) TO dashboard_user;
-GRANT ALL ON FUNCTION realtime.to_regrole(role_name text) TO anon;
-GRANT ALL ON FUNCTION realtime.to_regrole(role_name text) TO authenticated;
-GRANT ALL ON FUNCTION realtime.to_regrole(role_name text) TO service_role;
-GRANT ALL ON FUNCTION realtime.to_regrole(role_name text) TO supabase_realtime_admin;
-
-
---
--- Name: FUNCTION topic(); Type: ACL; Schema: realtime; Owner: supabase_realtime_admin
---
-
-GRANT ALL ON FUNCTION realtime.topic() TO postgres;
-GRANT ALL ON FUNCTION realtime.topic() TO dashboard_user;
-
-
---
--- Name: FUNCTION http_request(); Type: ACL; Schema: supabase_functions; Owner: supabase_functions_admin
---
-
-REVOKE ALL ON FUNCTION supabase_functions.http_request() FROM PUBLIC;
-GRANT ALL ON FUNCTION supabase_functions.http_request() TO postgres;
-GRANT ALL ON FUNCTION supabase_functions.http_request() TO anon;
-GRANT ALL ON FUNCTION supabase_functions.http_request() TO authenticated;
-GRANT ALL ON FUNCTION supabase_functions.http_request() TO service_role;
-
-
---
--- Name: FUNCTION insert_pool_and_blockfix(p_address text, p_internal_chain_id integer, p_height bigint); Type: ACL; Schema: v1_cosmos; Owner: postgres
---
-
-GRANT ALL ON FUNCTION v1_cosmos.insert_pool_and_blockfix(p_address text, p_internal_chain_id integer, p_height bigint) TO authenticated;
-GRANT ALL ON FUNCTION v1_cosmos.insert_pool_and_blockfix(p_address text, p_internal_chain_id integer, p_height bigint) TO service_role;
-
-
---
--- Name: TABLE audit_log_entries; Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
-
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE auth.audit_log_entries TO dashboard_user;
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE auth.audit_log_entries TO postgres;
-GRANT SELECT ON TABLE auth.audit_log_entries TO postgres WITH GRANT OPTION;
-
-
---
--- Name: TABLE flow_state; Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE auth.flow_state TO postgres;
-GRANT SELECT ON TABLE auth.flow_state TO postgres WITH GRANT OPTION;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE auth.flow_state TO dashboard_user;
-
-
---
--- Name: TABLE identities; Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE auth.identities TO postgres;
-GRANT SELECT ON TABLE auth.identities TO postgres WITH GRANT OPTION;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE auth.identities TO dashboard_user;
-
-
---
--- Name: TABLE instances; Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
-
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE auth.instances TO dashboard_user;
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE auth.instances TO postgres;
-GRANT SELECT ON TABLE auth.instances TO postgres WITH GRANT OPTION;
-
-
---
--- Name: TABLE mfa_amr_claims; Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE auth.mfa_amr_claims TO postgres;
-GRANT SELECT ON TABLE auth.mfa_amr_claims TO postgres WITH GRANT OPTION;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE auth.mfa_amr_claims TO dashboard_user;
-
-
---
--- Name: TABLE mfa_challenges; Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE auth.mfa_challenges TO postgres;
-GRANT SELECT ON TABLE auth.mfa_challenges TO postgres WITH GRANT OPTION;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE auth.mfa_challenges TO dashboard_user;
-
-
---
--- Name: TABLE mfa_factors; Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE auth.mfa_factors TO postgres;
-GRANT SELECT ON TABLE auth.mfa_factors TO postgres WITH GRANT OPTION;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE auth.mfa_factors TO dashboard_user;
-
-
---
--- Name: TABLE one_time_tokens; Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE auth.one_time_tokens TO postgres;
-GRANT SELECT ON TABLE auth.one_time_tokens TO postgres WITH GRANT OPTION;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE auth.one_time_tokens TO dashboard_user;
-
-
---
--- Name: TABLE refresh_tokens; Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
-
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE auth.refresh_tokens TO dashboard_user;
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE auth.refresh_tokens TO postgres;
-GRANT SELECT ON TABLE auth.refresh_tokens TO postgres WITH GRANT OPTION;
-
-
---
--- Name: SEQUENCE refresh_tokens_id_seq; Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
-
-GRANT ALL ON SEQUENCE auth.refresh_tokens_id_seq TO dashboard_user;
-GRANT ALL ON SEQUENCE auth.refresh_tokens_id_seq TO postgres;
-
-
---
--- Name: TABLE saml_providers; Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE auth.saml_providers TO postgres;
-GRANT SELECT ON TABLE auth.saml_providers TO postgres WITH GRANT OPTION;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE auth.saml_providers TO dashboard_user;
-
-
---
--- Name: TABLE saml_relay_states; Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE auth.saml_relay_states TO postgres;
-GRANT SELECT ON TABLE auth.saml_relay_states TO postgres WITH GRANT OPTION;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE auth.saml_relay_states TO dashboard_user;
-
-
---
--- Name: TABLE schema_migrations; Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
-
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE auth.schema_migrations TO dashboard_user;
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE auth.schema_migrations TO postgres;
-GRANT SELECT ON TABLE auth.schema_migrations TO postgres WITH GRANT OPTION;
-
-
---
--- Name: TABLE sessions; Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE auth.sessions TO postgres;
-GRANT SELECT ON TABLE auth.sessions TO postgres WITH GRANT OPTION;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE auth.sessions TO dashboard_user;
-
-
---
--- Name: TABLE sso_domains; Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE auth.sso_domains TO postgres;
-GRANT SELECT ON TABLE auth.sso_domains TO postgres WITH GRANT OPTION;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE auth.sso_domains TO dashboard_user;
-
-
---
--- Name: TABLE sso_providers; Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE auth.sso_providers TO postgres;
-GRANT SELECT ON TABLE auth.sso_providers TO postgres WITH GRANT OPTION;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE auth.sso_providers TO dashboard_user;
-
-
---
--- Name: TABLE users; Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
-
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE auth.users TO dashboard_user;
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE auth.users TO postgres;
-GRANT SELECT ON TABLE auth.users TO postgres WITH GRANT OPTION;
-
-
---
--- Name: TABLE pg_stat_statements; Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE extensions.pg_stat_statements FROM postgres;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE extensions.pg_stat_statements TO postgres WITH GRANT OPTION;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE extensions.pg_stat_statements TO dashboard_user;
-
-
---
--- Name: TABLE pg_stat_statements_info; Type: ACL; Schema: extensions; Owner: postgres
---
-
-REVOKE SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE extensions.pg_stat_statements_info FROM postgres;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE extensions.pg_stat_statements_info TO postgres WITH GRANT OPTION;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE extensions.pg_stat_statements_info TO dashboard_user;
-
-
---
--- Name: TABLE assets; Type: ACL; Schema: hubble; Owner: postgres
---
-
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE hubble.assets TO authenticated;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE hubble.assets TO service_role;
-
-
---
--- Name: TABLE block_fix; Type: ACL; Schema: hubble; Owner: postgres
---
-
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE hubble.block_fix TO authenticated;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE hubble.block_fix TO service_role;
-
-
---
--- Name: TABLE block_status; Type: ACL; Schema: hubble; Owner: postgres
---
-
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE hubble.block_status TO authenticated;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE hubble.block_status TO service_role;
-
-
---
--- Name: TABLE chains; Type: ACL; Schema: hubble; Owner: postgres
---
-
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE hubble.chains TO authenticated;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE hubble.chains TO service_role;
-
-
---
--- Name: SEQUENCE chains_id_seq; Type: ACL; Schema: hubble; Owner: postgres
---
-
-GRANT ALL ON SEQUENCE hubble.chains_id_seq TO authenticated;
-GRANT ALL ON SEQUENCE hubble.chains_id_seq TO service_role;
-
-
---
--- Name: TABLE clients; Type: ACL; Schema: hubble; Owner: postgres
---
-
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE hubble.clients TO authenticated;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE hubble.clients TO service_role;
-
-
---
--- Name: TABLE consensus_heights; Type: ACL; Schema: hubble; Owner: postgres
---
-
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE hubble.consensus_heights TO authenticated;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE hubble.consensus_heights TO service_role;
-
-
---
--- Name: TABLE contract_status; Type: ACL; Schema: hubble; Owner: postgres
---
-
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE hubble.contract_status TO authenticated;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE hubble.contract_status TO service_role;
-
-
---
--- Name: TABLE indexer_status; Type: ACL; Schema: hubble; Owner: postgres
---
-
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE hubble.indexer_status TO authenticated;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE hubble.indexer_status TO service_role;
-
-
---
--- Name: TABLE token_source_representations; Type: ACL; Schema: hubble; Owner: postgres
---
-
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE hubble.token_source_representations TO authenticated;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE hubble.token_source_representations TO service_role;
-
-
---
--- Name: TABLE token_sources; Type: ACL; Schema: hubble; Owner: postgres
---
-
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE hubble.token_sources TO authenticated;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE hubble.token_sources TO service_role;
-
-
---
--- Name: SEQUENCE token_sources_id_seq; Type: ACL; Schema: hubble; Owner: postgres
---
-
-GRANT ALL ON SEQUENCE hubble.token_sources_id_seq TO authenticated;
-GRANT ALL ON SEQUENCE hubble.token_sources_id_seq TO service_role;
-
-
---
--- Name: TABLE decrypted_key; Type: ACL; Schema: pgsodium; Owner: supabase_admin
---
-
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE pgsodium.decrypted_key TO pgsodium_keyholder;
-
-
---
--- Name: TABLE masking_rule; Type: ACL; Schema: pgsodium; Owner: supabase_admin
---
-
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE pgsodium.masking_rule TO pgsodium_keyholder;
-
-
---
--- Name: TABLE mask_columns; Type: ACL; Schema: pgsodium; Owner: supabase_admin
---
-
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE pgsodium.mask_columns TO pgsodium_keyholder;
-
-
---
--- Name: TABLE add_liquidity; Type: ACL; Schema: v1_cosmos; Owner: postgres
---
-
-GRANT SELECT ON TABLE v1_cosmos.add_liquidity TO v1_cosmos_readonly;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.add_liquidity TO authenticated;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.add_liquidity TO service_role;
-
-
---
--- Name: TABLE blocks; Type: ACL; Schema: v1_cosmos; Owner: postgres
---
-
-GRANT SELECT ON TABLE v1_cosmos.blocks TO v1_cosmos_readonly;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.blocks TO authenticated;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.blocks TO service_role;
-
-
---
--- Name: TABLE incentivize; Type: ACL; Schema: v1_cosmos; Owner: postgres
---
-
-GRANT SELECT ON TABLE v1_cosmos.incentivize TO v1_cosmos_readonly;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.incentivize TO authenticated;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.incentivize TO service_role;
-
-
---
--- Name: TABLE swap; Type: ACL; Schema: v1_cosmos; Owner: postgres
---
-
-GRANT SELECT ON TABLE v1_cosmos.swap TO v1_cosmos_readonly;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.swap TO authenticated;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.swap TO service_role;
-
-
---
--- Name: TABLE withdraw_liquidity; Type: ACL; Schema: v1_cosmos; Owner: postgres
---
-
-GRANT SELECT ON TABLE v1_cosmos.withdraw_liquidity TO v1_cosmos_readonly;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.withdraw_liquidity TO authenticated;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.withdraw_liquidity TO service_role;
-
-
---
--- Name: TABLE pool_balance; Type: ACL; Schema: v1_cosmos; Owner: postgres
---
-
-GRANT SELECT ON TABLE v1_cosmos.pool_balance TO v1_cosmos_readonly;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.pool_balance TO authenticated;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.pool_balance TO service_role;
-
-
---
--- Name: TABLE token_prices; Type: ACL; Schema: v1_cosmos; Owner: postgres
---
-
-GRANT SELECT ON TABLE v1_cosmos.token_prices TO v1_cosmos_readonly;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.token_prices TO authenticated;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.token_prices TO service_role;
-
-
---
--- Name: TABLE historic_pool_yield; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE public.historic_pool_yield TO anon;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE public.historic_pool_yield TO authenticated;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE public.historic_pool_yield TO service_role;
-
-
---
--- Name: TABLE messages; Type: ACL; Schema: realtime; Owner: supabase_realtime_admin
---
-
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE realtime.messages TO postgres;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE realtime.messages TO dashboard_user;
-GRANT SELECT,INSERT,UPDATE ON TABLE realtime.messages TO anon;
-GRANT SELECT,INSERT,UPDATE ON TABLE realtime.messages TO authenticated;
-GRANT SELECT,INSERT,UPDATE ON TABLE realtime.messages TO service_role;
-
-
---
--- Name: TABLE schema_migrations; Type: ACL; Schema: realtime; Owner: supabase_admin
---
-
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE realtime.schema_migrations TO postgres;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE realtime.schema_migrations TO dashboard_user;
-GRANT SELECT ON TABLE realtime.schema_migrations TO anon;
-GRANT SELECT ON TABLE realtime.schema_migrations TO authenticated;
-GRANT SELECT ON TABLE realtime.schema_migrations TO service_role;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE realtime.schema_migrations TO supabase_realtime_admin;
-
-
---
--- Name: TABLE subscription; Type: ACL; Schema: realtime; Owner: supabase_admin
---
-
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE realtime.subscription TO postgres;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE realtime.subscription TO dashboard_user;
-GRANT SELECT ON TABLE realtime.subscription TO anon;
-GRANT SELECT ON TABLE realtime.subscription TO authenticated;
-GRANT SELECT ON TABLE realtime.subscription TO service_role;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE realtime.subscription TO supabase_realtime_admin;
-
-
---
--- Name: SEQUENCE subscription_id_seq; Type: ACL; Schema: realtime; Owner: supabase_admin
---
-
-GRANT ALL ON SEQUENCE realtime.subscription_id_seq TO postgres;
-GRANT ALL ON SEQUENCE realtime.subscription_id_seq TO dashboard_user;
-GRANT USAGE ON SEQUENCE realtime.subscription_id_seq TO anon;
-GRANT USAGE ON SEQUENCE realtime.subscription_id_seq TO authenticated;
-GRANT USAGE ON SEQUENCE realtime.subscription_id_seq TO service_role;
-GRANT ALL ON SEQUENCE realtime.subscription_id_seq TO supabase_realtime_admin;
-
-
---
--- Name: TABLE buckets; Type: ACL; Schema: storage; Owner: supabase_storage_admin
---
-
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE storage.buckets TO anon;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE storage.buckets TO authenticated;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE storage.buckets TO service_role;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE storage.buckets TO postgres;
-
-
---
--- Name: TABLE migrations; Type: ACL; Schema: storage; Owner: supabase_storage_admin
---
-
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE storage.migrations TO anon;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE storage.migrations TO authenticated;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE storage.migrations TO service_role;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE storage.migrations TO postgres;
-
-
---
--- Name: TABLE objects; Type: ACL; Schema: storage; Owner: supabase_storage_admin
---
-
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE storage.objects TO anon;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE storage.objects TO authenticated;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE storage.objects TO service_role;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE storage.objects TO postgres;
-
-
---
--- Name: TABLE s3_multipart_uploads; Type: ACL; Schema: storage; Owner: supabase_storage_admin
---
-
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE storage.s3_multipart_uploads TO service_role;
-GRANT SELECT ON TABLE storage.s3_multipart_uploads TO authenticated;
-GRANT SELECT ON TABLE storage.s3_multipart_uploads TO anon;
-
-
---
--- Name: TABLE s3_multipart_uploads_parts; Type: ACL; Schema: storage; Owner: supabase_storage_admin
---
-
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE storage.s3_multipart_uploads_parts TO service_role;
-GRANT SELECT ON TABLE storage.s3_multipart_uploads_parts TO authenticated;
-GRANT SELECT ON TABLE storage.s3_multipart_uploads_parts TO anon;
-
-
---
--- Name: TABLE hooks; Type: ACL; Schema: supabase_functions; Owner: supabase_functions_admin
---
-
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE supabase_functions.hooks TO postgres;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE supabase_functions.hooks TO anon;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE supabase_functions.hooks TO authenticated;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE supabase_functions.hooks TO service_role;
-
-
---
--- Name: SEQUENCE hooks_id_seq; Type: ACL; Schema: supabase_functions; Owner: supabase_functions_admin
---
-
-GRANT ALL ON SEQUENCE supabase_functions.hooks_id_seq TO postgres;
-GRANT ALL ON SEQUENCE supabase_functions.hooks_id_seq TO anon;
-GRANT ALL ON SEQUENCE supabase_functions.hooks_id_seq TO authenticated;
-GRANT ALL ON SEQUENCE supabase_functions.hooks_id_seq TO service_role;
-
-
---
--- Name: TABLE migrations; Type: ACL; Schema: supabase_functions; Owner: supabase_functions_admin
---
-
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE supabase_functions.migrations TO postgres;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE supabase_functions.migrations TO anon;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE supabase_functions.migrations TO authenticated;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE supabase_functions.migrations TO service_role;
-
-
---
--- Name: TABLE contracts; Type: ACL; Schema: v1_cosmos; Owner: postgres
---
-
-GRANT SELECT ON TABLE v1_cosmos.contracts TO v1_cosmos_readonly;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.contracts TO authenticated;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.contracts TO service_role;
-
-
---
--- Name: TABLE token; Type: ACL; Schema: v1_cosmos; Owner: postgres
---
-
-GRANT SELECT ON TABLE v1_cosmos.token TO v1_cosmos_readonly;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.token TO authenticated;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.token TO service_role;
-
-
---
--- Name: TABLE historic_pool_yield; Type: ACL; Schema: v1_cosmos; Owner: postgres
---
-
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.historic_pool_yield TO authenticated;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.historic_pool_yield TO service_role;
-GRANT SELECT ON TABLE v1_cosmos.historic_pool_yield TO v1_cosmos_readonly;
-
-
---
--- Name: TABLE pool_fee_periods; Type: ACL; Schema: v1_cosmos; Owner: postgres
---
-
-GRANT SELECT ON TABLE v1_cosmos.pool_fee_periods TO v1_cosmos_readonly;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.pool_fee_periods TO authenticated;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.pool_fee_periods TO service_role;
-
-
---
--- Name: TABLE pool_user_shares; Type: ACL; Schema: v1_cosmos; Owner: postgres
---
-
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.pool_user_shares TO authenticated;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.pool_user_shares TO service_role;
-GRANT SELECT ON TABLE v1_cosmos.pool_user_shares TO v1_cosmos_readonly;
-
-
---
--- Name: TABLE pools; Type: ACL; Schema: v1_cosmos; Owner: postgres
---
-
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.pools TO authenticated;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.pools TO service_role;
-GRANT SELECT ON TABLE v1_cosmos.pools TO v1_cosmos_readonly;
-
-
---
--- Name: SEQUENCE token_id_seq; Type: ACL; Schema: v1_cosmos; Owner: postgres
---
-
-GRANT ALL ON SEQUENCE v1_cosmos.token_id_seq TO authenticated;
-GRANT ALL ON SEQUENCE v1_cosmos.token_id_seq TO service_role;
-
-
---
--- Name: SEQUENCE token_prices_id_seq; Type: ACL; Schema: v1_cosmos; Owner: postgres
---
-
-GRANT ALL ON SEQUENCE v1_cosmos.token_prices_id_seq TO authenticated;
-GRANT ALL ON SEQUENCE v1_cosmos.token_prices_id_seq TO service_role;
-
-
---
--- Name: TABLE transactions; Type: ACL; Schema: v1_cosmos; Owner: postgres
---
-
-GRANT SELECT ON TABLE v1_cosmos.transactions TO v1_cosmos_readonly;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.transactions TO authenticated;
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE v1_cosmos.transactions TO service_role;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR SEQUENCES; Type: DEFAULT ACL; Schema: auth; Owner: supabase_auth_admin
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_auth_admin IN SCHEMA auth GRANT ALL ON SEQUENCES TO postgres;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_auth_admin IN SCHEMA auth GRANT ALL ON SEQUENCES TO dashboard_user;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR FUNCTIONS; Type: DEFAULT ACL; Schema: auth; Owner: supabase_auth_admin
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_auth_admin IN SCHEMA auth GRANT ALL ON FUNCTIONS TO postgres;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_auth_admin IN SCHEMA auth GRANT ALL ON FUNCTIONS TO dashboard_user;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: auth; Owner: supabase_auth_admin
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_auth_admin IN SCHEMA auth GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLES TO postgres;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_auth_admin IN SCHEMA auth GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLES TO dashboard_user;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR SEQUENCES; Type: DEFAULT ACL; Schema: extensions; Owner: supabase_admin
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA extensions GRANT ALL ON SEQUENCES TO postgres WITH GRANT OPTION;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR FUNCTIONS; Type: DEFAULT ACL; Schema: extensions; Owner: supabase_admin
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA extensions GRANT ALL ON FUNCTIONS TO postgres WITH GRANT OPTION;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: extensions; Owner: supabase_admin
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA extensions GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLES TO postgres WITH GRANT OPTION;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR SEQUENCES; Type: DEFAULT ACL; Schema: graphql; Owner: supabase_admin
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql GRANT ALL ON SEQUENCES TO postgres;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql GRANT ALL ON SEQUENCES TO anon;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql GRANT ALL ON SEQUENCES TO authenticated;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql GRANT ALL ON SEQUENCES TO service_role;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR FUNCTIONS; Type: DEFAULT ACL; Schema: graphql; Owner: supabase_admin
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql GRANT ALL ON FUNCTIONS TO postgres;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql GRANT ALL ON FUNCTIONS TO anon;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql GRANT ALL ON FUNCTIONS TO authenticated;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql GRANT ALL ON FUNCTIONS TO service_role;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: graphql; Owner: supabase_admin
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLES TO postgres;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLES TO anon;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLES TO authenticated;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLES TO service_role;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR SEQUENCES; Type: DEFAULT ACL; Schema: graphql_public; Owner: supabase_admin
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql_public GRANT ALL ON SEQUENCES TO postgres;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql_public GRANT ALL ON SEQUENCES TO anon;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql_public GRANT ALL ON SEQUENCES TO authenticated;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql_public GRANT ALL ON SEQUENCES TO service_role;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR FUNCTIONS; Type: DEFAULT ACL; Schema: graphql_public; Owner: supabase_admin
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql_public GRANT ALL ON FUNCTIONS TO postgres;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql_public GRANT ALL ON FUNCTIONS TO anon;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql_public GRANT ALL ON FUNCTIONS TO authenticated;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql_public GRANT ALL ON FUNCTIONS TO service_role;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: graphql_public; Owner: supabase_admin
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql_public GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLES TO postgres;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql_public GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLES TO anon;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql_public GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLES TO authenticated;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql_public GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLES TO service_role;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR SEQUENCES; Type: DEFAULT ACL; Schema: hubble; Owner: postgres
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA hubble GRANT ALL ON SEQUENCES TO authenticated;
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA hubble GRANT ALL ON SEQUENCES TO service_role;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR FUNCTIONS; Type: DEFAULT ACL; Schema: hubble; Owner: postgres
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA hubble GRANT ALL ON FUNCTIONS TO authenticated;
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA hubble GRANT ALL ON FUNCTIONS TO service_role;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: hubble; Owner: postgres
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA hubble GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLES TO authenticated;
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA hubble GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLES TO service_role;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR SEQUENCES; Type: DEFAULT ACL; Schema: pgsodium; Owner: supabase_admin
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA pgsodium GRANT ALL ON SEQUENCES TO pgsodium_keyholder;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: pgsodium; Owner: supabase_admin
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA pgsodium GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLES TO pgsodium_keyholder;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR SEQUENCES; Type: DEFAULT ACL; Schema: pgsodium_masks; Owner: supabase_admin
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA pgsodium_masks GRANT ALL ON SEQUENCES TO pgsodium_keyiduser;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR FUNCTIONS; Type: DEFAULT ACL; Schema: pgsodium_masks; Owner: supabase_admin
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA pgsodium_masks GRANT ALL ON FUNCTIONS TO pgsodium_keyiduser;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: pgsodium_masks; Owner: supabase_admin
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA pgsodium_masks GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLES TO pgsodium_keyiduser;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR SEQUENCES; Type: DEFAULT ACL; Schema: public; Owner: postgres
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON SEQUENCES TO postgres;
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON SEQUENCES TO anon;
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON SEQUENCES TO authenticated;
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON SEQUENCES TO service_role;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR SEQUENCES; Type: DEFAULT ACL; Schema: public; Owner: supabase_admin
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON SEQUENCES TO postgres;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON SEQUENCES TO anon;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON SEQUENCES TO authenticated;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON SEQUENCES TO service_role;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR FUNCTIONS; Type: DEFAULT ACL; Schema: public; Owner: postgres
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON FUNCTIONS TO postgres;
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON FUNCTIONS TO anon;
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON FUNCTIONS TO authenticated;
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON FUNCTIONS TO service_role;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR FUNCTIONS; Type: DEFAULT ACL; Schema: public; Owner: supabase_admin
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON FUNCTIONS TO postgres;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON FUNCTIONS TO anon;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON FUNCTIONS TO authenticated;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON FUNCTIONS TO service_role;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: public; Owner: postgres
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLES TO postgres;
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLES TO anon;
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLES TO authenticated;
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLES TO service_role;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: public; Owner: supabase_admin
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLES TO postgres;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLES TO anon;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLES TO authenticated;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLES TO service_role;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR SEQUENCES; Type: DEFAULT ACL; Schema: realtime; Owner: supabase_admin
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA realtime GRANT ALL ON SEQUENCES TO postgres;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA realtime GRANT ALL ON SEQUENCES TO dashboard_user;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR FUNCTIONS; Type: DEFAULT ACL; Schema: realtime; Owner: supabase_admin
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA realtime GRANT ALL ON FUNCTIONS TO postgres;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA realtime GRANT ALL ON FUNCTIONS TO dashboard_user;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: realtime; Owner: supabase_admin
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA realtime GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLES TO postgres;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA realtime GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLES TO dashboard_user;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR SEQUENCES; Type: DEFAULT ACL; Schema: storage; Owner: postgres
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA storage GRANT ALL ON SEQUENCES TO postgres;
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA storage GRANT ALL ON SEQUENCES TO anon;
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA storage GRANT ALL ON SEQUENCES TO authenticated;
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA storage GRANT ALL ON SEQUENCES TO service_role;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR FUNCTIONS; Type: DEFAULT ACL; Schema: storage; Owner: postgres
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA storage GRANT ALL ON FUNCTIONS TO postgres;
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA storage GRANT ALL ON FUNCTIONS TO anon;
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA storage GRANT ALL ON FUNCTIONS TO authenticated;
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA storage GRANT ALL ON FUNCTIONS TO service_role;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: storage; Owner: postgres
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA storage GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLES TO postgres;
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA storage GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLES TO anon;
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA storage GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLES TO authenticated;
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA storage GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLES TO service_role;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR SEQUENCES; Type: DEFAULT ACL; Schema: supabase_functions; Owner: supabase_admin
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA supabase_functions GRANT ALL ON SEQUENCES TO postgres;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA supabase_functions GRANT ALL ON SEQUENCES TO anon;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA supabase_functions GRANT ALL ON SEQUENCES TO authenticated;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA supabase_functions GRANT ALL ON SEQUENCES TO service_role;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR FUNCTIONS; Type: DEFAULT ACL; Schema: supabase_functions; Owner: supabase_admin
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA supabase_functions GRANT ALL ON FUNCTIONS TO postgres;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA supabase_functions GRANT ALL ON FUNCTIONS TO anon;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA supabase_functions GRANT ALL ON FUNCTIONS TO authenticated;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA supabase_functions GRANT ALL ON FUNCTIONS TO service_role;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: supabase_functions; Owner: supabase_admin
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA supabase_functions GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLES TO postgres;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA supabase_functions GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLES TO anon;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA supabase_functions GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLES TO authenticated;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA supabase_functions GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLES TO service_role;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR SEQUENCES; Type: DEFAULT ACL; Schema: v1_cosmos; Owner: postgres
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA v1_cosmos GRANT ALL ON SEQUENCES TO authenticated;
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA v1_cosmos GRANT ALL ON SEQUENCES TO service_role;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR FUNCTIONS; Type: DEFAULT ACL; Schema: v1_cosmos; Owner: postgres
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA v1_cosmos GRANT ALL ON FUNCTIONS TO authenticated;
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA v1_cosmos GRANT ALL ON FUNCTIONS TO service_role;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: v1_cosmos; Owner: postgres
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA v1_cosmos GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLES TO authenticated;
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA v1_cosmos GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLES TO service_role;
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA v1_cosmos GRANT SELECT ON TABLES TO v1_cosmos_readonly;
-
-
---
--- Name: issue_graphql_placeholder; Type: EVENT TRIGGER; Schema: -; Owner: supabase_admin
+-- Name: issue_graphql_placeholder; Type: EVENT TRIGGER; Schema: -; Owner: -
 --
 
 CREATE EVENT TRIGGER issue_graphql_placeholder ON sql_drop
@@ -23231,10 +21177,8 @@ CREATE EVENT TRIGGER issue_graphql_placeholder ON sql_drop
    EXECUTE FUNCTION extensions.set_graphql_placeholder();
 
 
-ALTER EVENT TRIGGER issue_graphql_placeholder OWNER TO supabase_admin;
-
 --
--- Name: issue_pg_cron_access; Type: EVENT TRIGGER; Schema: -; Owner: supabase_admin
+-- Name: issue_pg_cron_access; Type: EVENT TRIGGER; Schema: -; Owner: -
 --
 
 CREATE EVENT TRIGGER issue_pg_cron_access ON ddl_command_end
@@ -23242,10 +21186,8 @@ CREATE EVENT TRIGGER issue_pg_cron_access ON ddl_command_end
    EXECUTE FUNCTION extensions.grant_pg_cron_access();
 
 
-ALTER EVENT TRIGGER issue_pg_cron_access OWNER TO supabase_admin;
-
 --
--- Name: issue_pg_graphql_access; Type: EVENT TRIGGER; Schema: -; Owner: supabase_admin
+-- Name: issue_pg_graphql_access; Type: EVENT TRIGGER; Schema: -; Owner: -
 --
 
 CREATE EVENT TRIGGER issue_pg_graphql_access ON ddl_command_end
@@ -23253,10 +21195,8 @@ CREATE EVENT TRIGGER issue_pg_graphql_access ON ddl_command_end
    EXECUTE FUNCTION extensions.grant_pg_graphql_access();
 
 
-ALTER EVENT TRIGGER issue_pg_graphql_access OWNER TO supabase_admin;
-
 --
--- Name: issue_pg_net_access; Type: EVENT TRIGGER; Schema: -; Owner: postgres
+-- Name: issue_pg_net_access; Type: EVENT TRIGGER; Schema: -; Owner: -
 --
 
 CREATE EVENT TRIGGER issue_pg_net_access ON ddl_command_end
@@ -23264,27 +21204,21 @@ CREATE EVENT TRIGGER issue_pg_net_access ON ddl_command_end
    EXECUTE FUNCTION extensions.grant_pg_net_access();
 
 
-ALTER EVENT TRIGGER issue_pg_net_access OWNER TO postgres;
-
 --
--- Name: pgrst_ddl_watch; Type: EVENT TRIGGER; Schema: -; Owner: supabase_admin
+-- Name: pgrst_ddl_watch; Type: EVENT TRIGGER; Schema: -; Owner: -
 --
 
 CREATE EVENT TRIGGER pgrst_ddl_watch ON ddl_command_end
    EXECUTE FUNCTION extensions.pgrst_ddl_watch();
 
 
-ALTER EVENT TRIGGER pgrst_ddl_watch OWNER TO supabase_admin;
-
 --
--- Name: pgrst_drop_watch; Type: EVENT TRIGGER; Schema: -; Owner: supabase_admin
+-- Name: pgrst_drop_watch; Type: EVENT TRIGGER; Schema: -; Owner: -
 --
 
 CREATE EVENT TRIGGER pgrst_drop_watch ON sql_drop
    EXECUTE FUNCTION extensions.pgrst_drop_watch();
 
-
-ALTER EVENT TRIGGER pgrst_drop_watch OWNER TO supabase_admin;
 
 --
 -- PostgreSQL database dump complete

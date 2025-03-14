@@ -16,9 +16,11 @@ export const Button = extendVariants(NextButton, {
       true: "p-1 h-fit w-fit min-w-fit",
     },
     size: {
+      xs: "text-xs py-1 px-2",
       sm: "text-xs py-2 px-4",
       md: "text-sm py-3 px-6",
       lg: "text-lg py-4 px-8",
+      icon: "p-1 min-h-fit min-w-fit",
     },
   },
   defaultVariants: {

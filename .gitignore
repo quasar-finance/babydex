@@ -34,6 +34,6 @@ target/
 next-env.d.ts
 
 # Supabase
-.branches
-.temp
-.env
+**/.branches
+**/.temp
+**/.env

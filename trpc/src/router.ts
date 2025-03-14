@@ -14,12 +14,12 @@ export const edgeRouter = createTRPCRouter({
 export const localRouter = createTRPCRouter({
   pools: poolsRouter,
   assets: assetsRouter,
-  indexer: indexerRouter,
 });
 
 export const appRouter = createTRPCRouter({
   edge: edgeRouter,
   local: localRouter,
+  indexer: indexerRouter,
 });
 
 export type AppRouter = typeof appRouter;

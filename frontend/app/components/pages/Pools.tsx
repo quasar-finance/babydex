@@ -11,6 +11,7 @@ import { trpc } from "~/trpc/client";
 
 import type React from "react";
 import PoolsSkeleton from "../molecules/skeletons/PoolsSkeleton";
+import { CellPoolName } from "../atoms/cells/CellPoolName";
 
 const Pools: React.FC = () => {
   const { showModal } = useModal();
@@ -27,7 +28,7 @@ const Pools: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex flex-col gap-3 grays">
+      <div className="flex flex-col gap-3">
         <div className={twMerge("grid  px-4 text-xs text-white/50", gridClass)}>
           <p>Pool</p>
           <p>TVL</p>
@@ -43,17 +44,11 @@ const Pools: React.FC = () => {
             <div
               key={pool.name + i}
               className={twMerge(
-                "border first:rounded-t-2xl last:rounded-b-2xl border-b-0 last:border-b-1 border-white/10 p-4 grid items-center",
+                "border first:rounded-t-2xl last:rounded-b-2xl border-b-0 last:border-b-1 border-white/10 p-4 grid items-center bg-tw-bg/50 backdrop-blur-md",
                 gridClass,
               )}
             >
-              <div className=" flex items-center  justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <AssetsStacked assets={pool.assets} />
-                  <span>{pool.name}</span>
-                </div>
-                <Pill>0,3%</Pill>
-              </div>
+              <CellPoolName assets={pool.assets} name={pool.name} />
               <div>{pool.poolLiquidity}</div>
               <div>-</div>
               <div>-</div>

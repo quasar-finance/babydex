@@ -6,11 +6,11 @@ import { useModal } from "~/app/providers/ModalProvider";
 import { ModalTypes } from "~/types/modal";
 
 import { IntlAddress } from "~/utils/intl";
-import { Popover, PopoverContent, PopoverTrigger } from "@heroui/react";
 import { twMerge } from "~/utils/twMerge";
 import CopyMessage from "../atoms/CopyMessage";
 import { IconCopy, IconLogout } from "@tabler/icons-react";
 import { useAccount } from "@cosmi/react";
+import { Popover, PopoverContent, PopoverTrigger } from "../atoms/Popover";
 
 const ConnectWallet: React.FC = () => {
   const { showModal } = useModal();
@@ -25,17 +25,13 @@ const ConnectWallet: React.FC = () => {
     <div>
       {_isConnected ? (
         <>
-          <Popover placement="bottom" showArrow offset={10}>
+          <Popover>
             <PopoverTrigger>
               <Button color="secondary">
                 <Avatar seed={address || ""} className="w-4 h-4" /> {IntlAddress(address || "")}
               </Button>
             </PopoverTrigger>
-            <PopoverContent
-              className={twMerge(
-                "min-w-[20rem] border border-tw-gray-900 bg-tw-bg rounded-xl py-2 relative overflow-hidden p-2 flex items-start flex-col gap-3",
-              )}
-            >
+            <PopoverContent>
               <h3 className="text-sm text-tw-gray-200">
                 Connected to <span className="font-bold">{chain?.name}</span>
               </h3>

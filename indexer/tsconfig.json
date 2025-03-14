@@ -23,18 +23,9 @@
     },
     "include": [
         "src",
-        "global.d.ts"
     ],
     "exclude": [
         "node_modules",
         "build"
-    ],
-    "references": [
-        {
-            "path": "../types"
-        },
-        {
-            "path": "../indexer"
-        }
     ]
 }

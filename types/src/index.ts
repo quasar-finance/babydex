@@ -22,3 +22,7 @@ export type {
   PoolResponse,
   Uint128,
 } from "./contracts.js";
+
+export type {
+  Indexer, QueryInput
+} from "./indexer.js";

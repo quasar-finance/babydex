@@ -25,6 +25,11 @@ export const indexerRouter = createTRPCRouter(
             .query(async (opts) => {
                 return await opts.ctx.indexerService.queryView('incentivize', opts.input);
             }),
+        pools: createTRPCPublicProcedure
+            .input(input)
+            .query(async (opts) => {
+                return await opts.ctx.indexerService.queryView('pools', opts.input);
+            }),
         poolBalance: createTRPCPublicProcedure
             .input(input)
             .query(async (opts) => {

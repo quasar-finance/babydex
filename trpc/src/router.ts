@@ -6,6 +6,7 @@ import {indexerRouter} from "./routers/indexer.js";
 
 export const edgeRouter = createTRPCRouter({
   user: userRouter,
+  indexer: indexerRouter,
   health: createTRPCPublicProcedure.query(async () => {
     return { status: "up" };
   }),
@@ -19,7 +20,6 @@ export const localRouter = createTRPCRouter({
 export const appRouter = createTRPCRouter({
   edge: edgeRouter,
   local: localRouter,
-  indexer: indexerRouter,
 });
 
 export type AppRouter = typeof appRouter;

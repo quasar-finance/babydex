@@ -23,6 +23,4 @@ export type {
   Uint128,
 } from "./contracts.js";
 
-export type {
-  Indexer, QueryInput
-} from "./indexer.js";
+export type { DbCredentials, Indexer, QueryInput } from "./indexer.js";

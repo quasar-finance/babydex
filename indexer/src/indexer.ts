@@ -15,7 +15,7 @@ export class Indexer {
             user: credentials.user,
             password: credentials.password,
             database: credentials.database,
-            ssl: credentials.ssl,
+            // ssl: credentials.ssl,
         }));
     }
 
@@ -28,7 +28,7 @@ export class Indexer {
         const query = this.queryier.select().from(viewName as PgViewWithSelection);
 
         if (!input) {
-            return query;
+            return await query;
         }
 
         const dynamicQuery = query.$dynamic();
@@ -37,7 +37,7 @@ export class Indexer {
         const page = input?.page ?? 1;
         const limit = input?.limit ?? 50;
 
-        return this.withPagination(dynamicQuery, page, limit, orderBy, orderByColumn);
+        return await this.withPagination(dynamicQuery, page, limit, orderBy, orderByColumn);
     }
 
     private withPagination<T extends PgSelect>(

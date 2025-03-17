@@ -15,5 +15,5 @@ export type QueryInput = {
 }
 
 export type Indexer = {
-    queryView<T>(viewName: string, input?: QueryInput | undefined | null): Promise<T | null>;
+    queryView<T, G>(viewName: G, input?: QueryInput | undefined | null): Promise<T | null>;
 }

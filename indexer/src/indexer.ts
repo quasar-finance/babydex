@@ -1,33 +1,9 @@
 import type {DbCredentials} from "@towerfi/types";
 import {drizzle, NodePgDatabase} from "drizzle-orm/node-postgres";
 import {Pool} from "pg";
-import {type PgSelect} from "drizzle-orm/pg-core";
+import {type PgSelect, type PgViewWithSelection} from "drizzle-orm/pg-core";
 import {asc, desc} from "drizzle-orm";
 import {StringChunk} from "drizzle-orm/sql/sql";
-import {
-    addLiquidityInV1Cosmos,
-    historicPoolYieldInV1Cosmos,
-    incentivizeInV1Cosmos,
-    poolsInV1Cosmos,
-    poolBalanceInV1Cosmos,
-    poolFeePeriodsInV1Cosmos,
-    poolUserSharesInV1Cosmos,
-    swapInV1Cosmos,
-    withdrawLiquidityInV1Cosmos,
-} from "./drizzle/schema.js";
-
-
-export const IndexerViews = {
-    "addLiquidity": addLiquidityInV1Cosmos,
-    "historicPoolYield": historicPoolYieldInV1Cosmos,
-    "incentivize": incentivizeInV1Cosmos,
-    "pools": poolsInV1Cosmos,
-    "poolBalance": poolBalanceInV1Cosmos,
-    "poolFeePeriods": poolFeePeriodsInV1Cosmos,
-    "poolUserShares": poolUserSharesInV1Cosmos,
-    "swap": swapInV1Cosmos,
-    "withdrawLiquidity": withdrawLiquidityInV1Cosmos
-}
 
 export class Indexer {
     private queryier: NodePgDatabase<Record<string, never>> & { $client: Pool };
@@ -43,14 +19,13 @@ export class Indexer {
         }));
     }
 
-    public async queryView(viewName: string, input?: {
+    public async queryView<G>(viewName: G, input?: {
         orderBy?: "asc" | "desc" | null | undefined;
         limit?: number | null | undefined;
         orderByColumn?: string | null | undefined;
         page?: number | null | undefined;
     } | null) {
-        const viewNameValue = IndexerViews[viewName as keyof typeof IndexerViews];
-        const query = this.queryier.select().from(viewNameValue);
+        const query = this.queryier.select().from(viewName as PgViewWithSelection);
 
         if (!input) {
             return query;

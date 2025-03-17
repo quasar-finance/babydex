@@ -10,12 +10,12 @@ import type {DbCredentials} from "@towerfi/types";
 interface Env {
   CONTRACTS: string;
   RPC_NODE: string;
-  COSMOS_V1_READONLY_HOST: string;
-  COSMOS_V1_READONLY_PORT: string;
-  COSMOS_V1_READONLY_USER: string;
-  COSMOS_V1_READONLY_PASSWORD: string;
-  COSMOS_V1_READONLY_DATABASE: string;
-  COSMOS_V1_READONLY_SSL: string;
+  SUPABASE_READONLY_HOST: string;
+  SUPABASE_READONLY_PORT: string;
+  SUPABASE_READONLY_USER: string;
+  SUPABASE_READONLY_PASSWORD: string;
+  SUPABASE_READONLY_DATABASE: string;
+  SUPABASE_READONLY_SSL: string;
 }
 
 export default {
@@ -26,12 +26,12 @@ export default {
       createContext: () => {
         const cacheService = createRedisService();
         const indexerService = createIndexerService({
-          host: env.COSMOS_V1_READONLY_HOST,
-          port: Number(env.COSMOS_V1_READONLY_PORT),
-          user: env.COSMOS_V1_READONLY_USER,
-          password: env.COSMOS_V1_READONLY_PASSWORD,
-          database: env.COSMOS_V1_READONLY_DATABASE,
-          ssl: Boolean(env.COSMOS_V1_READONLY_SSL),
+          host: env.SUPABASE_READONLY_HOST,
+          port: Number(env.SUPABASE_READONLY_PORT),
+          user: env.SUPABASE_READONLY_USER,
+          password: env.SUPABASE_READONLY_PASSWORD,
+          database: env.SUPABASE_READONLY_DATABASE,
+          ssl: Boolean(env.SUPABASE_READONLY_SSL),
         } as DbCredentials);
         return {
           contracts: JSON.parse(env.CONTRACTS),

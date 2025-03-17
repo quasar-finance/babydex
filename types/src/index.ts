@@ -24,5 +24,3 @@ export type {
   ConfigResponse,
   CumulativePricesResponse,
 } from "./contracts.js";
-
-export type { DbCredentials, Indexer, QueryInput } from "./indexer.js";

@@ -6,7 +6,7 @@ import { createLocalTRPCLink } from "./router";
 
 export const trpc = createTRPCReact<AppRouter>();
 
-export const createClient = (ctx: ContextOptions) =>
+export const createClient = (ctx: Omit<ContextOptions, "indexerService">) =>
   trpc.createClient({
     links: [
       loggerLink({

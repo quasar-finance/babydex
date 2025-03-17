@@ -1,11 +1,10 @@
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import { createRedisService } from "../services/redis.js";
 import { createCoingeckoService } from "../services/coingecko.js";
-import {createIndexerService} from "../services/indexer.js";
+import { createIndexerService } from "@towerfi/indexer";
 
 import { appRouter } from "../router.js";
 import { createPublicClient, http } from "cosmi";
-import type {DbCredentials} from "@towerfi/types";
 
 interface Env {
   CONTRACTS: string;
@@ -32,7 +31,7 @@ export default {
           password: env.SUPABASE_READONLY_PASSWORD,
           database: env.SUPABASE_READONLY_DATABASE,
           ssl: Boolean(env.SUPABASE_READONLY_SSL),
-        } as DbCredentials);
+        });
         return {
           contracts: JSON.parse(env.CONTRACTS),
           cacheService,

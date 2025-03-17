@@ -13,43 +13,42 @@ export const indexerRouter = createTRPCRouter(
         addLiquidity: createTRPCPublicProcedure
             .input(input)
             .query(async (opts) => {
-                return opts.ctx.indexerService.queryView('addLiquidity', opts.input);
-
+                return await opts.ctx.indexerService.queryView('addLiquidity', opts.input);
             }),
         historicPoolYield: createTRPCPublicProcedure
             .input(input)
             .query(async (opts) => {
-                return opts.ctx.indexerService.queryView('historicPoolYield', opts.input);
+                return await opts.ctx.indexerService.queryView('historicPoolYield', opts.input);
             }),
         incentivize: createTRPCPublicProcedure
             .input(input)
             .query(async (opts) => {
-                return opts.ctx.indexerService.queryView('incentivize', opts.input);
+                return await opts.ctx.indexerService.queryView('incentivize', opts.input);
             }),
         poolBalance: createTRPCPublicProcedure
             .input(input)
             .query(async (opts) => {
-                return opts.ctx.indexerService.queryView('poolBalance', opts.input);
+                return await opts.ctx.indexerService.queryView('poolBalance', opts.input);
             }),
         poolFeePeriods: createTRPCPublicProcedure
             .input(input)
             .query(async (opts) => {
-                return opts.ctx.indexerService.queryView('poolFeePeriods', opts.input);
+                return await opts.ctx.indexerService.queryView('poolFeePeriods', opts.input);
             }),
         poolUserShares: createTRPCPublicProcedure
             .input(input)
             .query(async (opts) => {
-                return opts.ctx.indexerService.queryView('poolUserShares', opts.input);
+                return await opts.ctx.indexerService.queryView('poolUserShares', opts.input);
             }),
         swap: createTRPCPublicProcedure
             .input(input)
             .query(async (opts) => {
-                return opts.ctx.indexerService.queryView('swap', opts.input);
+                return await opts.ctx.indexerService.queryView('swap', opts.input);
             }),
         withdrawLiquidity: createTRPCPublicProcedure
             .input(input)
             .query(async (opts) => {
-                return opts.ctx.indexerService.queryView('withdrawLiquidity', opts.input);
+                return await opts.ctx.indexerService.queryView('withdrawLiquidity', opts.input);
             }),
     }
 );

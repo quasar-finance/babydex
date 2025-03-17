@@ -1,5 +1,16 @@
 import {createTRPCPublicProcedure, createTRPCRouter} from "../config.js";
 import {z} from "zod";
+import {
+    addLiquidityInV1Cosmos,
+    historicPoolYieldInV1Cosmos,
+    incentivizeInV1Cosmos,
+    poolsInV1Cosmos,
+    poolBalanceInV1Cosmos,
+    poolFeePeriodsInV1Cosmos,
+    poolUserSharesInV1Cosmos,
+    swapInV1Cosmos,
+    withdrawLiquidityInV1Cosmos
+} from "@towerfi/indexer";
 
 const input = z.object({
     orderBy: z.enum(["asc", "desc"]).nullish(),
@@ -13,47 +24,47 @@ export const indexerRouter = createTRPCRouter(
         addLiquidity: createTRPCPublicProcedure
             .input(input)
             .query(async (opts) => {
-                return await opts.ctx.indexerService.queryView('addLiquidity', opts.input);
+                return await opts.ctx.indexerService.queryView(addLiquidityInV1Cosmos, opts.input);
             }),
         historicPoolYield: createTRPCPublicProcedure
             .input(input)
             .query(async (opts) => {
-                return await opts.ctx.indexerService.queryView('historicPoolYield', opts.input);
+                return await opts.ctx.indexerService.queryView(historicPoolYieldInV1Cosmos, opts.input);
             }),
         incentivize: createTRPCPublicProcedure
             .input(input)
             .query(async (opts) => {
-                return await opts.ctx.indexerService.queryView('incentivize', opts.input);
+                return await opts.ctx.indexerService.queryView(incentivizeInV1Cosmos, opts.input);
             }),
         pools: createTRPCPublicProcedure
             .input(input)
             .query(async (opts) => {
-                return await opts.ctx.indexerService.queryView('pools', opts.input);
+                return await opts.ctx.indexerService.queryView(poolsInV1Cosmos, opts.input);
             }),
         poolBalance: createTRPCPublicProcedure
             .input(input)
             .query(async (opts) => {
-                return await opts.ctx.indexerService.queryView('poolBalance', opts.input);
+                return await opts.ctx.indexerService.queryView(poolBalanceInV1Cosmos, opts.input);
             }),
         poolFeePeriods: createTRPCPublicProcedure
             .input(input)
             .query(async (opts) => {
-                return await opts.ctx.indexerService.queryView('poolFeePeriods', opts.input);
+                return await opts.ctx.indexerService.queryView(poolFeePeriodsInV1Cosmos, opts.input);
             }),
         poolUserShares: createTRPCPublicProcedure
             .input(input)
             .query(async (opts) => {
-                return await opts.ctx.indexerService.queryView('poolUserShares', opts.input);
+                return await opts.ctx.indexerService.queryView(poolUserSharesInV1Cosmos, opts.input);
             }),
         swap: createTRPCPublicProcedure
             .input(input)
             .query(async (opts) => {
-                return await opts.ctx.indexerService.queryView('swap', opts.input);
+                return await opts.ctx.indexerService.queryView(swapInV1Cosmos, opts.input);
             }),
         withdrawLiquidity: createTRPCPublicProcedure
             .input(input)
             .query(async (opts) => {
-                return await opts.ctx.indexerService.queryView('withdrawLiquidity', opts.input);
+                return await opts.ctx.indexerService.queryView(withdrawLiquidityInV1Cosmos, opts.input);
             }),
     }
 );

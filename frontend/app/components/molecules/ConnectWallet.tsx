@@ -110,7 +110,7 @@ export const MobileConnectWallet: React.FC<{ closeMenu: () => void }> = ({ close
           </Button>
         </div>
       ) : (
-        <Button fullWidth onPress={() => [showModal(ModalTypes.connect_wallet), closeMenu]}>
+        <Button fullWidth onPress={() => [showModal(ModalTypes.connect_wallet), closeMenu()]}>
           Connect wallet
         </Button>
       )}

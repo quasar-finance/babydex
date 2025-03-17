@@ -87,6 +87,7 @@ const SwapComponent: React.FC = () => {
         src="/tower-gradient.png"
         alt="letters"
         className="absolute bottom-0 left-0 w-full object-cover select-none z-10 min-h-[35rem]"
+        draggable="false"
       />
     </>
   );

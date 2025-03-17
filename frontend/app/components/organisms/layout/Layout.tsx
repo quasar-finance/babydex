@@ -12,7 +12,8 @@ const Layout: React.FC<PropsWithChildren> = ({ children }) => {
         <img
           src="/letters.png"
           alt="letters"
-          className="absolute bottom-0 left-0 w-full object-cover h-[335px] object-top opacity-20 select-none z-0"
+          className="absolute bottom-0 left-0 w-full object-cover h-[335px] object-top opacity-20 select-none z-0 "
+          draggable="false"
         />
       </footer>
     </main>

@@ -1,0 +1,28 @@
+import React, { useEffect, useState } from "react";
+
+export type MediaBreakpoints = "sm" | "md" | "lg" | "xl" | "2xl";
+
+const medias = {
+  sm: 640,
+  md: 768,
+  lg: 1024,
+  xl: 1280,
+  "2xl": 1536,
+};
+
+const useMediaQuery = (size: MediaBreakpoints) => {
+  const [matchSize, setMatchSize] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setMatchSize(() => window.innerWidth >= medias[size]);
+    };
+    window.addEventListener("resize", handleResize);
+    handleResize();
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  return matchSize;
+};
+
+export default useMediaQuery;

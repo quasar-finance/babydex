@@ -8,6 +8,7 @@ import { CellPoolName } from "../atoms/cells/CellPoolName";
 import { IconDots } from "@tabler/icons-react";
 import { Popover, PopoverTrigger, PopoverContent } from "../atoms/Popover";
 import { CellClaimRewards } from "../atoms/cells/CellClaimRewards";
+import { CellData } from "../atoms/cells/CellData";
 
 const positions = [
   {
@@ -67,7 +68,7 @@ const positions = [
 const Dashboard: React.FC = () => {
   const { showModal } = useModal();
 
-  const gridClass = "grid-cols-[2fr_1fr_1fr_1fr_1fr_2fr] gap-2";
+  const gridClass = "grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr_2fr] gap-4";
 
   return (
     <div className="flex flex-col gap-8 px-4">
@@ -79,7 +80,7 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
       <div className="flex flex-col gap-3">
-        <div className={twMerge("grid  px-4 text-xs text-white/50", gridClass)}>
+        <div className={twMerge("hidden lg:grid px-4 text-xs text-white/50", gridClass)}>
           <p>Pool</p>
           <p>APR</p>
           <p>Staked</p>
@@ -88,24 +89,32 @@ const Dashboard: React.FC = () => {
           <p></p>
         </div>
 
-        <div>
+        <div className="flex flex-col gap-4 lg:gap-0">
           {positions.map((pool, i) => (
             <div
               key={pool.name + i}
               className={twMerge(
-                "border first:rounded-t-2xl last:rounded-b-2xl border-b-0 last:border-b-1 border-white/10 p-4 grid items-center",
+                "rounded-2xl border lg:rounded-none lg:first:rounded-t-2xl lg:last:rounded-b-2xl lg:border-b-0 lg:last:border-b-1 border-white/10 p-4 flex flex-wrap lg:grid items-center justify-between bg-tw-bg/50 backdrop-blur-md",
                 gridClass,
               )}
             >
-              <CellPoolName assets={pool.assets} name={pool.name} />
-              <div>-</div>
-              <div>-</div>
-              <div>-</div>
-              <CellClaimRewards rewardAmount="$0.0" claimAction={() => {}} />
-              <div className=" flex items-end justify-end">
+              <CellPoolName
+                assets={pool.assets}
+                name={pool.name}
+                className="order-1 col-span-1 w-[80%] lg:w-auto"
+              />
+              <CellData title="APR" data="-" className="order-3 w-[45%] lg:w-auto" />
+              <CellData title="Staked" data="-" className="order-4 w-[45%] lg:w-auto" />
+              <CellData title="Price Range" data="-" className="order-5 w-[45%] lg:w-auto" />
+              <CellClaimRewards
+                rewardAmount="$0.0"
+                claimAction={() => {}}
+                className="order-6 w-[45%] lg:w-auto"
+              />
+              <div className="order-2 lg:order-7 flex items-end justify-end w-fit lg:w-auto">
                 <Popover>
                   <PopoverTrigger>
-                    <Button color="tertiary" radius="sm" size="icon">
+                    <Button color="tertiary" radius="sm" size="icon" className="mt-4 lg:mt-0">
                       <IconDots className="w-6 h-6" />
                     </Button>
                   </PopoverTrigger>

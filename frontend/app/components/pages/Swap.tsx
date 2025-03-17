@@ -9,7 +9,6 @@ import { motion } from "motion/react";
 import RotateButton from "../atoms/RotateButton";
 import { mockTokens } from "~/utils/consts";
 import SwapInfoAccordion from "../molecules/Swap/SwapInfoAccordion";
-import { trpc } from "~/trpc/client";
 import { useAccount } from "@cosmi/react";
 
 const SwapComponent: React.FC = () => {
@@ -18,6 +17,7 @@ const SwapComponent: React.FC = () => {
   const [_isConnected, _setIsConnected] = useState(false);
   const { isConnected } = useAccount();
   const { showModal } = useModal();
+  const [activeTab, setActiveTab] = useState<"swap" | "bridge">("swap");
 
   useEffect(() => {
     _setIsConnected(isConnected);

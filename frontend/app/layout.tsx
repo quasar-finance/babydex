@@ -1,4 +1,4 @@
-import Layout from "~/app/components/organisms/Layout";
+import Layout from "~/app/components/organisms/layout/Layout";
 import "./globals.css";
 import { Inter } from "next/font/google";
 import AppProvider from "~/app/providers/AppProvider";

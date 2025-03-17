@@ -21,22 +21,35 @@ const PoolsSkeleton: React.FC<Props> = ({ className }) => {
               className,
             )}
           >
-            <div className=" flex items-center  justify-between gap-3">
-              <div className="flex items-center gap-3 w-full">
-                <AssetsStacked />
-                <Skeleton className="w-full h-6" />
+            <div className="flex flex-col gap-2 col-span-2 lg:col-span-1">
+              <div className=" flex items-center  justify-between gap-3">
+                <div className="flex items-center gap-3 w-full">
+                  <AssetsStacked />
+                  <Skeleton className="w-full h-6" />
+                </div>
+                <Pill className="animate-pulse ">-%</Pill>
               </div>
-              <Pill className="animate-pulse ">-%</Pill>
             </div>
-            <Skeleton className="w-full h-6" />
+            <div className="flex flex-col gap-2">
+              <p className="text-xs text-white/50 lg:hidden">TVL</p>
+              <Skeleton className="w-full h-6" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <p className="text-xs text-white/50 lg:hidden">APR</p>
+              <Skeleton className="w-full h-6" />
+            </div>
 
-            <Skeleton className="w-full h-6" />
+            <div className="flex flex-col gap-2">
+              <p className="text-xs text-white/50 lg:hidden">Volume 24h</p>
+              <Skeleton className="w-full h-6" />
+            </div>
 
-            <Skeleton className="w-full h-6" />
+            <div className="flex flex-col gap-2">
+              <p className="text-xs text-white/50 lg:hidden">Fees 24h</p>
+              <Skeleton className="w-full h-6" />
+            </div>
 
-            <Skeleton className="w-full h-6" />
-
-            <div className=" flex items-end justify-end">
+            <div className=" flex lg:items-end lg:justify-end">
               <Button variant="flat" className="bg-white/10 text-white/20 animate-pulse">
                 Add Liquidity
               </Button>

@@ -30,11 +30,11 @@ const ModalDepositLP: React.FC<ModalDepositLPProps> = ({ pool }) => {
       <div className="flex flex-col max-w-xl">
         <div className="flex flex-col gap-5 px-4 py-5">
           <div className="flex flex-col gap-4">
-            <div className="bg-white/5 w-full rounded-xl p-4 flex items-center justify-between">
+            <div className="bg-white/5 w-full rounded-xl p-4 flex lg:items-center justify-between gap-4 lg:gap-1 flex-col lg:flex-row">
               <p className="text-white/50 text-sm">
                 Selected Pool: <span className="font-bold text-white ">{name}</span>
               </p>
-              <div className="flex gap-2 py-1 px-[6px]">
+              <div className="flex gap-2 lg:py-1 lg:px-[6px]">
                 <Button
                   variant="flat"
                   onPress={() => setSide("double")}

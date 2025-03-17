@@ -1,3 +1,4 @@
+import type {DbCredentials} from "@towerfi/types";
 import {drizzle, NodePgDatabase} from "drizzle-orm/node-postgres";
 import {Pool} from "pg";
 import {type PgSelect} from "drizzle-orm/pg-core";
@@ -14,16 +15,8 @@ import {
     withdrawLiquidityInV1Cosmos,
 } from "./drizzle/schema.js";
 
-export type DB_CREDENTIALS = {
-    host: string,
-    port: number,
-    user: string,
-    password: string,
-    database: string,
-    ssl: boolean,
-}
 
-const viewNameMapping = {
+export const IndexerViews = {
     "addLiquidity": addLiquidityInV1Cosmos,
     "historicPoolYield": historicPoolYieldInV1Cosmos,
     "incentivize": incentivizeInV1Cosmos,
@@ -37,7 +30,7 @@ const viewNameMapping = {
 export class Indexer {
     private queryier: NodePgDatabase<Record<string, never>> & { $client: Pool };
 
-    constructor(credentials: DB_CREDENTIALS) {
+    constructor(credentials: DbCredentials) {
         this.queryier = drizzle(new Pool({
             host: credentials.host,
             port: credentials.port,
@@ -54,7 +47,7 @@ export class Indexer {
         orderByColumn?: string | null | undefined;
         page?: number | null | undefined;
     } | null) {
-        const viewNameValue = viewNameMapping[viewName as keyof typeof viewNameMapping];
+        const viewNameValue = IndexerViews[viewName as keyof typeof IndexerViews];
         const query = this.queryier.select().from(viewNameValue);
 
         if (!input) {

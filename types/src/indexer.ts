@@ -1,3 +1,12 @@
+export type DbCredentials = {
+    host: string,
+    port: number,
+    user: string,
+    password: string,
+    database: string,
+    ssl: boolean,
+}
+
 export type QueryInput = {
     page?: number | null | undefined;
     limit?: number | null | undefined;

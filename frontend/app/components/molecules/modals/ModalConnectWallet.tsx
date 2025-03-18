@@ -21,7 +21,7 @@ function ConnectorButton({ connector, onClick }: { connector: any; onClick: () =
       type="button"
       className="flex flex-col p-2 h-fit group overflow-hidden"
     >
-      <div className="h-12 w-12 p-1 bg-tw-orange-400 rounded-full relative">
+      <div className="h-12 w-12 p-1 relative">
         <Image
           className="w-full h-full rounded-full object-contain relative z-10"
           src={`https://raw.githubusercontent.com/quasar-finance/quasar-resources/main/assets/wallet/${id}.webp`}
@@ -30,9 +30,11 @@ function ConnectorButton({ connector, onClick }: { connector: any; onClick: () =
           alt={`chain-${name}-${id}`}
           priority
         />
-        <span className="bg-tw-orange-400 h-12 w-12 absolute rounded-full top-0 left-0 z-0 group-hover:scale-[5] transition-all duration-400" />
+        <span className="bg-tw-orange-400 h-4 w-4 absolute rounded-full top-4 left-4 z-0 group-hover:scale-[13] transition-all duration-400" />
       </div>
-      <p className="relative z-10 group-hover:text-tw-bg transition-all duration-400">{name}</p>
+      <p className="relative z-10 text-white group-hover:text-tw-bg transition-all duration-400">
+        {name}
+      </p>
     </Button>
   );
 }
@@ -48,8 +50,8 @@ const ModalConnectWallet: React.FC = () => {
   }, [isConnected]);
 
   return (
-    <BasicModal title="Connect modal">
-      <div className="grid grid-cols-2 gap-3">
+    <BasicModal title="Connect Wallet" classNames={{ wrapper: "max-w-sm" }}>
+      <div className="grid grid-cols-2 gap-3 ">
         {connectors.map((connector) => (
           <ConnectorButton
             key={connector.uid}

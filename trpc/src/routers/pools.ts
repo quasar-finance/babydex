@@ -44,13 +44,17 @@ export const poolsRouter = createTRPCRouter({
       const { address } = input;
       const caller = createCallerFactory(appRouter)(ctx);
 
-      const config = await caller.local.pools.getPoolConfig({ address });
-      const { params } = config;
+      const [pool, config, cumulativePrices] = await Promise.all([
+        caller.local.pools.getPool({ address }),
+        caller.local.pools.getPoolConfig({ address }),
+        publicClient.queryContractSmart<CumulativePricesResponse>({
+          address,
+          msg: { cumulative_prices: {} },
+        }),
+      ]);
 
-      const cumulativePrices = await publicClient.queryContractSmart<CumulativePricesResponse>({
-        address,
-        msg: { cumulative_prices: {} },
-      });
+      const { params } = config;
+      const pairType = Object.keys(pool.pair_type)[0] as string;
 
       if (!cumulativePrices) throw new Error("Pool not found or invalid");
       const [token0, token1] = cumulativePrices.assets;
@@ -68,11 +72,28 @@ export const poolsRouter = createTRPCRouter({
 
       const poolAmount0 = Number(token0Amount) / 10 ** assetInfo0.decimals;
       const poolAmount1 = Number(token1Amount) / 10 ** assetInfo1.decimals;
+
+      if (pairType === "xyk") {
+        const optimalRatio: number = poolAmount0 / poolAmount1;
+        return optimalRatio;
+      }
+
       const priceScale = Number(params.price_scale);
 
       const optimalRatio: number = poolAmount0 / (poolAmount1 * priceScale);
 
       return optimalRatio;
+    }),
+  getPool: createTRPCPublicProcedure
+    .input(z.object({ address: z.string() }))
+    .query<PairInfo>(async ({ ctx, input }) => {
+      const { publicClient } = ctx;
+      const { address } = input;
+
+      return await publicClient.queryContractSmart<PairInfo>({
+        address,
+        msg: { pair: {} },
+      });
     }),
   getPools: createTRPCPublicProcedure.query<PoolInfo[]>(async ({ ctx }) => {
     const { publicClient, contracts } = ctx;

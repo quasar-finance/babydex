@@ -1,5 +1,6 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js";
+import { serve } from "std/http/server.ts";
+import { createClient } from "@supabase/supabase-js";
+
 
 // the supabase url and service role key are set by default in production
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;

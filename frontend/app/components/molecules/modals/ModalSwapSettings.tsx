@@ -1,7 +1,7 @@
 import BasicModal from "~/app/components/templates/BasicModal";
 import Input from "~/app/components/atoms/Input";
 import { useForm } from "react-hook-form";
-import MaxSlippageSwitcher from "../Swap/MaxSlippageSwitcher";
+import MaxSlippageSwitcher from "../MaxSlippageSwitcher";
 
 import type React from "react";
 

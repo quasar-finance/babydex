@@ -23,10 +23,6 @@ const MaxSlippageSwitcher: React.FC<Props> = ({ maxSlippage, setMaxSlippage, cus
     setCustom(false);
   };
 
-  /* useEffect(() => {
-    setCustom(maxSlippage !== slippage);
-  }, [maxSlippage, slippage]); */
-
   return (
     <motion.div className="bg-white/5 p-1 relative flex h-[38px] rounded-full">
       <motion.button

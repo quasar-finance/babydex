@@ -31,7 +31,7 @@ serve(async (req) => {
     console.log('Filtered pools:', newPools);
 
     if (newPools && newPools.length > 0) {
-      console.log(`Found ${newPools.length} new pools`)
+      console.log(`Found ${newPools.length} new pools`);
       
       for (const pool of newPools) {
         console.log(pool);
@@ -39,33 +39,33 @@ serve(async (req) => {
           p_address: pool.pool_address,
           p_internal_chain_id: pool.internal_chain_id,
           p_height: pool.height
-        })
+        });
 
         if (error) {
-          console.error(`RPC error for pool ${pool.pool_address}:`, error)
-          throw error
+          console.error(`RPC error for pool ${pool.pool_address}:`, error);
+          throw error;
         }
         
         if (!data.success) {
-          console.error(`Function error for pool ${pool.pool_address}:`, JSON.stringify(data.error))
-          throw new Error(`Function error for pool ${pool.pool_address}: ${JSON.stringify(data.error)}`)
+          console.error(`Function error for pool ${pool.pool_address}:`, JSON.stringify(data.error));
+          throw new Error(`Function error for pool ${pool.pool_address}: ${JSON.stringify(data.error)}`);
         }
-    }
+      }
       return new Response(
         JSON.stringify({ 
           success: true, 
           message: `Processed ${newPools.length} new pools` 
         }),
         { headers: { 'Content-Type': 'application/json' } }
-      )
+      );
     } else {
       return new Response(
         JSON.stringify({ success: true, message: 'No new pools found' }),
         { headers: { 'Content-Type': 'application/json' } }
-      )
+      );
     }
   } catch (error) {
-    console.error('Error:', error)
+    console.error('Error:', error);
     
     return new Response(
       JSON.stringify({ success: false, error: error }),
@@ -73,6 +73,6 @@ serve(async (req) => {
         status: 500,
         headers: { 'Content-Type': 'application/json' } 
       }
-    )
+    );
   }
-})
+});

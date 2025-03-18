@@ -14,6 +14,16 @@ import PoolsSkeleton from "../molecules/skeletons/PoolsSkeleton";
 import { CellPoolName } from "../atoms/cells/CellPoolName";
 import { CellTVL } from "../atoms/cells/CellTVL";
 import { CellData } from "../atoms/cells/CellData";
+import { Table, TableRow } from "../atoms/Table";
+
+const columns = [
+  { key: "name", title: "Pool", className: "col-span-2 lg:col-span-1" },
+  { key: "poolLiquidity", title: "TVL" },
+  { key: "apr", title: "APR" },
+  { key: "volume", title: "Volume 24h" },
+  { key: "fees", title: "Fees 24h" },
+  { key: "actions", title: "" },
+];
 
 const Pools: React.FC = () => {
   const { showModal } = useModal();
@@ -30,43 +40,26 @@ const Pools: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex flex-col gap-3">
-        <div className={twMerge("hidden lg:grid px-4 text-xs text-white/50", gridClass)}>
-          <p>Pool</p>
-          <p>TVL</p>
-          <p>APR</p>
-          <p>Volume 24h</p>
-          <p>Fees 24h</p>
-          <p></p>
-        </div>
-
-        <div className="flex flex-col gap-4 lg:gap-0">
-          {isLoading && <PoolsSkeleton className={gridClass} />}
-          {pools.map((pool, i) => (
-            <div
-              key={pool.name + i}
-              className={twMerge(
-                "rounded-2xl border lg:rounded-none lg:first:rounded-t-2xl lg:last:rounded-b-2xl lg:border-b-0 lg:last:border-b-1 border-white/10 p-4 grid items-center bg-tw-bg/50 backdrop-blur-md",
-                gridClass,
-              )}
-            >
-              <CellPoolName assets={pool.assets} name={pool.name} />
-              <CellTVL poolLiquidity={pool.poolLiquidity} />
-              <CellData title="APR" />
-              <CellData title="Volume 24h" />
-              <CellData title="Fees 24h" />
-              <div className=" flex lg:items-end lg:justify-end">
-                <Button
-                  variant="flat"
-                  onPress={() => showModal(ModalTypes.deposit_lp, true, { pool })}
-                >
-                  Add Liquidity
-                </Button>
-              </div>
+      <Table columns={columns} gridClass={gridClass}>
+        {isLoading && <PoolsSkeleton className={twMerge("grid", gridClass)} />}
+        {pools.map((pool, i) => (
+          <TableRow key={i} gridClass={twMerge("grid", gridClass)}>
+            <CellPoolName assets={pool.assets} name={pool.name} />
+            <CellTVL poolLiquidity={pool.poolLiquidity} />
+            <CellData title="APR" />
+            <CellData title="Volume 24h" />
+            <CellData title="Fees 24h" />
+            <div className="flex lg:items-end lg:justify-end">
+              <Button
+                variant="flat"
+                onPress={() => showModal(ModalTypes.deposit_lp, true, { pool })}
+              >
+                Add Liquidity
+              </Button>
             </div>
-          ))}
-        </div>
-      </div>
+          </TableRow>
+        ))}
+      </Table>
     </div>
   );
 };

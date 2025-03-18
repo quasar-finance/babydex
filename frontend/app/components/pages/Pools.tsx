@@ -1,10 +1,7 @@
 "use client";
 import Input from "../atoms/Input";
-import { mockPools } from "~/utils/consts";
 import { Button } from "../atoms/Button";
-import Pill from "../atoms/Pill";
 import { twMerge } from "~/utils/twMerge";
-import AssetsStacked from "../atoms/AssetsStacked";
 import { useModal } from "~/app/providers/ModalProvider";
 import { ModalTypes } from "~/types/modal";
 import { trpc } from "~/trpc/client";
@@ -15,6 +12,7 @@ import { CellPoolName } from "../atoms/cells/CellPoolName";
 import { CellTVL } from "../atoms/cells/CellTVL";
 import { CellData } from "../atoms/cells/CellData";
 import { Table, TableRow } from "../atoms/Table";
+import { Pagination } from "../atoms/Pagination";
 
 const columns = [
   { key: "name", title: "Pool", className: "col-span-2 lg:col-span-1" },
@@ -60,6 +58,7 @@ const Pools: React.FC = () => {
           </TableRow>
         ))}
       </Table>
+      <Pagination total={5} className={{ base: "self-center backdrop-blur-xl rounded-3xl p-1" }} />
     </div>
   );
 };

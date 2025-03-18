@@ -50,6 +50,11 @@ export const Button = extendVariants(NextButton, {
         "bg-transparent border-tw-orange-400 text-tw-orange-400 hover:!bg-tw-orange-400 hover:!text-tw-bg",
     },
     {
+      variant: "light",
+      color: "primary",
+      class: "bg-transparent hover:text-tw-orange-400 hover:bg-transparent",
+    },
+    {
       color: "secondary",
       class: "bg-tw-orange-400/20 text-tw-orange-400 hover:bg-tw-orange-400/10",
     },

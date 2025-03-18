@@ -1,8 +1,7 @@
 {
   "name": "tower-monorepo",
-  "packageManager": "pnpm@9.15.9",
+  "packageManager": "pnpm@10.6.4",
   "engines": {
-    "pnpm": ">=9.0.0",
     "node": ">=22.0.0"
   },
   "scripts": {

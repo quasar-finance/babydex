@@ -9,75 +9,6 @@ export default function TestComponents() {
       <h2 className="text-xl">BUTTONS</h2>
       <div className="flex gap-4 flex-wrap">
         <Button variant="solid">Solid</Button>
-        <Button variant="faded">Faded</Button>
-        <Button variant="bordered">Bordered</Button>
-        <Button variant="light">Light</Button>
-        <Button variant="flat">Flat</Button>
-        <Button variant="ghost">Ghost</Button>
-        <Button variant="shadow">Shadow</Button>
-      </div>
-      <div className="flex gap-4 flex-wrap">
-        <Button color="blue" variant="solid">
-          Solid
-        </Button>
-        <Button color="blue" variant="faded">
-          Faded
-        </Button>
-        <Button color="blue" variant="bordered">
-          Bordered
-        </Button>
-        <Button color="blue" variant="light">
-          Light
-        </Button>
-        <Button color="blue" variant="flat">
-          Flat
-        </Button>
-        <Button color="blue" variant="ghost">
-          Ghost
-        </Button>
-        <Button color="blue" variant="shadow">
-          Shadow
-        </Button>
-      </div>
-      <div className="flex gap-4 flex-wrap">
-        <Button color="green" variant="solid">
-          Solid
-        </Button>
-        <Button color="green" variant="faded">
-          Faded
-        </Button>
-        <Button color="green" variant="bordered">
-          Bordered
-        </Button>
-        <Button color="green" variant="light">
-          Light
-        </Button>
-        <Button color="green" variant="flat">
-          Flat
-        </Button>
-        <Button color="green" variant="ghost">
-          Ghost
-        </Button>
-        <Button color="green" variant="shadow">
-          Shadow
-        </Button>
-      </div>
-      <div className="flex gap-4 flex-wrap">
-        <Button color="gradient" variant="solid">
-          Solid
-        </Button>
-        <Button color="gradient" variant="faded">
-          Faded
-        </Button>
-        <Button color="gradient" variant="light">
-          Light
-        </Button>
-        <Button color="gradient" variant="flat">
-          Flat
-        </Button>
-        <Button color="gradient" variant="shadow">
-          Shadow
-        </Button>
       </div>
 
       <h2 className="text-xl">TOASTS</h2>
@@ -105,7 +36,11 @@ export default function TestComponents() {
                 <label className="sr-only" htmlFor="currency">
                   Currency
                 </label>
-                <select className="outline-none border-0 bg-transparent text-default-400 text-small" id="currency" name="currency">
+                <select
+                  className="outline-none border-0 bg-transparent text-default-400 text-small"
+                  id="currency"
+                  name="currency"
+                >
                   <option>USD</option>
                   <option>ARS</option>
                   <option>EUR</option>

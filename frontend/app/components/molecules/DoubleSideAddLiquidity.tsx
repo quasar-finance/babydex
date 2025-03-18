@@ -1,4 +1,4 @@
-import { useForm } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import type { PoolInfo } from "@towerfi/types";
 import type React from "react";
 import { useAccount, useBalances, useSigningClient } from "@cosmi/react";
@@ -8,17 +8,18 @@ import { IconWallet } from "@tabler/icons-react";
 import { trpc } from "~/trpc/client";
 import { useModal } from "~/app/providers/ModalProvider";
 import { ModalTypes } from "~/types/modal";
+import type { DepositFormData } from "./modals/ModalDepositLP";
+import { useImperativeHandle } from "react";
 
 interface Props {
   pool: PoolInfo;
-  slipageTolerance: string;
-  setLoading: (loading: boolean) => void;
+  submitRef: React.MutableRefObject<{ onSubmit: (data: DepositFormData) => Promise<void> } | null>;
 }
 
-export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, slipageTolerance, setLoading }) => {
+export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => {
   const { toast } = useToast();
   const { address } = useAccount();
-  const { register, watch, setValue, handleSubmit } = useForm();
+  const { register, watch, setValue } = useFormContext();
   const { data: signingClient } = useSigningClient();
   const [token0, token1] = pool.assets;
   const { showModal } = useModal();
@@ -43,56 +44,58 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, slipageTolerance
     { t0Balance: "0", t1Balance: "0" },
   );
 
-  const onSubmit = handleSubmit(async (data) => {
-    try {
-      if (!signingClient) throw new Error("we couldn't submit the tx");
-      setLoading(true);
-      const id = toast.loading({
-        title: "Depositing",
-        description: `Depositing ${data[token0.symbol]} ${token0.symbol} and ${data[token1.symbol]} ${token1.symbol} to the pool`,
-      });
+  const t0DenomBalance = convertMicroDenomToDenom(t0Balance, token0.decimals);
+  const t1DenomBalance = convertMicroDenomToDenom(t1Balance, token1.decimals);
 
-      const token0Amount = convertDenomToMicroDenom(data[token0.symbol], token0.decimals);
-      const token1Amount = convertDenomToMicroDenom(data[token1.symbol], token1.decimals);
-      await signingClient.execute({
-        execute: {
-          address: pool.poolAddress,
-          message: {
-            provide_liquidity: {
-              assets: [
-                { amount: token0Amount, info: { native_token: { denom: token0.denom } } },
-                { amount: token1Amount, info: { native_token: { denom: token1.denom } } },
-              ],
-              slippage_tolerance: slipageTolerance,
+  useImperativeHandle(submitRef, () => ({
+    onSubmit: async ({ slipageTolerance, ...data }) => {
+      try {
+        if (!signingClient) throw new Error("we couldn't submit the tx");
+        const id = toast.loading({
+          title: "Depositing",
+          description: `Depositing ${data[token0.symbol]} ${token0.symbol} and ${data[token1.symbol]} ${token1.symbol} to the pool`,
+        });
+
+        const token0Amount = convertDenomToMicroDenom(data[token0.symbol], token0.decimals);
+        const token1Amount = convertDenomToMicroDenom(data[token1.symbol], token1.decimals);
+        await signingClient.execute({
+          execute: {
+            address: pool.poolAddress,
+            message: {
+              provide_liquidity: {
+                assets: [
+                  { amount: token0Amount, info: { native_token: { denom: token0.denom } } },
+                  { amount: token1Amount, info: { native_token: { denom: token1.denom } } },
+                ],
+                slippage_tolerance: slipageTolerance,
+              },
             },
+            funds: [
+              { denom: token0.denom, amount: token0Amount },
+              { denom: token1.denom, amount: token1Amount },
+            ],
           },
-          funds: [
-            { denom: token0.denom, amount: token0Amount },
-            { denom: token1.denom, amount: token1Amount },
+          sender: address as string,
+        });
+        toast.dismiss(id);
+        await refreshBalances();
+        showModal(ModalTypes.deposit_completed, true, {
+          tokens: [
+            { amount: token0Amount, ...token0 },
+            { amount: token1Amount, ...token1 },
           ],
-        },
-        sender: address as string,
-      });
-      toast.dismiss(id);
-      await refreshBalances();
-      showModal(ModalTypes.deposit_completed, true, {
-        tokens: [
-          { amount: token0Amount, ...token0 },
-          { amount: token1Amount, ...token1 },
-        ],
-      });
-    } catch (error) {
-      toast.error({
-        title: "Deposit failed",
-        description: `Failed to deposit ${data[token0.symbol]} ${token0.symbol} and ${data[token1.symbol]} ${token1.symbol} to the pool`,
-      });
-    } finally {
-      setLoading(false);
-    }
-  });
+        });
+      } catch (error) {
+        toast.error({
+          title: "Deposit failed",
+          description: `Failed to deposit ${data[token0.symbol]} ${token0.symbol} and ${data[token1.symbol]} ${token1.symbol} to the pool`,
+        });
+      }
+    },
+  }));
 
   return (
-    <form id="addLiquidity" onSubmit={onSubmit} className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-4 bg-white/5 w-full rounded-xl p-4 flex-1">
         <div className="w-full flex gap-4 items-center justify-between">
           <div className="flex items-center gap-2 p-2 pr-3 bg-white/5 rounded-full w-fit">
@@ -106,7 +109,7 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, slipageTolerance
               validate: (value) => {
                 if (value === "") return "Amount is required";
                 if (Number.isNaN(+value)) return "Only enter digits to bond to a vault";
-                if (Number(value) > Number(t0Balance)) return "Insufficient Amount";
+                if (Number(value) > Number(t0DenomBalance)) return "Insufficient Amount";
                 if (Number(value) <= 0) return "Amount must be greater than 0";
               },
             })}
@@ -125,7 +128,7 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, slipageTolerance
         <div className="flex gap-2 items-center justify-between text-white/50 text-xs">
           <div className="flex gap-1 items-center">
             <IconWallet className="h-4 w-4" />
-            <p>{convertMicroDenomToDenom(t0Balance, token0.decimals)}</p>
+            <p>{t0DenomBalance}</p>
           </div>
           <p>$0</p>
         </div>
@@ -144,7 +147,7 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, slipageTolerance
               validate: (value) => {
                 if (value === "") return "Amount is required";
                 if (Number.isNaN(+value)) return "Only enter digits to bond to a vault";
-                if (Number(value) > Number(t0Balance)) return "Insufficient Amount";
+                if (Number(value) > Number(t1DenomBalance)) return "Insufficient Amount";
                 if (Number(value) <= 0) return "Amount must be greater than 0";
               },
             })}
@@ -163,11 +166,11 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, slipageTolerance
         <div className="flex gap-2 items-center justify-between text-white/50 text-xs">
           <div className="flex gap-1 items-center">
             <IconWallet className="h-4 w-4" />
-            <p>{convertMicroDenomToDenom(t1Balance, token1.decimals)}</p>
+            <p>{t1DenomBalance}</p>
           </div>
           <p>$0</p>
         </div>
       </div>
-    </form>
+    </div>
   );
 };

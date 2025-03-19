@@ -181,7 +181,7 @@ const FaucetForm: React.FC = () => {
           </label>
           <Dropdown
             defaultValue={AVAILABLE_DENOMS[0]}
-            options={AVAILABLE_DENOMS}
+            options={[...AVAILABLE_DENOMS]} // Convert readonly array to mutable
             onChange={(item) => setSelectedDenom(item.value)}
             classNames={{
               container: "w-full",

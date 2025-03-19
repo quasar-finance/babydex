@@ -12,6 +12,10 @@ export const navLinks: { label: string; to: string; isDisabled?: boolean; isExte
       label: "Dashboard",
       to: "/dashboard",
     },
+    {
+      label: "Faucet",
+      to: "/faucet",
+    }
     /* {
     label: "Vote",
     to: "/vote",

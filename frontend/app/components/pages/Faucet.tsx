@@ -7,8 +7,10 @@ import { useAccount } from "wagmi";
 import { Button } from "../atoms/Button";
 import { twMerge } from "~/utils/twMerge";
 
+const FAUCET_API_URL = "";
+const TURNSTILE_KEY = "";
+
 interface FaucetResponse {
-  // Adjust to match the actual structure your faucet API returns
   success: boolean;
   message?: string;
   txHash?: string;
@@ -21,29 +23,25 @@ const FaucetForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [resultMessage, setResultMessage] = useState("");
 
-  // Set the connected wallet address when it changes
   useEffect(() => {
     if (connectedAddress) {
       setAddress(connectedAddress);
     }
   }, [connectedAddress]);
 
-  // Handle form submission
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setResultMessage(""); // Clear old messages
+    setResultMessage("");
     setLoading(true);
 
     try {
-      // Make sure you've got your real endpoint & request structure here:
-      const res = await fetch("https://api.unionlabs.ai/faucet", {
+      const res = await fetch(FAUCET_API_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           address,
-          // Turnstile token is usually expected in some field, e.g. `captchaToken`
           captchaToken, 
         }),
       });
@@ -54,13 +52,11 @@ const FaucetForm: React.FC = () => {
         throw new Error(data.message || "Failed to get faucet funds");
       }
 
-      // If successful, you might get a transaction hash, or something similar
       setResultMessage(
         data.txHash
           ? `Success! TxHash: ${data.txHash}`
           : data.message || "Success!"
       );
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       setResultMessage("An unknown error occurred.");
     } finally {
@@ -100,7 +96,7 @@ const FaucetForm: React.FC = () => {
         </div>
 
         <Turnstile
-          turnstileSiteKey="0x4AAAAAABBnKau3xkStNjot"
+          turnstileSiteKey={TURNSTILE_KEY}
           callback={(token: string) => {
             setCaptchaToken(token);
             setResultMessage("");

@@ -1,7 +1,8 @@
 packages:
-  - trpc
-  - frontend
-  - types
+  - "trpc"
+  - "frontend"
+  - "types"
+  - "indexer"
 packageOptions:
   overrides:
     '@tanstack/react-query': ^4.0.0

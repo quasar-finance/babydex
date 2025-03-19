@@ -107,6 +107,9 @@ importers:
       react:
         specifier: 19.0.0
         version: 19.0.0
+      react-cloudflare-turnstile:
+        specifier: ^1.1.5
+        version: 1.1.5(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       react-dom:
         specifier: 19.0.0
         version: 19.0.0(react@19.0.0)
@@ -3897,6 +3900,12 @@ packages:
 
   radix3@1.1.2:
     resolution: {integrity: sha512-b484I/7b8rDEdSDKckSSBA8knMpcdsXudlE/LNL639wFoHKwLbEkQFZHWEYwDC0wa0FKUcCY+GAF73Z7wxNVFA==}
+
+  react-cloudflare-turnstile@1.1.5:
+    resolution: {integrity: sha512-L0obTtOBkkjt0SavxYUt3807RaXD8MesqfwD2qDL6a4jtTf7+l41fdn+kiO6nE57TWRINUFCCqVvBWybrxuMEQ==}
+    peerDependencies:
+      react: '>= 17.0.0'
+      react-dom: '>= 17.0.0'
 
   react-dom@19.0.0:
     resolution: {integrity: sha512-4GV5sHFG0e/0AD4X+ySy6UJd3jVl1iNsNHdpad0qhABJ11twS3TTBnseqsKurKcsNqCEFeGL3uLpVChpIO3QfQ==}
@@ -9370,6 +9379,11 @@ snapshots:
   quick-format-unescaped@4.0.4: {}
 
   radix3@1.1.2: {}
+
+  react-cloudflare-turnstile@1.1.5(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
+    dependencies:
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
 
   react-dom@19.0.0(react@19.0.0):
     dependencies:

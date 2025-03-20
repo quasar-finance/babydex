@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
-import { asc, desc } from "drizzle-orm";
+import {asc, desc, sql} from "drizzle-orm";
 import { StringChunk } from "drizzle-orm/sql/sql";
 
 import {
@@ -74,5 +74,36 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     return await dynamicQuery;
   }
 
-  return { queryView } as Indexer;
+  async function getLatestPoolBalances(limit: number, offset: number) {
+    const query = `
+        SELECT
+            p.*
+        FROM
+            pool_balance p
+        INNER JOIN (
+            SELECT
+                pool_address,
+                MAX(height) AS max_height
+            FROM
+                pool_balance
+            GROUP BY
+                pool_address
+        ) latest ON p.pool_address = latest.pool_address AND p.height = latest.max_height
+        ORDER BY p.pool_address
+        LIMIT ${limit}
+        OFFSET ${offset};
+    `;
+
+    try {
+      const result = await client.execute(sql`${query}`);
+
+      return result.rows;
+    } catch (error) {
+      console.error('Error executing raw query:', error);
+
+      return null;
+    }
+  }
+
+  return { queryView, getLatestPoolBalances } as Indexer;
 };

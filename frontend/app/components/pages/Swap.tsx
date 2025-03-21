@@ -1,23 +1,21 @@
 "use client";
 
-import { IconChevronDown, IconSettingsFilled } from "@tabler/icons-react";
+import { IconSettingsFilled } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { Button } from "../atoms/Button";
 import { ModalTypes } from "~/types/modal";
 import { useModal } from "~/app/providers/ModalProvider";
 import { motion } from "motion/react";
-import RotateButton from "../atoms/RotateButton";
-import { mockTokens } from "~/utils/consts";
 import SwapInfoAccordion from "../molecules/Swap/SwapInfoAccordion";
 import { useAccount } from "@cosmi/react";
+import { Tab, TabList, TabContent, Tabs } from "../atoms/Tabs";
+import { Swap } from "../organisms/swap/Swap";
+import { Bridge } from "../organisms/swap/Bridge";
 
 const SwapComponent: React.FC = () => {
-  const [fromToken, setFromToken] = useState(mockTokens[0]);
-  const [toToken, setToToken] = useState(mockTokens[1]);
   const [_isConnected, _setIsConnected] = useState(false);
   const { isConnected } = useAccount();
   const { showModal } = useModal();
-  const [activeTab, setActiveTab] = useState<"swap" | "bridge">("swap");
 
   useEffect(() => {
     _setIsConnected(isConnected);
@@ -26,46 +24,29 @@ const SwapComponent: React.FC = () => {
   return (
     <>
       <div className="flex flex-col gap-4 max-w-[434px] mx-auto py-8 px-4 relative z-20">
-        <div className="w-full flex-1 flex items-center justify-center bg-tw-sub-bg rounded-2xl p-2 flex-col">
-          <div className="flex items-center justify-between w-full p-4">
-            <p className="text-xl">Swap </p>
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => showModal(ModalTypes.swap_settings, true)}
-            >
-              <IconSettingsFilled className="w-5 h-5" />
-            </motion.button>
-          </div>
-          <div className="flex flex-col gap-2 w-full items-center justify-center">
-            <div className="w-full rounded-xl p-4 bg-tw-bg">
-              <div className="flex items-center justify-between">
-                <motion.button
-                  className="flex items-center gap-2 p-2 bg-white/5 rounded-full"
-                  onClick={() => showModal(ModalTypes.select_asset, true)}
-                >
-                  <img src={fromToken.logoURI} alt={fromToken.name} className="w-7 h-7" />
-                  <p>{fromToken.symbol}</p>
-                  <IconChevronDown className="h-4 w-4" />
-                </motion.button>
-                <p>0.00</p>
-              </div>
-            </div>
-            <RotateButton />
-            <div className="w-full rounded-xl p-4 bg-tw-bg">
-              <div className="flex items-center justify-between">
-                <motion.button
-                  className="flex items-center gap-2 p-2 bg-white/5 rounded-full"
-                  onClick={() => showModal(ModalTypes.select_asset, true)}
-                >
-                  <img src={toToken.logoURI} alt={toToken.name} className="w-7 h-7" />
-                  <p>{toToken.symbol}</p>
-                  <IconChevronDown className="h-4 w-4" />
-                </motion.button>
-                <p>0.00</p>
-              </div>
-            </div>
-          </div>
+        <div className="w-full flex-1 flex items-center justify-center bg-tw-sub-bg rounded-2xl p-2 flex-col relative">
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => showModal(ModalTypes.swap_settings, true)}
+            className="absolute top-4 right-4 p-2 bg-tw-bg rounded-full"
+          >
+            <IconSettingsFilled className="w-5 h-5" />
+          </motion.button>
+
+          <Tabs defaultKey="swap">
+            <TabList>
+              <Tab tabKey="swap">Swap</Tab>
+              <Tab tabKey="bridge">Bridge</Tab>
+            </TabList>
+
+            <TabContent tabKey="swap">
+              <Swap />
+            </TabContent>
+            <TabContent tabKey="bridge">
+              <Bridge />
+            </TabContent>
+          </Tabs>
         </div>
         <div className="w-full px-4 flex flex-col gap-6">
           {_isConnected ? (

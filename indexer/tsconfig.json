@@ -27,5 +27,6 @@
     "exclude": [
         "node_modules",
         "build"
-    ]
+    ],
+    "typeRoots": ["./global.d.ts", "./node_modules/@types"]
 }

@@ -1,7 +1,7 @@
-import { drizzle } from "drizzle-orm/node-postgres";
-import { Pool } from "pg";
+import {drizzle} from "drizzle-orm/node-postgres";
+import {Pool} from "pg";
 import {asc, desc, sql} from "drizzle-orm";
-import { StringChunk } from "drizzle-orm/sql/sql";
+import {StringChunk} from "drizzle-orm/sql/sql";
 
 import {
   addLiquidityInV1Cosmos,
@@ -31,7 +31,14 @@ export type Indexer = {
   queryView: <T extends keyof typeof views>(
     viewName: T,
     filters?: IndexerFilters,
-  ) => Promise<(typeof views)[T]["$inferSelect"]>;
+  ) => Promise<(typeof views)[T]["$inferSelect"][]>;
+  getLatestPoolBalances: (
+    limit: number,
+    offset: number
+  ) => Promise<Record<string, unknown>[] | null>;
+  getPoolBalancesByAddresses: (
+    addresses: string[]
+  ) => Promise<Record<string, unknown>[] | null>;
 };
 
 export type IndexerFilters = {
@@ -60,7 +67,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
 
     if (!filters) return await query;
 
-    const { orderBy = "asc", page = 1, limit = 50, orderByColumn } = filters;
+    const {orderBy = "asc", page = 1, limit = 50, orderByColumn} = filters;
 
     const dynamicQuery = query.$dynamic();
 
@@ -74,28 +81,21 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     return await dynamicQuery;
   }
 
-  async function getLatestPoolBalances(limit: number, offset: number) {
-    const query = `
-        SELECT
-            p.*
-        FROM
-            pool_balance p
-        INNER JOIN (
-            SELECT
-                pool_address,
-                MAX(height) AS max_height
-            FROM
-                pool_balance
-            GROUP BY
-                pool_address
-        ) latest ON p.pool_address = latest.pool_address AND p.height = latest.max_height
+  async function getLatestPoolBalances(limit: number, offset: number): Promise<Record<string, unknown>[] | null> {
+    const query = sql`
+        SELECT p.*
+        FROM v1_cosmos.pool_balance p
+                 INNER JOIN (SELECT pool_address,
+                                    MAX(height) AS max_height
+                             FROM v1_cosmos.pool_balance
+                             GROUP BY pool_address) latest
+                            ON p.pool_address = latest.pool_address AND p.height = latest.max_height
         ORDER BY p.pool_address
-        LIMIT ${limit}
-        OFFSET ${offset};
+        LIMIT ${limit} OFFSET ${offset};
     `;
 
     try {
-      const result = await client.execute(sql`${query}`);
+      const result = await client.execute(query);
 
       return result.rows;
     } catch (error) {
@@ -105,5 +105,50 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     }
   }
 
-  return { queryView, getLatestPoolBalances } as Indexer;
-};
+  async function getPoolBalancesByAddresses(addresses: string[]): Promise<Record<string, unknown>[] | null> {
+    const pool_addresses_sql = sql.raw(createPoolAddressArraySql(addresses));
+    const query = sql`
+        SELECT
+            p.*
+        FROM
+            v1_cosmos.pool_balance p
+                INNER JOIN (
+                SELECT
+                    pool_address,
+                    MAX(height) AS max_height
+                FROM
+                    v1_cosmos.pool_balance
+                WHERE
+                    ${pool_addresses_sql}
+                GROUP BY
+                    pool_address
+            ) latest ON p.pool_address = latest.pool_address AND p.height = latest.max_height
+        WHERE
+            p.${pool_addresses_sql}
+        ORDER BY
+            p.pool_address;
+    `;
+
+    try {
+      const result = await client.execute(query);
+
+      return result.rows;
+    } catch (error) {
+      console.error('Error executing raw query:', error);
+
+      return null;
+    }
+  }
+
+  function createPoolAddressArraySql(addresses: string[]): string {
+    if (!addresses || addresses.length === 0) {
+      return `pool_address = ANY('{}'::text[])`;
+    }
+
+    const quotedAddresses = addresses.map(address => `"${address}"`).join(',');
+
+    return `pool_address = ANY('{${quotedAddresses}}'::text[])`;
+  }
+
+  return {queryView, getLatestPoolBalances, getPoolBalancesByAddresses} as Indexer;
+}

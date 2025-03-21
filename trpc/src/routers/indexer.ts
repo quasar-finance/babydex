@@ -1,41 +1,51 @@
-import { createTRPCPublicProcedure, createTRPCRouter } from "../config.js";
-import { z } from "zod";
+import {createTRPCPublicProcedure, createTRPCRouter} from "../config.js";
+import {z} from "zod";
 
 const input = z
   .object({
     orderBy: z.enum(["asc", "desc"]).optional(),
     orderByColumn: z.string().optional(),
-    page: z.number().min(1).optional(),
+    page: z.number().min(0).optional(),
     limit: z.number().min(1).max(100).optional(),
   })
   .optional();
 
 export const indexerRouter = createTRPCRouter({
-  addLiquidity: createTRPCPublicProcedure.input(input).query(async ({ ctx, input }) => {
+  addLiquidity: createTRPCPublicProcedure.input(input).query(async ({ctx, input}) => {
     return await ctx.indexerService.queryView("addLiquidity", input);
   }),
-  historicPoolYield: createTRPCPublicProcedure.input(input).query(async ({ ctx, input }) => {
+  historicPoolYield: createTRPCPublicProcedure.input(input).query(async ({ctx, input}) => {
     return await ctx.indexerService.queryView("historicPoolYield", input);
   }),
-  incentivize: createTRPCPublicProcedure.input(input).query(async ({ ctx, input }) => {
+  incentivize: createTRPCPublicProcedure.input(input).query(async ({ctx, input}) => {
     return await ctx.indexerService.queryView("incentivize", input);
   }),
-  pools: createTRPCPublicProcedure.input(input).query(async ({ ctx, input }) => {
+  pools: createTRPCPublicProcedure.input(input).query(async ({ctx, input}) => {
     return await ctx.indexerService.queryView("pools", input);
   }),
-  poolBalance: createTRPCPublicProcedure.input(input).query(async ({ ctx, input }) => {
+  poolBalance: createTRPCPublicProcedure.input(input).query(async ({ctx, input}) => {
     return await ctx.indexerService.queryView("poolBalance", input);
   }),
-  poolFeePeriods: createTRPCPublicProcedure.input(input).query(async ({ ctx, input }) => {
+  poolFeePeriods: createTRPCPublicProcedure.input(input).query(async ({ctx, input}) => {
     return await ctx.indexerService.queryView("poolFeePeriods", input);
   }),
-  poolUserShares: createTRPCPublicProcedure.input(input).query(async ({ ctx, input }) => {
+  poolUserShares: createTRPCPublicProcedure.input(input).query(async ({ctx, input}) => {
     return await ctx.indexerService.queryView("poolUserShares", input);
   }),
-  swap: createTRPCPublicProcedure.input(input).query(async ({ ctx, input }) => {
+  swap: createTRPCPublicProcedure.input(input).query(async ({ctx, input}) => {
     return await ctx.indexerService.queryView("swap", input);
   }),
-  withdrawLiquidity: createTRPCPublicProcedure.input(input).query(async ({ ctx, input }) => {
+  withdrawLiquidity: createTRPCPublicProcedure.input(input).query(async ({ctx, input}) => {
     return await ctx.indexerService.queryView("withdrawLiquidity", input);
   }),
+  getLatestPoolBalances: createTRPCPublicProcedure
+    .input(z.object({page: z.number().min(0), limit: z.number().min(1).max(100)}))
+    .query(async ({ctx, input}) => {
+      return await ctx.indexerService.getLatestPoolBalances(input.limit, input.page);
+    }),
+  getPoolBalancesByAddresses: createTRPCPublicProcedure
+    .input(z.object({addresses: z.string().array()}))
+    .query(async ({ctx, input}) => {
+      return await ctx.indexerService.getPoolBalancesByAddresses(input.addresses);
+    }),
 });

@@ -5,7 +5,7 @@ const input = z
   .object({
     orderBy: z.enum(["asc", "desc"]).optional(),
     orderByColumn: z.string().optional(),
-    page: z.number().min(1).optional(),
+    page: z.number().min(0).optional(),
     limit: z.number().min(1).max(100).optional(),
   })
   .optional();

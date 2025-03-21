@@ -10,7 +10,7 @@ const medias = {
   "2xl": 1536,
 };
 
-const useMediaQuery = (size: MediaBreakpoints) => {
+export const useMediaQuery = (size: MediaBreakpoints) => {
   const [matchSize, setMatchSize] = useState<boolean>(false);
 
   useEffect(() => {
@@ -24,5 +24,3 @@ const useMediaQuery = (size: MediaBreakpoints) => {
 
   return matchSize;
 };
-
-export default useMediaQuery;

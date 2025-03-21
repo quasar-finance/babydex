@@ -39,7 +39,7 @@ const Dropdown: React.FC<Props> = ({
         <div className="relative">
           <MenuButton
             className={twMerge(
-              "z-10 group subpixel-antialiased flex items-center gap-2 p-2 pr-3 bg-white/5 rounded-full w-fit",
+              "z-10 group subpixel-antialiased flex items-center gap-2 p-2 pr-3 bg-white/5 rounded-full w-fit transition-all",
               open ? "scale-[0.97] opacity-70" : "",
               classNames?.container,
             )}

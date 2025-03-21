@@ -3,8 +3,8 @@ import { NavLinks } from "./NavLinks";
 import { MenuMobile } from "./MenuMobile";
 import { useState } from "react";
 import { ConnectWallet } from "../../molecules/ConnectWallet";
-import useMediaQuery from "~/app/hooks/useMediaQuery";
 import { Hamburguer } from "../../atoms/Hamburguer";
+import { useMediaQuery } from "~/app/hooks";
 
 export const Header: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);

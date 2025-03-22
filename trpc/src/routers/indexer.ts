@@ -41,11 +41,11 @@ export const indexerRouter = createTRPCRouter({
   getLatestPoolBalances: createTRPCPublicProcedure
     .input(z.object({page: z.number().min(0), limit: z.number().min(1).max(100)}))
     .query(async ({ctx, input}) => {
-      return await ctx.indexerService.getLatestPoolBalances(input.limit, input.page);
+      return await ctx.indexerService.getCurrentPoolBalances(input.limit, input.page);
     }),
   getPoolBalancesByAddresses: createTRPCPublicProcedure
     .input(z.object({addresses: z.string().array()}))
     .query(async ({ctx, input}) => {
-      return await ctx.indexerService.getPoolBalancesByAddresses(input.addresses);
+      return await ctx.indexerService.getPoolBalancesByPoolAddresses(input.addresses);
     }),
 });

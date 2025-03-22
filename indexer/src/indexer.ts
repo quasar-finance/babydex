@@ -32,11 +32,11 @@ export type Indexer = {
     viewName: T,
     filters?: IndexerFilters,
   ) => Promise<(typeof views)[T]["$inferSelect"][]>;
-  getLatestPoolBalances: (
+  getCurrentPoolBalances: (
     limit: number,
     offset: number
   ) => Promise<Record<string, unknown>[] | null>;
-  getPoolBalancesByAddresses: (
+  getPoolBalancesByPoolAddresses: (
     addresses: string[]
   ) => Promise<Record<string, unknown>[] | null>;
 };
@@ -81,7 +81,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     return await dynamicQuery;
   }
 
-  async function getLatestPoolBalances(limit: number, offset: number): Promise<Record<string, unknown>[] | null> {
+  async function getCurrentPoolBalances(limit: number, offset: number): Promise<Record<string, unknown>[] | null> {
     const query = sql`
         SELECT p.*
         FROM v1_cosmos.pool_balance p
@@ -101,11 +101,11 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     } catch (error) {
       console.error('Error executing raw query:', error);
 
-      return null;
+      throw error;
     }
   }
 
-  async function getPoolBalancesByAddresses(addresses: string[]): Promise<Record<string, unknown>[] | null> {
+  async function getPoolBalancesByPoolAddresses(addresses: string[]): Promise<Record<string, unknown>[] | null> {
     const pool_addresses_sql = sql.raw(createPoolAddressArraySql(addresses));
     const query = sql`
         SELECT
@@ -119,12 +119,12 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
                 FROM
                     v1_cosmos.pool_balance
                 WHERE
-                    ${pool_addresses_sql}
+                    pool_address = ${pool_addresses_sql}
                 GROUP BY
                     pool_address
             ) latest ON p.pool_address = latest.pool_address AND p.height = latest.max_height
         WHERE
-            p.${pool_addresses_sql}
+            p.pool_address = ${pool_addresses_sql}
         ORDER BY
             p.pool_address;
     `;
@@ -136,19 +136,19 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     } catch (error) {
       console.error('Error executing raw query:', error);
 
-      return null;
+      throw error;
     }
   }
 
   function createPoolAddressArraySql(addresses: string[]): string {
     if (!addresses || addresses.length === 0) {
-      return `pool_address = ANY('{}'::text[])`;
+      return `ANY('{}'::text[])`;
     }
 
     const quotedAddresses = addresses.map(address => `"${address}"`).join(',');
 
-    return `pool_address = ANY('{${quotedAddresses}}'::text[])`;
+    return `ANY('{${quotedAddresses}}'::text[])`;
   }
 
-  return {queryView, getLatestPoolBalances, getPoolBalancesByAddresses} as Indexer;
+  return {queryView, getCurrentPoolBalances, getPoolBalancesByPoolAddresses} as Indexer;
 }

@@ -24,7 +24,7 @@
     "dev": "tsc -w",
     "build": "tsc",
     "drizzle-pull": "npx drizzle-kit pull",
-    "test": "vitest"
+    "test": "npx vitest"
   },
   "devDependencies": {
     "@towerfi/types": "workspace:^",

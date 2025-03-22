@@ -209,7 +209,6 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
 
       throw error;
     }
-
   }
 
   function createPoolAddressArraySql(addresses: string[]): string {

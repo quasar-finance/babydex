@@ -37,6 +37,7 @@ interface Props {
     container?: string;
     wrapper?: string;
   };
+  onClose?: () => void;
 }
 
 const BasicModal: React.FC<PropsWithChildren<Props>> = ({
@@ -46,6 +47,7 @@ const BasicModal: React.FC<PropsWithChildren<Props>> = ({
   classNames,
   separator = true,
   showClose = true,
+  onClose,
 }) => {
   const { hideModal } = useModal();
   return (
@@ -77,7 +79,7 @@ const BasicModal: React.FC<PropsWithChildren<Props>> = ({
             )}
           </div>
           {showClose && (
-            <button onClick={hideModal} type="button">
+            <button onClick={() => [hideModal(), onClose?.()]} type="button">
               <IconX
                 className={twMerge("h-5 w-5 text-white/20", {
                   "absolute right-4 top-4": !title && !subtitle,

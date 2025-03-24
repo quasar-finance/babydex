@@ -8,4 +8,6 @@ const base: BaseCurrency = {
     "https://raw.githubusercontent.com/cosmos/chain-registry/master/testnets/babylontestnet/images/logo.svg",
 };
 
-export const ubbn = { ubbn: base, "ibc/ubbn": base };
+export const ubbn = {
+  ubbn: base,
+};

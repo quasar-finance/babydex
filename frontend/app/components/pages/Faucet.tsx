@@ -15,8 +15,8 @@ import { useToast } from "~/app/hooks";
 import { Assets } from "~/config";
 import Link from "next/link";
 
-const FAUCET_API_URL = "";
-const TURNSTILE_KEY = "";
+const FAUCET_API_URL = "116.203.127.129";
+const TURNSTILE_KEY = "0x4AAAAAAA-eVs5k0b8Q1dl5";
 
 interface FaucetResponse {
   success: boolean;

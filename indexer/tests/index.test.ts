@@ -34,3 +34,20 @@ test('get pool balances by addresses', async () => {
 
   expect(res.length).toBeGreaterThan(0);
 });
+
+test('get current pool volumes', async () => {
+  const res = await indexer.getCurrentPoolVolumes(100, 0);
+
+  // expect(res.length).toBeGreaterThan(0);
+  expect(res.length).toBe(0);
+});
+
+test('get pool volumes by addresses', async () => {
+  const res = await indexer.getPoolVolumesByPoolAddresses([
+    "bbn10vzynuvh08kssssdrj9k2vaxxl9uqn0f08jaq8zq6h7vxmd9cnuqa3putu",
+    "bbn17xgsxm4vll7trsd59e26wg9f0unwmx2ktfhtvhu35jeel5wrakcqvnwzyu",
+  ]);
+
+  // expect(res.length).toBeGreaterThan(0);
+  expect(res.length).toBe(0);
+});

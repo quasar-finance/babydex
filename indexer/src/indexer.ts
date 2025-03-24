@@ -39,6 +39,13 @@ export type Indexer = {
   getPoolBalancesByPoolAddresses: (
     addresses: string[]
   ) => Promise<Record<string, unknown>[] | null>;
+  getCurrentPoolVolumes: (
+    limit: number,
+    offset: number
+  ) => Promise<Record<string, unknown>[] | null>;
+  getPoolVolumesByPoolAddresses: (
+    addresses: string[]
+  ) => Promise<Record<string, unknown>[] | null>;
 };
 
 export type IndexerFilters = {
@@ -109,25 +116,16 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
   async function getPoolBalancesByPoolAddresses(addresses: string[]): Promise<Record<string, unknown>[] | null> {
     const pool_addresses_sql = sql.raw(createPoolAddressArraySql(addresses));
     const query = sql`
-        SELECT
-            p.*
-        FROM
-            v1_cosmos.pool_balance p
-                INNER JOIN (
-                SELECT
-                    pool_address,
-                    MAX(height) AS max_height
-                FROM
-                    v1_cosmos.pool_balance
-                WHERE
-                    pool_address = ${pool_addresses_sql}
-                GROUP BY
-                    pool_address
-            ) latest ON p.pool_address = latest.pool_address AND p.height = latest.max_height
-        WHERE
-            p.pool_address = ${pool_addresses_sql}
-        ORDER BY
-            p.pool_address;
+        SELECT p.*
+        FROM v1_cosmos.pool_balance p
+                 INNER JOIN (SELECT pool_address,
+                                    MAX(height) AS max_height
+                             FROM v1_cosmos.pool_balance
+                             WHERE pool_address = ${pool_addresses_sql}
+                             GROUP BY pool_address) latest
+                            ON p.pool_address = latest.pool_address AND p.height = latest.max_height
+        WHERE p.pool_address = ${pool_addresses_sql}
+        ORDER BY p.pool_address;
     `;
 
     try {
@@ -141,6 +139,47 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     }
   }
 
+  async function getCurrentPoolVolumes(limit: number, offset: number): Promise<Record<string, unknown>[] | null> {
+    const query = sql`
+        SELECT pool_address,
+               SUM(offer_amount) AS total_volume
+        FROM v1_cosmos.swap
+        GROUP BY pool_address
+        ORDER BY pool_address
+        LIMIT ${limit} OFFSET ${offset};
+    `;
+    try {
+      const result = await client.execute(query);
+
+      return result.rows;
+    } catch (error) {
+      console.error('Error executing raw query:', error);
+
+      throw error;
+    }
+  }
+
+  async function getPoolVolumesByPoolAddresses(addresses: string[]): Promise<Record<string, unknown>[] | null> {
+    const pool_addresses_sql = sql.raw(createPoolAddressArraySql(addresses));
+    const query = sql`
+        SELECT pool_address,
+               SUM(offer_amount) AS total_volume
+        FROM v1_cosmos.swap
+        WHERE pool_address = ${pool_addresses_sql}
+        GROUP BY pool_address;`
+
+    try {
+      const result = await client.execute(query);
+
+      return result.rows;
+    } catch (error) {
+      console.error('Error executing raw query:', error);
+
+      throw error;
+    }
+
+  }
+
   function createPoolAddressArraySql(addresses: string[]): string {
     if (!addresses || addresses.length === 0) {
       return `ANY('{}'::text[])`;
@@ -151,5 +190,11 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     return `ANY('{${quotedAddresses}}'::text[])`;
   }
 
-  return {queryView, getCurrentPoolBalances, getPoolBalancesByPoolAddresses} as Indexer;
+  return {
+    queryView,
+    getCurrentPoolBalances,
+    getPoolBalancesByPoolAddresses,
+    getCurrentPoolVolumes,
+    getPoolVolumesByPoolAddresses,
+  } as Indexer;
 }

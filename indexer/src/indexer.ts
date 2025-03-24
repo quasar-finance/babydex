@@ -141,11 +141,24 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
 
   async function getCurrentPoolVolumes(limit: number, offset: number): Promise<Record<string, unknown>[] | null> {
     const query = sql`
-        SELECT pool_address,
-               SUM(offer_amount) AS total_volume
-        FROM v1_cosmos.swap
-        GROUP BY pool_address
-        ORDER BY pool_address
+        SELECT s.pool_address,
+               SUM(
+                       CASE
+                           WHEN s.offer_asset = pb.token0_denom THEN offer_amount
+                           ELSE 0
+                           END
+               )                   AS token0_volume,
+               SUM(
+                       CASE
+                           WHEN s.offer_asset = pb.token1_denom THEN offer_amount
+                           ELSE 0
+                           END
+               )                   AS token1_volume
+        FROM v1_cosmos.swap s
+                 JOIN
+             v1_cosmos.pool_balance pb ON s.pool_address = pb.pool_address
+        GROUP BY s.pool_address
+        ORDER BY s.pool_address
         LIMIT ${limit} OFFSET ${offset};
     `;
     try {
@@ -162,11 +175,29 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
   async function getPoolVolumesByPoolAddresses(addresses: string[]): Promise<Record<string, unknown>[] | null> {
     const pool_addresses_sql = sql.raw(createPoolAddressArraySql(addresses));
     const query = sql`
-        SELECT pool_address,
-               SUM(offer_amount) AS total_volume
-        FROM v1_cosmos.swap
-        WHERE pool_address = ${pool_addresses_sql}
-        GROUP BY pool_address;`
+        SELECT
+            s.pool_address,
+            SUM(
+                    CASE
+                        WHEN s.offer_asset = pb.token0_denom THEN offer_amount
+                        ELSE 0
+                        END
+            ) AS token0_volume,
+            SUM(
+                    CASE
+                        WHEN s.offer_asset = pb.token1_denom THEN offer_amount
+                        ELSE 0
+                        END
+            ) AS token1_volume
+        FROM
+            v1_cosmos.swap s
+                JOIN
+            v1_cosmos.pool_balance pb ON s.pool_address = pb.pool_address
+        WHERE
+            s.pool_address = ${pool_addresses_sql}
+        GROUP BY
+            s.pool_address;
+    `;
 
     try {
       const result = await client.execute(query);

@@ -19,6 +19,7 @@ interface TabContextType {
 interface TabProps {
   tabKey: string;
   disabled?: boolean;
+  className?: string;
 }
 
 const TabContext = createContext<TabContextType | undefined>(undefined);
@@ -53,7 +54,12 @@ export const TabList: React.FC<PropsWithChildren> = ({ children }) => {
   return <div className="relative flex items-center gap-1 w-fit rounded-full">{children}</div>;
 };
 
-export const Tab: React.FC<PropsWithChildren<TabProps>> = ({ tabKey, children, disabled }) => {
+export const Tab: React.FC<PropsWithChildren<TabProps>> = ({
+  tabKey,
+  children,
+  disabled,
+  className,
+}) => {
   const context = useContext(TabContext);
   if (!context) throw new Error("Tab must be used within a Tabs");
 
@@ -75,6 +81,7 @@ export const Tab: React.FC<PropsWithChildren<TabProps>> = ({ tabKey, children, d
         "relative px-[14px] py-[10px] rounded-full text-sm flex items-center gap-2 transition-all z-10",
         isActive ? colorVariants[context.color] : "text-white",
         disabled ? "opacity-30 cursor-not-allowed" : "hover:text-white/50",
+        className,
       )}
     >
       {children}

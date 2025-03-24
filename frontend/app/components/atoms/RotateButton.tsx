@@ -11,6 +11,7 @@ const RotateButton: React.FC<RotateButtonProps> = ({ className, onClick }) => {
   };
   return (
     <motion.button
+      type="button"
       animate={{ rotate: rotation }}
       transition={{ duration: 0.3 }}
       onClick={(e) => [onClick?.(e), handleRotate()]}

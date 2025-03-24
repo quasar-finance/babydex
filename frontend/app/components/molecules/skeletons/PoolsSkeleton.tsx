@@ -22,7 +22,7 @@ const PoolsSkeleton: React.FC<Props> = ({ className = "" }) => {
                   <AssetsStacked />
                   <Skeleton className="w-full h-6" />
                 </div>
-                <Pill className="animate-pulse ">-%</Pill>
+                <Pill className="animate-pulse ">type</Pill>
               </div>
             </div>
             <div className="flex flex-col gap-2">

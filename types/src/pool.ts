@@ -1,6 +1,6 @@
 import type { BaseCurrency, WithPrice } from "./currency.js";
 
-export type PoolType = "concentrated";
+export type PoolType = "concentrated" | "xyk";
 
 export type PoolInfo = {
   name: string;

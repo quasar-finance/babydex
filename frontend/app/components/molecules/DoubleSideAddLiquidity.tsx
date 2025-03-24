@@ -8,7 +8,7 @@ import { IconWallet } from "@tabler/icons-react";
 import { trpc } from "~/trpc/client";
 import { useModal } from "~/app/providers/ModalProvider";
 import { ModalTypes } from "~/types/modal";
-import type { DepositFormData } from "./modals/ModalDepositLP";
+import type { DepositFormData } from "./modals/ModalAddLiquidity";
 import { useImperativeHandle } from "react";
 
 interface Props {

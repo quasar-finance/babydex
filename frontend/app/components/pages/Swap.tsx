@@ -1,6 +1,6 @@
 "use client";
 
-import { IconSettingsFilled } from "@tabler/icons-react";
+import { IconReload, IconRepeat, IconSettingsFilled } from "@tabler/icons-react";
 import { Button } from "../atoms/Button";
 import { ModalTypes } from "~/types/modal";
 import { useModal } from "~/app/providers/ModalProvider";
@@ -16,6 +16,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { convertMicroDenomToDenom } from "~/utils/intl";
 import { Assets } from "~/config";
 import { babylonTestnet } from "~/config/chains/babylon-testnet";
+import { useToast } from "~/app/hooks";
 
 const assets = Object.values(Assets);
 
@@ -24,11 +25,16 @@ const SwapComponent: React.FC = () => {
   const { showModal } = useModal();
   const methods = useForm();
   const { formState, handleSubmit, setValue } = methods;
+  const { toast } = useToast();
   const { errors } = formState;
 
   const { data: skipClient } = useSkipClient();
 
-  const { data: simulation, mutateAsync: simulateSwap } = useMutation({
+  const {
+    data: simulation,
+    mutateAsync: simulateSwap,
+    isLoading,
+  } = useMutation({
     mutationFn: async ({
       amountIn,
       fromDenom,
@@ -55,6 +61,8 @@ const SwapComponent: React.FC = () => {
     },
   });
 
+  console.log(simulation);
+
   const onSubmit = handleSubmit(async () => {
     if (!skipClient || !simulation) throw new Error("error: no client or simulation");
     const { requiredChainAddresses } = simulation;
@@ -65,16 +73,29 @@ const SwapComponent: React.FC = () => {
         address: address as string,
       })),
       onTransactionCompleted: async (chainID, txHash, status) => {
-        console.log(`Route completed with tx hash: ${txHash} & status: ${status.state}`);
+        toast.success({
+          title: "Success",
+          description: `Route completed with tx hash: ${txHash} & status: ${status.state}`,
+        });
       },
       onTransactionBroadcast: async ({ txHash, chainID }) => {
-        console.log(`Transaction broadcasted with tx hash: ${txHash}`);
+        toast.success({
+          title: "Success",
+          description: `Transaction broadcasted with tx hash: ${txHash}`,
+        });
       },
       onTransactionTracked: async ({ txHash, chainID }) => {
         console.log(`Transaction tracked with tx hash: ${txHash}`);
+        toast.success({
+          title: "Success",
+          description: `Transaction tracked with tx hash: ${txHash}`,
+        });
       },
       onTransactionSigned: async ({ chainID }) => {
-        console.log(`Transaction signed with chain ID: ${chainID}`);
+        toast.success({
+          title: "Success",
+          description: `Transaction signed with chain ID: ${chainID}`,
+        });
       },
     });
   });
@@ -91,19 +112,25 @@ const SwapComponent: React.FC = () => {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={() => showModal(ModalTypes.swap_settings, true)}
-              className="absolute top-4 right-4 p-2 bg-tw-bg rounded-full"
+              className="absolute top-[10px] right-2 p-2 bg-tw-bg rounded-full z-10"
             >
               <IconSettingsFilled className="w-5 h-5" />
             </motion.button>
 
             <Tabs defaultKey="swap">
               <TabList>
-                <Tab tabKey="swap">Swap</Tab>
-                <Tab tabKey="bridge">Bridge</Tab>
+                <Tab tabKey="swap">
+                  <IconRepeat className="w-5 h-5" />
+                  <p>Swap</p>
+                </Tab>
+                <Tab tabKey="bridge" disabled>
+                  <IconReload className="w-5 h-5" />
+                  <p>Bridge</p>
+                </Tab>
               </TabList>
 
               <TabContent tabKey="swap">
-                <Swap simulate={simulateSwap} assets={assets} />
+                <Swap simulate={simulateSwap} assets={assets} disabled={isLoading} />
               </TabContent>
               <TabContent tabKey="bridge">
                 <Bridge />
@@ -112,7 +139,7 @@ const SwapComponent: React.FC = () => {
           </div>
           <div className="w-full px-4 flex flex-col gap-6">
             {isConnected ? (
-              <Button fullWidth type="submit">
+              <Button fullWidth type="submit" disabled={isLoading}>
                 Swap
               </Button>
             ) : (
@@ -120,12 +147,7 @@ const SwapComponent: React.FC = () => {
                 Connect wallet
               </Button>
             )}
-            <SwapInfoAccordion
-              fee={1.54}
-              minimumReceived="0.345 BTC"
-              priceImpact={-0.034}
-              maxSlippage={1}
-            />
+            <SwapInfoAccordion simulation={simulation} fromSymbol="" toSymbol="" />
           </div>
         </FormProvider>
       </form>

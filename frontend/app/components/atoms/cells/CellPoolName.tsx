@@ -3,11 +3,11 @@ import AssetsStacked from "../AssetsStacked";
 import Pill from "../Pill";
 import type { PoolInfo } from "@towerfi/types";
 import { twMerge } from "~/utils/twMerge";
-interface Props extends Pick<PoolInfo, "assets" | "name"> {
+interface Props extends Pick<PoolInfo, "assets" | "name" | "poolType"> {
   className?: string;
 }
 
-export const CellPoolName: React.FC<Props> = ({ assets, name, className }) => {
+export const CellPoolName: React.FC<Props> = ({ assets, name, poolType, className }) => {
   return (
     <div className={twMerge("col-span-2 lg:col-span-1 flex flex-col gap-2", className)}>
       <p className="text-xs text-white/50 lg:hidden">Pool</p>
@@ -16,7 +16,7 @@ export const CellPoolName: React.FC<Props> = ({ assets, name, className }) => {
           <AssetsStacked assets={assets} />
           <span>{name}</span>
         </div>
-        <Pill>0,3%</Pill>
+        <Pill color={poolType.includes("xyk") ? "blue" : "green"}>{poolType}</Pill>
       </div>
     </div>
   );

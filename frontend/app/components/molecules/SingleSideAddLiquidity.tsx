@@ -9,7 +9,7 @@ import { useAccount, useBalances, useSigningClient } from "@cosmi/react";
 import { useToast } from "~/app/hooks";
 import { useModal } from "~/app/providers/ModalProvider";
 import { ModalTypes } from "~/types/modal";
-import type { DepositFormData } from "./modals/ModalDepositLP";
+import type { DepositFormData } from "./modals/ModalAddLiquidity";
 interface Props {
   pool: PoolInfo;
   submitRef: React.MutableRefObject<{ onSubmit: (data: DepositFormData) => Promise<void> } | null>;

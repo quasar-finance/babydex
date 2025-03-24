@@ -73,10 +73,13 @@ const Input = forwardRef<HTMLInputElement, InputProps & Input>(
               error && "border border-tw-error/50 bg-tw-error/10",
             )}
           >
-            <div className={twMerge("text-white/50 flex gap-2")}>
-              {isSearch ? <IconSearch className="h-5 w-5" /> : null}
-              {startContent}
-            </div>
+            {(startContent || isSearch) && (
+              <div className={twMerge("text-white/50 flex gap-2")}>
+                {isSearch ? <IconSearch className="h-5 w-5" /> : null}
+                {startContent}
+              </div>
+            )}
+
             <input
               ref={ref}
               className={twMerge(

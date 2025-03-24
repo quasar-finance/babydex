@@ -10,13 +10,15 @@ import { Popover, PopoverTrigger, PopoverContent } from "../atoms/Popover";
 import { CellClaimRewards } from "../atoms/cells/CellClaimRewards";
 import { CellData } from "../atoms/cells/CellData";
 import { Table, TableRow } from "../atoms/Table";
+import { ModalTypes } from "~/types/modal";
+import type { PoolType } from "@towerfi/types";
 
 const positions = [
   {
     name: "IBCT1 / IBCT4",
     poolAddress: "bbn146uw5zknvk63tz5xhghs46037z5rxllz3y2aqhljw6khgddpnezs4msqwm",
     lpAddress: "bbn16ajpzp8f6zg2f5hch6fxf5mlh4w8ec8z5c4p59far7ltz0hzyjsszufqq9",
-    poolType: "concentrated",
+    poolType: "concentrated" as PoolType,
     assets: [
       {
         symbol: "IBCT1",
@@ -42,7 +44,7 @@ const positions = [
     name: "IBCT5 / IBCT4",
     poolAddress: "bbn148tyz7fs5ahctp8p42k4qwysur3zx2pfxwp54qepdddjhwru0eeqvnq487",
     lpAddress: "bbn1m94w92jh4ajxryzgv6pyakzeptj3n8fjep9cw7h78rkaksqkxsfs049jtv",
-    poolType: "concentrated",
+    poolType: "xyk" as PoolType,
     assets: [
       {
         symbol: "IBCT5",
@@ -77,6 +79,7 @@ const columns = [
 
 const Dashboard: React.FC = () => {
   const gridClass = "grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr_2fr] gap-4";
+  const { showModal } = useModal();
 
   return (
     <div className="flex flex-col gap-8 px-4">
@@ -95,6 +98,7 @@ const Dashboard: React.FC = () => {
             <CellPoolName
               assets={pool.assets}
               name={pool.name}
+              poolType={pool.poolType}
               className="order-1 col-span-1 w-[80%] lg:w-auto"
             />
             <CellData title="APR" data="-" className="order-3 w-[45%] lg:w-auto" />
@@ -114,16 +118,28 @@ const Dashboard: React.FC = () => {
                 </PopoverTrigger>
                 <PopoverContent className="min-w-[10rem] p-1">
                   <ul className="w-full">
-                    <li className="px-3 py-2 rounded-lg hover:text-tw-orange-400 hover:bg-tw-orange-400/20 w-full transition-all cursor-pointer">
+                    <li
+                      className="px-3 py-2 rounded-lg hover:text-tw-orange-400 hover:bg-tw-orange-400/20 w-full transition-all cursor-pointer"
+                      onClick={() => showModal(ModalTypes.stake_liquidity, true, { pool })}
+                    >
                       Stake
                     </li>
-                    <li className="px-3 py-2 rounded-lg hover:text-tw-orange-400 hover:bg-tw-orange-400/20 w-full transition-all cursor-pointer">
+                    <li
+                      className="px-3 py-2 rounded-lg hover:text-tw-orange-400 hover:bg-tw-orange-400/20 w-full transition-all cursor-pointer"
+                      onClick={() => showModal(ModalTypes.unstake_liquidity, true, { pool })}
+                    >
                       Unstake
                     </li>
-                    <li className="px-3 py-2 rounded-lg hover:text-tw-orange-400 hover:bg-tw-orange-400/20 w-full transition-all cursor-pointer">
+                    <li
+                      className="px-3 py-2 rounded-lg hover:text-tw-orange-400 hover:bg-tw-orange-400/20 w-full transition-all cursor-pointer"
+                      onClick={() => showModal(ModalTypes.add_liquidity, true, { pool })}
+                    >
                       Add
                     </li>
-                    <li className="px-3 py-2 rounded-lg hover:text-tw-orange-400 hover:bg-tw-orange-400/20 w-full transition-all cursor-pointer">
+                    <li
+                      className="px-3 py-2 rounded-lg hover:text-tw-orange-400 hover:bg-tw-orange-400/20 w-full transition-all cursor-pointer"
+                      onClick={() => showModal(ModalTypes.remove_liquidity, true, { pool })}
+                    >
                       Remove
                     </li>
                   </ul>

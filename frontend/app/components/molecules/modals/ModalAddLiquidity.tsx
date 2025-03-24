@@ -14,7 +14,7 @@ import { SingleSideAddLiquidity } from "../SingleSideAddLiquidity";
 import { DoubleSideAddLiquidity } from "../DoubleSideAddLiquidity";
 import { FormProvider, useForm } from "react-hook-form";
 
-interface ModalDepositLPProps {
+interface Props {
   pool: PoolInfo;
 }
 
@@ -23,7 +23,7 @@ export interface DepositFormData {
   slipageTolerance: string;
 }
 
-const ModalDepositLP: React.FC<ModalDepositLPProps> = ({ pool }) => {
+export const ModalAddLiquidity: React.FC<Props> = ({ pool }) => {
   const { name } = pool;
   const { showModal } = useModal();
   const [side, setSide] = useState<"double" | "single">("double");
@@ -127,5 +127,3 @@ const ModalDepositLP: React.FC<ModalDepositLPProps> = ({ pool }) => {
     </BasicModal>
   );
 };
-
-export default ModalDepositLP;

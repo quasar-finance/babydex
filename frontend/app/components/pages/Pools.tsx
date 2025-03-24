@@ -42,7 +42,7 @@ const Pools: React.FC = () => {
         {isLoading && <PoolsSkeleton className={twMerge("grid", gridClass)} />}
         {pools.map((pool, i) => (
           <TableRow key={i} gridClass={twMerge("grid", gridClass)}>
-            <CellPoolName assets={pool.assets} name={pool.name} />
+            <CellPoolName assets={pool.assets} name={pool.name} poolType={pool.poolType} />
             <CellTVL poolLiquidity={pool.poolLiquidity} />
             <CellData title="APR" />
             <CellData title="Volume 24h" />
@@ -50,7 +50,7 @@ const Pools: React.FC = () => {
             <div className="flex lg:items-end lg:justify-end">
               <Button
                 variant="flat"
-                onPress={() => showModal(ModalTypes.deposit_lp, true, { pool })}
+                onPress={() => showModal(ModalTypes.add_liquidity, true, { pool })}
               >
                 Add Liquidity
               </Button>
@@ -58,7 +58,7 @@ const Pools: React.FC = () => {
           </TableRow>
         ))}
       </Table>
-      <Pagination total={5} className={{ base: "self-center backdrop-blur-xl rounded-3xl p-1" }} />
+      {/* <Pagination total={5} className={{ base: "self-center backdrop-blur-xl rounded-3xl p-1" }} /> */}
     </div>
   );
 };

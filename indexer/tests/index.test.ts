@@ -20,8 +20,8 @@ test('check test database access', async () => {
   expect(res.length).toBeGreaterThan(0);
 });
 
-test('get latest pool balances', async () => {
-  const res = await indexer.getCurrentPoolBalances(1, 100);
+test('get current pool balances', async () => {
+  const res = await indexer.getCurrentPoolBalances(100, 0);
 
   expect(res.length).toBeGreaterThan(0);
 });

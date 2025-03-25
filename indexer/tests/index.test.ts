@@ -36,7 +36,7 @@ test('get pool balances by addresses', async () => {
 });
 
 test('get current pool volumes', async () => {
-  const res = await indexer.getCurrentPoolVolumes(100, 0);
+  const res = await indexer.getCurrentPoolVolumes(0, 100);
 
   // expect(res.length).toBeGreaterThan(0);
   expect(res.length).toBe(0);

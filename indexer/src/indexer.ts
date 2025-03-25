@@ -140,7 +140,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
   }
 
   async function getCurrentPoolVolumes(page: number, limit: number): Promise<Record<string, unknown>[] | null> {
-    const offset = (page - 1) * limit;
+    const offset = (Math.max(1, page) - 1) * limit;
     const query = sql`
         SELECT s.pool_address,
                SUM(

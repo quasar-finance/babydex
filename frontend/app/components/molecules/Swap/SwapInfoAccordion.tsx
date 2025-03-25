@@ -71,7 +71,7 @@ const SwapInfoAccordion: React.FC<Props> = ({ simulation }) => {
       </div>
       <div className="flex items-center justify-between h-4">
         <p>Max Slippage</p>
-        <p className="text-white capitalize">{slippage}</p>
+        <p className="text-white capitalize">{slippage}%</p>
       </div>
     </div>
   );

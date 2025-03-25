@@ -17,9 +17,21 @@ interface Env {
   SUPABASE_READONLY_SSL: string;
 }
 
+const headers = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+};
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    return fetchRequestHandler({
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        status: 204,
+        headers,
+      });
+    }
+
+    const response = await fetchRequestHandler({
       req: request,
       router: appRouter,
       createContext: () => {
@@ -48,5 +60,7 @@ export default {
         enabled: true,
       },
     });
+
+    return new Response(response.body, { headers, status: response.status });
   },
 };

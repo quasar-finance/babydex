@@ -16,9 +16,8 @@
     }
   },
   "scripts": {
-    "worker:deploy": "wrangler deploy",
-    "worker:dev": "wrangler dev",
-    "dev": "tsc -w",
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
     "build": "tsc"
   },
   "devDependencies": {

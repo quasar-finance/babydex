@@ -18,7 +18,7 @@ export const createClient = (ctx: Omit<ContextOptions, "indexerService">) =>
         },
         true: createLocalTRPCLink({ router: appRouter, ...ctx }),
         false: httpBatchLink({
-          url: process.env.API_URL ?? "",
+          url: process.env.NEXT_PUBLIC_API_URL ?? "",
           fetch: async (input, init?) => {
             const fetch = getFetch();
             return fetch(input, {

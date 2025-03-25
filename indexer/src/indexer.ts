@@ -47,8 +47,8 @@ export type Indexer = {
     addresses: string[]
   ) => Promise<Record<string, unknown>[] | null>;
   getCurrentPoolApr: (
-    limit: number,
-    offset: number
+    page: number,
+    limit: number
   ) => Promise<Record<string, unknown>[] | null>;
   getPoolAprByPoolAddresses: (
     addresses: string[]
@@ -218,7 +218,8 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     }
   }
 
-  async function getCurrentPoolApr(limit: number, offset: number): Promise<Record<string, unknown>[] | null> {
+  async function getCurrentPoolApr(page: number, limit: number): Promise<Record<string, unknown>[] | null> {
+    const offset = (Math.max(1, page) - 1) * limit;
     const query = sql`
         SELECT pool_address,
                AVG(fees_usd / total_liquidity_usd * 365) AS avg_apr

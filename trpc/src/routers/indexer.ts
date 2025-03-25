@@ -58,8 +58,8 @@ export const indexerRouter = createTRPCRouter({
     .query(async ({ctx, input}) => {
       return await ctx.indexerService.getPoolVolumesByPoolAddresses(input.addresses);
     }),
-  getCurrentPoolApr: createTRPCPublicProcedure
-    .input(z.object({page: z.number().min(0), limit: z.number().min(1).max(100)}))
+  getCurrentPoolAprs: createTRPCPublicProcedure
+    .input(z.object({page: z.number().min(1), limit: z.number().min(1).max(100)}))
     .query(async ({ctx, input}) => {
       return await ctx.indexerService.getCurrentPoolVolumes(input.limit, input.page);
     }),

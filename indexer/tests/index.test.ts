@@ -53,7 +53,7 @@ test('get pool volumes by addresses', async () => {
 });
 
 test('get current pool apr', async () => {
-  const res = await indexer.getCurrentPoolApr(100, 0);
+  const res = await indexer.getCurrentPoolApr(1, 100);
 
   expect(res.length).toBeGreaterThan(0);
   console.log(res);

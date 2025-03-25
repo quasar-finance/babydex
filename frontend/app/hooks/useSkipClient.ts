@@ -15,13 +15,12 @@ export function useSkipClient(parameters: UseSkipClientParameters = {}): {
   simulation: UseQueryResult<RouteResponse | null>;
   skipClient: SkipClient | undefined;
 } {
-  const { isConnected, connector, address } = useAccount();
+  const { connector, address } = useAccount();
   const { getEVMSigner, cacheKey = ["skipClient", address] } = parameters;
   const requestRef = useRef<RouteRequest | null>(null);
 
   const { data: skipClient } = useQuery({
-    enabled: isConnected,
-    queryKey: ["query", cacheKey],
+    queryKey: ["query", address, cacheKey],
     queryFn: () => {
       return new SkipClient({
         getEVMSigner,

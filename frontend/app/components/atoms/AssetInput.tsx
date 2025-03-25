@@ -69,7 +69,7 @@ export const AssetInput: React.FC<AssetInputProps> = ({
           {...register(name, {
             validate: (value) => {
               if (value === "") return "Amount is required";
-              if (Number.isNaN(+value)) return "Only enter digits to bond to a vault";
+              if (Number.isNaN(+value)) return "Only enter number digits";
               if (Number(value) > Number(denomBalance)) return "Insufficient Amount";
               if (Number(value) <= 0) return "Amount must be greater than 0";
             },

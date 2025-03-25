@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import ky from "ky";
 
 import Turnstile from "react-cloudflare-turnstile";
-import { useAccount } from "wagmi";
+import { useAccount } from "@cosmi/react";
 
 import { Button } from "../atoms/Button";
 import Dropdown from "../atoms/Dropdown";

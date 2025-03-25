@@ -21,7 +21,7 @@ test('check test database access', async () => {
 });
 
 test('get latest pool balances', async () => {
-  const res = await indexer.getCurrentPoolBalances(100, 1);
+  const res = await indexer.getCurrentPoolBalances(1, 100);
 
   expect(res.length).toBeGreaterThan(0);
 });

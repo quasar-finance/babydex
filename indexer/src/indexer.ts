@@ -33,8 +33,8 @@ export type Indexer = {
     filters?: IndexerFilters,
   ) => Promise<(typeof views)[T]["$inferSelect"][]>;
   getCurrentPoolBalances: (
-    limit: number,
-    offset: number
+    page: number,
+    limit: number
   ) => Promise<Record<string, unknown>[] | null>;
   getPoolBalancesByPoolAddresses: (
     addresses: string[]
@@ -81,7 +81,8 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     return await dynamicQuery;
   }
 
-  async function getCurrentPoolBalances(limit: number, offset: number): Promise<Record<string, unknown>[] | null> {
+  async function getCurrentPoolBalances(page: number, limit: number): Promise<Record<string, unknown>[] | null> {
+    const offset = (page - 1) * limit;
     const query = sql`
         SELECT p.*
         FROM v1_cosmos.pool_balance p

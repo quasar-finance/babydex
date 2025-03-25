@@ -5,7 +5,7 @@ const input = z
   .object({
     orderBy: z.enum(["asc", "desc"]).optional(),
     orderByColumn: z.string().optional(),
-    page: z.number().min(0).optional(),
+    page: z.number().min(1).optional(),
     limit: z.number().min(1).max(100).optional(),
   })
   .optional();
@@ -39,9 +39,9 @@ export const indexerRouter = createTRPCRouter({
     return await ctx.indexerService.queryView("withdrawLiquidity", input);
   }),
   getCurrentPoolBalances: createTRPCPublicProcedure
-    .input(z.object({page: z.number().min(0), limit: z.number().min(1).max(100)}))
+    .input(z.object({page: z.number().min(1), limit: z.number().min(1).max(100)}))
     .query(async ({ctx, input}) => {
-      return await ctx.indexerService.getCurrentPoolBalances(input.limit, input.page);
+      return await ctx.indexerService.getCurrentPoolBalances(input.page, input.limit);
     }),
   getPoolBalancesByAddresses: createTRPCPublicProcedure
     .input(z.object({addresses: z.string().array()}))

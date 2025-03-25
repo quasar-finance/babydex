@@ -11,63 +11,39 @@ import { Tab, TabList, TabContent, Tabs } from "../atoms/Tabs";
 import { Swap } from "../organisms/swap/Swap";
 import { Bridge } from "../organisms/swap/Bridge";
 import { useSkipClient } from "~/app/hooks/useSkipClient";
-import { useMutation } from "@tanstack/react-query";
 import { FormProvider, useForm } from "react-hook-form";
-import { convertMicroDenomToDenom } from "~/utils/intl";
-import { Assets } from "~/config";
-import { babylonTestnet } from "~/config/chains/babylon-testnet";
 import { useToast } from "~/app/hooks";
-
-const assets = Object.values(Assets);
+import { useMemo, useState } from "react";
+import { useSwapStore } from "~/app/hooks/useSwapStore";
 
 const SwapComponent: React.FC = () => {
+  const [action, setAction] = useState("swap");
   const { isConnected, address } = useAccount();
   const { showModal } = useModal();
+  const { slippage } = useSwapStore();
   const methods = useForm();
-  const { formState, handleSubmit, setValue } = methods;
+  const { formState, handleSubmit, reset } = methods;
   const { toast } = useToast();
-  const { errors } = formState;
+  const { errors, isValid } = formState;
 
-  const { data: skipClient } = useSkipClient();
+  const { skipClient, simulation: simulationResult } = useSkipClient({ cacheKey: action });
+  const { data: simulation, isLoading, isError } = simulationResult;
 
-  const {
-    data: simulation,
-    mutateAsync: simulateSwap,
-    isLoading,
-  } = useMutation({
-    mutationFn: async ({
-      amountIn,
-      fromDenom,
-      tokenDenom,
-      direction,
-    }: { amountIn: string; fromDenom: string; tokenDenom: string; direction: string }) => {
-      if (!skipClient) throw new Error("error: no client");
-      const targetOutput = direction === "lineal" ? "toAmount" : "fromAmount";
-      const outputAsset = assets.find((asset) => asset.denom === tokenDenom);
-
-      const simulation = await skipClient.route({
-        amountIn,
-        sourceAssetDenom: fromDenom,
-        sourceAssetChainID: babylonTestnet.id as unknown as string,
-        destAssetDenom: tokenDenom,
-        destAssetChainID: babylonTestnet.id as unknown as string,
-        allowSwaps: true,
-        allowUnsafe: true,
-      });
-      const { amountOut } = simulation;
-      const amount = convertMicroDenomToDenom(amountOut, outputAsset?.decimals);
-      setValue(targetOutput, amount, { shouldValidate: true });
-      return simulation;
-    },
-  });
-
-  console.log(simulation);
+  const { isDisabled, text } = useMemo(() => {
+    if (isError) return { isDisabled: true, text: "No routes found" };
+    if (Object.keys(errors).length) return { isDisabled: true, text: "Insufficient Balance" };
+    if (isValid) return { isDisabled: false, text: "Swap" };
+    return { isDisabled: true, text: "Choose Amount" };
+  }, [isValid, errors, isError]);
 
   const onSubmit = handleSubmit(async () => {
     if (!skipClient || !simulation) throw new Error("error: no client or simulation");
     const { requiredChainAddresses } = simulation;
+    const slippageTolerancePercent = slippage === "auto" ? undefined : slippage;
+
     await skipClient?.executeRoute({
       route: simulation,
+      slippageTolerancePercent,
       userAddresses: requiredChainAddresses.map((chainID) => ({
         chainID,
         address: address as string,
@@ -109,6 +85,7 @@ const SwapComponent: React.FC = () => {
         <FormProvider {...methods}>
           <div className="w-full flex-1 flex items-center justify-center bg-tw-sub-bg rounded-2xl p-2 flex-col relative">
             <motion.button
+              type="button"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={() => showModal(ModalTypes.swap_settings, true)}
@@ -117,7 +94,11 @@ const SwapComponent: React.FC = () => {
               <IconSettingsFilled className="w-5 h-5" />
             </motion.button>
 
-            <Tabs defaultKey="swap">
+            <Tabs
+              defaultKey="swap"
+              selectedKey={action}
+              onSelectionChange={(a) => [reset(), setAction(a)]}
+            >
               <TabList>
                 <Tab tabKey="swap">
                   <IconRepeat className="w-5 h-5" />
@@ -130,7 +111,7 @@ const SwapComponent: React.FC = () => {
               </TabList>
 
               <TabContent tabKey="swap">
-                <Swap simulate={simulateSwap} assets={assets} disabled={isLoading} />
+                <Swap />
               </TabContent>
               <TabContent tabKey="bridge">
                 <Bridge />
@@ -139,15 +120,15 @@ const SwapComponent: React.FC = () => {
           </div>
           <div className="w-full px-4 flex flex-col gap-6">
             {isConnected ? (
-              <Button fullWidth type="submit" disabled={isLoading}>
-                Swap
+              <Button fullWidth type="submit" isDisabled={isLoading || isDisabled}>
+                {text}
               </Button>
             ) : (
               <Button onPress={() => showModal(ModalTypes.connect_wallet)} fullWidth>
                 Connect wallet
               </Button>
             )}
-            <SwapInfoAccordion simulation={simulation} fromSymbol="" toSymbol="" />
+            <SwapInfoAccordion simulation={simulation} />
           </div>
         </FormProvider>
       </form>

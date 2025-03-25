@@ -16,7 +16,7 @@ export const CellPoolName: React.FC<Props> = ({ assets, name, poolType, classNam
           <AssetsStacked assets={assets} />
           <span>{name}</span>
         </div>
-        <Pill color={poolType.includes("xyk") ? "blue" : "green"}>{poolType}</Pill>
+        <Pill>{poolType}</Pill>
       </div>
     </div>
   );

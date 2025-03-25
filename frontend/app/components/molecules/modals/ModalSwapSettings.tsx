@@ -1,28 +1,23 @@
 import BasicModal from "~/app/components/templates/BasicModal";
-import Input from "~/app/components/atoms/Input";
-import { useForm } from "react-hook-form";
 import MaxSlippageSwitcher from "../MaxSlippageSwitcher";
 
 import type React from "react";
+import { useSwapStore } from "~/app/hooks/useSwapStore";
 
 const ModalSwapSettings: React.FC = () => {
-  const defaultSlippage = 5.5;
-
-  const { handleSubmit, register, formState, setValue, watch } = useForm<{
-    slippage: number;
-    txDeadline: number;
-  }>({ mode: "onChange", defaultValues: { slippage: defaultSlippage, txDeadline: 30 } });
-
-  const setSlippage = (value: number) => setValue("slippage", value);
+  const { slippage, setSlippage } = useSwapStore();
 
   return (
     <BasicModal title="Swap">
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between gap-2">
           <p>Max Slippage</p>
-          <MaxSlippageSwitcher maxSlippage={defaultSlippage} setMaxSlippage={setSlippage} />
+          <MaxSlippageSwitcher
+            maxSlippage={slippage}
+            setMaxSlippage={(v) => setSlippage(v.toString())}
+          />
         </div>
-        <div className="flex items-center justify-between gap-2">
+        {/*  <div className="flex items-center justify-between gap-2">
           <p>Transaction Deadline</p>
           <Input
             type="text"
@@ -30,7 +25,7 @@ const ModalSwapSettings: React.FC = () => {
             classNames={{ inputClassName: "max-w-[24px]" }}
             {...register("txDeadline")}
           />
-        </div>
+        </div> */}
       </div>
     </BasicModal>
   );

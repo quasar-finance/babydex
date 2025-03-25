@@ -1,50 +1,63 @@
-import { IconChevronDown, IconWallet } from "@tabler/icons-react";
 import type React from "react";
-import { type Dispatch, type SetStateAction, useState } from "react";
+import { useEffect, useState } from "react";
 import RotateButton from "../../atoms/RotateButton";
-import { motion } from "motion/react";
-import { ModalTypes } from "~/types/modal";
-import { useModal } from "~/app/providers/ModalProvider";
 
-import type { BaseCurrency } from "@towerfi/types";
 import { useFormContext } from "react-hook-form";
-import { useBalances } from "@cosmi/react";
 import { convertDenomToMicroDenom, convertMicroDenomToDenom } from "~/utils/intl";
+import { useSkipClient } from "~/app/hooks/useSkipClient";
+import { babylonTestnet } from "~/config/chains/babylon-testnet";
+import { AssetInput } from "../../atoms/AssetInput";
+import { Assets } from "~/config";
 
-type SwapProps = {
-  assets: BaseCurrency[];
-  simulate: ({
-    amountIn,
-    fromDenom,
-    tokenDenom,
-    direction,
-  }: { amountIn: string; fromDenom: string; tokenDenom: string; direction: string }) => void;
-  disabled?: boolean;
-};
+const assets = Object.values(Assets);
 
-export const Swap: React.FC<SwapProps> = ({ simulate, assets, disabled }) => {
+export const Swap: React.FC = () => {
+  const [activeInput, setActiveInput] = useState<"from" | "to">("from");
   const [fromToken, setFromToken] = useState(assets[0]);
   const [toToken, setToToken] = useState(assets[1]);
-  const { showModal } = useModal();
-  const { register, watch, setValue } = useFormContext();
-
-  const { data: balances = [] } = useBalances();
-
-  const fromAmount = watch("fromAmount");
+  const { watch, setValue, control, formState } = useFormContext();
+  const { isSubmitting, isDirty } = formState;
   const toAmount = watch("toAmount");
+  const fromAmount = watch("fromAmount");
 
-  const onSelectToken = async (
-    setter: Dispatch<SetStateAction<BaseCurrency>>,
-    selectedToken: BaseCurrency,
-  ) => {
-    const { promise, resolve, reject } = Promise.withResolvers<BaseCurrency>();
-    showModal(ModalTypes.select_asset, false, {
-      onSelectAsset: resolve,
-      onClose: reject,
-      assets: assets.filter((asset) => asset.symbol !== selectedToken.symbol),
-    });
-    promise.then(setter).catch(() => {});
-  };
+  const { simulation, simulate, skipClient } = useSkipClient({ cacheKey: "swap" });
+  const { isLoading } = simulation;
+
+  useEffect(() => {
+    if (!skipClient || !isDirty || (!toAmount && !fromAmount)) return;
+
+    (async () => {
+      if (activeInput === "from") {
+        const simulation = await simulate({
+          destAssetChainID: babylonTestnet.id as unknown as string,
+          destAssetDenom: toToken.denom,
+          sourceAssetChainID: babylonTestnet.id as unknown as string,
+          sourceAssetDenom: fromToken.denom,
+          allowSwaps: true,
+          allowUnsafe: true,
+          amountIn: convertDenomToMicroDenom(fromAmount, fromToken.decimals),
+        });
+
+        setValue("toAmount", convertMicroDenomToDenom(simulation?.amountOut, toToken.decimals), {
+          shouldValidate: true,
+        });
+      } else {
+        const simulation = await simulate({
+          destAssetChainID: babylonTestnet.id as unknown as string,
+          destAssetDenom: toToken.denom,
+          sourceAssetChainID: babylonTestnet.id as unknown as string,
+          sourceAssetDenom: fromToken.denom,
+          allowSwaps: true,
+          allowUnsafe: true,
+          amountOut: convertDenomToMicroDenom(toAmount, toToken.decimals),
+        });
+
+        setValue("fromAmount", convertMicroDenomToDenom(simulation?.amountIn, fromToken.decimals), {
+          shouldValidate: true,
+        });
+      }
+    })();
+  }, [fromAmount, toAmount]);
 
   const onRotate = () => {
     const fToken = { ...fromToken };
@@ -53,102 +66,28 @@ export const Swap: React.FC<SwapProps> = ({ simulate, assets, disabled }) => {
     setToToken(fToken);
     setValue("fromAmount", toAmount);
     setValue("toAmount", fromAmount);
+    setActiveInput("from");
   };
-
-  const { toBalance, fromBalance } = balances.reduce(
-    (acc, { denom, amount }) => {
-      if (denom === toToken.denom) acc.toBalance = amount;
-      if (denom === fromToken.denom) acc.fromBalance = amount;
-      return acc;
-    },
-    { toBalance: "0", fromBalance: "0" },
-  );
-
-  const toDenomBalance = convertMicroDenomToDenom(toBalance, toToken.decimals);
-  const fromDenomBalance = convertMicroDenomToDenom(fromBalance, fromToken.decimals);
 
   return (
     <div className="flex flex-col gap-2 w-full items-center justify-center">
-      <div className="w-full rounded-xl p-4 bg-tw-bg flex flex-col gap-2">
-        <div className="flex items-center justify-between">
-          <motion.button
-            disabled={disabled}
-            type="button"
-            className="flex items-center gap-2 p-2 bg-white/5 rounded-full"
-            onClick={() => onSelectToken(setFromToken, toToken)}
-          >
-            <img src={fromToken.logoURI} alt={fromToken.symbol} className="w-7 h-7" />
-            <p>{fromToken.symbol}</p>
-            <IconChevronDown className="h-4 w-4" />
-          </motion.button>
-          <input
-            className="text-2xl w-[8rem] bg-transparent text-right"
-            placeholder="0"
-            {...register("fromAmount", {
-              validate: (value) => {
-                if (value === "") return "Amount is required";
-                if (Number.isNaN(+value)) return "Only enter digits to bond to a vault";
-                if (Number(value) > Number(fromDenomBalance)) return "Insufficient Amount";
-                if (Number(value) <= 0) return "Amount must be greater than 0";
-              },
-              onChange: (e) => {
-                if (e.target.value === "") return e;
-                simulate({
-                  amountIn: convertDenomToMicroDenom(e.target.value, fromToken.decimals),
-                  fromDenom: fromToken.denom,
-                  tokenDenom: toToken.denom,
-                  direction: "lineal",
-                });
-                return e;
-              },
-            })}
-          />
-        </div>
-        <div className="flex items-center justify-between text-white/50 text-xs">
-          <div className="flex items-center gap-1 ">
-            <IconWallet className="w-4 h-4" />
-            <p>{fromDenomBalance}</p>
-          </div>
-          <p>$0</p>
-        </div>
-      </div>
+      <AssetInput
+        name="fromAmount"
+        control={control}
+        asset={fromToken}
+        disabled={isSubmitting || (isLoading && activeInput === "to")}
+        onSelect={setFromToken}
+        onFocus={() => setActiveInput("from")}
+      />
       <RotateButton onClick={onRotate} />
-      <div className="w-full rounded-xl p-4 bg-tw-bg">
-        <div className="flex items-center justify-between gap-2">
-          <motion.button
-            type="button"
-            disabled={disabled}
-            className="flex items-center gap-2 p-2 bg-white/5 rounded-full"
-            onClick={() => onSelectToken(setToToken, fromToken)}
-          >
-            <img src={toToken.logoURI} alt={toToken.symbol} className="w-7 h-7" />
-            <p>{toToken.symbol}</p>
-            <IconChevronDown className="h-4 w-4" />
-          </motion.button>
-          <input
-            className="text-2xl bg-transparent text-right w-[8rem]"
-            placeholder="0"
-            {...register("toAmount", {
-              validate: (value) => {
-                if (value === "") return "Amount is required";
-                if (Number.isNaN(+value)) return "Only enter digits to bond to a vault";
-                if (Number(value) > Number(toDenomBalance)) return "Insufficient Amount";
-                if (Number(value) <= 0) return "Amount must be greater than 0";
-              },
-              onChange: (e) => {
-                if (e.target.value === "") return e;
-                simulate({
-                  amountIn: convertDenomToMicroDenom(e.target.value, toToken.decimals),
-                  fromDenom: toToken.denom,
-                  tokenDenom: fromToken.denom,
-                  direction: "reverse",
-                });
-                return e;
-              },
-            })}
-          />
-        </div>
-      </div>
+      <AssetInput
+        name="toAmount"
+        control={control}
+        asset={toToken}
+        disabled={isSubmitting || (isLoading && activeInput === "from")}
+        onSelect={setToToken}
+        onFocus={() => setActiveInput("to")}
+      />
     </div>
   );
 };

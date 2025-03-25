@@ -15,7 +15,7 @@ import { useToast } from "~/app/hooks";
 import { Assets } from "~/config";
 import Link from "next/link";
 
-const FAUCET_API_URL = "116.203.127.129";
+const FAUCET_API_URL = "http://116.203.127.129/v1/graphql";
 const TURNSTILE_KEY = "0x4AAAAAAA-eVs5k0b8Q1dl5";
 
 interface FaucetResponse {
@@ -44,7 +44,7 @@ const FaucetForm: React.FC = () => {
   const [address, setAddress] = useState("");
   const [captchaToken, setCaptchaToken] = useState("");
   const [loading, setLoading] = useState(false);
-  const [selectedDenom, setSelectedDenom] = useState("");
+  const [selectedDenom, setSelectedDenom] = useState(available_denoms[0].value);
 
   useEffect(() => {
     if (connectedAddress) {
@@ -58,6 +58,7 @@ const FaucetForm: React.FC = () => {
     await toast.promise(
       (async () => {
         try {
+          console.log("posting request")
           const data: FaucetResponse = await ky
             .post(FAUCET_API_URL, {
               json: {
@@ -73,13 +74,14 @@ const FaucetForm: React.FC = () => {
               },
             })
             .json();
-
+          console.log(data)
           if (!data.success) {
             throw new Error(data.message || "Failed to get faucet funds");
           }
 
           return data;
         } catch (error) {
+          setLoading(false);
           throw new Error("Something went wrong while requesting funds");
         }
       })(),

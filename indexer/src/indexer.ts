@@ -40,8 +40,8 @@ export type Indexer = {
     addresses: string[]
   ) => Promise<Record<string, unknown>[] | null>;
   getCurrentPoolVolumes: (
-    limit: number,
-    offset: number
+    page: number,
+    limit: number
   ) => Promise<Record<string, unknown>[] | null>;
   getPoolVolumesByPoolAddresses: (
     addresses: string[]
@@ -139,7 +139,8 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     }
   }
 
-  async function getCurrentPoolVolumes(limit: number, offset: number): Promise<Record<string, unknown>[] | null> {
+  async function getCurrentPoolVolumes(page: number, limit: number): Promise<Record<string, unknown>[] | null> {
+    const offset = (page - 1) * limit;
     const query = sql`
         SELECT s.pool_address,
                SUM(

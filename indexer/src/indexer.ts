@@ -82,7 +82,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
   }
 
   async function getCurrentPoolBalances(page: number, limit: number): Promise<Record<string, unknown>[] | null> {
-    const offset = (page - 1) * limit;
+    const offset = (Math.max(1, page) - 1) * limit;
     const query = sql`
         SELECT p.*
         FROM v1_cosmos.pool_balance p

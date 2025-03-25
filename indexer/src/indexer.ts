@@ -46,6 +46,13 @@ export type Indexer = {
   getPoolVolumesByPoolAddresses: (
     addresses: string[]
   ) => Promise<Record<string, unknown>[] | null>;
+  getCurrentPoolApr: (
+    limit: number,
+    offset: number
+  ) => Promise<Record<string, unknown>[] | null>;
+  getPoolAprByPoolAddresses: (
+    addresses: string[]
+  ) => Promise<Record<string, unknown>[] | null>;
 };
 
 export type IndexerFilters = {
@@ -211,6 +218,54 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     }
   }
 
+  async function getCurrentPoolApr(limit: number, offset: number): Promise<Record<string, unknown>[] | null> {
+    const query = sql`
+        SELECT pool_address,
+               AVG(fees_usd / total_liquidity_usd * 365) AS avg_apr
+        FROM v1_cosmos.historic_pool_yield
+        WHERE timestamp >= NOW() - INTERVAL '1 year'
+          AND total_liquidity_usd > 0
+        GROUP BY pool_address
+        ORDER BY pool_address
+        LIMIT ${limit} OFFSET ${offset};
+    `;
+    try {
+      const result = await client.execute(query);
+
+      return result.rows;
+    } catch (error) {
+      console.error('Error executing raw query:', error);
+
+      throw error;
+    }
+  }
+
+  async function getPoolAprByPoolAddresses(addresses: string[]): Promise<Record<string, unknown>[] | null> {
+    const pool_addresses_sql = sql.raw(createPoolAddressArraySql(addresses));
+    const query = sql`
+        SELECT
+            pool_address,
+            AVG(fees_usd / total_liquidity_usd * 365) AS avg_apr
+        FROM
+            v1_cosmos.historic_pool_yield
+        WHERE
+            pool_address = ${pool_addresses_sql}
+          AND timestamp >= NOW() - INTERVAL '1 year'
+          AND total_liquidity_usd > 0 -- Avoid division by zero
+        GROUP BY
+            pool_address;
+    `;
+    try {
+      const result = await client.execute(query);
+
+      return result.rows;
+    } catch (error) {
+      console.error('Error executing raw query:', error);
+
+      throw error;
+    }
+  }
+
   function createPoolAddressArraySql(addresses: string[]): string {
     if (!addresses || addresses.length === 0) {
       return `ANY('{}'::text[])`;
@@ -227,5 +282,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     getPoolBalancesByPoolAddresses,
     getCurrentPoolVolumes,
     getPoolVolumesByPoolAddresses,
+    getCurrentPoolApr,
+    getPoolAprByPoolAddresses,
   } as Indexer;
 }

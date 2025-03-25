@@ -15,7 +15,7 @@ import { useToast } from "~/app/hooks";
 import { Assets } from "~/config";
 import Link from "next/link";
 
-const FAUCET_API_URL = "http://116.203.127.129/v1/graphql";
+const FAUCET_API_URL = "https://graphql.union.build/v1/graphql";
 const TURNSTILE_KEY = "0x4AAAAAAA-eVs5k0b8Q1dl5";
 
 interface FaucetResponse {
@@ -61,19 +61,19 @@ const FaucetForm: React.FC = () => {
           console.log("posting request")
           const data: FaucetResponse = await ky
             .post(FAUCET_API_URL, {
+              timeout: 60000,
               json: {
                 query: `mutation UnoFaucetMutation($chain_id: String!, $denom: String!, $address: String!, $captchaToken: String!) {
               send(chainId: $chain_id, denom: $denom, address: $address, captchaToken: $captchaToken)
             }`,
                 variables: {
-                  chain_id: "bbn-testnet-5",
+                  chain_id: "bbn-test-5",
                   denom: selectedDenom,
                   address,
                   captchaToken,
                 },
               },
-            })
-            .json();
+            }).json();
           console.log(data)
           if (!data.success) {
             throw new Error(data.message || "Failed to get faucet funds");
@@ -81,6 +81,7 @@ const FaucetForm: React.FC = () => {
 
           return data;
         } catch (error) {
+          console.log(error)
           setLoading(false);
           throw new Error("Something went wrong while requesting funds");
         }

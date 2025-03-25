@@ -68,7 +68,7 @@ const Input = forwardRef<HTMLInputElement, InputProps & Input>(
           </div> */}
           <div
             className={twMerge(
-              "flex gap-1 relative rounded-full bg-white/5 px-3 items-center border border-transparent",
+              "flex gap-1 relative rounded-2xl bg-white/5 px-3 items-center border border-transparent",
               classNames?.wrapperClassName,
               error && "border border-tw-error/50 bg-tw-error/10",
             )}

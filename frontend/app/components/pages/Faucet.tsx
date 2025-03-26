@@ -21,22 +21,18 @@ const TURNSTILE_KEY = "0x4AAAAAAA-eVs5k0b8Q1dl5";
 interface FaucetResponse {
   data: {
     send: string;
-  }
+  };
 }
 
-const faucet_assets = ["ubbn", "IBCT1", "IBCT2", "IBCT3", "IBCT4", "IBCT5", "IBCT6"];
-
-const available_denoms = Object.values(Assets)
-  .filter((asset) => faucet_assets.includes(asset.symbol))
-  .map((asset) => ({
-    value: asset.denom,
-    label: (
-      <div className="flex items-center gap-2">
-        <img src={asset.logoURI} alt={asset.symbol} className="w-5 h-5" />
-        <span>{asset.symbol}</span>
-      </div>
-    ),
-  }));
+const available_denoms = Object.values(Assets).map((asset) => ({
+  value: asset.denom,
+  label: (
+    <div className="flex items-center gap-2">
+      <img src={asset.logoURI} alt={asset.symbol} className="w-5 h-5" />
+      <span>{asset.symbol}</span>
+    </div>
+  ),
+}));
 
 const FaucetForm: React.FC = () => {
   const { address: connectedAddress } = useAccount();
@@ -72,7 +68,8 @@ const FaucetForm: React.FC = () => {
                   captchaToken,
                 },
               },
-            }).json();
+            })
+            .json();
 
           if (response.data.send === null) {
             throw new Error("Empty faucet response");
@@ -84,7 +81,9 @@ const FaucetForm: React.FC = () => {
 
           return response;
         } catch (error) {
-          throw new Error(error instanceof Error ? error.message : "Something went wrong while requesting funds");
+          throw new Error(
+            error instanceof Error ? error.message : "Something went wrong while requesting funds",
+          );
         }
       })(),
       {
@@ -110,7 +109,7 @@ const FaucetForm: React.FC = () => {
         },
         error: {
           title: "Error",
-          description: "Something went wrong while requesting funds"
+          description: "Something went wrong while requesting funds",
         },
       },
     );
@@ -120,65 +119,65 @@ const FaucetForm: React.FC = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto flex flex-col gap-6">
-      <h2 className="text-2xl font-semibold">Faucet</h2>
+    <div className="flex flex-col gap-10 w-full max-w-xl mx-auto items-center">
+      <h1 className="text-xl">Faucet</h1>
+      <div className="max-w-sm flex flex-col gap-6 bg-tw-sub-bg p-4 rounded-xl w-full">
+        <div className="flex flex-col gap-1">
+          <p className="text-sm text-white/50">Select Token</p>
+          <Dropdown
+            defaultValue={available_denoms[0]}
+            options={[...available_denoms]}
+            onChange={(item) => setSelectedDenom(item.value)}
+            classNames={{
+              container: "w-full justify-between",
+              dropdown: "w-full",
+            }}
+          />
+        </div>
 
-      <div className="flex flex-col gap-1">
-        <p className="text-sm text-white/50">Select Token</p>
-        <Dropdown
-          defaultValue={available_denoms[0]}
-          options={[...available_denoms]}
-          onChange={(item) => setSelectedDenom(item.value)}
-          classNames={{
-            container: "w-full justify-between",
-            dropdown: "w-full",
+        <div className="flex flex-col gap-1">
+          <Input
+            label="Wallet Address"
+            id="address-input"
+            placeholder="bbn1..."
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            required
+            fullWidth
+          />
+        </div>
+
+        <Turnstile
+          size="flexible"
+          theme="dark"
+          turnstileSiteKey={TURNSTILE_KEY}
+          callback={(token: string) => {
+            setCaptchaToken(token);
+          }}
+          errorCallback={() => {
+            toast.error({
+              title: "Captcha Error",
+              description: "Error with Turnstile verification",
+            });
+          }}
+          expiredCallback={() => {
+            setCaptchaToken("");
+            toast.error({
+              title: "Captcha Expired",
+              description: "Captcha expired, please try again.",
+            });
           }}
         />
-      </div>
 
-      <div className="flex flex-col gap-1">
-        <label htmlFor="address-input" className="text-sm text-white/50">
-          Wallet Address
-        </label>
-        <Input
-          label="Wallet Address"
-          id="address-input"
-          placeholder="bbn1..."
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-          required
+        <Button
+          isDisabled={!captchaToken || loading}
           fullWidth
-        />
+          isLoading={loading}
+          onClick={handleSubmit}
+        >
+          {loading ? "Requesting..." : "Request Faucet"}
+        </Button>
       </div>
-
-      <Turnstile
-        turnstileSiteKey={TURNSTILE_KEY}
-        callback={(token: string) => {
-          setCaptchaToken(token);
-        }}
-        errorCallback={() => {
-          toast.error({
-            title: "Captcha Error",
-            description: "Error with Turnstile verification",
-          });
-        }}
-        expiredCallback={() => {
-          setCaptchaToken("");
-          toast.error({
-            title: "Captcha Expired",
-            description: "Captcha expired, please try again.",
-          });
-        }}
-      />
-
-      <Button
-        isDisabled={!captchaToken || loading}
-        fullWidth
-        isLoading={loading}
-        onClick={handleSubmit}
-      >
-        {loading ? "Requesting..." : "Request Faucet"}
-      </Button>
     </div>
   );
 };

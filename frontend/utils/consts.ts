@@ -15,7 +15,7 @@ export const navLinks: { label: string; to: string; isDisabled?: boolean; isExte
     {
       label: "Faucet",
       to: "/faucet",
-    }
+    },
     /* {
     label: "Vote",
     to: "/vote",
@@ -32,6 +32,48 @@ export const navLinks: { label: string; to: string; isDisabled?: boolean; isExte
     isDisabled: true,
   }, */
   ];
+
+export const socialLinks: {
+  label: string;
+  href: string;
+  icon: "discord" | "twitter" | "telegram";
+}[] = [
+  {
+    label: "Twitter",
+    href: "https://x.com/tower",
+    icon: "twitter",
+  },
+  {
+    label: "Discord",
+    href: "https://discord.com/invite/tower",
+    icon: "discord",
+  },
+  {
+    label: "Telegram",
+    href: "https://t.me/tower",
+    icon: "twitter",
+  },
+];
+
+export const supportLinks: { label: string; href: string; isExternal?: boolean }[] = [
+  {
+    label: "About",
+    href: "https://www.tower.fi/",
+    isExternal: true,
+  },
+  {
+    label: "Docs",
+    href: "",
+  },
+  {
+    label: "Privacy Policy",
+    href: "",
+  },
+  {
+    label: "Terms of Use",
+    href: "",
+  },
+];
 
 export const mockTokens = [
   {

@@ -100,9 +100,9 @@ const SwapComponent: React.FC = () => {
   });
 
   return (
-    <>
+    <div className="flex flex-col min-h-[65vh] gap-8 w-full items-center z-20 relative">
       <form
-        className="flex flex-col gap-4 max-w-[434px] mx-auto py-8 px-4 relative z-20"
+        className="flex flex-col gap-4 max-w-[434px] mx-auto py-8 px-4 relative z-20 w-full"
         onSubmit={onSubmit}
       >
         <FormProvider {...methods}>
@@ -155,13 +155,7 @@ const SwapComponent: React.FC = () => {
           </div>
         </FormProvider>
       </form>
-      <img
-        src="/tower-gradient.png"
-        alt="letters"
-        className="absolute bottom-0 left-0 w-full object-cover select-none z-10 min-h-[35rem]"
-        draggable="false"
-      />
-    </>
+    </div>
   );
 };
 

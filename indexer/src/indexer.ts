@@ -216,6 +216,22 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     }
   }
 
+  /**
+   * @param interval
+   * @param page
+   * @param limit
+   *
+   * @description Daily Interval Calculation
+   *
+   *     LEAD(timestamp, 1, NOW()) OVER (PARTITION BY pool_address ORDER BY timestamp): This window function retrieves
+   *     the timestamp of the next row for the same pool_address, ordered by timestamp. If there's no next row, it defaults to NOW().
+   *     LEAD(...) - timestamp: This calculates the time difference between the current row's timestamp and the next row's timestamp.
+   *     EXTRACT(EPOCH FROM (...)): This converts the time difference to seconds.
+   *     / 86400: This converts the time difference from seconds to days.
+   *     fees_usd / total_liquidity_usd / (...): This divides the fees earned by the liquidity and the calculated interval in days to get the daily yield.
+   *     * 365: This annualizes the daily yield to get the APR.
+   *     AVG(...): This calculates the average APR for each pool.
+   */
   async function getCurrentPoolAprs(interval: number, page: number, limit: number): Promise<Record<string, unknown>[] | null> {
     const intervalSql = sql.raw(Math.min(Math.max(1, interval), 365).toString());
     const offset = (Math.max(1, page) - 1) * limit;

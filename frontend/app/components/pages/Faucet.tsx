@@ -19,9 +19,9 @@ const FAUCET_API_URL = "https://graphql.union.build/v1/graphql";
 const TURNSTILE_KEY = "0x4AAAAAAA-eVs5k0b8Q1dl5";
 
 interface FaucetResponse {
-  success: boolean;
-  message?: string;
-  txHash?: string;
+  data: {
+    send: string;
+  }
 }
 
 const faucet_assets = ["ubbn", "IBCT1", "IBCT2", "IBCT3", "IBCT4", "IBCT5", "IBCT6"];
@@ -58,10 +58,9 @@ const FaucetForm: React.FC = () => {
     await toast.promise(
       (async () => {
         try {
-          console.log("posting request")
-          const data: FaucetResponse = await ky
+          const response: FaucetResponse = await ky
             .post(FAUCET_API_URL, {
-              timeout: 60000,
+              timeout: 120000,
               json: {
                 query: `mutation UnoFaucetMutation($chain_id: String!, $denom: String!, $address: String!, $captchaToken: String!) {
               send(chainId: $chain_id, denom: $denom, address: $address, captchaToken: $captchaToken)
@@ -74,31 +73,34 @@ const FaucetForm: React.FC = () => {
                 },
               },
             }).json();
-          console.log(data)
-          if (!data.success) {
-            throw new Error(data.message || "Failed to get faucet funds");
+
+          if (response.data.send === null) {
+            throw new Error("Empty faucet response");
           }
 
-          return data;
+          if (response.data.send.startsWith("ERROR")) {
+            throw new Error(response.data.send);
+          }
+
+          return response;
         } catch (error) {
-          console.log(error)
-          setLoading(false);
-          throw new Error("Something went wrong while requesting funds");
+          throw new Error(error instanceof Error ? error.message : "Something went wrong while requesting funds");
         }
       })(),
       {
         loading: {
           title: "Requesting faucet funds...",
-          description: "Please wait while we process your request",
+          description: "Please wait while we process your request. This may take 1~2 minutes",
         },
         success: {
           title: "Success",
-          component: ({ result }) => (
+          component: ({ result }: { result: FaucetResponse }) => (
             <div className="text-sm text-white/50 flex gap-1 items-center">
               <p>Funds sent successfully! </p>
               <Link
-                href={`${result.txHash}`}
+                href={`https://www.mintscan.io/babylon-testnet/tx/${result.data.send}`}
                 target="_blank"
+                rel="noopener noreferrer"
                 className="underline hover:no-underline"
               >
                 View Tx
@@ -108,12 +110,13 @@ const FaucetForm: React.FC = () => {
         },
         error: {
           title: "Error",
-          description: "Something went wrong while requesting funds.",
+          description: "Something went wrong while requesting funds"
         },
       },
     );
 
     setLoading(false);
+    setCaptchaToken("");
   };
 
   return (

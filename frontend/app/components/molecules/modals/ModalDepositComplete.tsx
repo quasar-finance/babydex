@@ -35,15 +35,15 @@ const ModalDepositCompleted: React.FC = () => {
           <div className="flex items-center justify-center gap-1">
             <div className="flex items-center justify-center gap-1">
               <img src={token0?.logoURI} alt={token0?.symbol} className="w-5 h-5" />
-              <p>{convertMicroDenomToDenom(token0?.amount)}</p>
+              <p>{convertMicroDenomToDenom(token0?.amount, token0?.decimals)}</p>
               <p className="text-white">{token0?.symbol}</p>
             </div>
-            {tokens.length > 0 && (
+            {tokens.length > 1 && (
               <>
                 <p>and</p>
                 <div className="flex items-center justify-center gap-1">
                   <img src={token1?.logoURI} alt={token1?.symbol} className="w-5 h-5" />
-                  <p>{convertMicroDenomToDenom(token1?.amount)}</p>
+                  <p>{convertMicroDenomToDenom(token1?.amount, token1?.decimals)}</p>
                   <p className="text-white">{token1?.symbol}</p>
                 </div>
               </>

@@ -33,6 +33,9 @@ const SwapInfoAccordion: React.FC<Props> = ({ simulation }) => {
   const toDenom = assets.find((asset) => asset.denom === destAssetDenom);
 
   const amountOut = convertMicroDenomToDenom(amountOutMicro, toDenom?.decimals);
+  const rate = Number.parseFloat(
+    (amountOut / Number(convertMicroDenomToDenom(amountIn, fromDenom?.decimals))).toFixed(6),
+  );
 
   return (
     <div
@@ -44,8 +47,7 @@ const SwapInfoAccordion: React.FC<Props> = ({ simulation }) => {
     >
       <div className="flex items-center justify-between h-4">
         <p>
-          {convertMicroDenomToDenom(amountIn, fromDenom?.decimals)}
-          {fromDenom?.symbol} = {amountOut} {toDenom?.symbol}
+          1 {fromDenom?.symbol} = {rate} {toDenom?.symbol}
         </p>
         <div className="flex gap-2 items-center">
           <IconCoins className="" />

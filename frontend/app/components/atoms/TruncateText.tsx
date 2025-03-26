@@ -18,11 +18,11 @@ export const TruncateText: React.FC<Props & ComponentPropsWithoutRef<"p">> = ({
 }) => {
   const slot = children ? children : text ? text : "";
   return (
-    <p className={twMerge("flex overflow-auto", className)} {...props}>
+    <div className={twMerge("flex overflow-auto items-center gap-1", className)} {...props}>
       <span className="truncate">{slot.slice(0, start || 8)}</span>
       <span>...</span>
       <span>{slot.slice(slot.length - (end || 8))}</span>
-    </p>
+    </div>
   );
 };
 

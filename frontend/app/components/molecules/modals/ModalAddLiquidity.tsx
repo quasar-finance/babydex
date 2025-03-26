@@ -13,6 +13,8 @@ import { useModal } from "~/app/providers/ModalProvider";
 import { SingleSideAddLiquidity } from "../SingleSideAddLiquidity";
 import { DoubleSideAddLiquidity } from "../DoubleSideAddLiquidity";
 import { FormProvider, useForm } from "react-hook-form";
+import { Tab, TabList, Tabs } from "../../atoms/Tabs";
+import AssetsStacked from "../../atoms/AssetsStacked";
 
 interface Props {
   pool: PoolInfo;
@@ -55,28 +57,22 @@ export const ModalAddLiquidity: React.FC<Props> = ({ pool }) => {
           <div className="flex flex-col gap-5 px-4 py-5">
             <div className="flex flex-col gap-4">
               <div className="bg-white/5 w-full rounded-xl p-4 flex lg:items-center justify-between gap-4 lg:gap-1 flex-col lg:flex-row">
-                <p className="text-white/50 text-sm">
-                  Selected Pool: <span className="font-bold text-white ">{name}</span>
-                </p>
+                <div className="flex items-center gap-3">
+                  <AssetsStacked assets={pool.assets} />
+                  <span>{name}</span>
+                </div>
                 <div className="flex gap-2 lg:py-1 lg:px-[6px]">
-                  <Button
-                    variant="flat"
-                    onPress={() => changeSide("double")}
-                    className={twMerge("border-2 border-transparent", {
-                      " border-tw-orange-500": side.includes("double"),
-                    })}
+                  <Tabs
+                    color="orange"
+                    defaultKey="double"
+                    selectedKey={side}
+                    onSelectionChange={(key: string) => changeSide(key as "double" | "single")}
                   >
-                    Doubled sided
-                  </Button>
-                  <Button
-                    variant="flat"
-                    onPress={() => changeSide("single")}
-                    className={twMerge("border-2 border-transparent", {
-                      " border-tw-orange-500": side.includes("single"),
-                    })}
-                  >
-                    One sided
-                  </Button>
+                    <TabList className="bg-white/10 rounded-full p-1">
+                      <Tab tabKey="double">Doubled Sided</Tab>
+                      <Tab tabKey="single">Single Sided</Tab>
+                    </TabList>
+                  </Tabs>
                 </div>
               </div>
 

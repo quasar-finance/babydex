@@ -1,10 +1,11 @@
+import type { ReactNode } from "react";
 import _toast, { type ToastOptions } from "react-hot-toast";
 import { ToastCustom } from "~/app/components/atoms/ToastCustom";
 
 export type ToastMsg = {
   title?: string;
   description?: string;
-  component?: React.FC<any>;
+  component?: React.ComponentType<any>;
 };
 
 export type ToastMsgs = {
@@ -91,17 +92,20 @@ const info = (toastMsg: ToastMsg = {}, options?: ToastOptions) =>
   }, options);
 
 const loading = (toastMsg: ToastMsg = {}, options?: ToastOptions) =>
-  _toast.custom((t) => {
-    const msg = { ...defaultMsgs.loading, ...toastMsg };
-    return (
-      <ToastCustom
-        close={() => _toast.dismiss(t.id)}
-        title={msg.title as string}
-        description={msg.description}
-        type="loading"
-      />
-    );
-  }, options);
+  _toast.custom(
+    (t) => {
+      const msg = { ...defaultMsgs.loading, ...toastMsg };
+      return (
+        <ToastCustom
+          close={() => _toast.dismiss(t.id)}
+          title={msg.title as string}
+          description={msg.description}
+          type="loading"
+        />
+      );
+    },
+    { removeDelay: 0, ...options },
+  );
 
 const promise = async <T,>(promise: Promise<T>, toastMsgs: ToastMsgs = {}, delay?: number) => {
   const id = loading(
@@ -114,7 +118,7 @@ const promise = async <T,>(promise: Promise<T>, toastMsgs: ToastMsgs = {}, delay
       if (delay) await new Promise((resolve) => setTimeout(resolve, delay));
       if (toastMsgs?.success?.component) {
         const Component = toastMsgs.success.component;
-        toastMsgs.success.component = () => <Component result={result} />;
+        toastMsgs.success.component = Component;
       }
       const msg = { ...defaultMsgs.success, ...toastMsgs?.success };
       success(msg, { id, duration: 8000 });

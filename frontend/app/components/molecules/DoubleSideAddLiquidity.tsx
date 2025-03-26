@@ -118,7 +118,7 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
               const regex = /^\d+(\.\d{0,18})?$/;
               if (target.value === "" || regex.test(target.value)) {
                 setValue(token0.symbol, target.value, { shouldValidate: true });
-                setValue(token1.symbol, Number(target.value) * optimalRatio, {
+                setValue(token1.symbol, (Number(target.value) * optimalRatio).toFixed(2), {
                   shouldValidate: true,
                 });
               }
@@ -126,7 +126,15 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
           />
         </div>
         <div className="flex gap-2 items-center justify-between text-white/50 text-xs">
-          <div className="flex gap-1 items-center">
+          <div
+            className="flex gap-1 items-center cursor-pointer"
+            onClick={() => {
+              setValue(token0.symbol, t0DenomBalance.toFixed(2), { shouldValidate: true });
+              setValue(token1.symbol, (Number(t0DenomBalance) * optimalRatio).toFixed(2), {
+                shouldValidate: true,
+              });
+            }}
+          >
             <IconWallet className="h-4 w-4" />
             <p>{t0DenomBalance}</p>
           </div>
@@ -156,7 +164,7 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
               const regex = /^\d+(\.\d{0,18})?$/;
               if (target.value === "" || regex.test(target.value)) {
                 setValue(token1.symbol, target.value, { shouldValidate: true });
-                setValue(token0.symbol, Number(target.value) / optimalRatio, {
+                setValue(token0.symbol, (Number(target.value) / optimalRatio).toFixed(2), {
                   shouldValidate: true,
                 });
               }
@@ -164,7 +172,15 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
           />
         </div>
         <div className="flex gap-2 items-center justify-between text-white/50 text-xs">
-          <div className="flex gap-1 items-center">
+          <div
+            className="flex gap-1 items-center cursor-pointer"
+            onClick={() => {
+              setValue(token1.symbol, t1DenomBalance, { shouldValidate: true });
+              setValue(token0.symbol, (Number(t1DenomBalance) / optimalRatio).toFixed(2), {
+                shouldValidate: true,
+              });
+            }}
+          >
             <IconWallet className="h-4 w-4" />
             <p>{t1DenomBalance}</p>
           </div>

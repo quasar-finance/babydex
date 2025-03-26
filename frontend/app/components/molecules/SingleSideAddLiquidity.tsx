@@ -123,7 +123,14 @@ export const SingleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
         />
       </div>
       <div className="flex gap-2 items-center justify-between text-white/50 text-xs">
-        <div className="flex gap-1 items-center">
+        <div
+          className="flex gap-1 items-center cursor-pointer"
+          onClick={() =>
+            setValue(asset.symbol, denomBalance, {
+              shouldValidate: true,
+            })
+          }
+        >
           <IconWallet className="h-4 w-4" />
           <p>{denomBalance}</p>
         </div>

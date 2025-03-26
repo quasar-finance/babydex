@@ -6,13 +6,14 @@ import { twMerge } from "~/utils/twMerge";
 interface TabsProps {
   defaultKey?: string;
   selectedKey?: string;
-  onSelectionChange?: (index: string) => void;
+  onSelectionChange?: (key: string) => void;
   color?: "default" | "orange";
+  className?: string;
 }
 
 interface TabContextType {
   activeKey: string;
-  setKey: (index: string) => void;
+  setKey: (key: string) => void;
   color: "default" | "orange";
 }
 
@@ -29,29 +30,37 @@ export const Tabs: React.FC<PropsWithChildren<TabsProps>> = ({
   children,
   defaultKey = "",
   onSelectionChange,
+  className,
 }) => {
   const tabsArray = React.Children.toArray(children) as React.ReactElement<TabProps>[];
   const firstTabKey = tabsArray.length > 0 ? tabsArray[0].props.tabKey : "";
 
   const [activeKey, setActiveKey] = useState(defaultKey || firstTabKey);
 
-  const setKey = (index: string) => {
-    setActiveKey(index);
-    onSelectionChange ? onSelectionChange(index) : null;
+  const setKey = (key: string) => {
+    setActiveKey(key);
+    onSelectionChange ? onSelectionChange(key) : null;
   };
 
   return (
     <TabContext.Provider value={{ activeKey, setKey, color }}>
-      <div className="relative flex flex-col w-full gap-2">{children}</div>
+      <div className={twMerge("relative flex flex-col w-full gap-2", className)}>{children}</div>
     </TabContext.Provider>
   );
 };
 
-export const TabList: React.FC<PropsWithChildren> = ({ children }) => {
+export const TabList: React.FC<PropsWithChildren<{ className?: string }>> = ({
+  children,
+  className,
+}) => {
   const context = useContext(TabContext);
   if (!context) throw new Error("TabList must be used within a Tabs");
 
-  return <div className="relative flex items-center gap-1 w-fit rounded-full">{children}</div>;
+  return (
+    <div className={twMerge("relative flex items-center gap-1 w-fit rounded-full", className)}>
+      {children}
+    </div>
+  );
 };
 
 export const Tab: React.FC<PropsWithChildren<TabProps>> = ({
@@ -66,8 +75,8 @@ export const Tab: React.FC<PropsWithChildren<TabProps>> = ({
   const isActive = context.activeKey === tabKey;
 
   const colorVariants = {
-    default: " text-white",
-    orange: " text-tw-orange-400",
+    default: "text-white/80 aria-selected:text-white",
+    orange: "text-white/80 aria-selected:text-tw-orange-400",
   };
 
   return (
@@ -79,7 +88,7 @@ export const Tab: React.FC<PropsWithChildren<TabProps>> = ({
       onClick={() => !disabled && context.setKey(tabKey)}
       className={twMerge(
         "relative px-[14px] py-[10px] rounded-full text-sm flex items-center gap-2 transition-all z-10",
-        isActive ? colorVariants[context.color] : "text-white",
+        colorVariants[context.color],
         disabled ? "opacity-30 cursor-not-allowed" : "hover:text-white/50",
         className,
       )}

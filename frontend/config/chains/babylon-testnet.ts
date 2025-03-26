@@ -4,6 +4,12 @@ export const babylonTestnet = defineChain({
   id: "bbn-test-5",
   name: "babylontestnet",
   icon: "https://raw.githubusercontent.com/cosmos/chain-registry/master/testnets/babylontestnet/images/logo.svg",
+  blockExplorers: {
+    default: {
+      name: "Babylon Testnet Explorer",
+      url: "https://babylon-testnet.l2scan.co",
+    },
+  },
   nativeCurrency: {
     decimals: 6,
     name: "ubbn",

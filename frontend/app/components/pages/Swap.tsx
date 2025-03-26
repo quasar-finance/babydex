@@ -6,7 +6,7 @@ import { ModalTypes } from "~/types/modal";
 import { useModal } from "~/app/providers/ModalProvider";
 import { motion } from "motion/react";
 import SwapInfoAccordion from "../molecules/Swap/SwapInfoAccordion";
-import { useAccount } from "@cosmi/react";
+import { useAccount, useConfig } from "@cosmi/react";
 import { Tab, TabList, TabContent, Tabs } from "../atoms/Tabs";
 import { Swap } from "../organisms/swap/Swap";
 import { Bridge } from "../organisms/swap/Bridge";
@@ -15,13 +15,15 @@ import { FormProvider, useForm } from "react-hook-form";
 import { useToast } from "~/app/hooks";
 import { useMemo, useState } from "react";
 import { useSwapStore } from "~/app/hooks/useSwapStore";
+import { IntlAddress } from "~/utils/intl";
+import TruncateText from "../atoms/TruncateText";
 
 const SwapComponent: React.FC = () => {
   const [action, setAction] = useState("swap");
-  const { isConnected, address } = useAccount();
+  const { isConnected, address, chain } = useAccount();
   const { showModal } = useModal();
   const { slippage } = useSwapStore();
-  const methods = useForm();
+  const methods = useForm({ mode: "onChange" });
   const { formState, handleSubmit, reset } = methods;
   const { toast } = useToast();
   const { errors, isValid } = formState;
@@ -41,39 +43,60 @@ const SwapComponent: React.FC = () => {
     const { requiredChainAddresses } = simulation;
     const slippageTolerancePercent = slippage === "auto" ? undefined : slippage;
 
-    await skipClient?.executeRoute({
-      route: simulation,
-      slippageTolerancePercent,
-      userAddresses: requiredChainAddresses.map((chainID) => ({
-        chainID,
-        address: address as string,
-      })),
-      onTransactionCompleted: async (chainID, txHash, status) => {
-        toast.success({
-          title: "Success",
-          description: `Route completed with tx hash: ${txHash} & status: ${status.state}`,
-        });
+    const id = toast.loading(
+      {
+        title: "Processing transaction...",
+        description: "Waiting for transaction to be completed",
       },
-      onTransactionBroadcast: async ({ txHash, chainID }) => {
-        toast.success({
-          title: "Success",
-          description: `Transaction broadcasted with tx hash: ${txHash}`,
-        });
-      },
-      onTransactionTracked: async ({ txHash, chainID }) => {
-        console.log(`Transaction tracked with tx hash: ${txHash}`);
-        toast.success({
-          title: "Success",
-          description: `Transaction tracked with tx hash: ${txHash}`,
-        });
-      },
-      onTransactionSigned: async ({ chainID }) => {
-        toast.success({
-          title: "Success",
-          description: `Transaction signed with chain ID: ${chainID}`,
-        });
-      },
-    });
+      { duration: Number.POSITIVE_INFINITY },
+    );
+
+    try {
+      await skipClient?.executeRoute({
+        route: simulation,
+        slippageTolerancePercent,
+        userAddresses: requiredChainAddresses.map((chainID) => ({
+          chainID,
+          address: address as string,
+        })),
+        onTransactionSigned: async ({ chainID }) => {
+          toast.success({
+            title: "Succesfully Signed",
+            description: `Transaction signed with chain ID: ${chainID}`,
+          });
+        },
+        onTransactionCompleted: async (chainID, txHash, status) => {
+          toast.dismiss(id);
+          toast.success({
+            title: "Success",
+            component: () => (
+              <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-1">
+                  <p>Route completed with tx hash:</p>
+                  <TruncateText text={txHash} />{" "}
+                </div>
+                <a
+                  className="underline hover:no-underline"
+                  target="_blank"
+                  href={`${chain?.blockExplorers?.default.url}/tx/${txHash}`}
+                  rel="noreferrer"
+                >
+                  See tx
+                </a>
+              </div>
+            ),
+          });
+        },
+      });
+    } catch (e: any) {
+      toast.dismiss(id);
+      toast.error({
+        title: "Error",
+        description: e.message,
+      });
+    }
+    reset();
+    //TODO: refreshBalances()
   });
 
   return (
@@ -118,7 +141,7 @@ const SwapComponent: React.FC = () => {
               </TabContent>
             </Tabs>
           </div>
-          <div className="w-full px-4 flex flex-col gap-6">
+          <div className="w-full flex flex-col gap-6">
             {isConnected ? (
               <Button fullWidth type="submit" isDisabled={isLoading || isDisabled}>
                 {text}

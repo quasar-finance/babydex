@@ -4,12 +4,12 @@ import { extendVariants, Button as NextButton } from "@heroui/react";
 export const Button = extendVariants(NextButton, {
   variants: {
     color: {
-      primary: "",
-      secondary: "",
-      tertiary: "",
+      primary: "outline-none focus:outline-none",
+      secondary: "outline-none focus:outline-none",
+      tertiary: "outline-none focus:outline-none",
     },
     isDisabled: {
-      true: "!bg-white/10 !text-white/50 !hover:bg-white/10 cursor-not-allowed",
+      true: "!bg-white/10 z-10 backdrop-2xl !text-white/70 !hover:bg-white/10 cursor-not-allowed",
     },
     variant: {},
     isIconOnly: {

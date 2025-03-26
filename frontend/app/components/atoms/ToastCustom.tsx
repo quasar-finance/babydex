@@ -14,7 +14,7 @@ interface Props {
   type: "error" | "success" | "loading" | "warning" | "info";
   close: () => void;
   description?: string;
-  component?: React.FC;
+  component?: React.ComponentType<any>;
 }
 
 const Icons = {
@@ -71,7 +71,7 @@ export const ToastCustom: React.FC<Props> = ({
         </div>
         <IconX className="h-5 w-5 cursor-pointer text-white/20" onClick={close} />
       </div>
-      <div className="p-4">
+      <div className="p-4 text-sm text-gray-300">
         {description && !Component ? <p className="text-sm text-gray-300">{description}</p> : null}
         {Component ? <Component /> : null}
       </div>

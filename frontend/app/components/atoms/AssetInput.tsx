@@ -1,5 +1,5 @@
 import type { BaseCurrency } from "@towerfi/types";
-import type { Control } from "react-hook-form";
+import { useController, type Control } from "react-hook-form";
 import { convertMicroDenomToDenom } from "~/utils/intl";
 import { motion } from "motion/react";
 import { IconChevronDown, IconWallet } from "@tabler/icons-react";
@@ -8,6 +8,7 @@ import { ModalTypes } from "~/types/modal";
 import { useModal } from "~/app/providers/ModalProvider";
 import { Assets } from "~/config";
 import { useBalances } from "@cosmi/react";
+import { assetNumberMask } from "~/utils/masks";
 
 type AssetInputProps = {
   asset: BaseCurrency;
@@ -15,6 +16,7 @@ type AssetInputProps = {
   disabled?: boolean;
   onSelect: (asset: BaseCurrency) => void;
   control: Control;
+  mask?: (v: string) => string | null;
   onFocus?: () => void;
 };
 
@@ -27,9 +29,25 @@ export const AssetInput: React.FC<AssetInputProps> = ({
   onFocus,
   disabled,
   control,
+  mask = assetNumberMask,
 }) => {
   const { showModal } = useModal();
-  const { register } = control;
+
+  const { field: inputField } = useController({
+    name,
+    control,
+    defaultValue: "",
+    rules: {
+      validate: (value) => {
+        if (value === "") return "Amount is required";
+        if (Number.isNaN(+value)) return "Only enter number digits";
+        if (Number(value) > Number(denomBalance)) return "Insufficient Amount";
+        if (Number(value) <= 0) return "Amount must be greater than 0";
+      },
+    },
+  });
+
+  const setValue = (value: string) => inputField.onChange(value);
 
   const { data: balances = [] } = useBalances();
 
@@ -64,23 +82,24 @@ export const AssetInput: React.FC<AssetInputProps> = ({
         </motion.button>
 
         <input
+          {...inputField}
           className="text-2xl bg-transparent text-right w-[8rem]"
           placeholder="0"
-          {...register(name, {
-            validate: (value) => {
-              if (value === "") return "Amount is required";
-              if (Number.isNaN(+value)) return "Only enter number digits";
-              if (Number(value) > Number(denomBalance)) return "Insufficient Amount";
-              if (Number(value) <= 0) return "Amount must be greater than 0";
-            },
-          })}
           onFocus={onFocus}
           disabled={disabled}
+          onChange={(e) => {
+            if (!mask) setValue(e.target.value);
+            else {
+              if (e.target.value === "") return setValue("");
+              const v = mask(e.target.value);
+              if (v) setValue(v);
+            }
+          }}
         />
       </div>
 
       <div className="flex items-center justify-between text-white/50 text-xs">
-        <div className="flex items-center gap-1 ">
+        <div className="flex items-center gap-1" onClick={() => setValue(denomBalance.toString())}>
           <IconWallet className="w-4 h-4" />
           <p>{denomBalance}</p>
         </div>

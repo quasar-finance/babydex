@@ -53,17 +53,19 @@ test('get pool volumes by addresses', async () => {
 });
 
 test('get current pool apr', async () => {
-  const res = await indexer.getCurrentPoolApr(1, 100);
+  const res = await indexer.getCurrentPoolAprs(365, 1, 100);
 
   expect(res.length).toBeGreaterThan(0);
   console.log(res);
 });
 
 test('get pool apr by addresses', async () => {
-  const res = await indexer.getPoolAprByPoolAddresses([
-    "bbn10vzynuvh08kssssdrj9k2vaxxl9uqn0f08jaq8zq6h7vxmd9cnuqa3putu",
-    "bbn17xgsxm4vll7trsd59e26wg9f0unwmx2ktfhtvhu35jeel5wrakcqvnwzyu",
-  ]);
+  const res = await indexer.getPoolAprsByPoolAddresses(
+    365,
+    [
+      "bbn10vzynuvh08kssssdrj9k2vaxxl9uqn0f08jaq8zq6h7vxmd9cnuqa3putu",
+      "bbn17xgsxm4vll7trsd59e26wg9f0unwmx2ktfhtvhu35jeel5wrakcqvnwzyu",
+    ]);
 
   expect(res.length).toBeGreaterThan(0);
 });

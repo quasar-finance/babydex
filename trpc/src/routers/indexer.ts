@@ -59,13 +59,13 @@ export const indexerRouter = createTRPCRouter({
       return await ctx.indexerService.getPoolVolumesByPoolAddresses(input.addresses);
     }),
   getCurrentPoolAprs: createTRPCPublicProcedure
-    .input(z.object({page: z.number().min(1), limit: z.number().min(1).max(100)}))
+    .input(z.object({interval: z.number().min(1).max(365), page: z.number().min(1), limit: z.number().min(1).max(100)}))
     .query(async ({ctx, input}) => {
-      return await ctx.indexerService.getCurrentPoolVolumes(input.limit, input.page);
+      return await ctx.indexerService.getCurrentPoolAprs(input.interval, input.limit, input.page);
     }),
-  getPoolAprByAddresses: createTRPCPublicProcedure
-    .input(z.object({addresses: z.string().array()}))
+  getPoolAprsByAddresses: createTRPCPublicProcedure
+    .input(z.object({interval: z.number().min(1).max(365), addresses: z.string().array()}))
     .query(async ({ctx, input}) => {
-      return await ctx.indexerService.getPoolVolumesByPoolAddresses(input.addresses);
+      return await ctx.indexerService.getPoolAprsByPoolAddresses(input.interval, input.addresses);
     }),
 });

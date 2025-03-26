@@ -46,11 +46,13 @@ export type Indexer = {
   getPoolVolumesByPoolAddresses: (
     addresses: string[]
   ) => Promise<Record<string, unknown>[] | null>;
-  getCurrentPoolApr: (
+  getCurrentPoolAprs: (
+    interval: number,
     page: number,
     limit: number
   ) => Promise<Record<string, unknown>[] | null>;
-  getPoolAprByPoolAddresses: (
+  getPoolAprsByPoolAddresses: (
+    interval: number,
     addresses: string[]
   ) => Promise<Record<string, unknown>[] | null>;
 };
@@ -155,13 +157,13 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
                            WHEN s.offer_asset = pb.token0_denom THEN offer_amount
                            ELSE 0
                            END
-               )                   AS token0_volume,
+               ) AS token0_volume,
                SUM(
                        CASE
                            WHEN s.offer_asset = pb.token1_denom THEN offer_amount
                            ELSE 0
                            END
-               )                   AS token1_volume
+               ) AS token1_volume
         FROM v1_cosmos.swap s
                  JOIN
              v1_cosmos.pool_balance pb ON s.pool_address = pb.pool_address
@@ -183,28 +185,24 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
   async function getPoolVolumesByPoolAddresses(addresses: string[]): Promise<Record<string, unknown>[] | null> {
     const pool_addresses_sql = sql.raw(createPoolAddressArraySql(addresses));
     const query = sql`
-        SELECT
-            s.pool_address,
-            SUM(
-                    CASE
-                        WHEN s.offer_asset = pb.token0_denom THEN offer_amount
-                        ELSE 0
-                        END
-            ) AS token0_volume,
-            SUM(
-                    CASE
-                        WHEN s.offer_asset = pb.token1_denom THEN offer_amount
-                        ELSE 0
-                        END
-            ) AS token1_volume
-        FROM
-            v1_cosmos.swap s
-                JOIN
-            v1_cosmos.pool_balance pb ON s.pool_address = pb.pool_address
-        WHERE
-            s.pool_address = ${pool_addresses_sql}
-        GROUP BY
-            s.pool_address;
+        SELECT s.pool_address,
+               SUM(
+                       CASE
+                           WHEN s.offer_asset = pb.token0_denom THEN offer_amount
+                           ELSE 0
+                           END
+               ) AS token0_volume,
+               SUM(
+                       CASE
+                           WHEN s.offer_asset = pb.token1_denom THEN offer_amount
+                           ELSE 0
+                           END
+               ) AS token1_volume
+        FROM v1_cosmos.swap s
+                 JOIN
+             v1_cosmos.pool_balance pb ON s.pool_address = pb.pool_address
+        WHERE s.pool_address = ${pool_addresses_sql}
+        GROUP BY s.pool_address;
     `;
 
     try {
@@ -218,18 +216,26 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     }
   }
 
-  async function getCurrentPoolApr(page: number, limit: number): Promise<Record<string, unknown>[] | null> {
+  async function getCurrentPoolAprs(interval: number, page: number, limit: number): Promise<Record<string, unknown>[] | null> {
+    const intervalSql = sql.raw(Math.min(Math.max(1, interval), 365).toString());
     const offset = (Math.max(1, page) - 1) * limit;
     const query = sql`
+        WITH daily_yield AS (SELECT pool_address,
+                                    fees_usd / total_liquidity_usd / (EXTRACT(EPOCH FROM (LEAD(timestamp, 1, NOW())
+                                                                                          OVER (PARTITION BY pool_address ORDER BY timestamp) -
+                                                                                          timestamp)) /
+                                                                      86400) AS daily_yield
+                             FROM v1_cosmos.historic_pool_yield
+                             WHERE timestamp >= NOW() - INTERVAL '${intervalSql} day'
+                               AND total_liquidity_usd > 0)
         SELECT pool_address,
-               AVG(fees_usd / total_liquidity_usd * 365) AS avg_apr
-        FROM v1_cosmos.historic_pool_yield
-        WHERE timestamp >= NOW() - INTERVAL '1 year'
-          AND total_liquidity_usd > 0
+               AVG(daily_yield) * 365 AS avg_apr
+        FROM daily_yield
         GROUP BY pool_address
         ORDER BY pool_address
         LIMIT ${limit} OFFSET ${offset};
     `;
+
     try {
       const result = await client.execute(query);
 
@@ -241,20 +247,24 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     }
   }
 
-  async function getPoolAprByPoolAddresses(addresses: string[]): Promise<Record<string, unknown>[] | null> {
-    const pool_addresses_sql = sql.raw(createPoolAddressArraySql(addresses));
+  async function getPoolAprsByPoolAddresses(interval: number, addresses: string[]): Promise<Record<string, unknown>[] | null> {
+    const intervalSql = sql.raw(Math.min(Math.max(1, interval), 365).toString());
+    const poolAddressesSql = sql.raw(createPoolAddressArraySql(addresses));
     const query = sql`
-        SELECT
-            pool_address,
-            AVG(fees_usd / total_liquidity_usd * 365) AS avg_apr
-        FROM
-            v1_cosmos.historic_pool_yield
-        WHERE
-            pool_address = ${pool_addresses_sql}
-          AND timestamp >= NOW() - INTERVAL '1 year'
-          AND total_liquidity_usd > 0 -- Avoid division by zero
-        GROUP BY
-            pool_address;
+        WITH daily_yield AS (SELECT pool_address,
+                                    fees_usd / total_liquidity_usd / (EXTRACT(EPOCH FROM (LEAD(timestamp, 1, NOW())
+                                                                                          OVER (PARTITION BY pool_address ORDER BY timestamp) -
+                                                                                          timestamp)) /
+                                                                      86400) AS daily_yield
+                             FROM v1_cosmos.historic_pool_yield
+                             WHERE timestamp >= NOW() - INTERVAL '${intervalSql} day'
+                               AND total_liquidity_usd > 0
+                               AND pool_address = ${poolAddressesSql})
+        SELECT pool_address,
+               AVG(daily_yield) * 365 AS avg_apr
+        FROM daily_yield
+        GROUP BY pool_address
+        ORDER BY pool_address;
     `;
     try {
       const result = await client.execute(query);
@@ -283,7 +293,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     getPoolBalancesByPoolAddresses,
     getCurrentPoolVolumes,
     getPoolVolumesByPoolAddresses,
-    getCurrentPoolApr,
-    getPoolAprByPoolAddresses,
+    getCurrentPoolAprs,
+    getPoolAprsByPoolAddresses,
   } as Indexer;
 }

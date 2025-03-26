@@ -28,10 +28,10 @@ const MaxSlippageSwitcher: React.FC<Props> = ({ maxSlippage, setMaxSlippage }) =
       >
         <input
           type="number"
-          onFocus={() => setMaxSlippage("0.5")}
+          onFocus={() => setMaxSlippage(isCustom ? "0.5" : maxSlippage)}
           value={isCustom ? "0.5" : maxSlippage}
           onChange={(e) => setMaxSlippage(e.target.value)}
-          className="bg-transparent outline-none focus:border-none max-w-[1.5rem]"
+          className="bg-transparent outline-none focus:border-none max-w-[1.5rem] text-right"
         />
         <p>%</p>
       </motion.button>

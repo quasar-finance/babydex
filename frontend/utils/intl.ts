@@ -79,6 +79,10 @@ export function nFormatter(num: number, digits: number, digitsFrom?: number) {
     : "0";
 }
 
+export function formatDecimals(num: number, decimals?: number): number {
+  return Number.parseFloat(num.toFixed(decimals || 2));
+}
+
 export function graphDateFormatter(date: string, format: "month"): string {
   return new Date(date).toLocaleString("default", { month: "long" });
 }

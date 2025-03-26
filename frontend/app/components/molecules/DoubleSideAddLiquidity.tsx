@@ -2,7 +2,7 @@ import { useFormContext } from "react-hook-form";
 import type { PoolInfo } from "@towerfi/types";
 import type React from "react";
 import { useAccount, useBalances, useSigningClient } from "@cosmi/react";
-import { convertDenomToMicroDenom, convertMicroDenomToDenom } from "~/utils/intl";
+import { convertDenomToMicroDenom, convertMicroDenomToDenom, formatDecimals } from "~/utils/intl";
 import { useToast } from "~/app/hooks";
 import { IconWallet } from "@tabler/icons-react";
 import { trpc } from "~/trpc/client";
@@ -51,10 +51,13 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
     onSubmit: async ({ slipageTolerance, ...data }) => {
       try {
         if (!signingClient) throw new Error("we couldn't submit the tx");
-        const id = toast.loading({
-          title: "Depositing",
-          description: `Depositing ${data[token0.symbol]} ${token0.symbol} and ${data[token1.symbol]} ${token1.symbol} to the pool`,
-        });
+        const id = toast.loading(
+          {
+            title: "Depositing",
+            description: `Depositing ${data[token0.symbol]} ${token0.symbol} and ${data[token1.symbol]} ${token1.symbol} to the pool`,
+          },
+          { duration: Number.POSITIVE_INFINITY },
+        );
 
         const token0Amount = convertDenomToMicroDenom(data[token0.symbol], token0.decimals);
         const token1Amount = convertDenomToMicroDenom(data[token1.symbol], token1.decimals);
@@ -118,7 +121,7 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
               const regex = /^\d+(\.\d{0,18})?$/;
               if (target.value === "" || regex.test(target.value)) {
                 setValue(token0.symbol, target.value, { shouldValidate: true });
-                setValue(token1.symbol, (Number(target.value) * optimalRatio).toFixed(2), {
+                setValue(token1.symbol, formatDecimals(Number(target.value) * optimalRatio), {
                   shouldValidate: true,
                 });
               }
@@ -129,8 +132,8 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
           <div
             className="flex gap-1 items-center cursor-pointer"
             onClick={() => {
-              setValue(token0.symbol, t0DenomBalance.toFixed(2), { shouldValidate: true });
-              setValue(token1.symbol, (Number(t0DenomBalance) * optimalRatio).toFixed(2), {
+              setValue(token0.symbol, formatDecimals(t0DenomBalance), { shouldValidate: true });
+              setValue(token1.symbol, formatDecimals(t0DenomBalance * optimalRatio), {
                 shouldValidate: true,
               });
             }}
@@ -164,7 +167,7 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
               const regex = /^\d+(\.\d{0,18})?$/;
               if (target.value === "" || regex.test(target.value)) {
                 setValue(token1.symbol, target.value, { shouldValidate: true });
-                setValue(token0.symbol, (Number(target.value) / optimalRatio).toFixed(2), {
+                setValue(token0.symbol, formatDecimals(Number(target.value) / optimalRatio), {
                   shouldValidate: true,
                 });
               }
@@ -176,7 +179,7 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
             className="flex gap-1 items-center cursor-pointer"
             onClick={() => {
               setValue(token1.symbol, t1DenomBalance, { shouldValidate: true });
-              setValue(token0.symbol, (Number(t1DenomBalance) / optimalRatio).toFixed(2), {
+              setValue(token0.symbol, formatDecimals(Number(t1DenomBalance) / optimalRatio), {
                 shouldValidate: true,
               });
             }}

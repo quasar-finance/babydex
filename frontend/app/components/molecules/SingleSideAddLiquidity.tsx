@@ -37,10 +37,13 @@ export const SingleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
         try {
           if (!signingClient) throw new Error("we couldn't submit the tx");
 
-          const id = toast.loading({
-            title: "Depositing",
-            description: `Depositing ${data[asset.symbol]} ${asset.symbol} to the pool`,
-          });
+          const id = toast.loading(
+            {
+              title: "Depositing",
+              description: `Depositing ${data[asset.symbol]} ${asset.symbol} to the pool`,
+            },
+            { duration: Number.POSITIVE_INFINITY },
+          );
 
           const tokenAmount = convertDenomToMicroDenom(data[asset.symbol], asset.decimals);
           await signingClient.execute({

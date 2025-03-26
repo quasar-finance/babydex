@@ -100,7 +100,7 @@ const SwapComponent: React.FC = () => {
   });
 
   return (
-    <div className="flex flex-col min-h-[65vh] gap-8 w-full items-center z-20 relative">
+    <div className="flex flex-col min-h-[65vh] gap-8 w-full items-center relative">
       <form
         className="flex flex-col gap-4 max-w-[434px] mx-auto py-8 px-4 relative z-20 w-full"
         onSubmit={onSubmit}
@@ -141,17 +141,24 @@ const SwapComponent: React.FC = () => {
               </TabContent>
             </Tabs>
           </div>
-          <div className="w-full flex flex-col gap-6">
-            {isConnected ? (
-              <Button fullWidth type="submit" isDisabled={isLoading || isDisabled}>
-                {text}
-              </Button>
-            ) : (
-              <Button onPress={() => showModal(ModalTypes.connect_wallet)} fullWidth>
-                Connect wallet
-              </Button>
-            )}
-            <SwapInfoAccordion simulation={simulation} />
+          <div className="w-full flex flex-col gap-6  relative z-20">
+            <div className="backdrop-blur-md rounded-2xl">
+              {isConnected ? (
+                <Button
+                  fullWidth
+                  type="submit"
+                  isDisabled={isLoading || isDisabled}
+                  className="backdrop-blur-md"
+                >
+                  {text}
+                </Button>
+              ) : (
+                <Button onPress={() => showModal(ModalTypes.connect_wallet)} fullWidth>
+                  Connect wallet
+                </Button>
+              )}
+            </div>
+            <SwapInfoAccordion simulation={simulation} className="absolute w-full top-14" />
           </div>
         </FormProvider>
       </form>

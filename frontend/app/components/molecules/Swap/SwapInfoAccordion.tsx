@@ -9,11 +9,12 @@ import { Assets } from "~/config";
 
 interface Props {
   simulation?: RouteResponse | null;
+  className?: string;
 }
 
 const assets = Object.values(Assets);
 
-const SwapInfoAccordion: React.FC<Props> = ({ simulation }) => {
+const SwapInfoAccordion: React.FC<Props> = ({ simulation, className }) => {
   const [expanded, setExpanded] = useState(false);
   const { slippage } = useSwapStore();
 
@@ -42,6 +43,7 @@ const SwapInfoAccordion: React.FC<Props> = ({ simulation }) => {
       className={twMerge(
         "w-full flex flex-col gap-3 relative overflow-hidden transition-all duration-300 h-[1.5rem] text-white/50 text-sm cursor-pointer",
         expanded ? "h-[6.625rem]" : "h-4",
+        className,
       )}
       onClick={() => setExpanded(!expanded)}
     >

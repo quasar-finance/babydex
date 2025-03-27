@@ -23,14 +23,13 @@
   "scripts": {
     "dev": "tsc -w",
     "build": "tsc",
-    "drizzle-pull": "dotenv -e .env.testing npx drizzle-kit pull --verbose",
+    "drizzle-pull": "npx drizzle-kit pull",
     "test": "npx vitest"
   },
   "devDependencies": {
     "@towerfi/types": "workspace:^",
     "@types/pg": "^8.11.11",
     "dotenv": "^16.4.7",
-    "dotenv-cli": "^8.0.0",
     "drizzle-kit": "^0.30.5",
     "path": "^0.12.7",
     "ts-node": "^10.9.2",

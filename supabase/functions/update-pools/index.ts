@@ -57,7 +57,7 @@ serve(async (req) => {
       if (newPools && newPools.length > 0) {
         try {
           // Call check-lp-tokens function
-          const response = await fetch(`${Deno.env.get('SUPABASE_FUNCTIONS_URL')}/get-lp-tokens`, {
+          const response = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/get-lp-tokens`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

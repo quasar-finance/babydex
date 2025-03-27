@@ -1,13 +1,19 @@
 import { serve } from "std/http/server.ts";
 import { createClient } from "@supabase/supabase-js";
+import { CosmWasmClient } from "npm:@cosmjs/cosmwasm-stargate@^0.32.2";
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+const RPC_ENDPOINT = Deno.env.get("RPC_ENDPOINT")!;
+
+interface PoolRequest {
+  pools: string[];  // Array of pool addresses
+}
 
 serve(async (req) => {
   try {
-    // Parse the request body
-    const { pools } = await req.json();
+    // Parse the request body with type
+    const { pools } = await req.json() as PoolRequest;
     if (!pools || !Array.isArray(pools)) {
       throw new Error('Invalid request body - expected array of pool addresses');
     }
@@ -27,13 +33,12 @@ serve(async (req) => {
         const lpToken = await queryLPToken(poolAddress);
         
         // Insert the relationship into the database
+        console.log(lpToken)
         const { data, error } = await supabase
-          .from('pool_lp_tokens')
+          .from('pool_lp_token')
           .insert({
-            pool_address: poolAddress,
-            lp_token_address: lpToken,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
+            pool: poolAddress,
+            lp_token: lpToken,
           })
           .select()
           .single();
@@ -42,7 +47,7 @@ serve(async (req) => {
         
         results.push({
           pool_address: poolAddress,
-          lp_token_address: lpToken,
+          lp_token: lpToken,
           success: true
         });
 
@@ -79,10 +84,10 @@ serve(async (req) => {
 // This function needs to be implemented based on your blockchain SDK
 async function queryLPToken(poolAddress: string): Promise<string> {
   // Example implementation - replace with actual blockchain query
-  // const client = new CosmWasmClient(RPC_ENDPOINT);
-  // const result = await client.queryContractSmart(poolAddress, { 
-  //   get_lp_token: {} 
-  // });
-  // return result.lp_token_address;
-  throw new Error('queryLPToken function needs to be implemented');
+  const client = await CosmWasmClient.connect(RPC_ENDPOINT);
+  const result = await client.queryContractSmart(poolAddress, { 
+    pair: {} 
+  });
+  console.log(result.liquidity_token)
+  return result.liquidity_token;
 }

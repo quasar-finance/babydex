@@ -150,7 +150,7 @@ export const poolsRouter = createTRPCRouter({
         caller.local.pools.getPoolConfig({ address: pool.contract_addr }),
       ]);
 
-      const [shares, config] = response as [PoolResponse, ConfigResponse];
+      const [shares, config] = response as [PoolResponse, PoolInfo["config"]];
 
       const [token1, token2] = pool.asset_infos;
       if (!token1 || !token2) throw new Error("Invalid pool");

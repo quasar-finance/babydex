@@ -261,6 +261,53 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
 
       throw error;
     }
+
+  }
+
+
+  /**
+   * @param interval
+   * @param page
+   * @param limit
+   *
+   * @description Daily Interval Calculation
+   *
+   *     LEAD(timestamp, 1, NOW()) OVER (PARTITION BY pool_address ORDER BY timestamp): This window function retrieves
+   *     the timestamp of the next row for the same pool_address, ordered by timestamp. If there's no next row, it defaults to NOW().
+   *     LEAD(...) - timestamp: This calculates the time difference between the current row's timestamp and the next row's timestamp.
+   *     EXTRACT(EPOCH FROM (...)): This converts the time difference to seconds.
+   *     / 86400: This converts the time difference from seconds to days.
+   *     fees_usd / total_liquidity_usd / (...): This divides the fees earned by the liquidity and the calculated interval in days to get the daily yield.
+   *     * 365: This annualizes the daily yield to get the APR.
+   *     AVG(...): This calculates the average APR for each pool.
+   */
+  async function getCurrentPoolAprs(interval: number, page: number, limit: number): Promise<Record<string, unknown>[] | null> {
+    const intervalSql = sql.raw(Math.min(Math.max(1, interval), 365).toString());
+    const offset = (Math.max(1, page) - 1) * limit;
+    const query = sql`
+        WITH daily_yield AS (SELECT pool_address,
+                                    fees_usd / total_liquidity_usd / (EXTRACT(EPOCH FROM (LEAD(timestamp, 1, NOW())
+                                                                                          OVER (PARTITION BY pool_address ORDER BY timestamp) -
+                                                                                          timestamp)) /
+                                                                      86400) AS daily_yield
+                             FROM v1_cosmos.historic_pool_yield
+                             WHERE timestamp >= NOW() - INTERVAL '${intervalSql} day'
+                               AND total_liquidity_usd > 0)
+        SELECT pool_address,
+               AVG(daily_yield) * 365 AS avg_apr
+        FROM daily_yield
+        GROUP BY pool_address
+        ORDER BY pool_address
+        LIMIT ${limit} OFFSET ${offset};
+    `;
+    try {
+      const result = await client.execute(query);
+      return result.rows;
+    } catch (error) {
+      console.error('Error executing raw query:', error);
+      throw error;
+    }
+  }
   }
 
   async function getPoolAprsByPoolAddresses(interval: number, addresses: string[]): Promise<Record<string, unknown>[] | null> {

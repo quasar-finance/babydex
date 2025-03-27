@@ -27,8 +27,8 @@ export const cosmi = createConfig({
       },
     }),
   ],
-  batch: { multicall: { batchSize: 20, wait: 200 } },
+  batch: { multicall: { batchSize: 10, wait: 200 } },
   transports: {
-    [babylonTestnet.id]: http(undefined, { batch: { batchSize: 20, wait: 200 } }),
+    [babylonTestnet.id]: http(undefined, { batch: { batchSize: 10, wait: 200 } }),
   },
 });

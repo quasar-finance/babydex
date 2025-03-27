@@ -3,8 +3,9 @@ import { createRedisService } from "../services/redis.js";
 import { createCoingeckoService } from "../services/coingecko.js";
 import { createIndexerService } from "@towerfi/indexer";
 
-import { appRouter } from "../router.js";
+import { edgeRouter } from "../router.js";
 import { createPublicClient, http } from "cosmi";
+import { createTRPCRouter } from "../config.js";
 
 interface Env {
   CONTRACTS: string;
@@ -33,7 +34,7 @@ export default {
 
     const response = await fetchRequestHandler({
       req: request,
-      router: appRouter,
+      router: createTRPCRouter({ edge: edgeRouter }),
       createContext: () => {
         const cacheService = createRedisService();
         const indexerService = createIndexerService({
@@ -61,6 +62,8 @@ export default {
       },
     });
 
-    return new Response(response.body, { headers, status: response.status });
+    const body = await response.text();
+
+    return new Response(body, { headers, status: response.status });
   },
 };

@@ -24,3 +24,5 @@ export type {
   ConfigResponse,
   CumulativePricesResponse,
 } from "./contracts.js";
+
+export type { UserPoolBalances } from "./indexer.js";

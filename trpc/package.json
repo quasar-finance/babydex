@@ -7,7 +7,9 @@
   "types": "./build/index.d.ts",
   "typings": "./build/index.d.ts",
   "sideEffects": false,
-  "files": ["build"],
+  "files": [
+    "build"
+  ],
   "exports": {
     ".": {
       "types": "./build/index.d.ts",
@@ -29,6 +31,7 @@
     "wrangler": "catalog:"
   },
   "dependencies": {
+    "@trpc/client": "^10.45.2",
     "@trpc/server": "^10.45.2",
     "cosmi": "^0.1.0",
     "ky": "^1.7.5",

@@ -1,7 +1,7 @@
-import {drizzle} from "drizzle-orm/node-postgres";
-import {Pool} from "pg";
-import {asc, desc, SQL, sql} from "drizzle-orm";
-import {StringChunk} from "drizzle-orm/sql/sql";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
+import { asc, desc, type SQL, eq, sql } from "drizzle-orm";
+import { StringChunk } from "drizzle-orm/sql/sql";
 
 import {
   addLiquidityInV1Cosmos,
@@ -14,6 +14,14 @@ import {
   swapInV1Cosmos,
   withdrawLiquidityInV1Cosmos,
 } from "./drizzle/schema.js";
+import { integer, pgSchema, text } from "drizzle-orm/pg-core";
+
+const v1Cosmos = pgSchema("v1_cosmos");
+const userShares = v1Cosmos.table("pool_user_shares", {
+  pool_address: text("pool_address").notNull(),
+  owner: text("owner").notNull(),
+  staked_share_amount: integer("staked_share_amount").notNull(),
+});
 
 const views = {
   addLiquidity: addLiquidityInV1Cosmos,
@@ -32,38 +40,34 @@ export type Indexer = {
     viewName: T,
     filters?: IndexerFilters,
   ) => Promise<(typeof views)[T]["$inferSelect"][]>;
+  getUserBalances: (address: string) => Promise<(typeof userShares)["$inferSelect"][]>;
   getCurrentPoolBalances: (
     page: number,
-    limit: number
+    limit: number,
   ) => Promise<Record<string, unknown>[] | null>;
   getPoolBalancesByPoolAddresses: (
-    addresses: string[]
-  ) => Promise<Record<string, unknown>[] | null>;
-  getCurrentPoolVolumes: (
-    page: number,
-    limit: number
-  ) => Promise<Record<string, unknown>[] | null>;
-  getPoolVolumesByPoolAddresses: (
-    addresses: string[]
+    addresses: string[],
   ) => Promise<Record<string, unknown>[] | null>;
   getCurrentPoolAprs: (
     interval: number,
     page: number,
-    limit: number
+    limit: number,
   ) => Promise<Record<string, unknown>[] | null>;
   getPoolAprsByPoolAddresses: (
     interval: number,
-    addresses: string[]
+    addresses: string[],
   ) => Promise<Record<string, unknown>[] | null>;
   getCurrentPoolIncentives: (
     interval: number,
     page: number,
-    limit: number
+    limit: number,
   ) => Promise<Record<string, unknown>[] | null>;
   getPoolIncentivesByPoolAddresses: (
     interval: number,
-    addresses: string[]
+    addresses: string[],
   ) => Promise<Record<string, unknown>[] | null>;
+  getCurrentPoolVolumes: (page: number, limit: number) => Promise<Record<string, unknown>[] | null>;
+  getPoolVolumesByPoolAddresses: (addresses: string[]) => Promise<Record<string, unknown>[] | null>;
 };
 
 export type IndexerFilters = {
@@ -92,7 +96,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
 
     if (!filters) return await query;
 
-    const {orderBy = "asc", page = 1, limit = 50, orderByColumn} = filters;
+    const { orderBy = "asc", page = 1, limit = 50, orderByColumn } = filters;
 
     const dynamicQuery = query.$dynamic();
 
@@ -106,7 +110,20 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     return await dynamicQuery;
   }
 
-  async function getCurrentPoolBalances(page: number, limit: number): Promise<Record<string, unknown>[] | null> {
+  async function getUserBalances(address: string) {
+    try {
+      return await client.select().from(userShares).where(eq(userShares.owner, address));
+    } catch (error) {
+      console.error("Error executing raw query:", error);
+
+      throw error;
+    }
+  }
+
+  async function getCurrentPoolBalances(
+    page: number,
+    limit: number,
+  ): Promise<Record<string, unknown>[] | null> {
     const offset = (Math.max(1, page) - 1) * limit;
     const query = sql`
         SELECT p.*
@@ -125,13 +142,15 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
 
       return result.rows;
     } catch (error) {
-      console.error('Error executing raw query:', error);
+      console.error("Error executing raw query:", error);
 
       throw error;
     }
   }
 
-  async function getPoolBalancesByPoolAddresses(addresses: string[]): Promise<Record<string, unknown>[] | null> {
+  async function getPoolBalancesByPoolAddresses(
+    addresses: string[],
+  ): Promise<Record<string, unknown>[] | null> {
     const pool_addresses_sql = createPoolAddressArraySql(addresses);
     const query = sql`
         SELECT p.*
@@ -151,13 +170,16 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
 
       return result.rows;
     } catch (error) {
-      console.error('Error executing raw query:', error);
+      console.error("Error executing raw query:", error);
 
       throw error;
     }
   }
 
-  async function getCurrentPoolVolumes(page: number, limit: number): Promise<Record<string, unknown>[] | null> {
+  async function getCurrentPoolVolumes(
+    page: number,
+    limit: number,
+  ): Promise<Record<string, unknown>[] | null> {
     const offset = (Math.max(1, page) - 1) * limit;
     const query = sql`
         SELECT s.pool_address,
@@ -185,13 +207,15 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
 
       return result.rows;
     } catch (error) {
-      console.error('Error executing raw query:', error);
+      console.error("Error executing raw query:", error);
 
       throw error;
     }
   }
 
-  async function getPoolVolumesByPoolAddresses(addresses: string[]): Promise<Record<string, unknown>[] | null> {
+  async function getPoolVolumesByPoolAddresses(
+    addresses: string[],
+  ): Promise<Record<string, unknown>[] | null> {
     const pool_addresses_sql = createPoolAddressArraySql(addresses);
     const query = sql`
         SELECT s.pool_address,
@@ -219,7 +243,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
 
       return result.rows;
     } catch (error) {
-      console.error('Error executing raw query:', error);
+      console.error("Error executing raw query:", error);
 
       throw error;
     }
@@ -241,7 +265,11 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
    *     * 365: This annualizes the daily yield to get the APR.
    *     AVG(...): This calculates the average APR for each pool.
    */
-  async function getCurrentPoolAprs(interval: number, page: number, limit: number): Promise<Record<string, unknown>[] | null> {
+  async function getCurrentPoolAprs(
+    interval: number,
+    page: number,
+    limit: number,
+  ): Promise<Record<string, unknown>[] | null> {
     const intervalSql = createIntervalSql(interval);
     const offset = (Math.max(1, page) - 1) * limit;
     const query = sql`
@@ -265,12 +293,15 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
       const result = await client.execute(query);
       return result.rows;
     } catch (error) {
-      console.error('Error executing raw query:', error);
+      console.error("Error executing raw query:", error);
       throw error;
     }
   }
 
-  async function getPoolAprsByPoolAddresses(interval: number, addresses: string[]): Promise<Record<string, unknown>[] | null> {
+  async function getPoolAprsByPoolAddresses(
+    interval: number,
+    addresses: string[],
+  ): Promise<Record<string, unknown>[] | null> {
     const intervalSql = createIntervalSql(interval);
     const poolAddressesSql = createPoolAddressArraySql(addresses);
     const query = sql`
@@ -295,7 +326,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
 
       return result.rows;
     } catch (error) {
-      console.error('Error executing raw query:', error);
+      console.error("Error executing raw query:", error);
 
       throw error;
     }
@@ -321,7 +352,11 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
    *     ELSE EXTRACT(EPOCH FROM NOW()) - (EXTRACT(EPOCH FROM NOW()) - (days * 86400)):
    *        If the incentive period spans the beginning of the timeframe, we calculate the duration of the period that falls within the timeframe.
    */
-  async function getCurrentPoolIncentives(interval: number, page: number, limit: number): Promise<Record<string, unknown>[] | null> {
+  async function getCurrentPoolIncentives(
+    interval: number,
+    page: number,
+    limit: number,
+  ): Promise<Record<string, unknown>[] | null> {
     const intervalSql = createIntervalSql(interval);
     const offset = (Math.max(1, page) - 1) * limit;
     const daysInSecondsSql = sql.raw("86400");
@@ -361,7 +396,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
       const result = await client.execute(query);
       return result.rows;
     } catch (error) {
-      console.error('Error executing raw query:', error);
+      console.error("Error executing raw query:", error);
       throw error;
     }
   }
@@ -373,7 +408,10 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
    *
    * @description See getCurrentPoolIncentives
    */
-  async function getPoolIncentivesByPoolAddresses(interval: number, addresses: string[]): Promise<Record<string, unknown>[] | null> {
+  async function getPoolIncentivesByPoolAddresses(
+    interval: number,
+    addresses: string[],
+  ): Promise<Record<string, unknown>[] | null> {
     const intervalSql = createIntervalSql(interval);
     const poolAddressesSql = createPoolAddressArraySql(addresses);
     const daysInSecondsSql = sql.raw("86400");
@@ -413,7 +451,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
       const result = await client.execute(query);
       return result.rows;
     } catch (error) {
-      console.error('Error executing raw query:', error);
+      console.error("Error executing raw query:", error);
       throw error;
     }
   }
@@ -423,7 +461,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
       return sql.raw(`ANY('{}'::text[])`);
     }
 
-    const quotedAddresses = addresses.map(address => `"${address}"`).join(',');
+    const quotedAddresses = addresses.map((address) => `"${address}"`).join(",");
 
     return sql.raw(`ANY('{${quotedAddresses}}'::text[])`);
   }
@@ -434,6 +472,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
 
   return {
     queryView,
+    getUserBalances,
     getCurrentPoolBalances,
     getPoolBalancesByPoolAddresses,
     getCurrentPoolVolumes,
@@ -443,4 +482,4 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     getCurrentPoolIncentives,
     getPoolIncentivesByPoolAddresses,
   } as Indexer;
-}
+};

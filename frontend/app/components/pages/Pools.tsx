@@ -42,7 +42,12 @@ const Pools: React.FC = () => {
         {isLoading && <PoolsSkeleton className={twMerge("grid", gridClass)} />}
         {pools.map((pool, i) => (
           <TableRow key={i} gridClass={twMerge("grid", gridClass)}>
-            <CellPoolName assets={pool.assets} name={pool.name} poolType={pool.poolType} />
+            <CellPoolName
+              assets={pool.assets}
+              name={pool.name}
+              poolType={pool.poolType}
+              config={pool.config}
+            />
             <CellTVL poolLiquidity={pool.poolLiquidity} />
             <CellData title="APR" />
             <CellData title="Volume 24h" />

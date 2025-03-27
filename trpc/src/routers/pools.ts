@@ -12,11 +12,41 @@ import type {
   PoolResponse,
   PoolType,
   WithPrice,
+  UserPoolBalances,
 } from "@towerfi/types";
 import { fromBase64, fromUtf8 } from "cosmi/utils";
 import { getInnerValueFromAsset } from "../utils/assets.js";
+import { edgeCaller } from "../callers.js";
 
 export const poolsRouter = createTRPCRouter({
+  getUserPools: createTRPCPublicProcedure
+    .input(z.object({ address: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const { address } = input;
+      const caller = createCallerFactory(appRouter)(ctx);
+
+      const balances = await edgeCaller.edge.indexer.getUserBalances.query({ address });
+
+      const poolsInfo: { poolInfo: PoolInfo; userBalance: UserPoolBalances }[] = await Promise.all(
+        balances.map(async (balance) => ({
+          poolInfo: await caller.local.pools.getPool({ address: balance.pool_address }),
+          userBalance: balance,
+        })),
+      );
+
+      return poolsInfo;
+    }),
+  getPoolShares: createTRPCPublicProcedure
+    .input(z.object({ address: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const { publicClient } = ctx;
+      const { address } = input;
+
+      return await publicClient.queryContractSmart<PoolResponse>({
+        address,
+        msg: { pool: {} },
+      });
+    }),
   getPoolConfig: createTRPCPublicProcedure
     .input(z.object({ address: z.string() }))
     .query(async ({ ctx, input }) => {
@@ -37,24 +67,31 @@ export const poolsRouter = createTRPCRouter({
         params: JSON.parse(fromUtf8(fromBase64(pool.params ?? ""))),
       };
     }),
+  getCumulativePrices: createTRPCPublicProcedure
+    .input(z.object({ address: z.string() }))
+    .query<CumulativePricesResponse>(async ({ ctx, input }) => {
+      const { publicClient } = ctx;
+      const { address } = input;
+
+      return await publicClient.queryContractSmart<CumulativePricesResponse>({
+        address,
+        msg: { cumulative_prices: {} },
+      });
+    }),
   getOptimalRatio: createTRPCPublicProcedure
     .input(z.object({ address: z.string() }))
     .query(async ({ ctx, input }) => {
-      const { publicClient } = ctx;
       const { address } = input;
       const caller = createCallerFactory(appRouter)(ctx);
 
       const [pool, config, cumulativePrices] = await Promise.all([
         caller.local.pools.getPool({ address }),
         caller.local.pools.getPoolConfig({ address }),
-        publicClient.queryContractSmart<CumulativePricesResponse>({
-          address,
-          msg: { cumulative_prices: {} },
-        }),
+        caller.local.pools.getCumulativePrices({ address }),
       ]);
 
       const { params } = config;
-      const pairType = Object.keys(pool.pair_type)[0] as string;
+      const pairType = pool.poolType;
 
       if (!cumulativePrices) throw new Error("Pool not found or invalid");
       const [token0, token1] = cumulativePrices.assets;
@@ -86,14 +123,58 @@ export const poolsRouter = createTRPCRouter({
     }),
   getPool: createTRPCPublicProcedure
     .input(z.object({ address: z.string() }))
-    .query<PairInfo>(async ({ ctx, input }) => {
+    .query<PoolInfo>(async ({ ctx, input }) => {
       const { publicClient } = ctx;
       const { address } = input;
 
-      return await publicClient.queryContractSmart<PairInfo>({
+      const pool = await publicClient.queryContractSmart<PairInfo>({
         address,
         msg: { pair: {} },
       });
+
+      if (!pool) throw new Error("Pool not found or invalid");
+
+      const caller = createCallerFactory(appRouter)(ctx);
+
+      const response: PoolInfo = await caller.local.pools.getPoolInfo({ pool });
+      return response;
+    }),
+  getPoolInfo: createTRPCPublicProcedure
+    .input(z.object({ pool: z.any() }))
+    .query<PoolInfo>(async ({ ctx, input }) => {
+      const { pool } = input as { pool: PairInfo };
+      const caller = createCallerFactory(appRouter)(ctx);
+
+      const response = await Promise.all([
+        caller.local.pools.getPoolShares({ address: pool.contract_addr }),
+        caller.local.pools.getPoolConfig({ address: pool.contract_addr }),
+      ]);
+
+      const [shares, config] = response as [PoolResponse, ConfigResponse];
+
+      const [token1, token2] = pool.asset_infos;
+      if (!token1 || !token2) throw new Error("Invalid pool");
+
+      const t1: WithPrice<BaseCurrency> = await caller.local.assets.getAsset({
+        asset: getInnerValueFromAsset(token1),
+      });
+
+      const t2: WithPrice<BaseCurrency> = await caller.local.assets.getAsset({
+        asset: getInnerValueFromAsset(token2),
+      });
+
+      const name = `${t1.symbol} / ${t2.symbol}`;
+
+      return {
+        name,
+        config,
+        poolAddress: pool.contract_addr,
+        lpAddress: pool.liquidity_token,
+        poolType: Object.keys(pool.pair_type)[0] as PoolType,
+        assets: [t1, t2],
+        poolLiquidity: shares.total_share,
+        rewards: [],
+      };
     }),
   getPools: createTRPCPublicProcedure.query<PoolInfo[]>(async ({ ctx }) => {
     const { publicClient, contracts } = ctx;
@@ -105,37 +186,10 @@ export const poolsRouter = createTRPCRouter({
 
     const caller = createCallerFactory(appRouter)(ctx);
 
-    return await Promise.all(
-      pools.map(async (pool) => {
-        const info = await publicClient.queryContractSmart<PoolResponse>({
-          address: pool.contract_addr,
-          msg: { pool: {} },
-        });
-
-        const [token1, token2] = pool.asset_infos;
-        if (!token1 || !token2) throw new Error("Invalid pool");
-
-        const t1: WithPrice<BaseCurrency> = await caller.local.assets.getAsset({
-          asset: getInnerValueFromAsset(token1),
-        });
-
-        const t2: WithPrice<BaseCurrency> = await caller.local.assets.getAsset({
-          asset: getInnerValueFromAsset(token2),
-        });
-
-        const name = `${t1.symbol} / ${t2.symbol}`;
-
-        return {
-          name,
-          poolAddress: pool.contract_addr,
-          lpAddress: pool.liquidity_token,
-          poolType: Object.keys(pool.pair_type)[0] as PoolType,
-          assets: [t1, t2],
-          poolLiquidity: info.total_share,
-
-          rewards: [],
-        };
-      }),
+    const poolInfo: PoolInfo[] = await Promise.all(
+      pools.map((pool) => caller.local.pools.getPoolInfo({ pool })),
     );
+
+    return poolInfo;
   }),
 });

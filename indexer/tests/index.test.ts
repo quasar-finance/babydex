@@ -15,7 +15,7 @@ const config = {
 const indexer = createIndexerService(config);
 
 test('check test database access', async () => {
-  const res = await indexer.queryView("addLiquidity");
+  const res = await indexer.queryView("pools");
 
   expect(res.length).toBeGreaterThan(0);
 });

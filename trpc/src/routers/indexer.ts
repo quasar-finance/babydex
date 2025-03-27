@@ -26,11 +26,11 @@ export const indexerRouter = createTRPCRouter({
   poolBalance: createTRPCPublicProcedure.input(input).query(async ({ctx, input}) => {
     return await ctx.indexerService.queryView("poolBalance", input);
   }),
-  poolFeePeriods: createTRPCPublicProcedure.input(input).query(async ({ctx, input}) => {
-    return await ctx.indexerService.queryView("poolFeePeriods", input);
-  }),
   poolUserShares: createTRPCPublicProcedure.input(input).query(async ({ctx, input}) => {
     return await ctx.indexerService.queryView("poolUserShares", input);
+  }),
+  stakeLiquidity: createTRPCPublicProcedure.input(input).query(async ({ctx, input}) => {
+    return await ctx.indexerService.queryView("stakeLiquidity", input);
   }),
   swap: createTRPCPublicProcedure.input(input).query(async ({ctx, input}) => {
     return await ctx.indexerService.queryView("swap", input);

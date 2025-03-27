@@ -8,9 +8,9 @@ import {
   historicPoolYieldInV1Cosmos,
   incentivizeInV1Cosmos,
   poolBalanceInV1Cosmos,
-  poolFeePeriodsInV1Cosmos,
   poolsInV1Cosmos,
   poolUserSharesInV1Cosmos,
+  stakeLiquidityInV1Cosmos,
   swapInV1Cosmos,
   withdrawLiquidityInV1Cosmos,
 } from "./drizzle/schema.js";
@@ -21,8 +21,8 @@ const views = {
   incentivize: incentivizeInV1Cosmos,
   pools: poolsInV1Cosmos,
   poolBalance: poolBalanceInV1Cosmos,
-  poolFeePeriods: poolFeePeriodsInV1Cosmos,
   poolUserShares: poolUserSharesInV1Cosmos,
+  stakeLiquidity: stakeLiquidityInV1Cosmos,
   swap: swapInV1Cosmos,
   withdrawLiquidity: withdrawLiquidityInV1Cosmos,
 } as const;

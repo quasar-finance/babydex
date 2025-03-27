@@ -12,5 +12,5 @@ export default defineConfig({
         database: process.env.SUPABASE_DB || '',
         ssl: false,
     },
-    schemaFilter: "v1_cosmos",
+    schemaFilter: ["v1_cosmos", "hubble"],
 });

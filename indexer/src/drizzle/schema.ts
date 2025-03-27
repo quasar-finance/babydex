@@ -1,25 +1,9 @@
-import { pgTable, pgSchema, foreignKey, bigint, timestamp, text, integer, smallint, index, jsonb, numeric, doublePrecision, json } from "drizzle-orm/pg-core"
+import { pgTable, pgSchema, index, foreignKey, integer, text, bigint, jsonb, timestamp, smallint, numeric, serial, boolean, doublePrecision, json } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
 export const v1Cosmos = pgSchema("v1_cosmos");
+export const hubble = pgSchema("hubble");
 
-
-export const tokenInV1Cosmos = v1Cosmos.table("token", {
-	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
-	id: bigint({ mode: "number" }).generatedByDefaultAsIdentity({ name: "v1_cosmos.token_id_seq", startWith: 1, increment: 1, minValue: 1, maxValue: 9223372036854775807, cache: 1 }),
-	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
-	coingeckoId: text("coingecko_id").notNull(),
-	denomination: text(),
-	tokenName: text("token_name"),
-	chainId: integer("chain_id"),
-	decimals: smallint(),
-}, (table) => [
-	foreignKey({
-			columns: [table.chainId],
-			foreignColumns: [chains.id],
-			name: "token_chain_id_fkey"
-		}),
-]);
 
 export const transactionsInV1Cosmos = v1Cosmos.table("transactions", {
 	chainId: integer("chain_id").notNull(),
@@ -38,9 +22,26 @@ export const transactionsInV1Cosmos = v1Cosmos.table("transactions", {
 		}).onUpdate("cascade").onDelete("cascade"),
 	foreignKey({
 			columns: [table.chainId],
-			foreignColumns: [chains.id],
+			foreignColumns: [chainsInHubble.id],
 			name: "transactions_chain_id_fkey"
 		}).onUpdate("cascade").onDelete("cascade"),
+]);
+
+export const tokenInV1Cosmos = v1Cosmos.table("token", {
+	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
+	id: bigint({ mode: "number" }).generatedByDefaultAsIdentity({ name: "v1_cosmos.token_id_seq", startWith: 1, increment: 1, minValue: 1, maxValue: 9223372036854775807, cache: 1 }),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+	coingeckoId: text("coingecko_id").notNull(),
+	denomination: text(),
+	tokenName: text("token_name"),
+	chainId: integer("chain_id"),
+	decimals: smallint(),
+}, (table) => [
+	foreignKey({
+			columns: [table.chainId],
+			foreignColumns: [chainsInHubble.id],
+			name: "token_chain_id_fkey"
+		}),
 ]);
 
 export const tokenPricesInV1Cosmos = v1Cosmos.table("token_prices", {
@@ -69,7 +70,7 @@ export const blocksInV1Cosmos = v1Cosmos.table("blocks", {
 	index("idx_blocks_height").using("btree", table.chainId.asc().nullsLast().op("int4_ops"), table.height.asc().nullsLast().op("int4_ops")),
 	foreignKey({
 			columns: [table.chainId],
-			foreignColumns: [chains.id],
+			foreignColumns: [chainsInHubble.id],
 			name: "blocks_chain_id_fkey"
 		}).onUpdate("cascade").onDelete("cascade"),
 ]);
@@ -103,7 +104,7 @@ export const eventsInV1Cosmos = v1Cosmos.table("events", {
 		}).onUpdate("cascade").onDelete("cascade"),
 	foreignKey({
 			columns: [table.chainId],
-			foreignColumns: [chains.id],
+			foreignColumns: [chainsInHubble.id],
 			name: "events_chain_id_fkey"
 		}).onUpdate("cascade").onDelete("cascade"),
 	foreignKey({
@@ -111,6 +112,83 @@ export const eventsInV1Cosmos = v1Cosmos.table("events", {
 			foreignColumns: [transactionsInV1Cosmos.chainId, transactionsInV1Cosmos.hash],
 			name: "events_chain_id_transaction_hash_fkey"
 		}).onUpdate("cascade").onDelete("cascade"),
+]);
+
+export const clientsInHubble = hubble.table("clients", {
+	chainId: integer("chain_id").notNull(),
+	clientId: text("client_id").notNull(),
+	counterpartyChainId: text("counterparty_chain_id").notNull(),
+}, (table) => [
+	foreignKey({
+			columns: [table.chainId],
+			foreignColumns: [chainsInHubble.id],
+			name: "clients_chain_id_fkey"
+		}).onUpdate("cascade").onDelete("cascade"),
+]);
+
+export const chainsInHubble = hubble.table("chains", {
+	id: serial().notNull(),
+	chainId: text("chain_id").notNull(),
+	displayName: text("display_name"),
+	testnet: boolean(),
+	maxTipAgeSeconds: numeric("max_tip_age_seconds"),
+	rpcType: text("rpc_type"),
+	addrPrefix: text("addr_prefix"),
+	enabled: boolean().default(false).notNull(),
+	logoUri: text("logo_uri"),
+	enabledStaging: boolean("enabled_staging").default(false).notNull(),
+	execution: boolean().default(false).notNull(),
+	indexerId: text("indexer_id"),
+	maxMappedExecutionHeightGap: integer("max_mapped_execution_height_gap"),
+}, (table) => [
+	index("chains_chain_id_idx").using("btree", table.chainId.asc().nullsLast().op("text_ops"), table.id.asc().nullsLast().op("text_ops")),
+]);
+
+export const consensusHeightsInHubble = hubble.table("consensus_heights", {
+	chainId: integer("chain_id").notNull(),
+	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
+	executionHeight: bigint("execution_height", { mode: "number" }).notNull(),
+	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
+	consensusHeight: bigint("consensus_height", { mode: "number" }).notNull(),
+}, (table) => [
+	foreignKey({
+			columns: [table.chainId],
+			foreignColumns: [chainsInHubble.id],
+			name: "consensus_heights_chain_id_fkey"
+		}).onUpdate("cascade").onDelete("cascade"),
+]);
+
+export const contractStatusInHubble = hubble.table("contract_status", {
+	internalChainId: integer("internal_chain_id").notNull(),
+	address: text().notNull(),
+	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
+	height: bigint({ mode: "number" }).notNull(),
+	timestamp: timestamp({ withTimezone: true, mode: 'string' }).notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).notNull(),
+	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).notNull(),
+}, (table) => [
+	foreignKey({
+			columns: [table.internalChainId],
+			foreignColumns: [chainsInHubble.id],
+			name: "fk_internal_chain_id"
+		}).onDelete("cascade"),
+]);
+
+export const assetsInHubble = hubble.table("assets", {
+	chainId: integer("chain_id").notNull(),
+	denom: text().notNull(),
+	displaySymbol: text("display_symbol"),
+	decimals: integer(),
+	logoUri: text("logo_uri"),
+	displayName: text("display_name"),
+	gasToken: boolean("gas_token").notNull(),
+	source: text(),
+}, (table) => [
+	foreignKey({
+			columns: [table.chainId],
+			foreignColumns: [chainsInHubble.id],
+			name: "assets_chain_id_fkey"
+		}).onUpdate("set null").onDelete("set null"),
 ]);
 
 export const contractsInV1Cosmos = v1Cosmos.table("contracts", {
@@ -126,10 +204,73 @@ export const contractsInV1Cosmos = v1Cosmos.table("contracts", {
 }, (table) => [
 	foreignKey({
 			columns: [table.internalChainId],
-			foreignColumns: [chains.id],
+			foreignColumns: [chainsInHubble.id],
 			name: "contracts_chain_id_fkey"
 		}).onUpdate("cascade").onDelete("cascade"),
 ]);
+
+export const tokenSourcesInHubble = hubble.table("token_sources", {
+	id: serial().notNull(),
+	sourceUri: text("source_uri").notNull(),
+	name: text().notNull(),
+	logoUri: text("logo_uri"),
+	enabled: boolean(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).notNull(),
+	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).notNull(),
+});
+
+export const tokenSourceRepresentationsInHubble = hubble.table("token_source_representations", {
+	tokenSourceId: integer("token_source_id").notNull(),
+	internalChainId: integer("internal_chain_id").notNull(),
+	// TODO: failed to parse database type 'bytea'
+	address: unknown("address").notNull(),
+	symbol: text().notNull(),
+	name: text().notNull(),
+	decimals: integer().notNull(),
+	logoUri: text("logo_uri"),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).notNull(),
+	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).notNull(),
+}, (table) => [
+	foreignKey({
+			columns: [table.internalChainId],
+			foreignColumns: [chainsInHubble.id],
+			name: "token_source_representations_chains_id_fk"
+		}),
+	foreignKey({
+			columns: [table.tokenSourceId],
+			foreignColumns: [tokenSourcesInHubble.id],
+			name: "token_source_representations_token_sources_id_fk"
+		}),
+]);
+
+export const blockStatusInHubble = hubble.table("block_status", {
+	indexerId: text("indexer_id").notNull(),
+	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
+	height: bigint({ mode: "number" }).notNull(),
+	hash: text().notNull(),
+	timestamp: timestamp({ withTimezone: true, mode: 'string' }).notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).notNull(),
+	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).notNull(),
+});
+
+export const indexerStatusInHubble = hubble.table("indexer_status", {
+	indexerId: text("indexer_id").notNull(),
+	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
+	height: bigint({ mode: "number" }).notNull(),
+	timestamp: timestamp({ withTimezone: true, mode: 'string' }).notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).notNull(),
+	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).notNull(),
+});
+
+export const blockFixInHubble = hubble.table("block_fix", {
+	indexerId: text("indexer_id").notNull(),
+	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
+	startHeight: bigint("start_height", { mode: "number" }).notNull(),
+	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
+	endHeight: bigint("end_height", { mode: "number" }).notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).notNull(),
+	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).notNull(),
+});
 export const swapInV1Cosmos = v1Cosmos.view("swap", {	sender: text(),
 	receiver: text(),
 	askAsset: text("ask_asset"),

@@ -70,3 +70,5 @@ SELECT
     -- other fields...
 FROM events;
 ```
+
+Test verified commits

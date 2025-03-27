@@ -51,10 +51,45 @@ serve(async (req) => {
           throw new Error(`Function error for pool ${pool.pool_address}: ${JSON.stringify(data.error)}`);
         }
       }
+      
+      let lpTokenStatus = null;
+
+      if (newPools && newPools.length > 0) {
+        try {
+          // Call check-lp-tokens function
+          const response = await fetch(`${Deno.env.get('SUPABASE_FUNCTIONS_URL')}/check-lp-tokens`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+            },
+            body: JSON.stringify({
+              pools: newPools.map(pool => pool.pool_address)
+            })
+          });
+
+          const lpTokenResult = await response.json();
+          lpTokenStatus = {
+            success: lpTokenResult.success,
+            results: lpTokenResult.results,
+            error: lpTokenResult.error
+          };
+          console.log('LP token check result:', lpTokenResult);
+        } catch (error) {
+          console.error('Error checking LP tokens:', error);
+          lpTokenStatus = {
+            success: false,
+            error: error.message,
+            results: []
+          };
+        }
+      }
+      
       return new Response(
         JSON.stringify({ 
           success: true, 
-          message: `Processed ${newPools.length} new pools` 
+          message: `Processed ${newPools.length} new pools`,
+          lpTokenCheck: lpTokenStatus || { success: true, message: 'No new pools to check' }
         }),
         { headers: { 'Content-Type': 'application/json' } }
       );

@@ -1,6 +1,6 @@
 import {drizzle} from "drizzle-orm/node-postgres";
 import {Pool} from "pg";
-import {asc, desc, sql} from "drizzle-orm";
+import {asc, desc, SQL, sql} from "drizzle-orm";
 import {StringChunk} from "drizzle-orm/sql/sql";
 
 import {
@@ -52,6 +52,15 @@ export type Indexer = {
     limit: number
   ) => Promise<Record<string, unknown>[] | null>;
   getPoolAprsByPoolAddresses: (
+    interval: number,
+    addresses: string[]
+  ) => Promise<Record<string, unknown>[] | null>;
+  getCurrentPoolIncentives: (
+    interval: number,
+    page: number,
+    limit: number
+  ) => Promise<Record<string, unknown>[] | null>;
+  getPoolIncentivesByPoolAddresses: (
     interval: number,
     addresses: string[]
   ) => Promise<Record<string, unknown>[] | null>;
@@ -123,7 +132,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
   }
 
   async function getPoolBalancesByPoolAddresses(addresses: string[]): Promise<Record<string, unknown>[] | null> {
-    const pool_addresses_sql = sql.raw(createPoolAddressArraySql(addresses));
+    const pool_addresses_sql = createPoolAddressArraySql(addresses);
     const query = sql`
         SELECT p.*
         FROM v1_cosmos.pool_balance p
@@ -183,7 +192,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
   }
 
   async function getPoolVolumesByPoolAddresses(addresses: string[]): Promise<Record<string, unknown>[] | null> {
-    const pool_addresses_sql = sql.raw(createPoolAddressArraySql(addresses));
+    const pool_addresses_sql = createPoolAddressArraySql(addresses);
     const query = sql`
         SELECT s.pool_address,
                SUM(
@@ -233,7 +242,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
    *     AVG(...): This calculates the average APR for each pool.
    */
   async function getCurrentPoolAprs(interval: number, page: number, limit: number): Promise<Record<string, unknown>[] | null> {
-    const intervalSql = sql.raw(Math.min(Math.max(1, interval), 365).toString());
+    const intervalSql = createIntervalSql(interval);
     const offset = (Math.max(1, page) - 1) * limit;
     const query = sql`
         WITH daily_yield AS (SELECT pool_address,
@@ -262,8 +271,8 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
   }
 
   async function getPoolAprsByPoolAddresses(interval: number, addresses: string[]): Promise<Record<string, unknown>[] | null> {
-    const intervalSql = sql.raw(Math.min(Math.max(1, interval), 365).toString());
-    const poolAddressesSql = sql.raw(createPoolAddressArraySql(addresses));
+    const intervalSql = createIntervalSql(interval);
+    const poolAddressesSql = createPoolAddressArraySql(addresses);
     const query = sql`
         WITH daily_yield AS (SELECT pool_address,
                                     fees_usd / total_liquidity_usd / (EXTRACT(EPOCH FROM (LEAD(timestamp, 1, NOW())
@@ -292,14 +301,135 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     }
   }
 
-  function createPoolAddressArraySql(addresses: string[]): string {
+  /**
+   *
+   * @param interval
+   * @param page
+   * @param limit
+   *
+   * @description
+   *
+   * SUM(i.rewards_per_second * (...)): We calculate the total incentives for each
+   * pool by summing the product of rewards_per_second and the duration of each incentive period.
+   *
+   * The CASE statement handles different scenarios:
+   *
+   *     WHEN i.end_ts <= EXTRACT(EPOCH FROM NOW()) THEN i.end_ts - i.start_ts:
+   *        If the incentive period ended before the current time, we use the full duration of the period.
+   *     WHEN i.start_ts >= EXTRACT(EPOCH FROM NOW()) - (days * 86400) THEN EXTRACT(EPOCH FROM NOW()) - i.start_ts:
+   *        If the incentive period started within the specified timeframe, we calculate the duration from the start time to the current time.
+   *     ELSE EXTRACT(EPOCH FROM NOW()) - (EXTRACT(EPOCH FROM NOW()) - (days * 86400)):
+   *        If the incentive period spans the beginning of the timeframe, we calculate the duration of the period that falls within the timeframe.
+   */
+  async function getCurrentPoolIncentives(interval: number, page: number, limit: number): Promise<Record<string, unknown>[] | null> {
+    const intervalSql = createIntervalSql(interval);
+    const offset = (Math.max(1, page) - 1) * limit;
+    const daysInSecondsSql = sql.raw("86400");
+    const query = sql`
+        SELECT plt.pool     AS pool_address,
+               plt.lp_token AS lp_token_address,
+               CASE
+                   WHEN SUM(i.rewards_per_second * (
+                       CASE
+                           WHEN i.end_ts <= EXTRACT(EPOCH FROM NOW()) THEN i.end_ts - i.start_ts
+                           WHEN i.start_ts >= EXTRACT(EPOCH FROM NOW()) - (${intervalSql} * ${daysInSecondsSql})
+                               THEN EXTRACT(EPOCH FROM NOW()) - i.start_ts
+                           ELSE EXTRACT(EPOCH FROM NOW()) -
+                                (EXTRACT(EPOCH FROM NOW()) - (${intervalSql} * ${daysInSecondsSql}))
+                           END
+                       )) IS NULL THEN NULL
+                   ELSE SUM(i.rewards_per_second * (
+                       CASE
+                           WHEN i.end_ts <= EXTRACT(EPOCH FROM NOW()) THEN i.end_ts - i.start_ts
+                           WHEN i.start_ts >= EXTRACT(EPOCH FROM NOW()) - (${intervalSql} * ${daysInSecondsSql})
+                               THEN EXTRACT(EPOCH FROM NOW()) - i.start_ts
+                           ELSE EXTRACT(EPOCH FROM NOW()) -
+                                (EXTRACT(EPOCH FROM NOW()) - (${intervalSql} * ${daysInSecondsSql}))
+                           END
+                       ))
+                   END      AS total_incentives
+        FROM v1_cosmos.pool_lp_token plt
+                 LEFT JOIN
+             v1_cosmos.incentivize i ON plt.lp_token = i.lp_token
+        WHERE i.timestamp >= NOW() - (${intervalSql} || ' days')::INTERVAL
+        GROUP BY plt.pool, plt.lp_token
+        ORDER BY plt.pool
+        LIMIT ${limit} OFFSET ${offset};
+    `;
+
+    try {
+      const result = await client.execute(query);
+      return result.rows;
+    } catch (error) {
+      console.error('Error executing raw query:', error);
+      throw error;
+    }
+  }
+
+  /**
+   *
+   * @param interval
+   * @param addresses
+   *
+   * @description See getCurrentPoolIncentives
+   */
+  async function getPoolIncentivesByPoolAddresses(interval: number, addresses: string[]): Promise<Record<string, unknown>[] | null> {
+    const intervalSql = createIntervalSql(interval);
+    const poolAddressesSql = createPoolAddressArraySql(addresses);
+    const daysInSecondsSql = sql.raw("86400");
+    const query = sql`
+        SELECT plt.pool     AS pool_address,
+               plt.lp_token AS lp_token_address,
+               CASE
+                   WHEN SUM(i.rewards_per_second * (
+                       CASE
+                           WHEN i.end_ts <= EXTRACT(EPOCH FROM NOW()) THEN i.end_ts - i.start_ts
+                           WHEN i.start_ts >= EXTRACT(EPOCH FROM NOW()) - (${intervalSql} * ${daysInSecondsSql})
+                               THEN EXTRACT(EPOCH FROM NOW()) - i.start_ts
+                           ELSE EXTRACT(EPOCH FROM NOW()) -
+                                (EXTRACT(EPOCH FROM NOW()) - (${intervalSql} * ${daysInSecondsSql}))
+                           END
+                       )) IS NULL THEN NULL
+                   ELSE SUM(i.rewards_per_second * (
+                       CASE
+                           WHEN i.end_ts <= EXTRACT(EPOCH FROM NOW()) THEN i.end_ts - i.start_ts
+                           WHEN i.start_ts >= EXTRACT(EPOCH FROM NOW()) - (${intervalSql} * ${daysInSecondsSql})
+                               THEN EXTRACT(EPOCH FROM NOW()) - i.start_ts
+                           ELSE EXTRACT(EPOCH FROM NOW()) -
+                                (EXTRACT(EPOCH FROM NOW()) - (${intervalSql} * ${daysInSecondsSql}))
+                           END
+                       ))
+                   END      AS total_incentives
+        FROM v1_cosmos.pool_lp_token plt
+                 LEFT JOIN
+             v1_cosmos.incentivize i ON plt.lp_token = i.lp_token
+        WHERE i.timestamp >= NOW() - (${intervalSql} || ' days')::INTERVAL
+          AND plt.pool = ${poolAddressesSql}
+        GROUP BY plt.pool, plt.lp_token
+        ORDER BY plt.pool;
+    `;
+
+    try {
+      const result = await client.execute(query);
+      return result.rows;
+    } catch (error) {
+      console.error('Error executing raw query:', error);
+      throw error;
+    }
+  }
+
+  function createPoolAddressArraySql(addresses: string[]): SQL<unknown> {
     if (!addresses || addresses.length === 0) {
-      return `ANY('{}'::text[])`;
+      return sql.raw(`ANY('{}'::text[])`);
     }
 
     const quotedAddresses = addresses.map(address => `"${address}"`).join(',');
 
-    return `ANY('{${quotedAddresses}}'::text[])`;
+    return sql.raw(`ANY('{${quotedAddresses}}'::text[])`);
+  }
+
+  function createIntervalSql(interval: number) {
+    return sql.raw(Math.min(Math.max(1, interval), 365).toString());
   }
 
   return {
@@ -310,5 +440,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     getPoolVolumesByPoolAddresses,
     getCurrentPoolAprs,
     getPoolAprsByPoolAddresses,
+    getCurrentPoolIncentives,
+    getPoolIncentivesByPoolAddresses,
   } as Indexer;
 }

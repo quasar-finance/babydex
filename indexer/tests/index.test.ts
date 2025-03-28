@@ -68,3 +68,18 @@ test('get pool apr by addresses', async () => {
 
   expect(res.length).toBe(0);
 });
+
+test('get current pool incentives', async () => {
+  const res = await indexer.getCurrentPoolIncentives(365, 1, 100);
+
+  expect(res.length).toBeGreaterThan(0);
+});
+
+test('get pool incentives by addresses', async () => {
+  const res = await indexer.getPoolIncentivesByPoolAddresses(
+    365,
+    ["bbn1vkh603t635w73yndx3x92f9d9ykk7etr7fs274d9q0qdeeut0qhqcsz3qd"]
+  );
+
+  expect(res.length).toBeGreaterThan(0);
+});

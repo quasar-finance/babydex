@@ -60,7 +60,7 @@ export const CellDataToken: React.FC<Props> = ({
       <div className={twMerge("flex flex-col gap-2", className)}>
         <p className="text-xs text-white/50 lg:hidden">{title}</p>
         <div className="flex items-center  justify-between gap-3">
-          <p>{amount ? amount : "-"}</p>
+          <p>{convertMicroDenomToDenom(amount, 6)}</p>
         </div>
       </div>
     </Tooltip>

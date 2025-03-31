@@ -6,7 +6,7 @@ import { ModalTypes } from "~/types/modal";
 import { useModal } from "~/app/providers/ModalProvider";
 import { motion } from "motion/react";
 import SwapInfoAccordion from "../molecules/Swap/SwapInfoAccordion";
-import { useAccount, useConfig } from "@cosmi/react";
+import { useAccount, useBalances } from "@cosmi/react";
 import { Tab, TabList, TabContent, Tabs } from "../atoms/Tabs";
 import { Swap } from "../organisms/swap/Swap";
 import { Bridge } from "../organisms/swap/Bridge";
@@ -15,7 +15,6 @@ import { FormProvider, useForm } from "react-hook-form";
 import { useToast } from "~/app/hooks";
 import { useMemo, useState } from "react";
 import { useSwapStore } from "~/app/hooks/useSwapStore";
-import { IntlAddress } from "~/utils/intl";
 import TruncateText from "../atoms/TruncateText";
 
 const SwapComponent: React.FC = () => {
@@ -30,6 +29,8 @@ const SwapComponent: React.FC = () => {
 
   const { skipClient, simulation: simulationResult } = useSkipClient({ cacheKey: action });
   const { data: simulation, isLoading, isError } = simulationResult;
+
+  const { refetch: refreshBalances } = useBalances();
 
   const { isDisabled, text } = useMemo(() => {
     if (isError) return { isDisabled: true, text: "No routes found" };
@@ -96,7 +97,7 @@ const SwapComponent: React.FC = () => {
       });
     }
     reset();
-    //TODO: refreshBalances()
+    refreshBalances();
   });
 
   return (
@@ -147,7 +148,8 @@ const SwapComponent: React.FC = () => {
                 <Button
                   fullWidth
                   type="submit"
-                  isDisabled={isLoading || isDisabled}
+                  isDisabled={isDisabled}
+                  isLoading={isLoading}
                   className="backdrop-blur-md"
                 >
                   {text}

@@ -12,7 +12,6 @@ import { CellPoolName } from "../atoms/cells/CellPoolName";
 import { CellTVL } from "../atoms/cells/CellTVL";
 import { CellData } from "../atoms/cells/CellData";
 import { Table, TableRow } from "../atoms/Table";
-import { Pagination } from "../atoms/Pagination";
 
 const columns = [
   { key: "name", title: "Pool", className: "col-span-2 lg:col-span-1" },
@@ -30,7 +29,7 @@ const Pools: React.FC = () => {
   const gridClass = "grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr_2fr] gap-3";
 
   return (
-    <div className="flex flex-col gap-8 px-4 pb-20">
+    <div className="flex flex-col gap-8 px-4 pb-20 max-w-[84.5rem] mx-auto w-full min-h-[65vh]">
       <div className="flex gap-3 justify-between items-center">
         <h1 className="text-xl">Pools</h1>
         <div className="flex gap-3 h-[42px] items-center px-2">

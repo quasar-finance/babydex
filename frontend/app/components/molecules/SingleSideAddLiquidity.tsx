@@ -1,15 +1,16 @@
 import type { PoolInfo } from "@towerfi/types";
 import type React from "react";
 import Dropdown from "../atoms/Dropdown";
-import { useFormContext, FormProvider } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import { IconWallet } from "@tabler/icons-react";
 import { convertDenomToMicroDenom, convertMicroDenomToDenom } from "~/utils/intl";
 import { useImperativeHandle, useState } from "react";
-import { useAccount, useBalances, useSigningClient } from "@cosmi/react";
+import { useAccount, useBalances } from "@cosmi/react";
 import { useToast } from "~/app/hooks";
 import { useModal } from "~/app/providers/ModalProvider";
 import { ModalTypes } from "~/types/modal";
 import type { DepositFormData } from "./modals/ModalAddLiquidity";
+import { useDexClient } from "~/app/hooks/useDexClient";
 interface Props {
   pool: PoolInfo;
   submitRef: React.MutableRefObject<{ onSubmit: (data: DepositFormData) => Promise<void> } | null>;
@@ -19,7 +20,7 @@ export const SingleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
   const [selectedToken, setSelectedToken] = useState(0);
   const { address } = useAccount();
   const { toast } = useToast();
-  const { data: signingClient } = useSigningClient();
+  const { data: signingClient } = useDexClient();
   const { register, watch, setValue } = useFormContext();
   const { assets } = pool;
   const { showModal } = useModal();
@@ -46,18 +47,12 @@ export const SingleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
           );
 
           const tokenAmount = convertDenomToMicroDenom(data[asset.symbol], asset.decimals);
-          await signingClient.execute({
-            execute: {
-              address: pool.poolAddress,
-              message: {
-                provide_liquidity: {
-                  assets: [{ amount: tokenAmount, info: { native_token: { denom: asset.denom } } }],
-                  slippage_tolerance: slipageTolerance,
-                },
-              },
-              funds: [{ denom: asset.denom, amount: tokenAmount }],
-            },
+          await signingClient.addLiquidity({
             sender: address as string,
+            autoStake: true,
+            poolAddress: pool.poolAddress,
+            slipageTolerance,
+            assets: [{ amount: tokenAmount, info: { native_token: { denom: asset.denom } } }],
           });
           toast.dismiss(id);
           await refreshBalances();

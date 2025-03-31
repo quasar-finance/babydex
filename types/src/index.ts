@@ -9,6 +9,7 @@ export type {
   IBCCurrency,
   NativeCurrency,
   WithGasPriceStep,
+  WithAmount,
 } from "./currency.js";
 
 export type { PoolType, PoolInfo } from "./pool.js";

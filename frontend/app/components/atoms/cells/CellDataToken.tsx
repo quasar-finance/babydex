@@ -1,16 +1,32 @@
 import type React from "react";
 import { twMerge } from "~/utils/twMerge";
 import Tooltip from "../Tooltip";
-import type { BaseCurrency } from "@towerfi/types";
+import type { BaseCurrency, WithPrice } from "@towerfi/types";
+import { useWithdrawSimulation } from "~/app/hooks/useWithdrawSimulation";
+import { convertDenomToMicroDenom, convertMicroDenomToDenom } from "~/utils/intl";
 
 interface Props {
   title: string;
-  data?: number | string | React.ReactNode;
+  amount: string | number;
   className?: string;
-  tokens?: BaseCurrency[];
+  poolAddress: string;
+  tokens: WithPrice<BaseCurrency>[];
 }
 
-export const CellDataToken: React.FC<Props> = ({ title, data, className, tokens }) => {
+export const CellDataToken: React.FC<Props> = ({
+  poolAddress,
+  title,
+  amount,
+  className,
+  tokens,
+}) => {
+  const [token0, token1] = tokens;
+
+  const {
+    simulation: [{ amount: token0Amount }, { amount: token1Amount }],
+    query: { isLoading: isSimulateLoading },
+  } = useWithdrawSimulation({ poolAddress, assets: tokens, amount });
+
   return (
     <Tooltip
       className="min-w-[10rem]"
@@ -21,29 +37,21 @@ export const CellDataToken: React.FC<Props> = ({ title, data, className, tokens 
             <div className="flex items-center justify-between gap-2 text-sm">
               <div className="flex items-center gap-1 text-gray-500">
                 <img
-                  src={
-                    "https://raw.githubusercontent.com/cosmos/chain-registry/master/testnets/babylontestnet/images/logo.svg"
-                  }
+                  src={token0.logoURI}
                   alt="BTC"
                   className="grayscale w-3 h-3 select-none"
                   draggable={false}
                 />
-                <p>BTC</p>
+                <p>{token0.symbol}</p>
               </div>
-              <p>0.789</p>
+              <p>{convertMicroDenomToDenom(token0Amount, token0.decimals)}</p>
             </div>
             <div className="flex items-center justify-between gap-2 text-sm">
               <div className="flex items-center gap-1 text-gray-500 ">
-                <img
-                  src={
-                    "https://raw.githubusercontent.com/cosmos/chain-registry/master/testnets/babylontestnet/images/logo.svg"
-                  }
-                  alt="BTC"
-                  className="grayscale w-3 h-3"
-                />
-                <p>BTC</p>
+                <img src={token1.logoURI} alt="BTC" className="grayscale w-3 h-3" />
+                <p>{token1.symbol}</p>
               </div>
-              <p>0.789</p>
+              <p>{convertMicroDenomToDenom(token1Amount, token1.decimals)}</p>
             </div>
           </div>
         </div>
@@ -52,7 +60,7 @@ export const CellDataToken: React.FC<Props> = ({ title, data, className, tokens 
       <div className={twMerge("flex flex-col gap-2", className)}>
         <p className="text-xs text-white/50 lg:hidden">{title}</p>
         <div className="flex items-center  justify-between gap-3">
-          <p>{data ? data : "-"}</p>
+          <p>{amount ? amount : "-"}</p>
         </div>
       </div>
     </Tooltip>

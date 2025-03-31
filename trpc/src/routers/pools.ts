@@ -20,10 +20,12 @@ import { edgeCaller } from "../callers.js";
 
 export const poolsRouter = createTRPCRouter({
   getUserPools: createTRPCPublicProcedure
-    .input(z.object({ address: z.string() }))
+    .input(z.object({ address: z.string().optional() }))
     .query(async ({ ctx, input }) => {
       const { address } = input;
       const caller = createCallerFactory(appRouter)(ctx);
+
+      if (!address) return [];
 
       const balances = await edgeCaller.edge.indexer.getUserBalances.query({ address });
 
@@ -112,7 +114,8 @@ export const poolsRouter = createTRPCRouter({
 
       if (pairType === "xyk") {
         const optimalRatio: number = poolAmount0 / poolAmount1;
-        return optimalRatio;
+
+        return Number.isNaN(optimalRatio) ? 1 : optimalRatio;
       }
 
       const priceScale = Number(params.price_scale);

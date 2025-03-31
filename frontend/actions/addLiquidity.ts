@@ -32,10 +32,10 @@ export async function addLiquidity<
     execute: {
       address: poolAddress,
       message: {
-        receiver,
-        auto_stake: autoStake,
-        min_lp_to_receive: minLpToReceive,
         provide_liquidity: {
+          receiver,
+          auto_stake: autoStake,
+          min_lp_to_receive: minLpToReceive,
           assets: assets,
           slippage_tolerance: slipageTolerance,
         },

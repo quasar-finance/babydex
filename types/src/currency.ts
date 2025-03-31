@@ -20,6 +20,10 @@ export type WithPrice<T> = T & {
   readonly price: number;
 };
 
+export type WithAmount<T> = T & {
+  readonly amount: number;
+};
+
 export type NativeCurrency = Simplify<
   BaseCurrency & {
     readonly type: "native";

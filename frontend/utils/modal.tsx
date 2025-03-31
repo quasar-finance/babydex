@@ -6,6 +6,7 @@ import ModalRemoveLiquidity from "~/app/components/molecules/modals/ModalRemoveL
 import ModalSelectAsset from "~/app/components/molecules/modals/ModalSelectAsset";
 import { ModalStakeLiquidity } from "~/app/components/molecules/modals/ModalStakeLiquidity";
 import ModalSwapSettings from "~/app/components/molecules/modals/ModalSwapSettings";
+import { ModalUnstakeLiquidity } from "~/app/components/molecules/modals/ModalUnstakeLiquidity";
 import { ModalTypes } from "~/types/modal";
 
 export const modals = {
@@ -17,5 +18,5 @@ export const modals = {
   [ModalTypes.deposit_completed]: ModalDepositCompleted,
   [ModalTypes.remove_liquidity]: ModalRemoveLiquidity,
   [ModalTypes.stake_liquidity]: ModalStakeLiquidity,
-  [ModalTypes.unstake_liquidity]: ModalStakeLiquidity,
+  [ModalTypes.unstake_liquidity]: ModalUnstakeLiquidity,
 };

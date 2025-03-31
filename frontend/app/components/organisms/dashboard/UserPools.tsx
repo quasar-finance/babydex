@@ -13,8 +13,8 @@ import { Button } from "../../atoms/Button";
 import { IconDots } from "@tabler/icons-react";
 import { ModalTypes } from "~/types/modal";
 import Link from "next/link";
-import { useState } from "react";
 import { CellDataToken } from "../../atoms/cells/CellDataToken";
+import type { PoolInfo, UserPoolBalances } from "@towerfi/types";
 
 const columns = [
   { key: "name", title: "Pool" },
@@ -26,7 +26,7 @@ const columns = [
 ];
 
 interface Props {
-  pools: any[];
+  pools: { poolInfo: PoolInfo; userBalance: UserPoolBalances }[];
   isLoading: boolean;
 }
 
@@ -71,12 +71,16 @@ export const UserPools: React.FC<Props> = ({ pools, isLoading }) => {
             <CellData title="APR" data="-" className="order-3 w-[45%] lg:w-auto" />
             <CellDataToken
               title="Staked"
-              data={userBalance.staked_share_amount}
+              poolAddress={poolInfo.poolAddress}
+              amount={userBalance.staked_share_amount}
+              tokens={poolInfo.assets}
               className="order-4 w-[45%] lg:w-auto"
             />
             <CellDataToken
               title="Unstaked"
-              data={userBalance.unstaked_share_amount}
+              poolAddress={poolInfo.poolAddress}
+              amount={userBalance.unstaked_share_amount}
+              tokens={poolInfo.assets}
               className="order-5 w-[45%] lg:w-auto"
             />
             <CellClaimRewards
@@ -107,7 +111,10 @@ export const UserPools: React.FC<Props> = ({ pools, isLoading }) => {
                     <li
                       className="px-3 py-2 rounded-lg hover:text-tw-orange-400 hover:bg-tw-orange-400/20 w-full transition-all cursor-pointer"
                       onClick={() =>
-                        showModal(ModalTypes.unstake_liquidity, true, { pool: poolInfo })
+                        showModal(ModalTypes.unstake_liquidity, true, {
+                          pool: poolInfo,
+                          balance: userBalance,
+                        })
                       }
                     >
                       Unstake

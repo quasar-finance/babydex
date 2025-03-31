@@ -1,32 +1,56 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useState } from "react";
 import { Button } from "~/app/components/atoms/Button";
 import BasicModal from "~/app/components/templates/BasicModal";
 import { twMerge } from "~/utils/twMerge";
 
-import IconCoins from "~/app/components/atoms/icons/IconCoins";
 import Divider from "~/app/components/atoms/Divider";
 
-import type { PoolInfo } from "@towerfi/types";
-import { useAccount } from "@cosmi/react";
-import { ModalTypes } from "~/types/modal";
-import { useModal } from "~/app/providers/ModalProvider";
-import { SingleSideAddLiquidity } from "../SingleSideAddLiquidity";
-import { DoubleSideAddLiquidity } from "../DoubleSideAddLiquidity";
-import { FormProvider, useForm } from "react-hook-form";
+import type { Asset, PoolInfo, UserPoolBalances } from "@towerfi/types";
 import AssetsStacked from "../../atoms/AssetsStacked";
 import Pill from "../../atoms/Pill";
 import Input from "../../atoms/Input";
 import { RangeSelector } from "../../atoms/RangeSelector";
+import { useDexClient } from "~/app/hooks/useDexClient";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useAccount } from "@cosmi/react";
+import { AssetAmountSquare } from "../../atoms/AssetAmountSquare";
+import { getInnerValueFromAsset } from "@towerfi/trpc";
+import { useWithdrawSimulation } from "~/app/hooks/useWithdrawSimulation";
 
 interface ModalRemoveLiquidityProps {
   pool: PoolInfo;
+  balance: UserPoolBalances;
 }
 
-const ModalRemoveLiquidity: React.FC<ModalRemoveLiquidityProps> = ({ pool }) => {
-  const { name } = pool;
+const ModalRemoveLiquidity: React.FC<ModalRemoveLiquidityProps> = ({ pool, balance }) => {
+  const { name, assets } = pool;
+  const { unstaked_share_amount } = balance;
 
-  const { assets } = pool;
   const [percentage, setPercentage] = useState(50);
+
+  const { data: signingClient } = useDexClient();
+  const { address } = useAccount();
+
+  const { isLoading, mutateAsync: withdraw } = useMutation({
+    mutationFn: async () => {
+      if (!signingClient) return;
+      await signingClient.withdrawLiquidity({
+        sender: address as string,
+        poolAddress: pool.poolAddress,
+        lpTokenAddress: balance.lpToken,
+        amount: (unstaked_share_amount * (percentage / 100)).toFixed(0),
+      });
+    },
+  });
+
+  const {
+    simulation: [{ amount: token0Amount }, { amount: token1Amount }],
+    query: { isLoading: isSimulateLoading },
+  } = useWithdrawSimulation({
+    poolAddress: pool.poolAddress,
+    assets,
+    amount: unstaked_share_amount,
+  });
 
   return (
     <BasicModal
@@ -41,10 +65,17 @@ const ModalRemoveLiquidity: React.FC<ModalRemoveLiquidityProps> = ({ pool }) => 
               <AssetsStacked assets={assets} size="lg" />
               <span>{name}</span>
             </div>
-            <Pill>0,3%</Pill>
+            <Pill>{pool.config.params.fee_gamma || 0}%</Pill>
           </div>
         </div>
         <Divider dashed />
+        <div className="flex flex-col gap-2 p-4">
+          <p className="text-white/50 text-sm">Available Unstaked Deposit</p>
+          <div className="flex w-full items-center gap-2">
+            <AssetAmountSquare asset={assets[0]} balance={token0Amount} style="bordered" />
+            <AssetAmountSquare asset={assets[1]} balance={token1Amount} style="bordered" />
+          </div>
+        </div>
         <div className="flex flex-col gap-4 p-4 py-6">
           <div className="flex items-center gap-2">
             <p className="text-sm text-white/50">Remove</p>
@@ -63,9 +94,21 @@ const ModalRemoveLiquidity: React.FC<ModalRemoveLiquidityProps> = ({ pool }) => 
           </div>
           <RangeSelector value={percentage} onChange={setPercentage} />
         </div>
+        <div className="flex w-full items-center gap-2 p-4">
+          <AssetAmountSquare
+            asset={assets[0]}
+            balance={(token0Amount * (percentage / 100)).toFixed(0)}
+          />
+          <AssetAmountSquare
+            asset={assets[1]}
+            balance={(token1Amount * (percentage / 100)).toFixed(0)}
+          />
+        </div>
         <Divider dashed />
         <div className="p-4">
-          <Button fullWidth>Remove Liquidity</Button>
+          <Button fullWidth isLoading={isLoading} onClick={() => withdraw()}>
+            Remove Liquidity
+          </Button>
         </div>
       </form>
     </BasicModal>

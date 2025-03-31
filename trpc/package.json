@@ -7,9 +7,7 @@
   "types": "./build/index.d.ts",
   "typings": "./build/index.d.ts",
   "sideEffects": false,
-  "files": [
-    "build"
-  ],
+  "files": ["build"],
   "exports": {
     ".": {
       "types": "./build/index.d.ts",
@@ -20,7 +18,8 @@
   "scripts": {
     "deploy": "wrangler deploy",
     "dev": "wrangler dev",
-    "build": "tsc"
+    "build": "tsc",
+    "clean": "rm -rf ./build && rm -rf node_modules && rm -rf tsconfig.tsbuildinfo"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250303.0",

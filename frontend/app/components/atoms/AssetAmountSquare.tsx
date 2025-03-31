@@ -1,10 +1,11 @@
 import type { BaseCurrency } from "@towerfi/types";
 import type React from "react";
+import { convertMicroDenomToDenom } from "~/utils/intl";
 import { twMerge } from "~/utils/twMerge";
 
 interface Props {
   asset: BaseCurrency;
-  balance: number;
+  balance: number | string;
   style?: "bordered" | "background";
 }
 
@@ -26,7 +27,7 @@ export const AssetAmountSquare: React.FC<Props> = ({ asset, balance, style = "ba
         />
         <p className="text-white/50 text-sm">{asset.symbol}</p>
       </div>
-      <p>{balance}</p>
+      <p>{convertMicroDenomToDenom(balance, asset.decimals)}</p>
     </div>
   );
 };

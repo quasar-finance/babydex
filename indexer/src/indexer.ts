@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
-import { asc, desc, type SQL, eq, sql } from "drizzle-orm";
+import { asc, desc, eq, sql, type SQL } from "drizzle-orm";
 import { StringChunk } from "drizzle-orm/sql/sql";
 
 import {
@@ -14,13 +14,22 @@ import {
   swapInV1Cosmos,
   withdrawLiquidityInV1Cosmos,
 } from "./drizzle/schema.js";
-import { integer, pgSchema, text } from "drizzle-orm/pg-core";
+import { integer, pgSchema, serial, text } from "drizzle-orm/pg-core";
 
 const v1Cosmos = pgSchema("v1_cosmos");
 const userShares = v1Cosmos.table("pool_user_shares", {
   pool_address: text("pool_address").notNull(),
   owner: text("owner").notNull(),
   staked_share_amount: integer("staked_share_amount").notNull(),
+  unstaked_share_amount: integer("unstaked_share_amount").notNull(),
+  total_share_amount: integer("total_share_amount").notNull(),
+  incentive_address: text("incentive_address"),
+});
+
+const poolLpToken = v1Cosmos.table("pool_lp_token", {
+  id: serial("id").primaryKey(),
+  pool: text("pool").notNull(),
+  lp_token: text("lp_token").notNull(),
 });
 
 const views = {
@@ -40,7 +49,9 @@ export type Indexer = {
     viewName: T,
     filters?: IndexerFilters,
   ) => Promise<(typeof views)[T]["$inferSelect"][]>;
-  getUserBalances: (address: string) => Promise<(typeof userShares)["$inferSelect"][]>;
+  getUserBalances: (
+    address: string,
+  ) => Promise<((typeof userShares)["$inferSelect"] & { lpToken: string })[]>;
   getCurrentPoolBalances: (
     page: number,
     limit: number,
@@ -112,7 +123,16 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
 
   async function getUserBalances(address: string) {
     try {
-      return await client.select().from(userShares).where(eq(userShares.owner, address));
+      const response = await client
+        .select()
+        .from(userShares)
+        .leftJoin(poolLpToken, eq(poolLpToken.pool, userShares.pool_address))
+        .where(eq(userShares.owner, address));
+
+      return response.map(({ pool_user_shares, pool_lp_token }) => ({
+        ...pool_user_shares,
+        lpToken: pool_lp_token?.lp_token,
+      }));
     } catch (error) {
       console.error("Error executing raw query:", error);
 

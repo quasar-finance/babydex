@@ -5,21 +5,57 @@ import { twMerge } from "~/utils/twMerge";
 
 import Divider from "~/app/components/atoms/Divider";
 
-import type { PoolInfo } from "@towerfi/types";
+import type { PoolInfo, UserPoolBalances } from "@towerfi/types";
 import AssetsStacked from "../../atoms/AssetsStacked";
 import Pill from "../../atoms/Pill";
 import Input from "../../atoms/Input";
 import { RangeSelector } from "../../atoms/RangeSelector";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useDexClient } from "~/app/hooks/useDexClient";
+import { useAccount } from "@cosmi/react";
+import { trpc } from "~/trpc/client";
+import { AssetAmountSquare } from "../../atoms/AssetAmountSquare";
+import { contracts } from "~/config";
+import { useWithdrawSimulation } from "~/app/hooks/useWithdrawSimulation";
 
 interface Props {
   pool: PoolInfo;
+  balance: UserPoolBalances;
 }
 
-export const ModalStakeLiquidity: React.FC<Props> = ({ pool }) => {
+export const ModalStakeLiquidity: React.FC<Props> = ({ pool, balance }) => {
   const { name } = pool;
+  const { unstaked_share_amount } = balance;
+  const { data: signingClient } = useDexClient();
+  const { address } = useAccount();
+  const client = useQueryClient();
 
   const { assets } = pool;
   const [percentage, setPercentage] = useState(50);
+
+  const {
+    simulation: [{ amount: token0Amount }, { amount: token1Amount }],
+    query: { isLoading: isSimulateLoading },
+  } = useWithdrawSimulation({
+    poolAddress: pool.poolAddress,
+    assets: pool.assets,
+    amount: balance.unstaked_share_amount,
+  });
+
+  const { isLoading, mutateAsync: stake } = useMutation({
+    mutationFn: async () => {
+      if (!signingClient) return;
+      await signingClient.stakeLiquidity({
+        sender: address as string,
+        lpTokenAddress: pool.lpAddress,
+        amount: (unstaked_share_amount * (percentage / 100)).toFixed(0),
+        incentiveAddress: contracts.incentives,
+      });
+    },
+    onSuccess: () => {
+      client.invalidateQueries(trpc.local.pools.getUserPools.getQueryKey({ address }));
+    },
+  });
 
   return (
     <BasicModal
@@ -38,6 +74,13 @@ export const ModalStakeLiquidity: React.FC<Props> = ({ pool }) => {
           </div>
         </div>
         <Divider dashed />
+        <div className="flex flex-col gap-2 p-4">
+          <p className="text-white/50 text-sm">Available Unstaked Deposit</p>
+          <div className="flex w-full items-center gap-2">
+            <AssetAmountSquare asset={assets[0]} balance={token0Amount} style="bordered" />
+            <AssetAmountSquare asset={assets[1]} balance={token1Amount} style="bordered" />
+          </div>
+        </div>
         <div className="flex flex-col gap-4 p-4 py-6">
           <div className="flex items-center gap-2">
             <p className="text-sm text-white/50">Stake</p>
@@ -56,9 +99,21 @@ export const ModalStakeLiquidity: React.FC<Props> = ({ pool }) => {
           </div>
           <RangeSelector value={percentage} onChange={setPercentage} />
         </div>
+        <div className="flex w-full items-center gap-2 p-4">
+          <AssetAmountSquare
+            asset={assets[0]}
+            balance={(token0Amount * (percentage / 100)).toFixed(0)}
+          />
+          <AssetAmountSquare
+            asset={assets[1]}
+            balance={(token1Amount * (percentage / 100)).toFixed(0)}
+          />
+        </div>
         <Divider dashed />
         <div className="p-4">
-          <Button fullWidth>Stake</Button>
+          <Button fullWidth onClick={() => stake()} isLoading={isLoading}>
+            Stake
+          </Button>
         </div>
       </form>
     </BasicModal>

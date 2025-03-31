@@ -22,7 +22,18 @@ const AppProvider: React.FC<PropsWithChildren> = ({ children }) => {
         <CosmiProvider config={cosmi}>
           <ThemeProvider>
             <ModalProvider>{children}</ModalProvider>
-            <Toaster position="bottom-right" reverseOrder />
+            <Toaster
+              containerStyle={{
+                zIndex: 999999,
+              }}
+              toastOptions={{
+                style: {
+                  zIndex: 999999,
+                },
+              }}
+              position="bottom-right"
+              reverseOrder
+            />
           </ThemeProvider>
         </CosmiProvider>
       </trpc.Provider>

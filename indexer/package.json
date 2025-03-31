@@ -7,9 +7,7 @@
   "types": "./build/index.d.ts",
   "typings": "./build/index.d.ts",
   "sideEffects": false,
-  "files": [
-    "build"
-  ],
+  "files": ["build"],
   "directories": {
     "test": "tests"
   },
@@ -24,7 +22,8 @@
     "dev": "tsc -w",
     "build": "tsc",
     "drizzle-pull": "npx drizzle-kit pull",
-    "test": "npx vitest"
+    "test": "npx vitest",
+    "clean": "rm -rf ./build && rm -rf node_modules && rm -rf tsconfig.tsbuildinfo"
   },
   "devDependencies": {
     "@towerfi/types": "workspace:^",

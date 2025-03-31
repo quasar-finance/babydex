@@ -1,5 +1,6 @@
 "use client";
 import { useState, useCallback, type PropsWithChildren, createContext, useContext } from "react";
+import { useLockBodyScroll } from "react-use";
 import ControlModal from "~/app/components/molecules/modals/ControlModal";
 import type { ModalTypes } from "~/types/modal";
 
@@ -24,6 +25,8 @@ export const ModalProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalProps, setModalProps] = useState<Record<string, any>>({});
   const [allowClose, setAllowClose] = useState(false);
+
+  useLockBodyScroll(isModalVisible);
 
   const showModal = useCallback(
     (modalName: ModalTypes, allowClose?: boolean, modalProps?: Record<string, any>) => {

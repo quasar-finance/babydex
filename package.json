@@ -7,7 +7,8 @@
   "scripts": {
     "turbo": "turbo",
     "dev:app": "turbo dev",
-    "build:app": "turbo build"
+    "build:app": "turbo build",
+    "clean": "turbo clean"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",

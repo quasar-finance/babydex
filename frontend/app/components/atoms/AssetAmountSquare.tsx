@@ -1,0 +1,32 @@
+import type { BaseCurrency } from "@towerfi/types";
+import type React from "react";
+import { twMerge } from "~/utils/twMerge";
+
+interface Props {
+  asset: BaseCurrency;
+  balance: number;
+  style?: "bordered" | "background";
+}
+
+export const AssetAmountSquare: React.FC<Props> = ({ asset, balance, style = "background" }) => {
+  return (
+    <div
+      className={twMerge(
+        "flex-1 flex flex-col gap-2  p-4 rounded-2xl",
+        { "border border-white/10": style.includes("bordered") },
+        { "bg-white/10": style.includes("background") },
+      )}
+    >
+      <div className="flex gap-1 items-center  select-none">
+        <img
+          src={asset.logoURI}
+          alt={asset.symbol}
+          className="w-5 h-5 grayscale"
+          draggable={false}
+        />
+        <p className="text-white/50 text-sm">{asset.symbol}</p>
+      </div>
+      <p>{balance}</p>
+    </div>
+  );
+};

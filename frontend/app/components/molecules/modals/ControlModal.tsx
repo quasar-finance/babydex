@@ -17,7 +17,7 @@ const ControlModal: React.FC = () => {
     <AnimatePresence initial={false} mode="wait" onExitComplete={() => null}>
       <motion.div
         onClick={allowClose ? hideModal : undefined}
-        className="backdrop-blur-[2px] bg-tw-bg/90 w-screen h-screen fixed top-0 z-[90] flex items-center justify-center p-4"
+        className="backdrop-blur-[2px] bg-tw-bg/90 w-screen h-screen fixed top-0 z-[999999] flex items-center justify-center p-4"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}

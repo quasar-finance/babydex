@@ -64,14 +64,17 @@ export const supportLinks: { label: string; href: string; isExternal?: boolean }
   {
     label: "Docs",
     href: "https://docs.tower.fi/",
+    isExternal: true,
   },
   {
     label: "Privacy Policy",
     href: "https://www.tower.fi/privacy-policy",
+    isExternal: true,
   },
   {
     label: "Terms of Use",
     href: "https://www.tower.fi/terms-of-use",
+    isExternal: true,
   },
 ];
 

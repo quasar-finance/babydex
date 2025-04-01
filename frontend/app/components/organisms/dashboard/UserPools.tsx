@@ -32,7 +32,7 @@ interface Props {
 }
 
 export const UserPools: React.FC<Props> = ({ pools, isLoading }) => {
-  const gridClass = "grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr_2fr] gap-4";
+  const gridClass = "grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr_4rem] gap-4";
   const { showModal } = useModal();
   const { address } = useAccount();
 

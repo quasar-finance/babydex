@@ -1,7 +1,8 @@
-import { createTRPCPublicProcedure, createTRPCRouter } from "../config.js";
+import { createCallerFactory, createTRPCPublicProcedure, createTRPCRouter } from "../config.js";
 import { z } from "zod";
 
 import type { BaseCurrency, NativeCurrency, CW20Currency, WithPrice } from "@towerfi/types";
+import { appRouter } from "../router.js";
 
 export const assetsRouter = createTRPCRouter({
   getAsset: createTRPCPublicProcedure
@@ -47,5 +48,15 @@ export const assetsRouter = createTRPCRouter({
 
       await cacheService.setItem(denomOrAddress, unknownAsset);
       return unknownAsset;
+    }),
+
+  getAssets: createTRPCPublicProcedure
+    .input(z.object({ assets: z.array(z.string()) }))
+    .query<WithPrice<BaseCurrency>[]>(async ({ ctx, input }) => {
+      const caller = createCallerFactory(appRouter)(ctx);
+      const responses: WithPrice<BaseCurrency>[] = await Promise.all(
+        input.assets.map((asset) => caller.local.assets.getAsset({ asset })),
+      );
+      return responses;
     }),
 });

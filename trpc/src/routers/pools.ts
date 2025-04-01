@@ -13,6 +13,7 @@ import type {
   PoolType,
   WithPrice,
   UserPoolBalances,
+  Asset,
 } from "@towerfi/types";
 import { fromBase64, fromUtf8 } from "cosmi/utils";
 import { getInnerValueFromAsset } from "../utils/assets.js";
@@ -22,17 +23,30 @@ export const poolsRouter = createTRPCRouter({
   getUserPools: createTRPCPublicProcedure
     .input(z.object({ address: z.string().optional() }))
     .query(async ({ ctx, input }) => {
+      const { publicClient } = ctx;
       const { address } = input;
       const caller = createCallerFactory(appRouter)(ctx);
 
       if (!address) return [];
-
       const balances = await edgeCaller.edge.indexer.getUserBalances.query({ address });
 
-      const poolsInfo: { poolInfo: PoolInfo; userBalance: UserPoolBalances }[] = await Promise.all(
+      const poolsInfo: {
+        poolInfo: PoolInfo;
+        userBalance: UserPoolBalances;
+        incentives: Asset[];
+      }[] = await Promise.all(
         balances.map(async (balance) => ({
           poolInfo: await caller.local.pools.getPool({ address: balance.pool_address }),
           userBalance: balance,
+          incentives: await publicClient.queryContractSmart<Asset[]>({
+            address: ctx.contracts.incentives,
+            msg: {
+              pending_rewards: {
+                lp_token: balance.lpToken,
+                user: address,
+              },
+            },
+          }),
         })),
       );
 

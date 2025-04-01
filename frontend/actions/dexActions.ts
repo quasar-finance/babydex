@@ -24,6 +24,12 @@ import {
   type UnstakeLiquidityReturnType,
 } from "./unstakeLiquidity";
 
+import {
+  claimRewards,
+  type ClaimRewardsParameters,
+  type ClaimRewardsReturnType,
+} from "./claimRewards";
+
 export type DexActions<
   _transport extends Transport = Transport,
   _chain extends Chain | undefined = Chain | undefined,
@@ -33,6 +39,7 @@ export type DexActions<
   withdrawLiquidity: (args: WithdrawLiquidityParameters) => WithdrawLiquidityReturnType;
   stakeLiquidity: (args: StakeLiquidityParameters) => StakeLiquidityReturnType;
   unstakeLiquidity: (args: UnstakeLiquidityParameters) => UnstakeLiquidityReturnType;
+  claimRewards: (args: ClaimRewardsParameters) => ClaimRewardsReturnType;
 };
 
 export function dexActions<
@@ -45,5 +52,6 @@ export function dexActions<
     withdrawLiquidity: (args) => withdrawLiquidity(client, args),
     stakeLiquidity: (args) => stakeLiquidity(client, args),
     unstakeLiquidity: (args) => unstakeLiquidity(client, args),
+    claimRewards: (args) => claimRewards(client, args),
   };
 }

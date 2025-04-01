@@ -15,8 +15,8 @@ import { useToast } from "~/app/hooks";
 import { Assets } from "~/config";
 import Link from "next/link";
 
-const FAUCET_API_URL = "https://graphql.union.build/v1/graphql";
-const TURNSTILE_KEY = "0x4AAAAAAA-eVs5k0b8Q1dl5";
+const FAUCET_API_URL = "https://faucet-staging.tower.fi";
+const TURNSTILE_KEY = "0x4AAAAAABBnKau3xkStNjot";
 
 interface FaucetResponse {
   data: {

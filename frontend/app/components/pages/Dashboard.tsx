@@ -26,7 +26,9 @@ const Dashboard: React.FC = () => {
       return await signingClient.claimRewards({
         sender: address,
         incentiveAddress: contracts.incentives,
-        lpTokens: pools.map((pool) => pool.userBalance.lpToken),
+        lpTokens: pools
+          .filter((pool) => pool.userBalance.staked_share_amount > 0)
+          .map((pool) => pool.userBalance.lpToken),
       });
     },
     onSuccess: (data) => {

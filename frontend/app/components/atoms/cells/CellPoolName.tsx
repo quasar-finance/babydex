@@ -11,7 +11,7 @@ export const CellPoolName: React.FC<Props> = ({ assets, name, poolType, config, 
   return (
     <div className={twMerge("col-span-2 lg:col-span-1 flex flex-col gap-2", className)}>
       <p className="text-xs text-white/50 lg:hidden">Pool</p>
-      <div className="flex items-center  justify-between gap-3">
+      <div className="flex items-center gap-3">
         <div className="flex items-center gap-3">
           <AssetsStacked assets={assets} />
           <span>{name}</span>

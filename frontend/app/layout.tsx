@@ -28,11 +28,12 @@ export default function RootLayout({
     <html lang="en">
       <body className={twMerge("relative", inter.variable)}>
         <Script
-          src="https://widget.mava.app"
-          strategy="afterInteractive"
-          id="MavaWebChat"
-          data-token="eea2cb80e6bec4a059aa41be542d8adb8b1318532e7d3f1e300662659b737bd6"
           defer
+          src="https://widget.mava.app"
+          widget-version="v2"
+          id="MavaWebChat"
+          enable-sdk="false"
+          data-token="eea2cb80e6bec4a059aa41be542d8adb8b1318532e7d3f1e300662659b737bd6"
         />
         <AppProvider>
           <Layout>{children}</Layout>

@@ -50,16 +50,15 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
 
   useImperativeHandle(submitRef, () => ({
     onSubmit: async ({ slipageTolerance, ...data }) => {
+      const id = toast.loading(
+        {
+          title: "Depositing",
+          description: `Depositing ${data[token0.symbol]} ${token0.symbol} and ${data[token1.symbol]} ${token1.symbol} to the pool`,
+        },
+        { duration: Number.POSITIVE_INFINITY },
+      );
       try {
         if (!signingClient) throw new Error("we couldn't submit the tx");
-        const id = toast.loading(
-          {
-            title: "Depositing",
-            description: `Depositing ${data[token0.symbol]} ${token0.symbol} and ${data[token1.symbol]} ${token1.symbol} to the pool`,
-          },
-          { duration: Number.POSITIVE_INFINITY },
-        );
-
         const token0Amount = convertDenomToMicroDenom(data[token0.symbol], token0.decimals);
         const token1Amount = convertDenomToMicroDenom(data[token1.symbol], token1.decimals);
         await signingClient.addLiquidity({
@@ -72,7 +71,7 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
             { amount: token1Amount, info: { native_token: { denom: token1.denom } } },
           ],
         });
-        toast.dismiss(id);
+
         await refreshBalances();
         showModal(ModalTypes.deposit_completed, true, {
           tokens: [
@@ -86,6 +85,7 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
           description: `Failed to deposit ${data[token0.symbol]} ${token0.symbol} and ${data[token1.symbol]} ${token1.symbol} to the pool`,
         });
       }
+      toast.dismiss(id);
     },
   }));
 

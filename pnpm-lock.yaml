@@ -36,8 +36,8 @@ importers:
   frontend:
     dependencies:
       '@cosmi/react':
-        specifier: ^0.2.0
-        version: 0.2.0(@tanstack/query-core@5.67.2)(@tanstack/react-query@4.36.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@18.3.18)(bufferutil@4.0.9)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(viem@2.23.14(bufferutil@4.0.9)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2))(zod@3.24.2)
+        specifier: ^0.2.1
+        version: 0.2.1(@tanstack/query-core@5.67.2)(@tanstack/react-query@4.36.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@18.3.18)(bufferutil@4.0.9)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(viem@2.23.14(bufferutil@4.0.9)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2))(zod@3.24.2)
       '@dicebear/collection':
         specifier: ^9.2.2
         version: 9.2.2(@dicebear/core@9.2.2)
@@ -93,8 +93,8 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1
       cosmi:
-        specifier: ^0.2.0
-        version: 0.2.0(@tanstack/query-core@5.67.2)(@tanstack/react-query@4.36.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@18.3.18)(bufferutil@4.0.9)(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2)
+        specifier: ^0.2.1
+        version: 0.2.1(@tanstack/query-core@5.67.2)(@tanstack/react-query@4.36.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@18.3.18)(bufferutil@4.0.9)(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2)
       ky:
         specifier: ^1.7.5
         version: 1.7.5
@@ -377,8 +377,8 @@ packages:
     resolution: {integrity: sha512-wB6uo+3A50m0sW/EWcU64xpV/8wShZ6bMTa7pF8eYsTrSkQA7oLUIJcs/wb8g4y2Oyq701BaGiO6n/ak5WXO1w==}
     deprecated: Unmaintained. The codebase for this package was moved to https://github.com/cosmos/ics23 but then the JS implementation was removed in https://github.com/cosmos/ics23/pull/353. Please consult the maintainers of https://github.com/cosmos for further assistance.
 
-  '@cosmi/react@0.2.0':
-    resolution: {integrity: sha512-LNpgQ3JCsgDwpPsry52QeHjW8f06FTHGGmsVBV/IMi2NVmrMmBAtdOjbx2BXeoTRsn+xeCK65ksnLlHdGwZyZw==}
+  '@cosmi/react@0.2.1':
+    resolution: {integrity: sha512-xkBYIyYwtrHANOxorsTkP7FICdJrLwAXwReDhDTWsn3sDBs+bNtYhtEuPy+vDR+bX1FR1HOMAyMxWib18SDbcQ==}
     peerDependencies:
       '@tanstack/react-query': ^4.0.0
       react: '>=18.0.0'
@@ -3689,8 +3689,8 @@ packages:
   cosmi@0.1.0:
     resolution: {integrity: sha512-hDUTzHZgZ7Ax8hZJl5rXtDeeO6EuYSuVDjXOHtPKAvuoHmtweln1EJdXQhpDAEbaZXoFsD0NP42AhLOJDkl0wA==}
 
-  cosmi@0.2.0:
-    resolution: {integrity: sha512-8oSm61xZcYcoCqoW6gwTnFyUQX5GnF8p1ifGLoZZjFV6wioDU/nzARuCeuA5JOW6LylkdS4S1Zu9Si5JhQI3rw==}
+  cosmi@0.2.1:
+    resolution: {integrity: sha512-Yk46mtVivro3gE2OK/On8EaPLPeLsk0Kx2+OONGYX2ZGT6jdm5ZPx1CGxYGmakm5fGqC7QgawoTOzB/sir+3YQ==}
 
   cosmjs-types@0.7.2:
     resolution: {integrity: sha512-vf2uLyktjr/XVAgEq0DjMxeAWh1yYREe7AMHDKd7EiHVqxBPCaBS+qEEQUkXbR9ndnckqr1sUG8BQhazh4X5lA==}
@@ -6278,10 +6278,10 @@ snapshots:
       '@noble/hashes': 1.7.1
       protobufjs: 6.11.4
 
-  '@cosmi/react@0.2.0(@tanstack/query-core@5.67.2)(@tanstack/react-query@4.36.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@18.3.18)(bufferutil@4.0.9)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(viem@2.23.14(bufferutil@4.0.9)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2))(zod@3.24.2)':
+  '@cosmi/react@0.2.1(@tanstack/query-core@5.67.2)(@tanstack/react-query@4.36.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@18.3.18)(bufferutil@4.0.9)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(viem@2.23.14(bufferutil@4.0.9)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2))(zod@3.24.2)':
     dependencies:
       '@tanstack/react-query': 4.36.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
-      cosmi: 0.2.0(@tanstack/query-core@5.67.2)(@tanstack/react-query@4.36.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@18.3.18)(bufferutil@4.0.9)(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2)
+      cosmi: 0.2.1(@tanstack/query-core@5.67.2)(@tanstack/react-query@4.36.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@18.3.18)(bufferutil@4.0.9)(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2)
       react: 19.0.0
       react-dom: 19.0.0(react@19.0.0)
       use-sync-external-store: 1.4.0(react@19.0.0)
@@ -11056,7 +11056,7 @@ snapshots:
       - utf-8-validate
       - zod
 
-  cosmi@0.2.0(@tanstack/query-core@5.67.2)(@tanstack/react-query@4.36.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@18.3.18)(bufferutil@4.0.9)(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2):
+  cosmi@0.2.1(@tanstack/query-core@5.67.2)(@tanstack/react-query@4.36.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@18.3.18)(bufferutil@4.0.9)(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2):
     dependencies:
       cosmjs-types: 0.9.0
       viem: 2.23.14(bufferutil@4.0.9)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2)

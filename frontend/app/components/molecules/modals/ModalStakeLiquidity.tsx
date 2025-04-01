@@ -17,6 +17,8 @@ import { trpc } from "~/trpc/client";
 import { AssetAmountSquare } from "../../atoms/AssetAmountSquare";
 import { contracts } from "~/config";
 import { useWithdrawSimulation } from "~/app/hooks/useWithdrawSimulation";
+import { useToast } from "~/app/hooks";
+import TruncateText from "../../atoms/TruncateText";
 
 interface Props {
   pool: PoolInfo;
@@ -27,8 +29,9 @@ export const ModalStakeLiquidity: React.FC<Props> = ({ pool, balance }) => {
   const { name } = pool;
   const { unstaked_share_amount } = balance;
   const { data: signingClient } = useDexClient();
-  const { address } = useAccount();
+  const { address, chain } = useAccount();
   const client = useQueryClient();
+  const { toast } = useToast();
 
   const { assets } = pool;
   const [percentage, setPercentage] = useState(50);
@@ -45,15 +48,36 @@ export const ModalStakeLiquidity: React.FC<Props> = ({ pool, balance }) => {
   const { isLoading, mutateAsync: stake } = useMutation({
     mutationFn: async () => {
       if (!signingClient) return;
-      await signingClient.stakeLiquidity({
+      return await signingClient.stakeLiquidity({
         sender: address as string,
         lpTokenAddress: pool.lpAddress,
         amount: (unstaked_share_amount * (percentage / 100)).toFixed(0),
         incentiveAddress: contracts.incentives,
       });
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       client.invalidateQueries(trpc.local.pools.getUserPools.getQueryKey({ address }));
+      toast.success({
+        title: "Stake successful",
+        component: () => (
+          <div className="flex flex-col gap-1">
+            <a
+              className="underline hover:no-underline"
+              target="_blank"
+              href={`${chain?.blockExplorers?.default.url}/tx/${data?.hash}`}
+              rel="noreferrer"
+            >
+              See tx
+            </a>
+          </div>
+        ),
+      });
+    },
+    onError: (error: Error) => {
+      toast.error({
+        title: "Stake failed",
+        description: `Failed to stake ${percentage}% of unstake deposit. ${error.message}`,
+      });
     },
   });
 
@@ -77,8 +101,18 @@ export const ModalStakeLiquidity: React.FC<Props> = ({ pool, balance }) => {
         <div className="flex flex-col gap-2 p-4">
           <p className="text-white/50 text-sm">Available Unstaked Deposit</p>
           <div className="flex w-full items-center gap-2">
-            <AssetAmountSquare asset={assets[0]} balance={token0Amount} style="bordered" />
-            <AssetAmountSquare asset={assets[1]} balance={token1Amount} style="bordered" />
+            <AssetAmountSquare
+              asset={assets[0]}
+              balance={token0Amount}
+              style="bordered"
+              isLoading={isSimulateLoading}
+            />
+            <AssetAmountSquare
+              asset={assets[1]}
+              balance={token1Amount}
+              style="bordered"
+              isLoading={isSimulateLoading}
+            />
           </div>
         </div>
         <div className="flex flex-col gap-4 p-4 py-6">
@@ -103,10 +137,12 @@ export const ModalStakeLiquidity: React.FC<Props> = ({ pool, balance }) => {
           <AssetAmountSquare
             asset={assets[0]}
             balance={(token0Amount * (percentage / 100)).toFixed(0)}
+            isLoading={isSimulateLoading}
           />
           <AssetAmountSquare
             asset={assets[1]}
             balance={(token1Amount * (percentage / 100)).toFixed(0)}
+            isLoading={isSimulateLoading}
           />
         </div>
         <Divider dashed />

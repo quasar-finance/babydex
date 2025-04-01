@@ -18,8 +18,8 @@ const columns = [
   { key: "name", title: "Pool", className: "col-span-2 lg:col-span-1" },
   { key: "poolLiquidity", title: "TVL" },
   { key: "apr", title: "APR" },
-  { key: "volume", title: "Volume 24h" },
-  { key: "fees", title: "Fees 24h" },
+  /* { key: "volume", title: "Volume 24h" },
+  { key: "fees", title: "Fees 24h" }, */
   { key: "actions", title: "" },
 ];
 
@@ -28,7 +28,7 @@ const Pools: React.FC = () => {
   const { data: pools = [], isLoading } = trpc.local.pools.getPools.useQuery();
   const [searchText, setSearchText] = useState("");
 
-  const gridClass = "grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr_2fr] gap-3";
+  const gridClass = "grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr] gap-3";
 
   const filteredPools = pools.filter((pool) =>
     pool.name.toLowerCase().includes(searchText.toLowerCase()),
@@ -60,8 +60,8 @@ const Pools: React.FC = () => {
             />
             <CellTVL poolLiquidity={pool.poolLiquidity} />
             <CellData title="APR" />
-            <CellData title="Volume 24h" />
-            <CellData title="Fees 24h" />
+            {/* <CellData title="Volume 24h" />
+            <CellData title="Fees 24h" /> */}
             <div className="flex lg:items-end lg:justify-end">
               <Button
                 variant="flat"

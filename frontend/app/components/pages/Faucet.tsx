@@ -15,7 +15,7 @@ import { useToast } from "~/app/hooks";
 import { Assets } from "~/config";
 import Link from "next/link";
 
-const FAUCET_API_URL = "https://faucet-staging.tower.fi";
+const FAUCET_API_URL = "http://34.141.218.16:8000/";
 const TURNSTILE_KEY = "0x4AAAAAABBnKau3xkStNjot";
 
 interface FaucetResponse {
@@ -24,6 +24,7 @@ interface FaucetResponse {
   };
 }
 
+const faucet_assets = ["IBCT1", "IBCT2", "IBCT3", "IBCT4", "IBCT5", "IBCT6"];
 const available_denoms = Object.values(Assets).map((asset) => ({
   value: asset.denom,
   label: (

@@ -12,6 +12,7 @@ import { CellPoolName } from "../atoms/cells/CellPoolName";
 import { CellTVL } from "../atoms/cells/CellTVL";
 import { CellData } from "../atoms/cells/CellData";
 import { Table, TableRow } from "../atoms/Table";
+import { useState } from "react";
 
 const columns = [
   { key: "name", title: "Pool", className: "col-span-2 lg:col-span-1" },
@@ -25,21 +26,31 @@ const columns = [
 const Pools: React.FC = () => {
   const { showModal } = useModal();
   const { data: pools = [], isLoading } = trpc.local.pools.getPools.useQuery();
+  const [searchText, setSearchText] = useState("");
 
   const gridClass = "grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr_2fr] gap-3";
+
+  const filteredPools = pools.filter((pool) =>
+    pool.name.toLowerCase().includes(searchText.toLowerCase()),
+  );
 
   return (
     <div className="flex flex-col gap-8 px-4 pb-20 max-w-[84.5rem] mx-auto w-full min-h-[65vh]">
       <div className="flex gap-3 justify-between items-center">
         <h1 className="text-xl">Pools</h1>
         <div className="flex gap-3 h-[42px] items-center px-2">
-          <Input isSearch placeholder="Search" />
+          <Input
+            isSearch
+            placeholder="Search"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+          />
         </div>
       </div>
 
       <Table columns={columns} gridClass={gridClass}>
         {isLoading && <PoolsSkeleton className={twMerge("grid", gridClass)} />}
-        {pools.map((pool, i) => (
+        {filteredPools.map((pool, i) => (
           <TableRow key={i} gridClass={twMerge("grid", gridClass)}>
             <CellPoolName
               assets={pool.assets}

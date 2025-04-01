@@ -101,7 +101,7 @@ export const UserPools: React.FC<Props> = ({ pools, isLoading }) => {
                     <li
                       className="px-3 py-2 rounded-lg hover:text-tw-orange-400 hover:bg-tw-orange-400/20 w-full transition-all cursor-pointer"
                       onClick={() =>
-                        showModal(ModalTypes.stake_liquidity, true, {
+                        showModal(ModalTypes.stake_liquidity, false, {
                           pool: poolInfo,
                           balance: userBalance,
                         })
@@ -112,7 +112,7 @@ export const UserPools: React.FC<Props> = ({ pools, isLoading }) => {
                     <li
                       className="px-3 py-2 rounded-lg hover:text-tw-orange-400 hover:bg-tw-orange-400/20 w-full transition-all cursor-pointer"
                       onClick={() =>
-                        showModal(ModalTypes.unstake_liquidity, true, {
+                        showModal(ModalTypes.unstake_liquidity, false, {
                           pool: poolInfo,
                           balance: userBalance,
                         })
@@ -122,14 +122,14 @@ export const UserPools: React.FC<Props> = ({ pools, isLoading }) => {
                     </li>
                     <li
                       className="px-3 py-2 rounded-lg hover:text-tw-orange-400 hover:bg-tw-orange-400/20 w-full transition-all cursor-pointer"
-                      onClick={() => showModal(ModalTypes.add_liquidity, true, { pool: poolInfo })}
+                      onClick={() => showModal(ModalTypes.add_liquidity, false, { pool: poolInfo })}
                     >
                       Add
                     </li>
                     <li
                       className="px-3 py-2 rounded-lg hover:text-tw-orange-400 hover:bg-tw-orange-400/20 w-full transition-all cursor-pointer"
                       onClick={() =>
-                        showModal(ModalTypes.remove_liquidity, true, {
+                        showModal(ModalTypes.remove_liquidity, false, {
                           pool: poolInfo,
                           balance: userBalance,
                         })

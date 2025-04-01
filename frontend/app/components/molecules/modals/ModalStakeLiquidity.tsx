@@ -94,7 +94,7 @@ export const ModalStakeLiquidity: React.FC<Props> = ({ pool, balance }) => {
               <AssetsStacked assets={assets} size="lg" />
               <span>{name}</span>
             </div>
-            <Pill>0,3%</Pill>
+            <Pill>{pool.config.params.fee_gamma || 0}%</Pill>
           </div>
         </div>
         <Divider dashed />

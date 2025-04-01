@@ -38,15 +38,17 @@ export const poolsRouter = createTRPCRouter({
         balances.map(async (balance) => ({
           poolInfo: await caller.local.pools.getPool({ address: balance.pool_address }),
           userBalance: balance,
-          incentives: await publicClient.queryContractSmart<Asset[]>({
-            address: ctx.contracts.incentives,
-            msg: {
-              pending_rewards: {
-                lp_token: balance.lpToken,
-                user: address,
+          incentives: await publicClient
+            .queryContractSmart<Asset[]>({
+              address: ctx.contracts.incentives,
+              msg: {
+                pending_rewards: {
+                  lp_token: balance.lpToken,
+                  user: address,
+                },
               },
-            },
-          }),
+            })
+            .catch(() => []),
         })),
       );
 

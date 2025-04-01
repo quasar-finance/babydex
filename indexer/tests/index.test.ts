@@ -38,8 +38,7 @@ test('get pool balances by addresses', async () => {
 test('get current pool volumes', async () => {
   const res = await indexer.getCurrentPoolVolumes(1, 100);
 
-  // expect(res.length).toBeGreaterThan(0);
-  expect(res.length).toBe(0);
+  expect(res.length).toBeGreaterThan(0);
 });
 
 test('get pool volumes by addresses', async () => {
@@ -48,8 +47,7 @@ test('get pool volumes by addresses', async () => {
     "bbn17xgsxm4vll7trsd59e26wg9f0unwmx2ktfhtvhu35jeel5wrakcqvnwzyu",
   ]);
 
-  // expect(res.length).toBeGreaterThan(0);
-  expect(res.length).toBe(0);
+  expect(res.length).toBeGreaterThan(0);
 });
 
 test('get current pool apr', async () => {

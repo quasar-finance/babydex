@@ -1,20 +1,20 @@
-import { drizzle } from "drizzle-orm/node-postgres";
-import { Pool } from "pg";
-import { asc, desc, eq, sql, type SQL } from "drizzle-orm";
-import { StringChunk } from "drizzle-orm/sql/sql";
+import {drizzle} from "drizzle-orm/node-postgres";
+import {Pool} from "pg";
+import {asc, desc, eq, sql, type SQL} from "drizzle-orm";
+import {StringChunk} from "drizzle-orm/sql/sql";
 
 import {
-  addLiquidityInV1Cosmos,
-  historicPoolYieldInV1Cosmos,
-  incentivizeInV1Cosmos,
-  poolBalanceInV1Cosmos,
-  poolsInV1Cosmos,
-  poolUserSharesInV1Cosmos,
-  stakeLiquidityInV1Cosmos,
-  swapInV1Cosmos,
-  withdrawLiquidityInV1Cosmos,
+  materializedAddLiquidityInV1Cosmos,
+  materializedHistoricPoolYieldInV1Cosmos,
+  materializedIncentivizeInV1Cosmos,
+  materializedPoolBalanceInV1Cosmos,
+  materializedPoolsInV1Cosmos,
+  materializedPoolUserSharesInV1Cosmos,
+  materializedStakeLiquidityInV1Cosmos,
+  materializedSwapInV1Cosmos,
+  materializedWithdrawLiquidityInV1Cosmos,
 } from "./drizzle/schema.js";
-import { integer, pgSchema, serial, text } from "drizzle-orm/pg-core";
+import {integer, pgSchema, serial, text} from "drizzle-orm/pg-core";
 
 const v1Cosmos = pgSchema("v1_cosmos");
 const userShares = v1Cosmos.table("pool_user_shares", {
@@ -33,15 +33,15 @@ const poolLpToken = v1Cosmos.table("pool_lp_token", {
 });
 
 const views = {
-  addLiquidity: addLiquidityInV1Cosmos,
-  historicPoolYield: historicPoolYieldInV1Cosmos,
-  incentivize: incentivizeInV1Cosmos,
-  pools: poolsInV1Cosmos,
-  poolBalance: poolBalanceInV1Cosmos,
-  poolUserShares: poolUserSharesInV1Cosmos,
-  stakeLiquidity: stakeLiquidityInV1Cosmos,
-  swap: swapInV1Cosmos,
-  withdrawLiquidity: withdrawLiquidityInV1Cosmos,
+  addLiquidity: materializedAddLiquidityInV1Cosmos,
+  historicPoolYield: materializedHistoricPoolYieldInV1Cosmos,
+  incentivize: materializedIncentivizeInV1Cosmos,
+  pools: materializedPoolsInV1Cosmos,
+  poolBalance: materializedPoolBalanceInV1Cosmos,
+  poolUserShares: materializedPoolUserSharesInV1Cosmos,
+  stakeLiquidity: materializedStakeLiquidityInV1Cosmos,
+  swap: materializedSwapInV1Cosmos,
+  withdrawLiquidity: materializedWithdrawLiquidityInV1Cosmos,
 } as const;
 
 export type Indexer = {
@@ -107,7 +107,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
 
     if (!filters) return await query;
 
-    const { orderBy = "asc", page = 1, limit = 50, orderByColumn } = filters;
+    const {orderBy = "asc", page = 1, limit = 50, orderByColumn} = filters;
 
     const dynamicQuery = query.$dynamic();
 
@@ -129,7 +129,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
         .leftJoin(poolLpToken, eq(poolLpToken.pool, userShares.pool_address))
         .where(eq(userShares.owner, address));
 
-      return response.map(({ pool_user_shares, pool_lp_token }) => ({
+      return response.map(({pool_user_shares, pool_lp_token}) => ({
         ...pool_user_shares,
         lpToken: pool_lp_token?.lp_token,
       }));
@@ -147,10 +147,10 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     const offset = (Math.max(1, page) - 1) * limit;
     const query = sql`
         SELECT p.*
-        FROM v1_cosmos.pool_balance p
+        FROM v1_cosmos.materialized_pool_balance p
                  INNER JOIN (SELECT pool_address,
                                     MAX(height) AS max_height
-                             FROM v1_cosmos.pool_balance
+                             FROM v1_cosmos.materialized_pool_balance
                              GROUP BY pool_address) latest
                             ON p.pool_address = latest.pool_address AND p.height = latest.max_height
         ORDER BY p.pool_address
@@ -174,10 +174,10 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     const pool_addresses_sql = createPoolAddressArraySql(addresses);
     const query = sql`
         SELECT p.*
-        FROM v1_cosmos.pool_balance p
+        FROM v1_cosmos.materialized_pool_balance p
                  INNER JOIN (SELECT pool_address,
                                     MAX(height) AS max_height
-                             FROM v1_cosmos.pool_balance
+                             FROM v1_cosmos.materialized_pool_balance
                              WHERE pool_address = ${pool_addresses_sql}
                              GROUP BY pool_address) latest
                             ON p.pool_address = latest.pool_address AND p.height = latest.max_height
@@ -215,9 +215,9 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
                            ELSE 0
                            END
                ) AS token1_volume
-        FROM v1_cosmos.swap s
+        FROM v1_cosmos.materialized_swap s
                  JOIN
-             v1_cosmos.pool_balance pb ON s.pool_address = pb.pool_address
+             v1_cosmos.materialized_pool_balance pb ON s.pool_address = pb.pool_address
         GROUP BY s.pool_address
         ORDER BY s.pool_address
         LIMIT ${limit} OFFSET ${offset};
@@ -251,9 +251,9 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
                            ELSE 0
                            END
                ) AS token1_volume
-        FROM v1_cosmos.swap s
+        FROM v1_cosmos.materialized_swap s
                  JOIN
-             v1_cosmos.pool_balance pb ON s.pool_address = pb.pool_address
+             v1_cosmos.materialized_pool_balance pb ON s.pool_address = pb.pool_address
         WHERE s.pool_address = ${pool_addresses_sql}
         GROUP BY s.pool_address;
     `;
@@ -298,7 +298,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
                                                                                           OVER (PARTITION BY pool_address ORDER BY timestamp) -
                                                                                           timestamp)) /
                                                                       86400) AS daily_yield
-                             FROM v1_cosmos.historic_pool_yield
+                             FROM v1_cosmos.materialized_historic_pool_yield
                              WHERE timestamp >= NOW() - INTERVAL '${intervalSql} day'
                                AND total_liquidity_usd > 0)
         SELECT pool_address,
@@ -330,7 +330,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
                                                                                           OVER (PARTITION BY pool_address ORDER BY timestamp) -
                                                                                           timestamp)) /
                                                                       86400) AS daily_yield
-                             FROM v1_cosmos.historic_pool_yield
+                             FROM v1_cosmos.materialized_historic_pool_yield
                              WHERE timestamp >= NOW() - INTERVAL '${intervalSql} day'
                                AND total_liquidity_usd > 0
                                AND pool_address = ${poolAddressesSql})
@@ -379,7 +379,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
   ): Promise<Record<string, unknown>[] | null> {
     const intervalSql = createIntervalSql(interval);
     const offset = (Math.max(1, page) - 1) * limit;
-    const daysInSecondsSql = sql.raw("86400");
+    const dayInSecondsSql = sql.raw("86400");
     const query = sql`
         SELECT plt.pool     AS pool_address,
                plt.lp_token AS lp_token_address,
@@ -387,25 +387,25 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
                    WHEN SUM(i.rewards_per_second * (
                        CASE
                            WHEN i.end_ts <= EXTRACT(EPOCH FROM NOW()) THEN i.end_ts - i.start_ts
-                           WHEN i.start_ts >= EXTRACT(EPOCH FROM NOW()) - (${intervalSql} * ${daysInSecondsSql})
+                           WHEN i.start_ts >= EXTRACT(EPOCH FROM NOW()) - (${intervalSql} * ${dayInSecondsSql})
                                THEN EXTRACT(EPOCH FROM NOW()) - i.start_ts
                            ELSE EXTRACT(EPOCH FROM NOW()) -
-                                (EXTRACT(EPOCH FROM NOW()) - (${intervalSql} * ${daysInSecondsSql}))
+                                (EXTRACT(EPOCH FROM NOW()) - (${intervalSql} * ${dayInSecondsSql}))
                            END
                        )) IS NULL THEN NULL
                    ELSE SUM(i.rewards_per_second * (
                        CASE
                            WHEN i.end_ts <= EXTRACT(EPOCH FROM NOW()) THEN i.end_ts - i.start_ts
-                           WHEN i.start_ts >= EXTRACT(EPOCH FROM NOW()) - (${intervalSql} * ${daysInSecondsSql})
+                           WHEN i.start_ts >= EXTRACT(EPOCH FROM NOW()) - (${intervalSql} * ${dayInSecondsSql})
                                THEN EXTRACT(EPOCH FROM NOW()) - i.start_ts
                            ELSE EXTRACT(EPOCH FROM NOW()) -
-                                (EXTRACT(EPOCH FROM NOW()) - (${intervalSql} * ${daysInSecondsSql}))
+                                (EXTRACT(EPOCH FROM NOW()) - (${intervalSql} * ${dayInSecondsSql}))
                            END
                        ))
                    END      AS total_incentives
         FROM v1_cosmos.pool_lp_token plt
                  LEFT JOIN
-             v1_cosmos.incentivize i ON plt.lp_token = i.lp_token
+             v1_cosmos.materialized_incentivize i ON plt.lp_token = i.lp_token
         WHERE i.timestamp >= NOW() - (${intervalSql} || ' days')::INTERVAL
         GROUP BY plt.pool, plt.lp_token
         ORDER BY plt.pool
@@ -434,7 +434,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
   ): Promise<Record<string, unknown>[] | null> {
     const intervalSql = createIntervalSql(interval);
     const poolAddressesSql = createPoolAddressArraySql(addresses);
-    const daysInSecondsSql = sql.raw("86400");
+    const dayInSecondsSql = sql.raw("86400");
     const query = sql`
         SELECT plt.pool     AS pool_address,
                plt.lp_token AS lp_token_address,
@@ -442,25 +442,25 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
                    WHEN SUM(i.rewards_per_second * (
                        CASE
                            WHEN i.end_ts <= EXTRACT(EPOCH FROM NOW()) THEN i.end_ts - i.start_ts
-                           WHEN i.start_ts >= EXTRACT(EPOCH FROM NOW()) - (${intervalSql} * ${daysInSecondsSql})
+                           WHEN i.start_ts >= EXTRACT(EPOCH FROM NOW()) - (${intervalSql} * ${dayInSecondsSql})
                                THEN EXTRACT(EPOCH FROM NOW()) - i.start_ts
                            ELSE EXTRACT(EPOCH FROM NOW()) -
-                                (EXTRACT(EPOCH FROM NOW()) - (${intervalSql} * ${daysInSecondsSql}))
+                                (EXTRACT(EPOCH FROM NOW()) - (${intervalSql} * ${dayInSecondsSql}))
                            END
                        )) IS NULL THEN NULL
                    ELSE SUM(i.rewards_per_second * (
                        CASE
                            WHEN i.end_ts <= EXTRACT(EPOCH FROM NOW()) THEN i.end_ts - i.start_ts
-                           WHEN i.start_ts >= EXTRACT(EPOCH FROM NOW()) - (${intervalSql} * ${daysInSecondsSql})
+                           WHEN i.start_ts >= EXTRACT(EPOCH FROM NOW()) - (${intervalSql} * ${dayInSecondsSql})
                                THEN EXTRACT(EPOCH FROM NOW()) - i.start_ts
                            ELSE EXTRACT(EPOCH FROM NOW()) -
-                                (EXTRACT(EPOCH FROM NOW()) - (${intervalSql} * ${daysInSecondsSql}))
+                                (EXTRACT(EPOCH FROM NOW()) - (${intervalSql} * ${dayInSecondsSql}))
                            END
                        ))
                    END      AS total_incentives
         FROM v1_cosmos.pool_lp_token plt
                  LEFT JOIN
-             v1_cosmos.incentivize i ON plt.lp_token = i.lp_token
+             v1_cosmos.materialized_incentivize i ON plt.lp_token = i.lp_token
         WHERE i.timestamp >= NOW() - (${intervalSql} || ' days')::INTERVAL
           AND plt.pool = ${poolAddressesSql}
         GROUP BY plt.pool, plt.lp_token

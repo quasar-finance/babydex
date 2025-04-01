@@ -57,7 +57,7 @@ export const Swap: React.FC = () => {
         });
       }
     })();
-  }, [fromAmount, toAmount]);
+  }, [fromAmount, toAmount, fromToken, toToken]);
 
   const onRotate = () => {
     const fToken = { ...fromToken };

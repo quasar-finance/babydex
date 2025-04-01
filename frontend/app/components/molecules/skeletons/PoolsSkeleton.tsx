@@ -34,7 +34,7 @@ const PoolsSkeleton: React.FC<Props> = ({ className = "" }) => {
               <Skeleton className="w-full h-6" />
             </div>
 
-            <div className="flex flex-col gap-2">
+            {/*  <div className="flex flex-col gap-2">
               <p className="text-xs text-white/50 lg:hidden">Volume 24h</p>
               <Skeleton className="w-full h-6" />
             </div>
@@ -42,7 +42,7 @@ const PoolsSkeleton: React.FC<Props> = ({ className = "" }) => {
             <div className="flex flex-col gap-2">
               <p className="text-xs text-white/50 lg:hidden">Fees 24h</p>
               <Skeleton className="w-full h-6" />
-            </div>
+            </div> */}
 
             <div className=" flex lg:items-end lg:justify-end">
               <Button variant="flat" className="bg-white/10 text-white/20 animate-pulse">

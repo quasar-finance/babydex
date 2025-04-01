@@ -3,6 +3,7 @@ import "./globals.css";
 import { Inter } from "next/font/google";
 import AppProvider from "~/app/providers/AppProvider";
 import { twMerge } from "~/utils/twMerge";
+import Script from "next/script";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -26,6 +27,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={twMerge("relative", inter.variable)}>
+        <Script
+          src="https://widget.mava.app"
+          strategy="afterInteractive"
+          id="MavaWebChat"
+          data-token="eea2cb80e6bec4a059aa41be542d8adb8b1318532e7d3f1e300662659b737bd6"
+          defer
+        />
         <AppProvider>
           <Layout>{children}</Layout>
         </AppProvider>

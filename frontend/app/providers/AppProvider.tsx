@@ -24,11 +24,11 @@ const AppProvider: React.FC<PropsWithChildren> = ({ children }) => {
             <ModalProvider>{children}</ModalProvider>
             <Toaster
               containerStyle={{
-                zIndex: 999999,
+                zIndex: 99999999,
               }}
               toastOptions={{
                 style: {
-                  zIndex: 999999,
+                  zIndex: 99999999,
                 },
               }}
               position="bottom-right"

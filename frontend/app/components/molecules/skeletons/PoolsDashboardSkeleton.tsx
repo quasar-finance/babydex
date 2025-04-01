@@ -42,7 +42,7 @@ const PoolsDashboardSkeleton: React.FC<Props> = ({ className = "" }) => {
               <p className="text-xs text-white/50 lg:hidden text-nowrap">Claimable Rewards</p>
               <div className="flex gap-2 items-center">
                 <Skeleton className="w-full h-6 flex-1 min-w-[3rem]" />
-                <Button color="secondary" size="xs">
+                <Button color="secondary" size="sm">
                   Claim
                 </Button>
               </div>

@@ -87,6 +87,7 @@ export const UserPools: React.FC<Props> = ({ pools, isLoading }) => {
             <CellClaimRewards
               rewards={incentives}
               poolToken={userBalance.lpToken}
+              stakedAmount={userBalance.staked_share_amount}
               className="order-6 w-[45%] lg:w-auto"
             />
             <div className="order-2 lg:order-7 flex items-end justify-end w-fit lg:w-auto">

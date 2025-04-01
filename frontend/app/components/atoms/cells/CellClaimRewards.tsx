@@ -15,9 +15,15 @@ interface Props {
   rewards: Asset[];
   poolToken: string;
   className?: string;
+  stakedAmount?: number;
 }
 
-export const CellClaimRewards: React.FC<Props> = ({ rewards, poolToken, className }) => {
+export const CellClaimRewards: React.FC<Props> = ({
+  rewards,
+  poolToken,
+  className,
+  stakedAmount,
+}) => {
   const { address, chain } = useAccount();
   const { data: signingClient } = useDexClient();
   const queryClient = useQueryClient();
@@ -61,6 +67,25 @@ export const CellClaimRewards: React.FC<Props> = ({ rewards, poolToken, classNam
   const { data: assets, isLoading: isLoadingAssets } = trpc.local.assets.getAssets.useQuery({
     assets: rewards.map((r) => getInnerValueFromAsset(r.info)),
   });
+
+  if (!stakedAmount) {
+    return (
+      <div className={twMerge("flex flex-col gap-2", className)}>
+        <p className="text-xs text-white/50 lg:hidden">Claimable Rewards</p>
+        <div className="flex gap-2 items-center">
+          <Button
+            color="secondary"
+            size="sm"
+            onClick={() => claimReward()}
+            isLoading={isLoading}
+            isDisabled={stakedAmount === 0 || isLoading}
+          >
+            Claim
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={twMerge("flex flex-col gap-2", className)}>

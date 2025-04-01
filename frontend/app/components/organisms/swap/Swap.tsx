@@ -74,7 +74,7 @@ export const Swap: React.FC = () => {
       <AssetInput
         name="fromAmount"
         control={control}
-        asset={fromToken}
+        assets={[fromToken, toToken]}
         disabled={isSubmitting || (isLoading && activeInput === "to")}
         onSelect={setFromToken}
         onFocus={() => setActiveInput("from")}
@@ -83,7 +83,7 @@ export const Swap: React.FC = () => {
       <AssetInput
         name="toAmount"
         control={control}
-        asset={toToken}
+        assets={[toToken, fromToken]}
         disabled={isSubmitting || (isLoading && activeInput === "from")}
         onSelect={setToToken}
         onFocus={() => setActiveInput("to")}

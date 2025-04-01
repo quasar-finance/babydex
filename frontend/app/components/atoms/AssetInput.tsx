@@ -11,7 +11,7 @@ import { useBalances } from "@cosmi/react";
 import { assetNumberMask } from "~/utils/masks";
 
 type AssetInputProps = {
-  asset: BaseCurrency;
+  assets: BaseCurrency[];
   name: string;
   disabled?: boolean;
   onSelect: (asset: BaseCurrency) => void;
@@ -24,7 +24,7 @@ const assets = Object.values(Assets);
 
 export const AssetInput: React.FC<AssetInputProps> = ({
   name,
-  asset,
+  assets: assetsSelected,
   onSelect,
   onFocus,
   disabled,
@@ -54,14 +54,20 @@ export const AssetInput: React.FC<AssetInputProps> = ({
   const selectAsset = async () => {
     const { promise, resolve, reject } = Promise.withResolvers<BaseCurrency>();
 
+    const filteredTokens = assets.filter(
+      (a) => !assetsSelected.some((selected) => selected.symbol === a.symbol),
+    );
+
     showModal(ModalTypes.select_asset, false, {
       onSelectAsset: resolve,
       onClose: reject,
-      assets: assets.filter((a) => a.symbol !== asset.symbol),
+      assets: filteredTokens,
     });
 
     promise.then(onSelect).catch(() => {});
   };
+
+  const asset = assetsSelected[0];
 
   const { amount: balance = "0" } = balances.find(({ denom }) => denom === asset.denom) || {};
 

@@ -53,12 +53,36 @@ pub trait DecMul<T> {
 
 impl DecMul<Decimal> for Uint128 {
     fn dec_mul(self, rhs: Decimal) -> Self {
-        self * rhs.numerator() / rhs.denominator()
+        if self.is_zero() || rhs.is_zero() {
+            return Uint128::zero();
+        }
+        self.multiply_ratio(rhs.numerator(), rhs.denominator())
     }
 }
 
 impl DecMul<Decimal256> for Uint256 {
     fn dec_mul(self, rhs: Decimal256) -> Self {
-        self * rhs.numerator() / rhs.denominator()
+        if self.is_zero() || rhs.is_zero() {
+            return Uint256::zero();
+        }
+        self.multiply_ratio(rhs.numerator(), rhs.denominator())
+    }
+}
+
+#[cfg(test)]
+mod unit_tests {
+    use super::*;
+
+    #[test]
+    fn test_dec_mul() {
+        let a = Uint128::MAX;
+        let b = Decimal::from_ratio(1u8, 2u8);
+
+        assert_eq!(a.dec_mul(b), Uint128::new(u128::MAX / 2));
+
+        let a = Uint256::MAX;
+        let b = Decimal256::from_ratio(1u8, 2u8);
+
+        assert_eq!(a.dec_mul(b), Uint256::MAX / Uint256::from_u128(2));
     }
 }

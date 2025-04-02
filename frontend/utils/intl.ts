@@ -110,3 +110,14 @@ export const toPercentage = (num: string | number, decimals = 0): string => {
     ? `${percentage.toFixed(decimals)}%`
     : `${Math.floor(percentage).toFixed(decimals)}%`;
 };
+
+export function toFullNumberString(value: number | string): string {
+  if (typeof value === "number") {
+    return BigInt(value).toString();
+  }
+
+  if (value.includes("e") || value.includes("E")) {
+    return BigInt(Number(value)).toString();
+  }
+  return value;
+}

@@ -18,6 +18,7 @@ import { contracts } from "~/config";
 import { trpc } from "~/trpc/client";
 import { useWithdrawSimulation } from "~/app/hooks/useWithdrawSimulation";
 import { useToast } from "~/app/hooks";
+import { toFullNumberString } from "~/utils/intl";
 
 interface Props {
   pool: PoolInfo;
@@ -82,6 +83,8 @@ export const ModalUnstakeLiquidity: React.FC<Props> = ({ pool, balance }) => {
     amount: balance.staked_share_amount,
   });
 
+  const simulationFailed = !token0Amount || !token1Amount;
+
   return (
     <BasicModal
       title="Unstake"
@@ -102,18 +105,26 @@ export const ModalUnstakeLiquidity: React.FC<Props> = ({ pool, balance }) => {
         <div className="flex flex-col gap-2 p-4">
           <p className="text-white/50 text-sm">Available Staked Deposit</p>
           <div className="flex w-full items-center gap-2">
-            <AssetAmountSquare
-              asset={assets[0]}
-              balance={token0Amount}
-              style="bordered"
-              isLoading={isSimulateLoading}
-            />
-            <AssetAmountSquare
-              asset={assets[1]}
-              balance={token1Amount}
-              style="bordered"
-              isLoading={isSimulateLoading}
-            />
+            {simulationFailed ? (
+              <div className="bg-white/10 flex-1 flex flex-col gap-2  p-4 rounded-2xl">
+                {toFullNumberString(balance.staked_share_amount)}
+              </div>
+            ) : (
+              <>
+                <AssetAmountSquare
+                  asset={assets[0]}
+                  balance={token0Amount}
+                  style="bordered"
+                  isLoading={isSimulateLoading}
+                />
+                <AssetAmountSquare
+                  asset={assets[1]}
+                  balance={token1Amount}
+                  style="bordered"
+                  isLoading={isSimulateLoading}
+                />
+              </>
+            )}
           </div>
         </div>
         <div className="flex flex-col gap-4 p-4 py-6">
@@ -135,16 +146,25 @@ export const ModalUnstakeLiquidity: React.FC<Props> = ({ pool, balance }) => {
           <RangeSelector value={percentage} onChange={setPercentage} />
         </div>
         <div className="flex w-full items-center gap-2 p-4">
-          <AssetAmountSquare
-            asset={assets[0]}
-            balance={(token0Amount * (percentage / 100)).toFixed(0)}
-            isLoading={isSimulateLoading}
-          />
-          <AssetAmountSquare
-            asset={assets[1]}
-            balance={(token1Amount * (percentage / 100)).toFixed(0)}
-            isLoading={isSimulateLoading}
-          />
+          {simulationFailed ? (
+            <div className="border border-white/10 flex-1 flex flex-col gap-2 p-4 rounded-2xl">
+              {toFullNumberString((balance.staked_share_amount * (percentage / 100)).toFixed(0))}
+            </div>
+          ) : (
+            <>
+              {" "}
+              <AssetAmountSquare
+                asset={assets[0]}
+                balance={(token0Amount * (percentage / 100)).toFixed(0)}
+                isLoading={isSimulateLoading}
+              />
+              <AssetAmountSquare
+                asset={assets[1]}
+                balance={(token1Amount * (percentage / 100)).toFixed(0)}
+                isLoading={isSimulateLoading}
+              />
+            </>
+          )}
         </div>
         <Divider dashed />
         <div className="p-4">

@@ -3,7 +3,11 @@ import { twMerge } from "~/utils/twMerge";
 import Tooltip from "../Tooltip";
 import type { BaseCurrency, WithPrice } from "@towerfi/types";
 import { useWithdrawSimulation } from "~/app/hooks/useWithdrawSimulation";
-import { convertDenomToMicroDenom, convertMicroDenomToDenom } from "~/utils/intl";
+import {
+  convertDenomToMicroDenom,
+  convertMicroDenomToDenom,
+  toFullNumberString,
+} from "~/utils/intl";
 
 interface Props {
   title: string;
@@ -22,10 +26,23 @@ export const CellDataToken: React.FC<Props> = ({
 }) => {
   const [token0, token1] = tokens;
 
+  const parsedAmount = toFullNumberString(amount);
+
   const {
     simulation: [{ amount: token0Amount }, { amount: token1Amount }],
     query: { isLoading: isSimulateLoading },
-  } = useWithdrawSimulation({ poolAddress, assets: tokens, amount });
+  } = useWithdrawSimulation({ poolAddress, assets: tokens, amount: parsedAmount });
+
+  if (!token0Amount || !token1Amount) {
+    return (
+      <div className={twMerge("flex flex-col gap-2", className)}>
+        <p className="text-xs text-white/50 lg:hidden">{title}</p>
+        <div className="flex items-center  justify-between gap-3">
+          <p>{convertMicroDenomToDenom(parsedAmount, 6)}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Tooltip
@@ -60,7 +77,7 @@ export const CellDataToken: React.FC<Props> = ({
       <div className={twMerge("flex flex-col gap-2", className)}>
         <p className="text-xs text-white/50 lg:hidden">{title}</p>
         <div className="flex items-center  justify-between gap-3">
-          <p>{convertMicroDenomToDenom(amount, 6)}</p>
+          <p>{convertMicroDenomToDenom(parsedAmount, 6)}</p>
         </div>
       </div>
     </Tooltip>

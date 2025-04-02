@@ -410,7 +410,7 @@ fn query_buy_with_routes() {
     ]);
 
     let res: SimulateSwapOperationsResponse =
-        from_json(&query(deps.as_ref(), env.clone(), msg).unwrap()).unwrap();
+        from_json(query(deps.as_ref(), env.clone(), msg).unwrap()).unwrap();
     assert_eq!(
         res,
         SimulateSwapOperationsResponse {

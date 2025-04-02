@@ -475,7 +475,7 @@ mod tests {
             err.to_string()
                 .starts_with("Generic error: Reward per second must be at least 1 unit"),
             "Unexpected error: {}",
-            err.to_string()
+            err
         );
 
         env.block.time = Timestamp::from_seconds(EPOCHS_START + 10 * EPOCH_LENGTH + 3 * 86400);

@@ -6,8 +6,8 @@ use std::vec;
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{
     attr, ensure_eq, from_json, to_json_binary, wasm_execute, wasm_instantiate, Addr, Binary,
-    CosmosMsg, CustomMsg, CustomQuery, Decimal, Decimal256, Deps, DepsMut, Empty, Env, Fraction,
-    Isqrt, MessageInfo, QuerierWrapper, Reply, Response, StdError, StdResult, SubMsg,
+    CosmosMsg, CustomMsg, CustomQuery, Decimal, Decimal256, Deps, DepsMut, Empty, Env, Event,
+    Fraction, Isqrt, MessageInfo, QuerierWrapper, Reply, Response, StdError, StdResult, SubMsg,
     SubMsgResponse, SubMsgResult, Uint128, Uint256, WasmMsg,
 };
 use cw2::set_contract_version;
@@ -272,16 +272,16 @@ pub fn receive_cw20(
 /// * **assets** is an array with assets available in the pool.
 ///
 /// * **slippage_tolerance** is an optional parameter which is used to specify how much
-/// the pool price can move until the provide liquidity transaction goes through.
+///   the pool price can move until the provide liquidity transaction goes through.
 ///
 /// * **auto_stake** is an optional parameter which determines whether the LP tokens minted after
-/// liquidity provision are automatically staked in the Incentives contract on behalf of the LP token receiver.
+///   liquidity provision are automatically staked in the Incentives contract on behalf of the LP token receiver.
 ///
 /// * **receiver** is an optional parameter which defines the receiver of the LP tokens.
-/// If no custom receiver is specified, the pair will mint LP tokens for the function caller.
+///   If no custom receiver is specified, the pair will mint LP tokens for the function caller.
 ///
 /// * **min_lp_to_receive** is an optional parameter which specifies the minimum amount of LP tokens to receive.
-/// NOTE - the address that wants to provide liquidity should approve the pair contract to pull its relevant tokens.
+///   NOTE - the address that wants to provide liquidity should approve the pair contract to pull its relevant tokens.
 #[allow(clippy::too_many_arguments)]
 pub fn provide_liquidity(
     deps: DepsMut,
@@ -370,13 +370,17 @@ pub fn provide_liquidity(
         CONFIG.save(deps.storage, &config)?;
     }
 
-    Ok(Response::new().add_messages(messages).add_attributes(vec![
+    let attrs = vec![
         attr("action", "provide_liquidity"),
-        attr("sender", info.sender),
-        attr("receiver", receiver),
+        attr("sender", info.sender.to_string()),
+        attr("receiver", receiver.to_string()),
         attr("assets", format!("{}, {}", assets[0], assets[1])),
         attr("share", share),
-    ]))
+    ];
+
+    let event = Event::new("provide_liquidity").add_attributes(attrs);
+
+    Ok(Response::new().add_messages(messages).add_event(event))
 }
 
 /// Mint LP tokens for a beneficiary and auto stake the tokens in the Incentive contract (if auto staking is specified).
@@ -386,7 +390,7 @@ pub fn provide_liquidity(
 /// * **coin** denom and amount of LP tokens that will be minted for the recipient.
 ///
 /// * **auto_stake** determines whether the newly minted LP tokens will
-/// be automatically staked in the Incentives contract on behalf of the recipient.
+///   be automatically staked in the Incentives contract on behalf of the recipient.
 pub fn mint_liquidity_token_message<T, C>(
     querier: QuerierWrapper<C>,
     config: &Config,
@@ -493,7 +497,7 @@ pub fn withdraw_liquidity(
         .into(),
     );
 
-    Ok(Response::new().add_messages(messages).add_attributes(vec![
+    let attrs = vec![
         attr("action", "withdraw_liquidity"),
         attr("sender", &info.sender),
         attr("withdrawn_share", amount),
@@ -501,7 +505,12 @@ pub fn withdraw_liquidity(
             "refund_assets",
             format!("{}, {}", refund_assets[0], refund_assets[1]),
         ),
-    ]))
+        attr("receiver", receiver.to_string()),
+    ];
+
+    let event = Event::new("withdraw_liquidity").add_attributes(attrs);
+
+    Ok(Response::new().add_messages(messages).add_event(event))
 }
 
 /// Returns the amount of pool assets that correspond to an amount of LP tokens.
@@ -665,25 +674,23 @@ pub fn swap(
         CONFIG.save(deps.storage, &config)?;
     }
 
-    Ok(Response::new()
-        .add_messages(
-            // 1. send collateral tokens from the contract to a user
-            // 2. send inactive commission fees to the Maker contract
-            messages,
-        )
-        .add_attributes(vec![
-            attr("action", "swap"),
-            attr("sender", sender),
-            attr("receiver", receiver),
-            attr("offer_asset", offer_asset.info.to_string()),
-            attr("ask_asset", ask_pool.info.to_string()),
-            attr("offer_amount", offer_amount),
-            attr("return_amount", return_amount),
-            attr("spread_amount", spread_amount),
-            attr("commission_amount", commission_amount),
-            attr("maker_fee_amount", maker_fee_amount),
-            attr("fee_share_amount", fee_share_amount),
-        ]))
+    let attrs = vec![
+        attr("action", "swap"),
+        attr("sender", sender),
+        attr("receiver", receiver),
+        attr("offer_asset", offer_asset.info.to_string()),
+        attr("ask_asset", ask_pool.info.to_string()),
+        attr("offer_amount", offer_amount),
+        attr("return_amount", return_amount),
+        attr("spread_amount", spread_amount),
+        attr("commission_amount", commission_amount),
+        attr("maker_fee_amount", maker_fee_amount),
+        attr("fee_share_amount", fee_share_amount),
+    ];
+
+    let event = Event::new("swap").add_attributes(attrs);
+
+    Ok(Response::new().add_messages(messages).add_event(event))
 }
 
 /// Updates the pool configuration with the specified parameters in the `params` variable.
@@ -701,7 +708,7 @@ pub fn update_config(
         return Err(ContractError::Unauthorized {});
     }
 
-    let mut response = Response::default();
+    let mut event = Event::new("update_config");
 
     match from_json::<XYKPoolUpdateParams>(&params)? {
         XYKPoolUpdateParams::EnableFeeShare {
@@ -725,26 +732,22 @@ pub fn update_config(
 
             CONFIG.save(deps.storage, &config)?;
 
-            response.attributes.push(attr("action", "enable_fee_share"));
-            response
-                .attributes
-                .push(attr("fee_share_bps", fee_share_bps.to_string()));
-            response
-                .attributes
-                .push(attr("fee_share_address", fee_share_address));
+            event = event
+                .add_attribute("action", "enable_fee_share")
+                .add_attribute("fee_share_bps", fee_share_bps.to_string())
+                .add_attribute("fee_share_address", fee_share_address);
         }
         XYKPoolUpdateParams::DisableFeeShare => {
             // Disable fee sharing for this contract by setting bps and
             // address back to None
             config.fee_share = None;
             CONFIG.save(deps.storage, &config)?;
-            response
-                .attributes
-                .push(attr("action", "disable_fee_share"));
+
+            event = event.add_attribute("action", "disable_fee_share");
         }
     }
 
-    Ok(response)
+    Ok(Response::new().add_event(event))
 }
 
 /// Accumulate token prices for the assets in the pool.
@@ -935,7 +938,7 @@ pub fn query_simulation(deps: Deps, offer_asset: Asset) -> StdResult<SimulationR
 /// Returns information about a reverse swap simulation in a [`ReverseSimulationResponse`] object.
 ///
 /// * **ask_asset** is the asset to swap to as well as the desired amount of ask
-/// assets to receive from the swap.
+///   assets to receive from the swap.
 pub fn query_reverse_simulation(
     deps: Deps,
     ask_asset: Asset,
@@ -1039,7 +1042,7 @@ pub fn query_config(deps: Deps) -> StdResult<ConfigResponse> {
 /// * **assets** is an array with assets available in the pool.
 ///
 /// * **slippage_tolerance** is an optional parameter which is used to specify how much
-/// the pool price can move until the provide liquidity transaction goes through.
+///   the pool price can move until the provide liquidity transaction goes through.
 ///
 fn query_simulate_provide(
     deps: Deps,
@@ -1159,7 +1162,7 @@ pub fn compute_offer_amount(
 /// * **total_share** is the total amount of LP tokens currently minted
 ///
 /// * **slippage_tolerance** is an optional parameter which is used to specify how much
-/// the pool price can move until the provide liquidity transaction goes through.
+///   the pool price can move until the provide liquidity transaction goes through.
 pub fn calculate_shares(
     deposits: &[Uint128; 2],
     pools: &[Asset],
@@ -1321,7 +1324,7 @@ pub fn assert_slippage_tolerance(
 #[cfg(not(tarpaulin_include))]
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn migrate(_deps: DepsMut, _env: Env, _msg: Empty) -> Result<Response, ContractError> {
-    unimplemented!()
+    Ok(Response::new())
 }
 
 /// Returns the total amount of assets in the pool as well as the total amount of LP tokens currently minted.

@@ -61,10 +61,10 @@ fn store_factory_code(app: &mut App) -> u64 {
 }
 
 fn instantiate_pair(mut app: &mut App, owner: &Addr) -> Addr {
-    let token_contract_code_id = store_token_code(&mut app);
+    let token_contract_code_id = store_token_code(app);
 
-    let pair_contract_code_id = store_pair_code(&mut app);
-    let factory_code_id = store_factory_code(&mut app);
+    let pair_contract_code_id = store_pair_code(app);
+    let factory_code_id = store_factory_code(app);
 
     let init_msg = FactoryInstantiateMsg {
         fee_address: None,
@@ -109,18 +109,15 @@ fn instantiate_pair(mut app: &mut App, owner: &Addr) -> Addr {
         init_params: None,
     };
 
-    let pair = app
-        .instantiate_contract(
-            pair_contract_code_id,
-            owner.clone(),
-            &msg,
-            &[],
-            String::from("PAIR"),
-            None,
-        )
-        .unwrap();
-
-    pair
+    app.instantiate_contract(
+        pair_contract_code_id,
+        owner.clone(),
+        &msg,
+        &[],
+        String::from("PAIR"),
+        None,
+    )
+    .unwrap()
 }
 
 #[test]
@@ -195,6 +192,7 @@ fn test_provide_and_withdraw_liquidity() {
         Uint128::new(100_000_000),
         None,
         None,
+        None,
     );
     let res = router
         .execute_contract(alice_address.clone(), pair_instance.clone(), &msg, &coins)
@@ -238,6 +236,7 @@ fn test_provide_and_withdraw_liquidity() {
         Uint128::new(100),
         Some(bob_addr.to_string()),
         None,
+        None,
     );
     let res = router
         .execute_contract(alice_address.clone(), pair_instance.clone(), &msg, &coins)
@@ -265,6 +264,43 @@ fn test_provide_and_withdraw_liquidity() {
         attr("to", bob_addr.to_string())
     );
     assert_eq!(res.events[3].attributes[3], attr("amount", 100.to_string()));
+
+    // Provide with min_lp_to_receive with a bigger amount than expected.
+    let min_lp_amount_to_receive: Uint128 = router
+        .wrap()
+        .query_wasm_smart(
+            pair_instance.clone(),
+            &QueryMsg::SimulateProvide {
+                assets: vec![
+                    Asset {
+                        info: AssetInfo::NativeToken {
+                            denom: "uusd".to_string(),
+                        },
+                        amount: Uint128::new(100_000_000),
+                    },
+                    Asset {
+                        info: AssetInfo::NativeToken {
+                            denom: "uluna".to_string(),
+                        },
+                        amount: Uint128::new(100_000_000),
+                    },
+                ],
+                slippage_tolerance: None,
+            },
+        )
+        .unwrap();
+
+    let double_amount_to_receive = min_lp_amount_to_receive * Uint128::new(2);
+    let (msg, coins) = provide_liquidity_msg(
+        Uint128::new(100),
+        Uint128::new(100),
+        None,
+        None,
+        Some(double_amount_to_receive.clone()),
+    );
+    let res = router
+        .execute_contract(alice_address.clone(), pair_instance.clone(), &msg, &coins)
+        .unwrap_err();
 
     // Checking withdraw liquidity
     let token_contract_code_id = store_token_code(&mut router);
@@ -355,6 +391,7 @@ fn provide_liquidity_msg(
     uluna_amount: Uint128,
     receiver: Option<String>,
     slippage_tolerance: Option<Decimal>,
+    min_lp_to_receive: Option<Uint128>,
 ) -> (ExecuteMsg, [Coin; 2]) {
     let msg = ExecuteMsg::ProvideLiquidity {
         assets: vec![
@@ -362,29 +399,29 @@ fn provide_liquidity_msg(
                 info: AssetInfo::NativeToken {
                     denom: "uusd".to_string(),
                 },
-                amount: uusd_amount.clone(),
+                amount: uusd_amount,
             },
             Asset {
                 info: AssetInfo::NativeToken {
                     denom: "uluna".to_string(),
                 },
-                amount: uluna_amount.clone(),
+                amount: uluna_amount,
             },
         ],
-        slippage_tolerance: Option::from(slippage_tolerance),
+        slippage_tolerance: slippage_tolerance,
         auto_stake: None,
         receiver,
-        min_lp_to_receive: None,
+        min_lp_to_receive,
     };
 
     let coins = [
         Coin {
             denom: "uluna".to_string(),
-            amount: uluna_amount.clone(),
+            amount: uluna_amount,
         },
         Coin {
             denom: "uusd".to_string(),
-            amount: uusd_amount.clone(),
+            amount: uusd_amount,
         },
     ];
 
@@ -682,6 +719,7 @@ fn test_if_twap_is_calculated_correctly_when_pool_idles() {
         Uint128::new(1000000_000000),
         None,
         Option::from(Decimal::one()),
+        None,
     );
     app.execute_contract(user1.clone(), pair_instance.clone(), &msg, &coins)
         .unwrap();
@@ -701,6 +739,7 @@ fn test_if_twap_is_calculated_correctly_when_pool_idles() {
         Uint128::new(1000000_000000),
         None,
         Some(Decimal::percent(50)),
+        None,
     );
     app.execute_contract(user1.clone(), pair_instance.clone(), &msg, &coins)
         .unwrap();
@@ -1159,6 +1198,7 @@ fn test_imbalanced_withdraw_is_disabled() {
         Uint128::new(100_000_000),
         None,
         None,
+        None,
     );
     router
         .execute_contract(alice_address.clone(), pair_instance.clone(), &msg, &coins)
@@ -1169,6 +1209,7 @@ fn test_imbalanced_withdraw_is_disabled() {
         Uint128::new(100),
         Uint128::new(100),
         Some(api.addr_make("bob").to_string()),
+        None,
         None,
     );
     router
@@ -1566,6 +1607,7 @@ fn test_provide_liquidity_without_funds() {
     let (msg, coins) = provide_liquidity_msg(
         Uint128::new(100_000_000),
         Uint128::new(100_000_000),
+        None,
         None,
         None,
     );

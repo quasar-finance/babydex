@@ -22,7 +22,7 @@ const MAX_EVENTS: usize = 100;
 fn simulate_case(case: Vec<(usize, u128, u64)>) {
     let test_coins = vec![TestCoin::native("uluna"), TestCoin::cw20("USDC")];
 
-    let balances = vec![100_000_000_000000u128, 100_000_000_000000u128];
+    let balances = [100_000_000_000000u128, 100_000_000_000000u128];
 
     let mut helper = Helper::new(test_coins.clone(), common_pcl_params()).unwrap();
     let owner = helper.owner.clone();
@@ -67,7 +67,7 @@ fn simulate_case(case: Vec<(usize, u128, u64)>) {
 fn simulate_fee_share_case(case: Vec<(usize, u128, u64)>) {
     let test_coins = vec![TestCoin::native("uluna"), TestCoin::cw20("USDC")];
 
-    let balances = vec![100_000_000_000000u128, 100_000_000_000000u128];
+    let balances = [100_000_000_000000u128, 100_000_000_000000u128];
 
     let mut helper = Helper::new(test_coins.clone(), common_pcl_params()).unwrap();
     let owner = helper.owner.clone();
@@ -154,8 +154,8 @@ fn simulate_provide_case(case: Vec<(impl Into<String>, u128, u128, u64)>) {
             }
         } else {
             let entry = accounts.entry(user).or_default();
-            entry.0 = entry.0 + coin0_amnt;
-            entry.1 = entry.1 + coin1_amnt;
+            entry.0 += coin0_amnt;
+            entry.1 += coin1_amnt;
             entry.2 += 1;
         }
 

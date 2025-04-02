@@ -1,0 +1,20 @@
+packages:
+  - "trpc"
+  - "frontend"
+  - "types"
+  - "indexer"
+packageOptions:
+  overrides:
+    '@tanstack/react-query': ^4.0.0
+catalog:
+  typescript: ^5.8.2
+  wrangler: ^3.112.0
+onlyBuiltDependencies:
+  - '@biomejs/biome'
+  - '@heroui/shared-utils'
+  - bufferutil
+  - esbuild
+  - keccak
+  - sharp
+  - utf-8-validate
+  - workerd

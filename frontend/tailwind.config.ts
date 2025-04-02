@@ -1,0 +1,91 @@
+import { heroui } from "@heroui/theme";
+import type { Config } from "tailwindcss";
+const defaultTheme = require("tailwindcss/defaultTheme");
+
+export default {
+  content: [
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./node_modules/@heroui/theme/dist/components/(button|spinner|ripple).js",
+  ],
+  safelist: [
+    { pattern: /^-ml-(1|2|3|4|5|6|7|8|9|10|12|16|20|24|32|40|48|56|64)$/ },
+    { pattern: /^z-(\d+)$/ },
+  ],
+  theme: {
+    extend: {
+      fontFamily: {
+        inter: ["var(--font-inter)", ...defaultTheme.fontFamily.sans],
+      },
+      colors: {
+        "tw-bg": "#0F0F0F",
+        "tw-sub-bg": "#202020",
+        "tw-foreground": "#F7F5EB",
+        "tw-success": "#A4DD40",
+        "tw-error": "#FD4E4E",
+        "tw-info": "#389BF7",
+        "tw-warning": "#FFBE0C",
+        "tw-gray": {
+          "50": "#f6f6f6",
+          "100": "#e7e7e7",
+          "200": "#d1d1d1",
+          "300": "#b0b0b0",
+          "400": "#888888",
+          "500": "#6d6d6d",
+          "600": "#5d5d5d",
+          "700": "#4f4f4f",
+          "800": "#3d3d3d",
+          "900": "#262626",
+          "925": "#282828",
+          "950": "#191919",
+        },
+        "tw-brown": "#212014",
+        "tw-beige": "#EEE8D1",
+        "tw-orange": {
+          "50": "#fdf9e9",
+          "100": "#fbf0c6",
+          "200": "#f8df90",
+          "300": "#f3c751",
+          "400": "#eead21",
+          "500": "#de9614",
+          "600": "#c0710e",
+          "700": "#99510f",
+          "800": "#7f4114",
+          "900": "#6c3517",
+          "950": "#3f1a09",
+        },
+        "tw-blue": {
+          "50": "#f0f6fe",
+          "100": "#ddeafc",
+          "200": "#c2dcfb",
+          "300": "#98c6f8",
+          "400": "#68a7f2",
+          "500": "#4586ec",
+          "600": "#2f69e1",
+          "700": "#2653cb",
+          "800": "#2545a8",
+          "900": "#243e84",
+          "950": "#1a2851",
+        },
+        "tw-green": {
+          "50": "#effef6",
+          "100": "#dbfdeb",
+          "200": "#b8fad6",
+          "300": "#81f4b8",
+          "400": "#44e490",
+          "500": "#1ac56c",
+          "600": "#10a959",
+          "700": "#108549",
+          "800": "#13683c",
+          "900": "#115634",
+          "950": "#03301b",
+        },
+      },
+    },
+  },
+  plugins: [require("tailwind-scrollbar")({ nocompatible: true }), heroui()],
+  variants: {
+    scrollbar: ["rounded"],
+  },
+} satisfies Config;

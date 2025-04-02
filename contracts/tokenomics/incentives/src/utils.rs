@@ -1,5 +1,5 @@
 use cosmwasm_std::{
-    attr, ensure, wasm_execute, Addr, BankMsg, Deps, DepsMut, Env, MessageInfo, Order,
+    attr, ensure, wasm_execute, Addr, BankMsg, Deps, DepsMut, Env, Event, MessageInfo, Order,
     QuerierWrapper, ReplyOn, Response, StdError, StdResult, Storage, SubMsg, Uint128,
 };
 use itertools::Itertools;
@@ -91,9 +91,9 @@ pub fn claim_rewards(
         )?));
     }
 
-    Ok(Response::new()
-        .add_attributes(attrs)
-        .add_submessages(messages))
+    let event = Event::new("claim_rewards").add_attributes(attrs);
+
+    Ok(Response::new().add_submessages(messages).add_event(event))
 }
 
 /// Only factory can set the allocation points to zero for the specified pool.
@@ -138,10 +138,11 @@ pub fn deactivate_pool(
             ACTIVE_POOLS.save(deps.storage, &active_pools)?;
             CONFIG.save(deps.storage, &config)?;
 
-            Ok(Response::new().add_attributes([
-                attr("action", "deactivate_pool"),
-                attr("lp_token", lp_token),
-            ]))
+            let event = Event::new("deactivate_pool")
+                .add_attribute("action", "deactivate_pool")
+                .add_attribute("lp_token", lp_token);
+
+            Ok(Response::new().add_event(event))
         }
         _ => Ok(Response::new()),
     }
@@ -149,7 +150,8 @@ pub fn deactivate_pool(
 
 /// Removes pools from active pools if their pair type is blocked.
 pub fn deactivate_blocked_pools(deps: DepsMut, env: Env) -> Result<Response, ContractError> {
-    let mut response = Response::new();
+    let response = Response::new();
+    let mut attrs = vec![];
     let mut active_pools = ACTIVE_POOLS.load(deps.storage)?;
     let mut config = CONFIG.load(deps.storage)?;
 
@@ -174,8 +176,8 @@ pub fn deactivate_blocked_pools(deps: DepsMut, env: Env) -> Result<Response, Con
 
             to_remove.push(lp_token_asset.clone());
 
-            response.attributes.extend([
-                attr("action", "deactivate_pool"),
+            attrs.extend([
+                attr("action", "deactivate_blocked_pools"),
                 attr("lp_token", lp_token_asset.to_string()),
             ]);
         }
@@ -195,7 +197,11 @@ pub fn deactivate_blocked_pools(deps: DepsMut, env: Env) -> Result<Response, Con
         CONFIG.save(deps.storage, &config)?;
     }
 
-    Ok(response)
+    let event = Event::new("deactivate_blocked_pools")
+        .add_attribute("action", "deactivate_blocked_pools")
+        .add_attributes(attrs);
+
+    Ok(response.add_event(event))
 }
 
 pub fn incentivize(
@@ -208,13 +214,15 @@ pub fn incentivize(
 ) -> Result<Response, ContractError> {
     let schedule = IncentivesSchedule::from_input(env, &input)?;
 
-    let mut response = response.add_attributes([
+    let mut response = response;
+    let attrs = vec![
         attr("action", "incentivize"),
         attr("lp_token", lp_token.clone()),
         attr("start_ts", env.block.time.seconds().to_string()),
         attr("end_ts", schedule.end_ts.to_string()),
         attr("reward", schedule.reward_info.to_string()),
-    ]);
+        attr("rps", schedule.rps.to_string()),
+    ];
 
     let lp_token_asset = determine_asset_info(&lp_token, deps.api)?;
 
@@ -303,7 +311,11 @@ pub fn incentivize(
 
     pool_info.save(deps.storage, &lp_token_asset)?;
 
-    Ok(response)
+    let event = Event::new("incentivize")
+        .add_attribute("action", "incentivize")
+        .add_attributes(attrs);
+
+    Ok(response.add_event(event))
 }
 
 pub fn incentivize_many(
@@ -327,7 +339,9 @@ pub fn incentivize_many(
         );
     }
 
-    Ok(response)
+    let event = Event::new("incentivize_many").add_attribute("action", "incentivize_many");
+
+    Ok(response.add_event(event))
 }
 
 pub fn remove_reward_from_pool(
@@ -371,11 +385,12 @@ pub fn remove_reward_from_pool(
         response = response.add_submessage(transfer_msg);
     }
 
-    Ok(response.add_attributes([
-        attr("action", "remove_reward_from_pool"),
-        attr("lp_token", lp_token),
-        attr("reward", reward),
-    ]))
+    let event = Event::new("remove_reward_from_pool")
+        .add_attribute("action", "remove_reward_from_pool")
+        .add_attribute("lp_token", lp_token)
+        .add_attribute("reward", reward);
+
+    Ok(response.add_event(event))
 }
 
 /// Queries pair info corresponding to given LP token.
@@ -469,7 +484,9 @@ pub fn claim_orphaned_rewards(
         }
     }
 
-    Ok(Response::new().add_submessages(messages))
+    let event = Event::new("claim_orphaned_rewards").add_attributes(attrs);
+
+    Ok(Response::new().add_submessages(messages).add_event(event))
 }
 
 pub fn asset_info_key(asset_info: &AssetInfo) -> Vec<u8> {

@@ -409,7 +409,6 @@ fn test_multiple_schedules_same_reward() {
 
     // Create multiple overlapping schedules with the same reward token starting right away
     let schedules: Vec<_> = (1..=5)
-        .into_iter()
         .map(|i| helper.create_schedule(&reward, i).unwrap())
         .collect();
     for (ind, (schedule, _)) in schedules.iter().enumerate() {
@@ -482,7 +481,6 @@ fn test_astro_can_bypass_rewards_limit() {
     let bank = helper.app.api().addr_make("bank");
 
     let schedules: Vec<_> = (1..=MAX_REWARD_TOKENS)
-        .into_iter()
         .map(|i| {
             let reward_asset_info = AssetInfo::native(format!("reward{i}"));
             let reward = reward_asset_info.with_balance(1000_000000u128);
@@ -553,7 +551,6 @@ fn test_multiple_schedules_different_reward() {
     let bank = helper.app.api().addr_make("bank");
 
     let schedules: Vec<_> = (1..=MAX_REWARD_TOKENS)
-        .into_iter()
         .map(|i| {
             let reward_asset_info = AssetInfo::native(format!("reward{i}"));
             let reward = reward_asset_info.with_balance(1000_000000u128);
@@ -679,7 +676,6 @@ fn test_incentivize_many() {
     let bank = helper.app.api().addr_make("bank");
 
     let schedules: Vec<_> = (1..=MAX_REWARD_TOKENS)
-        .into_iter()
         .map(|i| {
             let reward_asset_info = AssetInfo::native(format!("reward{i}"));
             let reward = reward_asset_info.with_balance(1000_000000u128);
@@ -851,7 +847,6 @@ fn test_claim_between_different_periods() {
 
     // Create multiple overlapping schedules with the same reward token starting right away
     let schedules: Vec<_> = (1..=2)
-        .into_iter()
         .map(|i| helper.create_schedule(&reward, i).unwrap())
         .collect();
     for (ind, (schedule, _)) in schedules.iter().enumerate() {
@@ -1330,8 +1325,7 @@ fn test_long_unclaimed_rewards() {
     let bank = helper.app.api().addr_make("bank");
 
     let schedules: Vec<_> = (1..=2)
-        .into_iter()
-        .map(|i| {
+        .flat_map(|i| {
             let reward_asset_info = AssetInfo::native(format!("reward{i}"));
             let reward = reward_asset_info.with_balance(50_000_000000u128);
             // Create 2 schedules with different duration
@@ -1340,7 +1334,6 @@ fn test_long_unclaimed_rewards() {
                 helper.create_schedule(&reward, 10).unwrap(),
             ]
         })
-        .flatten()
         .collect();
     let max_end = schedules.iter().map(|(_, sch)| sch.end_ts).max().unwrap();
     // Create multiple schedules with different rewards (starts on the next week)
@@ -1486,7 +1479,6 @@ fn test_queries() {
 
     // Create multiple overlapping schedules with the same reward token starting right away
     let schedules: Vec<_> = (1..=5)
-        .into_iter()
         .map(|i| helper.create_schedule(&reward, i).unwrap())
         .collect();
     for (ind, (schedule, _)) in schedules.iter().enumerate() {
@@ -1900,7 +1892,6 @@ fn test_broken_cw20_incentives() {
     let bank = helper.app.api().addr_make("bank");
 
     let schedules: Vec<_> = (1..=2)
-        .into_iter()
         .map(|i| {
             let reward_asset_info = if i == 1 {
                 AssetInfo::native(format!("reward{i}"))
@@ -1975,7 +1966,6 @@ fn test_orphaned_rewards() {
     let bank = helper.app.api().addr_make("bank");
 
     let schedules: Vec<_> = (1..=(MAX_REWARD_TOKENS - 1))
-        .into_iter()
         .map(|i| {
             let reward_asset_info = AssetInfo::native(format!("reward{i}"));
             let reward = reward_asset_info.with_balance(1000_000000u128);

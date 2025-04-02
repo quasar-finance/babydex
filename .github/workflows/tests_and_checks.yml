@@ -13,13 +13,11 @@ jobs:
   test_and_check:
     name: Test and check
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
 
     steps:
-      - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.11.0
-        with:
-          access_token: ${{ github.token }}
-
       - name: Checkout sources
         uses: actions/checkout@v3
       - uses: actions/cache@v3
@@ -53,7 +51,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --features tests-tube --no-fail-fast --locked
+          args: --no-fail-fast --locked
         env:
           RUST_BACKTRACE: 1
 

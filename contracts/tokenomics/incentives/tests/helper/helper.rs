@@ -830,7 +830,7 @@ impl Helper {
     ) -> AnyResult<AppResponse> {
         // We don't test pair contract here thus we top up user's balance implicitly
         let funds = assets.iter().map(|a| a.as_coin().unwrap()).collect_vec();
-        self.mint_assets(&sender, assets);
+        self.mint_assets(sender, assets);
 
         let msg = pair::ExecuteMsg::ProvideLiquidity {
             assets: assets.to_vec(),

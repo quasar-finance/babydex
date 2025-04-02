@@ -1,0 +1,14 @@
+version: "3"
+
+services:
+  terratest:
+    build: terra
+    ports:
+      - "26657:26657"
+      - "9090:9090"
+      - "1317:1317"
+
+# val
+# whip swear crew absent miss rigid law reform crowd marble parade cloud village item circle permit announce urge settle buddy cinnamon catch mixed wink
+# test acc
+# bachelor sell sell excuse crop mansion embark finger level empty forum sad brain hazard stay morning tonight drip apology energy country any video kick

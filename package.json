@@ -1,0 +1,27 @@
+{
+  "name": "tower-monorepo",
+  "packageManager": "pnpm@10.6.4",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "turbo": "turbo",
+    "dev:app": "turbo dev",
+    "build:app": "turbo build",
+    "clean": "turbo clean"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/node": "^22.13.9",
+    "turbo": "^2.0.11",
+    "typescript": "catalog:"
+  },
+  "pnpm": {
+    "peerDependencyRules": {
+      "ignoreMissing": ["typescript", "tsup", "@biomejs/biome"]
+    },
+    "overrides": {
+      "@tanstack/react-query": "^4.0.0"
+    }
+  }
+}

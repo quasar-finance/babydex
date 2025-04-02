@@ -45,3 +45,6 @@ proptest = "1.0"
 anyhow = "1.0"
 derivative = "2.2"
 astroport-native-coin-registry = { path = "../periphery/native_coin_registry" }
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ["cfg(tarpaulin_include)"] }

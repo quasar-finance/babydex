@@ -1,0 +1,41 @@
+{
+  "name": "@towerfi/indexer",
+  "version": "0.0.1",
+  "type": "module",
+  "main": "./build/index.cjs",
+  "module": "./build/index.js",
+  "types": "./build/index.d.ts",
+  "typings": "./build/index.d.ts",
+  "sideEffects": false,
+  "files": ["build"],
+  "directories": {
+    "test": "tests"
+  },
+  "exports": {
+    ".": {
+      "types": "./build/index.d.ts",
+      "import": "./build/index.js",
+      "default": "./build/index.cjs"
+    }
+  },
+  "scripts": {
+    "dev": "tsc -w",
+    "build": "tsc",
+    "drizzle-pull": "npx drizzle-kit pull",
+    "test": "npx vitest",
+    "clean": "rm -rf ./build && rm -rf node_modules && rm -rf tsconfig.tsbuildinfo"
+  },
+  "devDependencies": {
+    "@towerfi/types": "workspace:^",
+    "@types/pg": "^8.11.11",
+    "dotenv": "^16.4.7",
+    "drizzle-kit": "^0.30.5",
+    "path": "^0.12.7",
+    "ts-node": "^10.9.2",
+    "vitest": "^3.0.9"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.40.0",
+    "pg": "^8.13.3"
+  }
+}

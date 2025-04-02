@@ -88,9 +88,9 @@ fn update_total_rewards(
                 lp_map
                     .entry(reward.clone())
                     .and_modify(|v| {
-                        v.left = v.left.checked_sub(claimed_amount).expect(&format!(
-                            "Tried to claim more than available: {v:?} - {claimed_amount}"
-                        ))
+                        v.left = v.left.checked_sub(claimed_amount).unwrap_or_else(|| {
+                            panic!("Tried to claim more than available: {v:?} - {claimed_amount}")
+                        })
                     })
                     .or_insert_with(|| {
                         panic!("Reward {reward} not found in {lp_token} rewards map");
@@ -111,7 +111,6 @@ fn simulate_case(events: Vec<(Event, u64)>) {
     let tokens_number = ((1.0 + (1.0 + 8.0 * MAX_POOLS as f64).sqrt()) / 2.0).ceil() as usize;
 
     let users = (0..MAX_USERS)
-        .into_iter()
         .map(|i| helper.app.api().addr_make(&format!("user{i}")))
         .collect_vec();
     let mut user_positions = HashMap::new();
@@ -145,7 +144,7 @@ fn simulate_case(events: Vec<(Event, u64)>) {
             for user in &users {
                 helper
                     .provide_liquidity(
-                        &user,
+                        user,
                         &provide_assets,
                         &pair_info.contract_addr,
                         false, // Do not stake on test initialization
@@ -243,14 +242,14 @@ fn simulate_case(events: Vec<(Event, u64)>) {
                     }
                     helper.mint_assets(&bank, &[schedule.reward.clone()]);
                     helper
-                        .incentivize(&bank, &lp_token, schedule, &attach_funds)
+                        .incentivize(&bank, lp_token, schedule, &attach_funds)
                         .unwrap();
 
                     let r = rewards
                         .entry(lp_token.to_string())
-                        .or_insert_with(HashMap::new)
+                        .or_default()
                         .entry(reward_token.to_string())
-                        .or_insert(RewardData::default());
+                        .or_default();
                     r.left += amount;
                     r.total += amount;
                 }
@@ -272,9 +271,7 @@ fn simulate_case(events: Vec<(Event, u64)>) {
                             .unwrap()
                             .entry(reward)
                             .and_modify(|v| {
-                                v.left = v.left.checked_sub(removed_amount).expect(&format!(
-                                    "Tried to remove more than available: {v:?} - {removed_amount}"
-                                ))
+                                v.left = v.left.checked_sub(removed_amount).unwrap_or_else(|| panic!("Tried to remove more than available: {v:?} - {removed_amount}"))
                             });
                     }
                     Err(err) => {
@@ -303,21 +300,18 @@ fn simulate_case(events: Vec<(Event, u64)>) {
 
     for (user, lp_tokens) in user_positions {
         for lp_token in lp_tokens {
-            let resp = helper.claim_rewards(&user, vec![lp_token.clone()]).unwrap();
+            let resp = helper.claim_rewards(user, vec![lp_token.clone()]).unwrap();
             update_total_rewards(&resp.events, &lp_token, &mut rewards);
         }
     }
 
     // Collect orphaned rewards.
-    match helper.claim_orphaned_rewards(None, dereg_rewards_receiver) {
-        Err(err) => {
-            let err = err.downcast::<ContractError>().unwrap();
-            match err {
-                ContractError::NoOrphanedRewards {} => {}
-                unexpected_err => panic!("Unexpected error: {unexpected_err:?}"),
-            }
+    if let Err(err) = helper.claim_orphaned_rewards(None, dereg_rewards_receiver) {
+        let err = err.downcast::<ContractError>().unwrap();
+        match err {
+            ContractError::NoOrphanedRewards {} => {}
+            unexpected_err => panic!("Unexpected error: {unexpected_err:?}"),
         }
-        _ => {}
     }
 }
 

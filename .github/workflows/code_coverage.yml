@@ -16,13 +16,11 @@ jobs:
   code-coverage:
     name: Code coverage
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
 
     steps:
-      - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.9.1
-        with:
-          access_token: ${{ github.token }}
-
       - name: Checkout repository
         uses: actions/checkout@v2
       - uses: actions/cache@v3
@@ -40,17 +38,19 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: 1.75.0
+          toolchain: stable
           override: true
 
+      - name: Install cargo-tarpaulin
+        run: cargo install cargo-tarpaulin
+  
       - name: Run cargo-tarpaulin
-        uses: actions-rs/tarpaulin@v0.1
-        with:
-          version: '0.22.0'
+        run: cargo tarpaulin --verbose --workspace --timeout 120 --out Xml
+  
 
-      - name: Upload to codecov.io
-        if: github.ref == 'refs/heads/main'
-        uses: codecov/codecov-action@v3
-        with:
-          token: ${{secrets.CODECOV_TOKEN}}
-          fail_ci_if_error: true
+      # - name: Upload to codecov.io
+      #   if: github.ref == 'refs/heads/main'
+      #   uses: codecov/codecov-action@v3
+      #   with:
+      #     token: ${{secrets.CODECOV_TOKEN}}
+      #     fail_ci_if_error: true

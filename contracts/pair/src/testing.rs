@@ -213,7 +213,7 @@ fn provide_liquidity() {
         }],
     );
     let res = execute(deps.as_mut(), env.clone().clone(), info, msg).unwrap();
-    let transfer_from_msg = res.messages.get(0).expect("no message");
+    let transfer_from_msg = res.messages.first().expect("no message");
     let mint_min_liquidity_msg = res.messages.get(1).expect("no message");
     let mint_receiver_msg = res.messages.get(2).expect("no message");
     assert_eq!(
@@ -334,7 +334,7 @@ fn provide_liquidity() {
 
     // Only accept 100, then 50 share will be generated with 100 * (100 / 200)
     let res: Response = execute(deps.as_mut(), env.clone(), info, msg).unwrap();
-    let transfer_from_msg = res.messages.get(0).expect("no message");
+    let transfer_from_msg = res.messages.first().expect("no message");
     let mint_msg = res.messages.get(1).expect("no message");
     assert_eq!(
         transfer_from_msg,
@@ -713,9 +713,14 @@ fn withdraw_liquidity() {
     let env = mock_env();
     let info = mock_info("liquidity0000", &[]);
     let res = execute(deps.as_mut(), env, info, msg).unwrap();
-    let log_withdrawn_share = res.attributes.get(2).expect("no log");
-    let log_refund_assets = res.attributes.get(3).expect("no log");
-    let msg_refund_0 = res.messages.get(0).expect("no message");
+    let event = res
+        .events
+        .iter()
+        .find(|e| e.ty == "withdraw_liquidity")
+        .unwrap();
+    let log_withdrawn_share = event.attributes.get(2).expect("no log");
+    let log_refund_assets = event.attributes.get(3).expect("no log");
+    let msg_refund_0 = res.messages.first().expect("no message");
     let msg_refund_1 = res.messages.get(1).expect("no message");
     let msg_burn_liquidity = res.messages.get(2).expect("no message");
     assert_eq!(
@@ -851,7 +856,7 @@ fn try_native_to_token() {
     );
 
     let res = execute(deps.as_mut(), env, info, msg).unwrap();
-    let msg_transfer = res.messages.get(0).expect("no message");
+    let msg_transfer = res.messages.first().expect("no message");
 
     // Current price is 1.5, so expected return without spread is 1000
     // 952380952 = 20000000000 - (30000000000 * 20000000000) / (30000000000 + 1500000000)
@@ -931,28 +936,29 @@ fn try_native_to_token() {
         },
     )
     .unwrap();
-    assert_eq!(
+    assert!(
         (offer_amount.u128() as i128 - reverse_simulation_res.offer_amount.u128() as i128).abs()
-            < 5i128,
-        true
+            < 5i128
     );
-    assert_eq!(
+    assert!(
         (expected_commission_amount.u128() as i128
             - reverse_simulation_res.commission_amount.u128() as i128)
             .abs()
-            < 5i128,
-        true
+            < 5i128
     );
-    assert_eq!(
+    assert!(
         (expected_spread_amount.u128() as i128
             - reverse_simulation_res.spread_amount.u128() as i128)
             .abs()
-            < 5i128,
-        true
+            < 5i128
     );
 
     assert_eq!(
-        res.attributes,
+        res.events
+            .iter()
+            .find(|e| e.ty == "swap")
+            .unwrap()
+            .attributes,
         vec![
             attr("action", "swap"),
             attr("sender", "addr0000"),
@@ -974,7 +980,7 @@ fn try_native_to_token() {
                 contract_addr: String::from("asset0000"),
                 msg: to_json_binary(&Cw20ExecuteMsg::Transfer {
                     recipient: String::from("addr0000"),
-                    amount: Uint128::from(expected_return_amount),
+                    amount: expected_return_amount,
                 })
                 .unwrap(),
                 funds: vec![],
@@ -1071,7 +1077,7 @@ fn try_token_to_native() {
     let info = mock_info("asset0000", &[]);
 
     let res = execute(deps.as_mut(), env, info, msg).unwrap();
-    let msg_transfer = res.messages.get(0).expect("no message");
+    let msg_transfer = res.messages.first().expect("no message");
 
     // Current price is 1.5, so expected return without spread is 1000
     // 952380952,3809524 = 20000000000 - (30000000000 * 20000000000) / (30000000000 + 1500000000)
@@ -1124,28 +1130,29 @@ fn try_token_to_native() {
         },
     )
     .unwrap();
-    assert_eq!(
+    assert!(
         (offer_amount.u128() as i128 - reverse_simulation_res.offer_amount.u128() as i128).abs()
-            < 5i128,
-        true
+            < 5i128
     );
-    assert_eq!(
+    assert!(
         (expected_commission_amount.u128() as i128
             - reverse_simulation_res.commission_amount.u128() as i128)
             .abs()
-            < 5i128,
-        true
+            < 5i128
     );
-    assert_eq!(
+    assert!(
         (expected_spread_amount.u128() as i128
             - reverse_simulation_res.spread_amount.u128() as i128)
             .abs()
-            < 5i128,
-        true
+            < 5i128
     );
 
     assert_eq!(
-        res.attributes,
+        res.events
+            .iter()
+            .find(|e| e.ty == "swap")
+            .unwrap()
+            .attributes,
         vec![
             attr("action", "swap"),
             attr("sender", "addr0000"),
@@ -1169,8 +1176,7 @@ fn try_token_to_native() {
                     denom: "uusd".to_string(),
                     amount: expected_return_amount
                 }],
-            })
-            .into(),
+            }),
             id: 0,
             gas_limit: None,
             reply_on: ReplyOn::Never,
@@ -1403,7 +1409,7 @@ fn test_accumulate_prices() {
             Case {
                 block_time: 1000,
                 block_time_last: 1000,
-                last0: 1 * price_precision,
+                last0: price_precision,
                 last1: 2 * price_precision,
                 x_amount: 250,
                 y_amount: 500,

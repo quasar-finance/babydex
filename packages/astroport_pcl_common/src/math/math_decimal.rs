@@ -125,7 +125,7 @@ pub(crate) fn newton_y(
     x[j] = x0;
 
     for _ in 0..MAX_ITER {
-        let xi = xi_1 - f(d.into(), &x, a, gamma) / df_dx(d, &x, a, gamma, j);
+        let xi = xi_1 - f(d, &x, a, gamma) / df_dx(d, &x, a, gamma, j);
         if xi.abs_diff(xi_1) <= TOL {
             return Ok(xi.try_into()?);
         }
@@ -241,11 +241,11 @@ mod tests {
     #[test]
     fn test_real_case() {
         let x0 = 1173700.016159;
-        let x1 = 0.800244312479334221;
+        let x1 = 0.800_244_312_479_334_3;
         let offer_amount = 1.0;
         let amp = 40.0;
         let gamma = 0.000145;
-        let d = 2064.855164704653967332;
+        let d = 2_064.855_164_704_654;
 
         println!("Pool before [{} {}]", x0, x1);
         let new_x1 = newton_y(
@@ -325,7 +325,7 @@ mod tests {
             f64_to_dec(100000000f64).try_into().unwrap(),
         ];
 
-        let val = f(d.into(), &x, a, gamma);
+        let val = f(d, &x, a, gamma);
         let val_f64 =
             crate::math::math_f64::f(20000000f64, &[1000000f64, 100000000f64], 40f64, 0.000145);
         let dec_val_f64 = dec_to_f64(val);
@@ -342,10 +342,7 @@ mod tests {
 
         let gamma = 0.000145;
 
-        let x_range = (1000u128..=100_000)
-            .step_by(10000)
-            .into_iter()
-            .collect_vec();
+        let x_range = (1000u128..=100_000).step_by(10000).collect_vec();
         let mut a_range = (100u128..=10000u128).step_by(1000).collect_vec();
         a_range.push(1);
 

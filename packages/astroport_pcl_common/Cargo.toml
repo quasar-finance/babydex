@@ -24,3 +24,6 @@ itertools.workspace = true
 [dev-dependencies]
 anyhow = "1"
 astroport-test = { path = "../astroport_test" }
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ["cfg(tarpaulin_include)"] }

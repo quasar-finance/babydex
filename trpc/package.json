@@ -1,0 +1,41 @@
+{
+  "name": "@towerfi/trpc",
+  "version": "0.0.1",
+  "type": "module",
+  "main": "./build/index.cjs",
+  "module": "./build/index.js",
+  "types": "./build/index.d.ts",
+  "typings": "./build/index.d.ts",
+  "sideEffects": false,
+  "files": ["build"],
+  "exports": {
+    ".": {
+      "types": "./build/index.d.ts",
+      "import": "./build/index.js",
+      "default": "./build/index.cjs"
+    }
+  },
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "build": "tsc",
+    "clean": "rm -rf ./build && rm -rf node_modules && rm -rf tsconfig.tsbuildinfo"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250303.0",
+    "@towerfi/indexer": "workspace:^",
+    "@towerfi/types": "workspace:^",
+    "@types/pg": "^8.11.11",
+    "typescript": "catalog:",
+    "wrangler": "catalog:"
+  },
+  "dependencies": {
+    "@trpc/client": "^10.45.2",
+    "@trpc/server": "^10.45.2",
+    "cosmi": "^0.1.0",
+    "ky": "^1.7.5",
+    "lru-cache": "^11.0.2",
+    "superjson": "^2.2.2",
+    "zod": "^3.24.2"
+  }
+}

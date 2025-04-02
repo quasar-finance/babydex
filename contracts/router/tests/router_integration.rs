@@ -240,7 +240,7 @@ fn route_through_pairs_with_natives() {
 
     // End sanity checks
 
-    mint_native(&mut app, &denom_x, 50_000_000000, &owner).unwrap();
+    mint_native(&mut app, denom_x, 50_000_000000, &owner).unwrap();
     let pair_1 = helper
         .query_pair_by_asset_infos(
             &mut app,
@@ -278,11 +278,11 @@ fn route_through_pairs_with_natives() {
         )
         .unwrap();
 
-    let resp_data: SwapResponseData = from_json(&resp.data.unwrap()).unwrap();
+    let resp_data: SwapResponseData = from_json(resp.data.unwrap()).unwrap();
 
     assert_eq!(resp_data.return_amount.u128(), 32_258_064515);
 
-    mint_native(&mut app, &denom_x, 50_000_000000, &owner).unwrap();
+    mint_native(&mut app, denom_x, 50_000_000000, &owner).unwrap();
     let err = app
         .execute_contract(
             owner.clone(),

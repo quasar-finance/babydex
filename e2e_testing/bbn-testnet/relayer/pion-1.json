@@ -1,0 +1,16 @@
+{
+    "type": "cosmos",
+    "value": {
+      "key": "default",
+      "chain-id": "pion-1",
+      "rpc-addr": "https://rpc-falcron.pion-1.ntrn.tech:443",
+      "account-prefix": "neutron",
+      "keyring-backend": "test",
+      "gas-adjustment": 1.2,
+      "gas-prices": "0.01untrn",
+      "debug": true,
+      "timeout": "20s",
+      "output-format": "json",
+      "sign-mode": "direct"
+    }
+  }

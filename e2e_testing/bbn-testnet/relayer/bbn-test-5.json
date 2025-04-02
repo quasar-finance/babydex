@@ -1,0 +1,16 @@
+{
+    "type": "cosmos",
+    "value": {
+      "key": "default",
+      "chain-id": "bbn-test-5",
+      "rpc-addr": "https://babylon-testnet-rpc.nodes.guru:443",
+      "account-prefix": "bbn",
+      "keyring-backend": "test",
+      "gas-adjustment": 1.2,
+      "gas-prices": "0.01bbn",
+      "debug": true,
+      "timeout": "20s",
+      "output-format": "json",
+      "sign-mode": "direct"
+    }
+  }

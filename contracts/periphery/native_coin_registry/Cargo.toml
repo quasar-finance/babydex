@@ -34,3 +34,6 @@ astroport.workspace = true
 
 [dev-dependencies]
 cw-multi-test = "2.3"
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ["cfg(tarpaulin_include)"] }

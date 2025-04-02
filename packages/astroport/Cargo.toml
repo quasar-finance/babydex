@@ -23,3 +23,6 @@ cw-asset = "4.0"
 
 [dev-dependencies]
 test-case = "3.1.0"
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ["cfg(tarpaulin_include)"] }

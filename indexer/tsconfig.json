@@ -1,0 +1,32 @@
+{
+    "$schema": "https://json.schemastore.org/tsconfig",
+    "esModuleInterop": true,
+    "compilerOptions": {
+        "skipLibCheck": true,
+        "target": "es2022",
+        "allowJs": true,
+        "resolveJsonModule": true,
+        "moduleDetection": "force",
+        "isolatedModules": true,
+        "verbatimModuleSyntax": true,
+        "strict": true,
+        "noUncheckedIndexedAccess": true,
+        "noImplicitOverride": true,
+        "module": "NodeNext",
+        "sourceMap": true,
+        "declaration": true,
+        "composite": true,
+        "declarationMap": true,
+        "outDir": "build",
+        "rootDir": "src",
+        "incremental": true
+    },
+    "include": [
+        "src",
+    ],
+    "exclude": [
+        "node_modules",
+        "build"
+    ],
+    "typeRoots": ["./global.d.ts", "./node_modules/@types"]
+}

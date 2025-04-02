@@ -39,3 +39,6 @@ cw20-base = "2.0"
 astroport-pair = { path = "../pair" }
 astroport-test = { path = "../../packages/astroport_test" }
 anyhow = "1.0"
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ["cfg(tarpaulin_include)"] }

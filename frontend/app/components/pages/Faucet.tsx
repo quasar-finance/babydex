@@ -53,32 +53,42 @@ const FaucetForm: React.FC = () => {
 
   const { mutateAsync: requestToken, isLoading } = useMutation({
     mutationFn: async () => {
-      const response = await ky
-        .post(FAUCET_API_URL, {
-          timeout: 120000,
-          json: {
-            query: `mutation UnoFaucetMutation($chain_id: String!, $denom: String!, $address: String!, $captchaToken: String!) {
+      const id = toast.loading({
+        title: "Requesting faucet funds...",
+        description: "Please wait while we process your request. This may take 1~2 minutes",
+      });
+
+      try {
+        const response = await ky
+          .post(FAUCET_API_URL, {
+            timeout: 120000,
+            json: {
+              query: `mutation UnoFaucetMutation($chain_id: String!, $denom: String!, $address: String!, $captchaToken: String!) {
               send(chainId: $chain_id, denom: $denom, address: $address, captchaToken: $captchaToken)
             }`,
-            variables: {
-              chain_id: "bbn-test-5",
-              denom: selectedDenom,
-              address,
-              captchaToken,
+              variables: {
+                chain_id: "bbn-test-5",
+                denom: selectedDenom,
+                address,
+                captchaToken,
+              },
             },
-          },
-        })
-        .json<FaucetResponse>();
+          })
+          .json<FaucetResponse>();
 
-      if (response.data.send === null) {
-        throw new Error("Empty faucet response");
+        if (response.data.send === null) {
+          throw new Error("Empty faucet response");
+        }
+
+        if (response.data.send.startsWith("ERROR")) {
+          throw new Error(response.data.send);
+        }
+
+        return response;
+      } finally {
+        setCaptchaToken("");
+        toast.dismiss(id);
       }
-
-      if (response.data.send.startsWith("ERROR")) {
-        throw new Error(response.data.send);
-      }
-
-      return response;
     },
     onSuccess: (response) => {
       toast.success({
@@ -103,9 +113,6 @@ const FaucetForm: React.FC = () => {
         title: "Error",
         description: e instanceof Error ? e.message : "Something went wrong while requesting funds",
       });
-    },
-    onSettled: () => {
-      setCaptchaToken("");
     },
   });
 

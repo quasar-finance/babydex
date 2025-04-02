@@ -44,7 +44,7 @@ export const ModalUnstakeLiquidity: React.FC<Props> = ({ pool, balance }) => {
       return await signingClient.unstakeLiquidity({
         sender: address as string,
         lpTokenAddress: pool.lpAddress,
-        amount: (staked_share_amount * (percentage / 100)).toFixed(0),
+        amount: toFullNumberString((staked_share_amount * (percentage / 100)).toFixed(0)),
         incentiveAddress: contracts.incentives,
       });
     },

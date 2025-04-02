@@ -4,6 +4,7 @@ import BasicModal from "~/app/components/templates/BasicModal";
 import { twMerge } from "~/utils/twMerge";
 
 import Divider from "~/app/components/atoms/Divider";
+import { contracts } from "~/config";
 
 import type { Asset, PoolInfo, UserPoolBalances } from "@towerfi/types";
 import AssetsStacked from "../../atoms/AssetsStacked";
@@ -16,6 +17,7 @@ import { useAccount } from "@cosmi/react";
 import { AssetAmountSquare } from "../../atoms/AssetAmountSquare";
 import { getInnerValueFromAsset } from "@towerfi/trpc";
 import { useWithdrawSimulation } from "~/app/hooks/useWithdrawSimulation";
+import { useToast } from "~/app/hooks";
 
 interface ModalRemoveLiquidityProps {
   pool: PoolInfo;
@@ -24,21 +26,47 @@ interface ModalRemoveLiquidityProps {
 
 const ModalRemoveLiquidity: React.FC<ModalRemoveLiquidityProps> = ({ pool, balance }) => {
   const { name, assets } = pool;
-  const { unstaked_share_amount } = balance;
+  const { staked_share_amount } = balance;
+  const { toast } = useToast();
 
   const [percentage, setPercentage] = useState(50);
 
   const { data: signingClient } = useDexClient();
-  const { address } = useAccount();
+  const { address, chain } = useAccount();
 
   const { isLoading, mutateAsync: withdraw } = useMutation({
     mutationFn: async () => {
       if (!signingClient) return;
-      await signingClient.withdrawLiquidity({
+      return await signingClient.withdrawLiquidity({
         sender: address as string,
         poolAddress: pool.poolAddress,
-        lpTokenAddress: balance.lpToken,
-        amount: (unstaked_share_amount * (percentage / 100)).toFixed(0),
+        lpTokenAddress: pool.lpAddress,
+        lpBalanceTokenAddress: balance.lpToken,
+        amount: (staked_share_amount * (percentage / 100)).toFixed(0),
+        incentiveAddress: contracts.incentives,
+      });
+    },
+    onSuccess: (data) => {
+      toast.success({
+        title: "Withdraw successful",
+        component: () => (
+          <div className="flex flex-col gap-1">
+            <a
+              className="underline hover:no-underline"
+              target="_blank"
+              href={`${chain?.blockExplorers?.default.url}/tx/${data?.hash}`}
+              rel="noreferrer"
+            >
+              See tx
+            </a>
+          </div>
+        ),
+      });
+    },
+    onError: (error: Error) => {
+      toast.error({
+        title: "Withdraw failed",
+        description: `Failed to withdraw ${percentage}% of staked deposit. ${error.message}`,
       });
     },
   });
@@ -49,7 +77,7 @@ const ModalRemoveLiquidity: React.FC<ModalRemoveLiquidityProps> = ({ pool, balan
   } = useWithdrawSimulation({
     poolAddress: pool.poolAddress,
     assets,
-    amount: unstaked_share_amount,
+    amount: staked_share_amount,
   });
 
   return (
@@ -70,7 +98,7 @@ const ModalRemoveLiquidity: React.FC<ModalRemoveLiquidityProps> = ({ pool, balan
         </div>
         <Divider dashed />
         <div className="flex flex-col gap-2 p-4">
-          <p className="text-white/50 text-sm">Available Unstaked Deposit</p>
+          <p className="text-white/50 text-sm">Available Staked Deposit</p>
           <div className="flex w-full items-center gap-2">
             <AssetAmountSquare asset={assets[0]} balance={token0Amount} style="bordered" />
             <AssetAmountSquare asset={assets[1]} balance={token1Amount} style="bordered" />

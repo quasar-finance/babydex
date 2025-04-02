@@ -34,10 +34,10 @@ const PoolsDashboardSkeleton: React.FC<Props> = ({ className = "" }) => {
               <p className="text-xs text-white/50 lg:hidden">Staked</p>
               <Skeleton className="w-full h-6" />
             </div>
-            <div className="flex flex-col gap-2 order-5 w-[45%] lg:w-auto">
+            {/* <div className="flex flex-col gap-2 order-5 w-[45%] lg:w-auto">
               <p className="text-xs text-white/50 lg:hidden">Unstaked</p>
               <Skeleton className="w-full h-6" />
-            </div>
+            </div> */}
             <div className="flex flex-col gap-2 order-6 w-[45%] lg:w-auto">
               <p className="text-xs text-white/50 lg:hidden text-nowrap">Claimable Rewards</p>
               <div className="flex gap-2 items-center">

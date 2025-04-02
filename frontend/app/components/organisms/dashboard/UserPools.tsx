@@ -21,7 +21,7 @@ const columns = [
   { key: "name", title: "Pool" },
   { key: "apr", title: "APR" },
   { key: "staked", title: "Staked" },
-  { key: "unstaked", title: "Unstaked" },
+  /*  { key: "unstaked", title: "Unstaked" }, */
   { key: "claimableRewards", title: "Claimable Rewards" },
   { key: "actions", title: "" },
 ];
@@ -32,7 +32,7 @@ interface Props {
 }
 
 export const UserPools: React.FC<Props> = ({ pools, isLoading }) => {
-  const gridClass = "grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr_4rem] gap-4";
+  const gridClass = "grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_8rem] gap-4";
   const { showModal } = useModal();
   const { address } = useAccount();
 
@@ -77,13 +77,13 @@ export const UserPools: React.FC<Props> = ({ pools, isLoading }) => {
               tokens={poolInfo.assets}
               className="order-4 w-[45%] lg:w-auto"
             />
-            <CellDataToken
+            {/* <CellDataToken
               title="Unstaked"
               poolAddress={poolInfo.poolAddress}
               amount={userBalance.unstaked_share_amount}
               tokens={poolInfo.assets}
               className="order-5 w-[45%] lg:w-auto"
-            />
+            /> */}
             <CellClaimRewards
               rewards={incentives}
               poolToken={userBalance.lpToken}
@@ -110,7 +110,7 @@ export const UserPools: React.FC<Props> = ({ pools, isLoading }) => {
                     >
                       Stake
                     </li>
-                    <li
+                    {/* <li
                       className="px-3 py-2 rounded-lg hover:text-tw-orange-400 hover:bg-tw-orange-400/20 w-full transition-all cursor-pointer"
                       onClick={() =>
                         showModal(ModalTypes.unstake_liquidity, false, {
@@ -120,7 +120,7 @@ export const UserPools: React.FC<Props> = ({ pools, isLoading }) => {
                       }
                     >
                       Unstake
-                    </li>
+                    </li> */}
                     <li
                       className="px-3 py-2 rounded-lg hover:text-tw-orange-400 hover:bg-tw-orange-400/20 w-full transition-all cursor-pointer"
                       onClick={() => showModal(ModalTypes.add_liquidity, false, { pool: poolInfo })}

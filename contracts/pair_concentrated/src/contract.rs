@@ -7,7 +7,7 @@ use cosmwasm_std::{
     Decimal, Decimal256, DepsMut, Empty, Env, Event, MessageInfo, Reply, Response, StdError,
     StdResult, SubMsg, SubMsgResponse, SubMsgResult, Uint128,
 };
-use cw2::set_contract_version;
+use cw2::{get_contract_version, set_contract_version};
 use cw20::{Cw20ExecuteMsg, Cw20ReceiveMsg, MinterResponse};
 use cw_utils::parse_instantiate_response_data;
 use itertools::Itertools;
@@ -791,6 +791,22 @@ fn update_config(
 /// Manages the contract migration.
 #[cfg(not(tarpaulin_include))]
 #[cfg_attr(not(feature = "library"), entry_point)]
-pub fn migrate(_deps: DepsMut, _env: Env, _msg: Empty) -> Result<Response, ContractError> {
-    Ok(Response::new())
+pub fn migrate(deps: DepsMut, _env: Env, _msg: Empty) -> Result<Response, ContractError> {
+    let version = get_contract_version(deps.storage)?;
+
+    match version.contract.as_ref() {
+        CONTRACT_NAME => match version.version.as_ref() {
+            "4.1.0" => {}
+            _ => return Err(ContractError::MigrationError {}),
+        },
+        _ => return Err(ContractError::MigrationError {}),
+    }
+
+    set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
+
+    Ok(Response::new()
+        .add_attribute("previous_contract_name", &version.contract)
+        .add_attribute("previous_contract_version", &version.version)
+        .add_attribute("new_contract_name", CONTRACT_NAME)
+        .add_attribute("new_contract_version", CONTRACT_VERSION))
 }

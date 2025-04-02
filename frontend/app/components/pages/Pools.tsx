@@ -66,7 +66,7 @@ const Pools: React.FC = () => {
             <div className="flex lg:items-end lg:justify-end">
               <Button
                 variant="flat"
-                onPress={() => showModal(ModalTypes.add_liquidity, true, { pool })}
+                onPress={() => showModal(ModalTypes.add_liquidity, false, { pool })}
               >
                 Add Liquidity
               </Button>

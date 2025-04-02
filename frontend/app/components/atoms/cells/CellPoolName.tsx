@@ -17,10 +17,10 @@ export const CellPoolName: React.FC<Props> = ({ assets, name, poolType, config, 
           <span>{name}</span>
         </div>
         <div className="flex gap-1 items-center">
-          <Pill>{config.params.fee_gamma || 0}%</Pill>
           <Pill color={poolType === "xyk" ? "green" : "blue"} className="uppercase">
             {poolType.replace("concentrated", "pcl")}
           </Pill>
+          <Pill>{config.params.fee_gamma || 0}%</Pill>
         </div>
       </div>
     </div>

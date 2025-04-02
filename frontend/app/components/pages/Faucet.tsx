@@ -15,8 +15,8 @@ import { useToast } from "~/app/hooks";
 import { Assets } from "~/config";
 import Link from "next/link";
 
-const FAUCET_API_URL = "https://faucet-staging.tower.fi/";
-const TURNSTILE_KEY = "0x4AAAAAABBnKau3xkStNjot";
+const FAUCET_API_URL = process.env.NEXT_PUBLIC_FAUCET_API_URL ?? "";
+const TURNSTILE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_KEY ?? "";
 
 interface FaucetResponse {
   data: {
@@ -57,7 +57,7 @@ const FaucetForm: React.FC = () => {
     await toast.promise(
       (async () => {
         try {
-          const response: FaucetResponse = await ky
+          const response = await ky
             .post(FAUCET_API_URL, {
               timeout: 120000,
               json: {
@@ -72,7 +72,7 @@ const FaucetForm: React.FC = () => {
                 },
               },
             })
-            .json();
+            .json<FaucetResponse>();
 
           if (response.data.send === null) {
             throw new Error("Empty faucet response");
@@ -96,11 +96,11 @@ const FaucetForm: React.FC = () => {
         },
         success: {
           title: "Success",
-          component: ({ result }: { result: FaucetResponse }) => (
+          component: (response: FaucetResponse) => (
             <div className="text-sm text-white/50 flex gap-1 items-center">
               <p>Funds sent successfully! </p>
               <Link
-                href={`https://www.mintscan.io/babylon-testnet/tx/${result.data.send}`}
+                href={`https://www.mintscan.io/babylon-testnet/tx/${response.data.send}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="underline hover:no-underline"
@@ -178,7 +178,7 @@ const FaucetForm: React.FC = () => {
           isLoading={loading}
           onClick={handleSubmit}
         >
-          {loading ? "Requesting..." : "Request Faucet"}
+          {loading ? "Requesting..." : "Request Tokens"}
         </Button>
       </div>
     </div>

@@ -1324,7 +1324,7 @@ pub fn assert_slippage_tolerance(
 #[cfg(not(tarpaulin_include))]
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn migrate(_deps: DepsMut, _env: Env, _msg: Empty) -> Result<Response, ContractError> {
-    unimplemented!()
+    Ok(Response::new())
 }
 
 /// Returns the total amount of assets in the pool as well as the total amount of LP tokens currently minted.

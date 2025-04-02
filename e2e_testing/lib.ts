@@ -3,7 +3,7 @@ import {SigningCosmWasmClient} from "@cosmjs/cosmwasm-stargate";
 import {GasPrice} from "@cosmjs/stargate";
 import {stringToPath} from "@cosmjs/crypto";
 
-const rpcEndpoint = "https://rpc-babylon-testnet.imperator.co";
+const rpcEndpoint = "https://babylon-testnet-rpc.contributiondao.com";
 const mnemonic = "noise upon meadow minute purse utility first verb surprise blood debate dentist refuse spoon load panic demise celery strong nerve again word possible human";
 const gasPrice = GasPrice.fromString("0.0025ubbn");
 const prefix = "bbn"

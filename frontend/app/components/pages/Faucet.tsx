@@ -25,15 +25,17 @@ interface FaucetResponse {
 }
 
 const faucet_assets = ["IBCT1", "IBCT2", "IBCT3", "IBCT4", "IBCT5", "IBCT6"];
-const available_denoms = Object.values(Assets).map((asset) => ({
-  value: asset.denom,
-  label: (
-    <div className="flex items-center gap-2">
-      <img src={asset.logoURI} alt={asset.symbol} className="w-5 h-5" />
-      <span>{asset.symbol}</span>
-    </div>
-  ),
-}));
+const available_denoms = Object.values(Assets)
+  .filter((asset) => faucet_assets.includes(asset.symbol))
+  .map((asset) => ({
+    value: asset.denom,
+    label: (
+      <div className="flex items-center gap-2">
+        <img src={asset.logoURI} alt={asset.symbol} className="w-5 h-5" />
+        <span>{asset.symbol}</span>
+      </div>
+    ),
+  }));
 
 const FaucetForm: React.FC = () => {
   const { address: connectedAddress } = useAccount();

@@ -19,7 +19,7 @@ import type { Asset, PoolInfo, UserPoolBalances } from "@towerfi/types";
 const columns = [
   { key: "name", title: "Pool" },
   { key: "apr", title: "APR" },
-  { key: "staked", title: "Staked" },
+  { key: "deposit", title: "Deposit" },
   /*  { key: "unstaked", title: "Unstaked" }, */
   { key: "claimableRewards", title: "Claimable Rewards" },
   { key: "actions", title: "" },

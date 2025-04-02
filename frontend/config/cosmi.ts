@@ -12,7 +12,7 @@ export const cosmi = createConfig({
         provider: (w) => w?.keplr,
       },
     }),
-    keplrish({
+    /* keplrish({
       target: {
         id: "leap",
         name: "Leap",
@@ -25,7 +25,7 @@ export const cosmi = createConfig({
         name: "Cosmostation",
         provider: (w) => w?.cosmostation?.providers.keplr,
       },
-    }),
+    }), */
   ],
   batch: { multicall: { batchSize: 10, wait: 200 } },
   transports: {

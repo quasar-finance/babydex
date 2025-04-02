@@ -87,6 +87,7 @@ export const Swap: React.FC = () => {
         disabled={isSubmitting || (isLoading && activeInput === "from")}
         onSelect={setToToken}
         onFocus={() => setActiveInput("to")}
+        validateBalance={false}
       />
     </div>
   );

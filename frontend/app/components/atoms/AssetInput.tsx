@@ -18,6 +18,7 @@ type AssetInputProps = {
   control: Control;
   mask?: (v: string) => string | null;
   onFocus?: () => void;
+  validateBalance?: boolean;
 };
 
 const assets = Object.values(Assets);
@@ -29,6 +30,7 @@ export const AssetInput: React.FC<AssetInputProps> = ({
   onFocus,
   disabled,
   control,
+  validateBalance = true,
   mask = assetNumberMask,
 }) => {
   const { showModal } = useModal();
@@ -41,8 +43,9 @@ export const AssetInput: React.FC<AssetInputProps> = ({
       validate: (value) => {
         if (value === "") return "Amount is required";
         if (Number.isNaN(+value)) return "Only enter number digits";
-        if (Number(value) > Number(denomBalance)) return "Insufficient Amount";
         if (Number(value) <= 0) return "Amount must be greater than 0";
+
+        if (validateBalance && Number(value) > Number(denomBalance)) return "Insufficient Amount";
       },
     },
   });

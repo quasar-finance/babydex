@@ -89,6 +89,7 @@ const SwapComponent: React.FC = () => {
           });
         },
       });
+      reset();
     } catch (e: any) {
       toast.dismiss(id);
       toast.error({
@@ -96,7 +97,6 @@ const SwapComponent: React.FC = () => {
         description: e.message,
       });
     }
-    reset();
     refreshBalances();
   });
 

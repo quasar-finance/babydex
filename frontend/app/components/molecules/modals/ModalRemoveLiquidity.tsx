@@ -6,7 +6,7 @@ import { twMerge } from "~/utils/twMerge";
 import Divider from "~/app/components/atoms/Divider";
 import { contracts } from "~/config";
 
-import type { Asset, PoolInfo, UserPoolBalances } from "@towerfi/types";
+import type { PoolInfo, UserPoolBalances } from "@towerfi/types";
 import AssetsStacked from "../../atoms/AssetsStacked";
 import Pill from "../../atoms/Pill";
 import Input from "../../atoms/Input";
@@ -15,19 +15,25 @@ import { useDexClient } from "~/app/hooks/useDexClient";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useAccount } from "@cosmi/react";
 import { AssetAmountSquare } from "../../atoms/AssetAmountSquare";
-import { getInnerValueFromAsset } from "@towerfi/trpc";
 import { useWithdrawSimulation } from "~/app/hooks/useWithdrawSimulation";
 import { useToast } from "~/app/hooks";
+import { useModal } from "~/app/providers/ModalProvider";
 
 interface ModalRemoveLiquidityProps {
   pool: PoolInfo;
   balance: UserPoolBalances;
+  refreshUserPools?: () => void;
 }
 
-const ModalRemoveLiquidity: React.FC<ModalRemoveLiquidityProps> = ({ pool, balance }) => {
+const ModalRemoveLiquidity: React.FC<ModalRemoveLiquidityProps> = ({
+  pool,
+  balance,
+  refreshUserPools,
+}) => {
   const { name, assets } = pool;
   const { staked_share_amount } = balance;
   const { toast } = useToast();
+  const { hideModal } = useModal();
 
   const [percentage, setPercentage] = useState(50);
 
@@ -62,6 +68,8 @@ const ModalRemoveLiquidity: React.FC<ModalRemoveLiquidityProps> = ({ pool, balan
           </div>
         ),
       });
+      hideModal();
+      refreshUserPools?.();
     },
     onError: (error: Error) => {
       toast.error({

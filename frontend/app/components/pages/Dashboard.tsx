@@ -16,7 +16,11 @@ const Dashboard: React.FC = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const { data: pools = [], isLoading: isPoolLoading } = trpc.local.pools.getUserPools.useQuery({
+  const {
+    data: pools = [],
+    isLoading: isPoolLoading,
+    refetch: refreshUserPools,
+  } = trpc.local.pools.getUserPools.useQuery({
     address,
   });
 
@@ -52,6 +56,7 @@ const Dashboard: React.FC = () => {
           </div>
         ),
       });
+      refreshUserPools();
     },
     onError: (error: Error) => {
       toast.error({
@@ -74,7 +79,7 @@ const Dashboard: React.FC = () => {
           </Button>
         </div>
       </div>
-      <UserPools pools={pools} isLoading={isPoolLoading} />
+      <UserPools pools={pools} isLoading={isPoolLoading} refreshUserPools={refreshUserPools} />
     </div>
   );
 };

@@ -18,6 +18,7 @@ import AssetsStacked from "../../atoms/AssetsStacked";
 
 interface Props {
   pool: PoolInfo;
+  successAction?: () => void;
 }
 
 export interface DepositFormData {
@@ -25,7 +26,7 @@ export interface DepositFormData {
   slipageTolerance: string;
 }
 
-export const ModalAddLiquidity: React.FC<Props> = ({ pool }) => {
+export const ModalAddLiquidity: React.FC<Props> = ({ pool, successAction }) => {
   const { name } = pool;
   const { showModal } = useModal();
   const [side, setSide] = useState<"double" | "single">("double");
@@ -48,6 +49,7 @@ export const ModalAddLiquidity: React.FC<Props> = ({ pool }) => {
 
   const onSubmit = methods.handleSubmit(async (data) => {
     await submitRef.current?.onSubmit({ ...data, slipageTolerance });
+    if (successAction) successAction();
   });
 
   return (

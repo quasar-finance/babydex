@@ -15,7 +15,6 @@ import { ModalTypes } from "~/types/modal";
 import Link from "next/link";
 import { CellDataToken } from "../../atoms/cells/CellDataToken";
 import type { Asset, PoolInfo, UserPoolBalances } from "@towerfi/types";
-import { useDexClient } from "~/app/hooks/useDexClient";
 
 const columns = [
   { key: "name", title: "Pool" },
@@ -29,9 +28,10 @@ const columns = [
 interface Props {
   pools: { poolInfo: PoolInfo; userBalance: UserPoolBalances; incentives: Asset[] }[];
   isLoading: boolean;
+  refreshUserPools?: () => void;
 }
 
-export const UserPools: React.FC<Props> = ({ pools, isLoading }) => {
+export const UserPools: React.FC<Props> = ({ pools, isLoading, refreshUserPools }) => {
   const gridClass = "grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_8rem] gap-4";
   const { showModal } = useModal();
   const { address } = useAccount();
@@ -99,7 +99,7 @@ export const UserPools: React.FC<Props> = ({ pools, isLoading }) => {
                 </PopoverTrigger>
                 <PopoverContent className="min-w-[10rem] p-1">
                   <ul className="w-full">
-                    <li
+                    {/* <li
                       className="px-3 py-2 rounded-lg hover:text-tw-orange-400 hover:bg-tw-orange-400/20 w-full transition-all cursor-pointer"
                       onClick={() =>
                         showModal(ModalTypes.stake_liquidity, false, {
@@ -109,7 +109,7 @@ export const UserPools: React.FC<Props> = ({ pools, isLoading }) => {
                       }
                     >
                       Stake
-                    </li>
+                    </li> */}
                     {/* <li
                       className="px-3 py-2 rounded-lg hover:text-tw-orange-400 hover:bg-tw-orange-400/20 w-full transition-all cursor-pointer"
                       onClick={() =>
@@ -123,7 +123,12 @@ export const UserPools: React.FC<Props> = ({ pools, isLoading }) => {
                     </li> */}
                     <li
                       className="px-3 py-2 rounded-lg hover:text-tw-orange-400 hover:bg-tw-orange-400/20 w-full transition-all cursor-pointer"
-                      onClick={() => showModal(ModalTypes.add_liquidity, false, { pool: poolInfo })}
+                      onClick={() =>
+                        showModal(ModalTypes.add_liquidity, false, {
+                          pool: poolInfo,
+                          refreshUserPools,
+                        })
+                      }
                     >
                       Add
                     </li>
@@ -133,6 +138,7 @@ export const UserPools: React.FC<Props> = ({ pools, isLoading }) => {
                         showModal(ModalTypes.remove_liquidity, false, {
                           pool: poolInfo,
                           balance: userBalance,
+                          refreshUserPools,
                         })
                       }
                     >

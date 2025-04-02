@@ -51,7 +51,7 @@ export const socialLinks: {
   {
     label: "Telegram",
     href: "https://t.me/tower",
-    icon: "twitter",
+    icon: "telegram",
   },
 ];
 

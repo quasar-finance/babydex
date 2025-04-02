@@ -505,6 +505,7 @@ pub fn withdraw_liquidity(
             "refund_assets",
             format!("{}, {}", refund_assets[0], refund_assets[1]),
         ),
+        attr("receiver", receiver.to_string()),
     ];
 
     let event = Event::new("withdraw_liquidity").add_attributes(attrs);

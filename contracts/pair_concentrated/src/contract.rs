@@ -561,6 +561,7 @@ pub fn withdraw_liquidity(
         attr("sender", info.sender),
         attr("withdrawn_share", amount),
         attr("refund_assets", refund_assets.iter().join(", ")),
+        attr("receiver", receiver.to_string()),
     ]);
     Ok(Response::new().add_messages(messages).add_event(event))
 }

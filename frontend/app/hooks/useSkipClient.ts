@@ -39,9 +39,8 @@ export function useSkipClient(parameters: UseSkipClientParameters = {}): {
     enabled: Boolean(skipClient),
     cacheTime: 0,
     queryKey: ["query", "simulation", cacheKey],
-    queryFn: async ({ signal }) => {
-      await sleep(300);
-      if (signal?.aborted || !requestRef.current) return null;
+    queryFn: async () => {
+      if (!requestRef.current) return null;
       if (!skipClient) throw new Error("skip client: no client");
       return await skipClient.route(requestRef.current);
     },

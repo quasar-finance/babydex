@@ -1,10 +1,11 @@
 "use client";
 
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ky from "ky";
 
 import Turnstile from "react-cloudflare-turnstile";
+import TurnstileInstance from "react-cloudflare-turnstile";
 import { useAccount } from "@cosmi/react";
 
 import { Button } from "../atoms/Button";
@@ -43,6 +44,7 @@ const FaucetForm: React.FC = () => {
   const { toast } = useToast();
   const [address, setAddress] = useState("");
   const [captchaToken, setCaptchaToken] = useState("");
+  const [captchaKey, setCaptchaKey] = useState(0);
   const [selectedDenom, setSelectedDenom] = useState(available_denoms[0].value);
 
   useEffect(() => {
@@ -53,10 +55,13 @@ const FaucetForm: React.FC = () => {
 
   const { mutateAsync: requestToken, isLoading } = useMutation({
     mutationFn: async () => {
-      const id = toast.loading({
-        title: "Requesting faucet funds...",
-        description: "Please wait while we process your request. This may take 1~2 minutes",
-      });
+      const id = toast.loading(
+        {
+          title: "Requesting faucet funds...",
+          description: "Please wait while we process your request. This may take 1~2 minutes",
+        },
+        { duration: Number.POSITIVE_INFINITY },
+      );
 
       try {
         const response = await ky
@@ -87,6 +92,7 @@ const FaucetForm: React.FC = () => {
         return response;
       } finally {
         setCaptchaToken("");
+        setCaptchaKey((prev) => prev + 1);
         toast.dismiss(id);
       }
     },
@@ -146,6 +152,7 @@ const FaucetForm: React.FC = () => {
         </div>
 
         <Turnstile
+          key={captchaKey}
           size="flexible"
           theme="dark"
           turnstileSiteKey={TURNSTILE_KEY}

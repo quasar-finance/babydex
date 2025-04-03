@@ -12,6 +12,7 @@ import {
   materializedPoolUserSharesInV1Cosmos,
   materializedStakeLiquidityInV1Cosmos,
   materializedSwapInV1Cosmos,
+  materializedUnstakeLiquidityInV1Cosmos,
   materializedWithdrawLiquidityInV1Cosmos,
 } from "./drizzle/schema.js";
 import {integer, pgSchema, serial, text} from "drizzle-orm/pg-core";
@@ -32,16 +33,17 @@ const poolLpToken = v1Cosmos.table("pool_lp_token", {
   lp_token: text("lp_token").notNull(),
 });
 
-const views = {
+export const views = {
   addLiquidity: materializedAddLiquidityInV1Cosmos,
-  historicPoolYield: materializedHistoricPoolYieldInV1Cosmos,
+  stakeLiquidity: materializedStakeLiquidityInV1Cosmos,
+  unstakeLiquidity: materializedUnstakeLiquidityInV1Cosmos,
+  withdrawLiquidity: materializedWithdrawLiquidityInV1Cosmos,
   incentivize: materializedIncentivizeInV1Cosmos,
+  swap: materializedSwapInV1Cosmos,
   pools: materializedPoolsInV1Cosmos,
   poolBalance: materializedPoolBalanceInV1Cosmos,
   poolUserShares: materializedPoolUserSharesInV1Cosmos,
-  stakeLiquidity: materializedStakeLiquidityInV1Cosmos,
-  swap: materializedSwapInV1Cosmos,
-  withdrawLiquidity: materializedWithdrawLiquidityInV1Cosmos,
+  historicPoolYield: materializedHistoricPoolYieldInV1Cosmos,
 } as const;
 
 export type Indexer = {

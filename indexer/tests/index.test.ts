@@ -1,6 +1,6 @@
 import {expect, test} from 'vitest';
 import {createIndexerService} from '../src/';
-import type {IndexerDbCredentials} from "../src/indexer";
+import {IndexerDbCredentials, views} from "../src/indexer";
 import sanitizedConfig from "./config";
 
 const config = {
@@ -14,10 +14,11 @@ const config = {
 
 const indexer = createIndexerService(config);
 
-test('check test database access', async () => {
-  const res = await indexer.queryView("pools");
-
-  expect(res.length).toBeGreaterThan(0);
+test('check all views', async () => {
+  for (const view in views) {
+    const res = await indexer.queryView(view as keyof typeof views);
+    expect(res.length).toBeGreaterThan(0);
+  }
 });
 
 test('get current pool balances', async () => {

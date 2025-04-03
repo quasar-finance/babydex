@@ -1,6 +1,11 @@
 "use client";
 
-import { IconReload, IconRepeat, IconSettingsFilled } from "@tabler/icons-react";
+import {
+  IconArrowsLeftRight,
+  IconReload,
+  IconRepeat,
+  IconSettingsFilled,
+} from "@tabler/icons-react";
 import { Button } from "../atoms/Button";
 import { ModalTypes } from "~/types/modal";
 import { useModal } from "~/app/providers/ModalProvider";
@@ -130,7 +135,7 @@ const SwapComponent: React.FC = () => {
                   <p>Swap</p>
                 </Tab>
                 <Tab tabKey="bridge" disabled>
-                  <IconReload className="w-5 h-5" />
+                  <IconArrowsLeftRight className="w-5 h-5" />
                   <p>Bridge</p>
                 </Tab>
               </TabList>

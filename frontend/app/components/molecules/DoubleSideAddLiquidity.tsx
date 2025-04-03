@@ -11,6 +11,7 @@ import { ModalTypes } from "~/types/modal";
 import type { DepositFormData } from "./modals/ModalAddLiquidity";
 import { useImperativeHandle } from "react";
 import { useDexClient } from "~/app/hooks/useDexClient";
+import { TxError } from "~/utils/formatTxErrors";
 
 interface Props {
   pool: PoolInfo;
@@ -79,10 +80,12 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
             { amount: token1Amount, ...token1 },
           ],
         });
-      } catch (error) {
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : "An unknown error occurred";
+        console.error(error);
         toast.error({
           title: "Deposit failed",
-          description: `Failed to deposit ${data[token0.symbol]} ${token0.symbol} and ${data[token1.symbol]} ${token1.symbol} to the pool`,
+          description: `Failed to deposit ${data[token0.symbol]} ${token0.symbol} and ${data[token1.symbol]} ${token1.symbol} to the pool. ${new TxError(message).pretty()}`,
         });
       }
       toast.dismiss(id);

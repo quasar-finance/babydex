@@ -44,4 +44,12 @@ export const BabylonTestnetAssets = {
     decimals: 18,
     logoURI: "/assets/default.png",
   },
+  bbn1cnx34p82zngq0uuaendsne0x4s5gsm7gpwk2es8zk8rz8tnj938qqyq8f9: {
+    symbol: "eBABY",
+    denom: "bbn1cnx34p82zngq0uuaendsne0x4s5gsm7gpwk2es8zk8rz8tnj938qqyq8f9",
+    name: "Babylon Testnet Escher LST",
+    decimals: 6,
+    logoURI:
+      "https://raw.githubusercontent.com/cosmos/chain-registry/master/testnets/babylontestnet/images/eBABY.svg",
+  },
 };

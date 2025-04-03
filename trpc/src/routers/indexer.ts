@@ -38,6 +38,9 @@ export const indexerRouter = createTRPCRouter({
   withdrawLiquidity: createTRPCPublicProcedure.input(input).query(async ({ ctx, input }) => {
     return await ctx.indexerService.queryView("withdrawLiquidity", input);
   }),
+  unstakeLiquidity: createTRPCPublicProcedure.input(input).query(async ({ ctx, input }) => {
+    return await ctx.indexerService.queryView("unstakeLiquidity", input);
+  }),
   getUserBalances: createTRPCPublicProcedure
     .input(z.object({ address: z.string() }))
     .query(async ({ ctx, input }) => {

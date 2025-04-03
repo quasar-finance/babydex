@@ -11,6 +11,7 @@ import { useModal } from "~/app/providers/ModalProvider";
 import { ModalTypes } from "~/types/modal";
 import type { DepositFormData } from "./modals/ModalAddLiquidity";
 import { useDexClient } from "~/app/hooks/useDexClient";
+import { TxError } from "~/utils/formatTxErrors";
 interface Props {
   pool: PoolInfo;
   submitRef: React.MutableRefObject<{ onSubmit: (data: DepositFormData) => Promise<void> } | null>;
@@ -60,10 +61,10 @@ export const SingleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
           });
         } catch (error: unknown) {
           const message = error instanceof Error ? error.message : "An unknown error occurred";
-
+          console.error(error);
           toast.error({
             title: "Deposit failed",
-            description: `Failed to deposit ${data[asset.symbol]} ${asset.symbol} to the pool. ${message}`,
+            description: `Failed to deposit ${data[asset.symbol]} ${asset.symbol} to the pool. ${new TxError(message).pretty()}`,
           });
         }
         toast.dismiss(id);

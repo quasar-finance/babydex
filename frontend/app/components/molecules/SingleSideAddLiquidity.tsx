@@ -58,10 +58,12 @@ export const SingleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
           showModal(ModalTypes.deposit_completed, true, {
             tokens: [{ amount: tokenAmount, ...asset }],
           });
-        } catch (error) {
+        } catch (error: unknown) {
+          const message = error instanceof Error ? error.message : "An unknown error occurred";
+
           toast.error({
             title: "Deposit failed",
-            description: `Failed to deposit ${data[asset.symbol]} ${asset.symbol} to the pool`,
+            description: `Failed to deposit ${data[asset.symbol]} ${asset.symbol} to the pool. ${message}`,
           });
         }
         toast.dismiss(id);

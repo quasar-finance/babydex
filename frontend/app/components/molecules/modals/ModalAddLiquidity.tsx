@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Button } from "~/app/components/atoms/Button";
 import BasicModal from "~/app/components/templates/BasicModal";
-import { twMerge } from "~/utils/twMerge";
 
 import IconCoins from "~/app/components/atoms/icons/IconCoins";
 import Divider from "~/app/components/atoms/Divider";
@@ -33,7 +32,7 @@ export const ModalAddLiquidity: React.FC<Props> = ({ pool, successAction }) => {
   const [slipageTolerance, setSlipageTolerance] = useState("0.04");
   const { isConnected } = useAccount();
   const submitRef = useRef<{ onSubmit: (data: DepositFormData) => Promise<void> } | null>(null);
-  const methods = useForm();
+  const methods = useForm({ mode: "onChange" });
   const { errors, isSubmitting, isValid } = methods.formState;
 
   const changeSide = (side: "double" | "single") => {
@@ -45,7 +44,7 @@ export const ModalAddLiquidity: React.FC<Props> = ({ pool, successAction }) => {
     if (Object.keys(errors).length) return { isDisabled: true, text: "Insufficient Balance" };
     if (isValid) return { isDisabled: false, text: "Deposit & Stake" };
     return { isDisabled: true, text: "Choose Amount" };
-  }, [isValid, errors]);
+  }, [isValid, methods.formState]);
 
   const onSubmit = methods.handleSubmit(async (data) => {
     await submitRef.current?.onSubmit({ ...data, slipageTolerance });

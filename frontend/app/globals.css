@@ -3,9 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --background: #F7F5EB;
-  --foreground: #0F0F0F;
-  --scrollbarColor: #f8f9fa;
+    --background: #0F0F0F;
+    --foreground: #F7F5EB;
   --scrollbar-width: 8px;
   --scrollbar-bg-color: #191919;
   --scrollbar-thumb-color: rgba(238, 173, 33, 0.5);

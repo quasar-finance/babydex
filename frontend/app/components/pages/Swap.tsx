@@ -28,16 +28,17 @@ const SwapComponent: React.FC = () => {
   const { errors, isValid } = formState;
 
   const { skipClient, simulation: simulationResult } = useSkipClient({ cacheKey: action });
-  const { data: simulation, isLoading, isError } = simulationResult;
+  const { data: simulation, isLoading, isError, isFetching } = simulationResult;
 
   const { refetch: refreshBalances } = useBalances();
 
   const { isDisabled, text } = useMemo(() => {
+    if (isFetching) return { isDisabled: true, text: "Fetching Quote" };
     if (isError) return { isDisabled: true, text: "No routes found" };
     if (Object.keys(errors).length) return { isDisabled: true, text: "Insufficient Balance" };
     if (isValid) return { isDisabled: false, text: "Swap" };
     return { isDisabled: true, text: "Choose Amount" };
-  }, [isValid, errors, isError]);
+  }, [isValid, errors, isError, isFetching]);
 
   const onSubmit = handleSubmit(async () => {
     if (!skipClient || !simulation) throw new Error("error: no client or simulation");

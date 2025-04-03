@@ -44,7 +44,6 @@ const FaucetForm: React.FC = () => {
   const { toast } = useToast();
   const [address, setAddress] = useState("");
   const [captchaToken, setCaptchaToken] = useState("");
-  const [captchaKey, setCaptchaKey] = useState(0);
   const [selectedDenom, setSelectedDenom] = useState(available_denoms[0].value);
 
   useEffect(() => {
@@ -92,7 +91,6 @@ const FaucetForm: React.FC = () => {
         return response;
       } finally {
         setCaptchaToken("");
-        setCaptchaKey((prev) => prev + 1);
         toast.dismiss(id);
       }
     },
@@ -152,7 +150,6 @@ const FaucetForm: React.FC = () => {
         </div>
 
         <Turnstile
-          key={captchaKey}
           size="flexible"
           theme="dark"
           turnstileSiteKey={TURNSTILE_KEY}

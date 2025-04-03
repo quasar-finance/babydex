@@ -18,7 +18,6 @@ import { AssetAmountSquare } from "../../atoms/AssetAmountSquare";
 import { contracts } from "~/config";
 import { useWithdrawSimulation } from "~/app/hooks/useWithdrawSimulation";
 import { useToast } from "~/app/hooks";
-import TruncateText from "../../atoms/TruncateText";
 
 interface Props {
   pool: PoolInfo;

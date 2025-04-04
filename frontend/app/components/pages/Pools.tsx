@@ -30,8 +30,7 @@ const Pools: React.FC = () => {
 
   const gridClass = "grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr] gap-3";
 
-  const PCLPools = pools.filter((pool) => pool.poolType === "concentrated");
-  const filteredPools = PCLPools.filter((pool) =>
+  const filteredPools = pools.filter((pool) =>
     pool.name.toLowerCase().includes(searchText.toLowerCase()),
   );
 

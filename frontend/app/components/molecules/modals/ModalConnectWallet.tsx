@@ -19,7 +19,7 @@ function ConnectorButton({ connector, onClick }: { connector: any; onClick: () =
       disabled={!isInstalled}
       onPress={onClick}
       type="button"
-      className="flex flex-col p-2 h-fit group overflow-hidden"
+      className="flex flex-col p-2 h-fit group overflow-hidden cursor-pointer"
     >
       <div className="h-12 w-12 p-1 relative">
         <Image

@@ -24,15 +24,21 @@ const Dashboard: React.FC = () => {
     address,
   });
 
+  const filteredPools = pools.filter((pool) => {
+    if (pool.poolInfo.poolType === 'xyk') {
+      return pool.userBalance.staked_share_amount > 100;
+    } else {
+      return pool.userBalance.staked_share_amount > 0;
+    }
+  });
+
   const { mutateAsync: claimAll, isLoading } = useMutation({
     mutationFn: async () => {
       if (!signingClient || !address) return;
       return await signingClient.claimRewards({
         sender: address,
         incentiveAddress: contracts.incentives,
-        lpTokens: pools
-          .filter((pool) => pool.userBalance.staked_share_amount > 0)
-          .map((pool) => pool.userBalance.lpToken),
+        lpTokens: filteredPools.map((pool) => pool.userBalance.lpToken),
       });
     },
     onSuccess: (data) => {
@@ -79,7 +85,7 @@ const Dashboard: React.FC = () => {
           </Button>
         </div>
       </div>
-      <UserPools pools={pools} isLoading={isPoolLoading} refreshUserPools={refreshUserPools} />
+      <UserPools pools={filteredPools} isLoading={isPoolLoading} refreshUserPools={refreshUserPools} />
     </div>
   );
 };

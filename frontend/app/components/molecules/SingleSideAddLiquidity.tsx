@@ -12,6 +12,8 @@ import { ModalTypes } from "~/types/modal";
 import type { DepositFormData } from "./modals/ModalAddLiquidity";
 import { useDexClient } from "~/app/hooks/useDexClient";
 import { TxError } from "~/utils/formatTxErrors";
+import MaxSlippageSwitcher from "./MaxSlippageSwitcher";
+
 interface Props {
   pool: PoolInfo;
   submitRef: React.MutableRefObject<{ onSubmit: (data: DepositFormData) => Promise<void> } | null>;
@@ -19,6 +21,7 @@ interface Props {
 
 export const SingleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => {
   const [selectedToken, setSelectedToken] = useState(0);
+  const [slippage, setSlippage] = useState("0.20");
   const { address } = useAccount();
   const { toast } = useToast();
   const { data: signingClient } = useDexClient();
@@ -51,7 +54,8 @@ export const SingleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
             sender: address as string,
             autoStake: true,
             poolAddress: pool.poolAddress,
-            slipageTolerance,
+            // Convert slippage tolerance from a percent to a decimal
+            slipageTolerance: slippage ,
             assets: [{ amount: tokenAmount, info: { native_token: { denom: asset.denom } } }],
           });
 
@@ -70,7 +74,7 @@ export const SingleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
         toast.dismiss(id);
       },
     }),
-    [signingClient],
+    [signingClient, slippage],
   );
 
   const balance = balances.find((balance) => balance.denom === asset.denom)?.amount ?? "0";
@@ -136,6 +140,10 @@ export const SingleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
           <p>{denomBalance}</p>
         </div>
         <p>$0</p>
+      </div>
+      <div className="flex items-center justify-between gap-2 mt-2">
+        <p className="text-white/50">Max Slippage</p>
+        <MaxSlippageSwitcher maxSlippage={slippage} setMaxSlippage={setSlippage} />
       </div>
     </div>
   );

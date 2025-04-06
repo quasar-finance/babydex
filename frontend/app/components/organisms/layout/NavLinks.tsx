@@ -1,7 +1,8 @@
 import type React from "react";
 import { navLinks } from "~/utils/consts";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 interface Props {
   closeMenu?: () => void;
@@ -10,6 +11,12 @@ interface Props {
 export const NavLinks: React.FC<Props> = ({ closeMenu }) => {
   const pathname = usePathname();
   const router = useRouter();
+  const [isFirstRender, setIsFirstRender] = useState(true);
+
+  useEffect(() => {
+    // After first render, set isFirstRender to false
+    setIsFirstRender(false);
+  }, []);
 
   const handleClick = (to: string, isDisabled?: boolean, isExternal?: boolean) => {
     if (isDisabled) return;
@@ -30,15 +37,15 @@ export const NavLinks: React.FC<Props> = ({ closeMenu }) => {
         return (
           <li
             key={to}
-            className={`relative px-1 font-medium text-xl md:text-base cursor-pointer ${
+            className={`relative px-1 font-medium text-xl md:text-base cursor-pointer -tracking-wide ${
               isDisabled ? "cursor-not-allowed opacity-50" : isActive ? "opacity-100" : "opacity-80"
             }`}
             onClick={() => handleClick(to, isDisabled, isExternal)}
           >
             {label}
-            {isActive && (
+            {isActive && !isFirstRender && (
               <motion.div
-                className="absolute md:left-0 md:bottom-0 md:top-auto md:w-full md:h-[3px] lg:h-[1px] bg-tw-orange-400 lg:bottom-[-25px] md:rotate-0 rotate-90 h-full w-[1px] right-2 top-0"
+                className="absolute lg:left-0 lg:top-auto lg:w-full lg:h-[1px] bg-tw-orange-400 lg:bottom-[-25px] h-full w-[1px] right-2 top-0"
                 layoutId="underline"
               />
             )}

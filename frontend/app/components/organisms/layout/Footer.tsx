@@ -10,23 +10,24 @@ export const Footer: React.FC = () => {
   return (
     <footer className="w-full">
       <div className="h-[20vh] md:h-[25vh] relative w-full">
+      {pathname.includes("swap") && (
 
+<img
+  src="/tower-gradient.png"
+  alt="letters"
+  className="absolute bottom-0 left-0 w-full h-full object-cover select-none  min-h-[35rem] bg-black-300"
+  draggable="false"
+/>
+)}
         <pre
-          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full font-mono text-white text-center select-none z-50 text-[2vw] md:text-[0.7vw] whitespace-pre max-w-full overflow-hidden"
+          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full font-mono text-white text-center select-none text-[2vw] md:text-[0.7vw] whitespace-pre max-w-full overflow-hidden"
           style={{ lineHeight: 1, mixBlendMode: "overlay" }}
         >
           {asciiLetters}
         </pre>
 
-        {pathname.includes("swap") && (
 
-          <img
-            src="/tower-gradient.png"
-            alt="letters"
-            className="absolute bottom-0 left-0 w-full object-cover select-none z-0 min-h-[35rem] bg-black-300"
-            draggable="false"
-          />
-        )}
+        
 
       </div>
       <div>

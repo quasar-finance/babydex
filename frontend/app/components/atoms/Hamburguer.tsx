@@ -8,16 +8,16 @@ interface Props {
 
 export const Hamburguer: React.FC<Props> = ({ isOpen, onClick }) => {
   return (
-    <div className="lg:hidden flex gap-2 flex-col" onClick={onClick}>
+    <div className="lg:hidden flex gap-2 flex-col p-2" onClick={onClick}>
       <div
         className={twMerge(
-          "w-[22px] h-[2px] bg-white/50 transition-all",
+          "w-[22px] h-[2px] bg-white transition-all",
           isOpen ? "rotate-45 translate-y-[5px]" : "",
         )}
       />
       <div
         className={twMerge(
-          "w-[22px] h-[2px] bg-white/50 transition-all",
+          "w-[22px] h-[2px] bg-white transition-all",
           isOpen ? "-rotate-45 translate-y-[-5px]" : "",
         )}
       />

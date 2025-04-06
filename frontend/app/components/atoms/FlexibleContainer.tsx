@@ -12,7 +12,7 @@ const FlexibleContainer: React.FC<PropsWithChildren<Props>> = ({ children, class
     <motion.div
       layout="position"
       transition={{ duration: 0.2, ease: "easeInOut" }}
-      className={twMerge("overflow-hidden", className)}
+      className={className}
     >
       <motion.div layout transition={{ duration: 0.2, ease: "easeInOut" }}>
         {children}

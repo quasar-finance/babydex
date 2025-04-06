@@ -16,10 +16,10 @@ export const modalDropIn = {
     y: "0",
     opacity: 1,
     transition: {
-      duration: 0.1,
+      duration: 0.331,
       type: "spring",
-      damping: 25,
-      stiffness: 500,
+      damping: 36.2,
+      stiffness: 563,
     },
   },
   exit: {
@@ -55,7 +55,7 @@ const BasicModal: React.FC<PropsWithChildren<Props>> = ({
       <motion.div
         onClick={(e) => e.stopPropagation()}
         className={twMerge(
-          "rounded-xl max-w-[480px] w-full bg-tw-gray-950 flex flex-col border-1 border-white/10 relative",
+          "rounded-xl max-w-[480px] w-full bg-tw-gray-950 flex flex-col border-1 border-white/10 relative overflow-visible",
           classNames?.wrapper,
         )}
         variants={modalDropIn}

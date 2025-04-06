@@ -103,7 +103,7 @@ export const ModalAddLiquidity: React.FC<Props> = ({ pool, successAction }) => {
               </Button>
             ) : (
               <Button
-                className="w-full text-base font-medium -tracking-wide"
+                className="w-full text-base"
                 size="md"
                 type="button"
                 onClick={() => showModal(ModalTypes.connect_wallet)}

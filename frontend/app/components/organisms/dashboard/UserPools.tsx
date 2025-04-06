@@ -40,7 +40,7 @@ export const UserPools: React.FC<Props> = ({ pools, isLoading, refreshUserPools 
     return (
       <div className="w-full h-full flex items-center justify-between bg-white/10 p-4 rounded-3xl">
         <p>Connect your wallet to see your pools</p>
-        <Button className="font-medium -tracking-wide" onClick={() => showModal(ModalTypes.connect_wallet)}>Connect Wallet</Button>
+        <Button onClick={() => showModal(ModalTypes.connect_wallet)}>Connect Wallet</Button>
       </div>
     );
   }

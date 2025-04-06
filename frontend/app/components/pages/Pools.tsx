@@ -35,8 +35,8 @@ const Pools: React.FC = () => {
   );
 
   return (
-    <div className="flex flex-col gap-8 px-4 pb-20 max-w-[84.5rem] mx-auto w-full min-h-[65vh]">
-      <div className="flex gap-3 justify-between items-center">
+    <div className="flex flex-col gap-8 px-4 pb-20 max-w-[84.5rem] mx-auto w-full min-h-[65vh] lg:pt-8">
+      <div className="flex gap-3 justify-between items-center lg:pl-3 lg:pr-2 pl-3">
         <h1 className="text-xl">Pools</h1>
         <div className="flex gap-3 h-[42px] items-center px-2">
           <Input

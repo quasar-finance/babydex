@@ -67,8 +67,8 @@ const Dashboard: React.FC = () => {
   });
 
   return (
-    <div className="flex flex-col gap-8 px-4 max-w-[84.5rem] mx-auto w-full min-h-[65vh]">
-      <div className="flex flex-col lg:flex-row gap-3 justify-between items-start lg:items-center">
+    <div className="flex flex-col gap-8 px-4 max-w-[84.5rem] mx-auto w-full min-h-[65vh] lg:pt-8">
+      <div className="flex flex-col lg:flex-row gap-3 justify-between items-start lg:items-center lg:pl-3 lg:pr-2 pl-3">
         <h1 className="text-xl">My Liquidity Positions</h1>
         <div className="flex gap-3 h-[42px] items-center lg:px-2">
           <Button color="tertiary" isDisabled>

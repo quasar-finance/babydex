@@ -17,9 +17,9 @@ export const Button = extendVariants(NextButton, {
     },
     size: {
       xs: "text-xs py-1 px-2",
-      sm: "text-xs py-1 px-3",
-      md: "text-sm py-3 px-6",
-      lg: "text-lg py-4 px-8",
+      sm: "text-xs py-1 px-2",
+      md: "text-sm py-3 px-3",
+      lg: "text-lg py-4 px-4",
       icon: "p-1 min-h-fit min-w-fit",
     },
   },
@@ -31,17 +31,17 @@ export const Button = extendVariants(NextButton, {
   compoundVariants: [
     {
       color: "primary",
-      class: "bg-tw-orange-400 text-tw-bg",
+      class: "bg-tw-orange-400 text-tw-bg font-medium -tracking-wide",
     },
     {
       variant: "faded",
       color: "primary",
-      class: "border-white/10 bg-tw-gray-900 text-tw-orange-400 hover:opacity-hover",
+      class: "border-white/10 bg-tw-gray-900 text-tw-orange-500 hover:opacity-hover",
     },
     {
       variant: "flat",
       color: "primary",
-      class: "bg-tw-orange-400/20 text-tw-orange-400 hover:opacity-hover",
+      class: "bg-tw-orange-400/10 text-tw-orange-400 hover:opacity-hover font-medium -tracking-wide",
     },
     {
       variant: "ghost",

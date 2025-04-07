@@ -129,7 +129,7 @@ export const poolsRouter = createTRPCRouter({
       const poolAmount1 = Number(token1Amount) / 10 ** assetInfo1.decimals;
 
       if (pairType === "xyk") {
-        const optimalRatio: number = poolAmount0 / poolAmount1;
+        const optimalRatio: number = poolAmount1 / poolAmount0;
 
         return Number.isNaN(optimalRatio) ? 1 : optimalRatio;
       }

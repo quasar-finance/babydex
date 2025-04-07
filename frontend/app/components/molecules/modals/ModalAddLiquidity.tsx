@@ -62,25 +62,27 @@ export const ModalAddLiquidity: React.FC<Props> = ({ pool, successAction }) => {
                   <AssetsStacked assets={pool.assets} />
                   <span>{name}</span>
                 </div>
-                <div className="flex gap-2 lg:py-1 lg:px-[6px]">
-                  <Tabs
-                    color="orange"
-                    defaultKey="double"
-                    selectedKey={side}
-                    onSelectionChange={(key: string) => changeSide(key as "double" | "single")}
-                  >
-                    <TabList className="bg-white/10 rounded-full p-1">
-                      <Tab tabKey="double">Doubled Sided</Tab>
-                      <Tab tabKey="single">Single Sided</Tab>
-                    </TabList>
-                  </Tabs>
-                </div>
+                {pool.poolType === 'concentrated' && (
+                  <div className="flex gap-2 lg:py-1 lg:px-[6px]">
+                    <Tabs
+                      color="orange"
+                      defaultKey="double"
+                      selectedKey={side}
+                      onSelectionChange={(key: string) => changeSide(key as "double" | "single")}
+                    >
+                      <TabList className="bg-white/10 rounded-full p-1">
+                        <Tab tabKey="double">Doubled Sided</Tab>
+                        <Tab tabKey="single">Single Sided</Tab>
+                      </TabList>
+                    </Tabs>
+                  </div>
+                )}
               </div>
 
               <div className="flex flex-col gap-2">
                 <p className="text-white/50 text-sm">Deposit Amount</p>
                 <div className="flex gap-4 flex-col">
-                  {side === "single" ? (
+                  {side === "single" && pool.poolType === 'concentrated' ? (
                     <SingleSideAddLiquidity submitRef={submitRef} pool={pool} />
                   ) : (
                     <DoubleSideAddLiquidity submitRef={submitRef} pool={pool} />

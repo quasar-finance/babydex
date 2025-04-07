@@ -55,7 +55,7 @@ export const SingleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
             autoStake: true,
             poolAddress: pool.poolAddress,
             // Convert slippage tolerance from a percent to a decimal
-            slipageTolerance: slippage ,
+            slipageTolerance: (Number(slippage) / 100).toString(),
             assets: [{ amount: tokenAmount, info: { native_token: { denom: asset.denom } } }],
           });
 

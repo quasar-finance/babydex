@@ -25,7 +25,7 @@ const columns = [
 
 const Pools: React.FC = () => {
   const { showModal } = useModal();
-  const { data: pools = [], isLoading } = trpc.local.pools.getPools.useQuery();
+  const { data: pools = [], isLoading } = trpc.local.pools.getPools.useQuery({});
   const [searchText, setSearchText] = useState("");
 
   const gridClass = "grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr] gap-3";

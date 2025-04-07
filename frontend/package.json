@@ -26,6 +26,7 @@
     "@trpc/client": "^10.45.2",
     "@trpc/react-query": "^10.45.2",
     "@trpc/server": "^10.45.2",
+    "@types/mixpanel-browser": "^2.54.0",
     "bignumber.js": "^9.1.2",
     "clsx": "^2.1.1",
     "cosmi": "^0.2.1",

@@ -89,6 +89,9 @@ importers:
       '@trpc/server':
         specifier: ^10.45.2
         version: 10.45.2
+      '@types/mixpanel-browser':
+        specifier: ^2.54.0
+        version: 2.54.0
       bignumber.js:
         specifier: ^9.1.2
         version: 9.1.2
@@ -3179,6 +3182,9 @@ packages:
 
   '@types/long@4.0.2':
     resolution: {integrity: sha512-MqTGEo5bj5t157U6fA/BiDynNkn0YknVdh48CMPkTSpFTVmvao5UQmm7uEF6xBEo7qIMAlY/JSleYaE6VOdpaA==}
+
+  '@types/mixpanel-browser@2.54.0':
+    resolution: {integrity: sha512-7DMzIH0M9TlpCTMZidaeXris+aMUyAgMMEZtV1xeD6fSQgpCGklUKqyRgidq5hKPKuNEOWBp73549Gusig/xBA==}
 
   '@types/ms@2.1.0':
     resolution: {integrity: sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA==}
@@ -10271,6 +10277,8 @@ snapshots:
   '@types/lodash@4.17.16': {}
 
   '@types/long@4.0.2': {}
+
+  '@types/mixpanel-browser@2.54.0': {}
 
   '@types/ms@2.1.0': {}
 

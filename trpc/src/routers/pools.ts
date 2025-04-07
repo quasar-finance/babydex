@@ -200,8 +200,9 @@ export const poolsRouter = createTRPCRouter({
 
     const pools: PairInfo[] = await publicClient.queryContractSmart<PairInfo[]>({
       address: contracts.factory,
-      msg: { pairs: {} },
+      msg: { pairs: {}, limit: 100 },
     });
+    console.log(pools);
 
     const caller = createCallerFactory(appRouter)(ctx);
 

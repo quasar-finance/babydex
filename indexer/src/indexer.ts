@@ -296,13 +296,18 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     const offset = (Math.max(1, page) - 1) * limit;
     const query = sql`
         WITH daily_yield AS (SELECT pool_address,
-                                    fees_usd / total_liquidity_usd / (EXTRACT(EPOCH FROM (LEAD(timestamp, 1, NOW())
-                                                                                          OVER (PARTITION BY pool_address ORDER BY timestamp) -
-                                                                                          timestamp)) /
-                                                                      86400) AS daily_yield
+                                    CASE
+                                        WHEN total_liquidity_usd > 0 AND (EXTRACT(EPOCH FROM (LEAD(timestamp, 1, NOW())
+                                                                                              OVER (PARTITION BY pool_address ORDER BY timestamp) -
+                                                                                              timestamp)) / 86400) > 0
+                                            THEN fees_usd / total_liquidity_usd / (EXTRACT(EPOCH FROM (
+                                                    LEAD(timestamp, 1, NOW())
+                                                    OVER (PARTITION BY pool_address ORDER BY timestamp) - timestamp)) /
+                                                                                   86400)
+                                        ELSE 0
+                                        END AS daily_yield
                              FROM v1_cosmos.materialized_historic_pool_yield
-                             WHERE timestamp >= NOW() - INTERVAL '${intervalSql} day'
-                               AND total_liquidity_usd > 0)
+                             WHERE timestamp >= NOW() - INTERVAL '${intervalSql} day')
         SELECT pool_address,
                AVG(daily_yield) * 365 AS avg_apr
         FROM daily_yield
@@ -328,13 +333,18 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     const poolAddressesSql = createPoolAddressArraySql(addresses);
     const query = sql`
         WITH daily_yield AS (SELECT pool_address,
-                                    fees_usd / total_liquidity_usd / (EXTRACT(EPOCH FROM (LEAD(timestamp, 1, NOW())
-                                                                                          OVER (PARTITION BY pool_address ORDER BY timestamp) -
-                                                                                          timestamp)) /
-                                                                      86400) AS daily_yield
+                                    CASE
+                                        WHEN total_liquidity_usd > 0 AND (EXTRACT(EPOCH FROM (LEAD(timestamp, 1, NOW())
+                                                                                              OVER (PARTITION BY pool_address ORDER BY timestamp) -
+                                                                                              timestamp)) / 86400) > 0
+                                            THEN fees_usd / total_liquidity_usd / (EXTRACT(EPOCH FROM (
+                                                    LEAD(timestamp, 1, NOW())
+                                                    OVER (PARTITION BY pool_address ORDER BY timestamp) - timestamp)) /
+                                                                                   86400)
+                                        ELSE 0
+                                        END AS daily_yield
                              FROM v1_cosmos.materialized_historic_pool_yield
                              WHERE timestamp >= NOW() - INTERVAL '${intervalSql} day'
-                               AND total_liquidity_usd > 0
                                AND pool_address = ${poolAddressesSql})
         SELECT pool_address,
                AVG(daily_yield) * 365 AS avg_apr

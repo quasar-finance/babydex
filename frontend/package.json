@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@amplitude/analytics-browser": "^2.13.0",
     "@cosmi/react": "^0.2.1",
     "@dicebear/collection": "^9.2.2",
     "@dicebear/core": "^9.2.2",
@@ -31,6 +32,7 @@
     "ky": "^1.7.5",
     "lru-cache": "^11.0.2",
     "mipd": "^0.0.7",
+    "mixpanel-browser": "^2.63.0",
     "motion": "^12.4.7",
     "next": "15.2.0",
     "react": "19.0.0",

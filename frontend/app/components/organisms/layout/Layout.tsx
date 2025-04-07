@@ -1,10 +1,46 @@
 "use client";
 
-import type { PropsWithChildren } from "react";
+import { useEffect, type PropsWithChildren } from "react";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
+import * as amplitude from "@amplitude/analytics-browser";
+import mixpanel from "mixpanel-browser";
+
+if (typeof window !== "undefined") {
+  amplitude.init("ea5eb25990baaab354865581cff0c417", undefined, {
+    defaultTracking: { sessions: true, pageViews: true, formInteractions: true },
+  });
+}
 
 const Layout: React.FC<PropsWithChildren> = ({ children }) => {
+  useEffect(() => {
+    //AMPLITUDE
+    amplitude.init("ea5eb25990baaab354865581cff0c417", undefined, {
+      defaultTracking: { sessions: true, pageViews: true, formInteractions: true },
+    });
+
+    //MIXPANNEL
+    const trackMixpanel = (event: MouseEvent) => {
+      if (!event.target) return;
+      if (event.target instanceof HTMLElement) {
+        if (event.target.tagName === "BUTTON") {
+          mixpanel.track("Click", { buttonClicked: event.target.innerText });
+        }
+      }
+    };
+
+    document.addEventListener("click", trackMixpanel);
+
+    mixpanel.init("9d2d7a23d6bf1038b076ac3d59fa2ffe", {
+      track_pageview: true,
+      persistence: "localStorage",
+    });
+
+    return () => {
+      document.removeEventListener("click", trackMixpanel);
+    };
+  }, []);
+
   return (
     <main className="relative flex flex-col items-center justify-center max-w-screen min-h-screen gap-8 scrollbar-none">
       <Header />

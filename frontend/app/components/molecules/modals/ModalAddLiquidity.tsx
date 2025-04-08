@@ -52,7 +52,7 @@ export const ModalAddLiquidity: React.FC<Props> = ({ pool, successAction }) => {
   const onSubmit = methods.handleSubmit(async (data) => {
     await submitRef.current?.onSubmit({
       ...data,
-      slipageTolerance: slipageTolerance === "auto" ? "0.05" : slipageTolerance,
+      slipageTolerance: (Number(slipageTolerance === "auto" ? "0.05" : slipageTolerance) / 100).toString(),
     });
     if (successAction) successAction();
   });

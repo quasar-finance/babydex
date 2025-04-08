@@ -38,7 +38,7 @@ export const createClient = () =>
             const fetch = getFetch();
             return fetch(input, {
               ...init,
-              credentials: "include",
+              credentials: "omit",
             });
           },
         }),

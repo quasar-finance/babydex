@@ -31,7 +31,7 @@ const Layout: React.FC<PropsWithChildren> = ({ children }) => {
 
     document.addEventListener("click", trackMixpanel);
 
-    mixpanel.init("9d2d7a23d6bf1038b076ac3d59fa2ffe", {
+    mixpanel.init("e90af3066ae585a14112ee029fb7a9b7", {
       track_pageview: true,
       persistence: "localStorage",
     });

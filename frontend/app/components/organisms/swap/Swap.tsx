@@ -27,12 +27,16 @@ export const Swap: React.FC = () => {
     if (!skipClient || !isDirty || (!toAmount && !fromAmount)) return;
 
     (async () => {
+
+      const destAssetDenom = toToken.type === "cw-20" ? `cw20:${toToken.denom}` : toToken.denom;
+      const sourceAssetDenom = fromToken.type === "cw-20" ? `cw20:${fromToken.denom}` : fromToken.denom;
+
       if (activeInput === "from") {
         const simulation = await simulate({
           destAssetChainID: babylonTestnet.id as unknown as string,
-          destAssetDenom: toToken.denom,
+          destAssetDenom,
           sourceAssetChainID: babylonTestnet.id as unknown as string,
-          sourceAssetDenom: fromToken.denom,
+          sourceAssetDenom,
           allowSwaps: true,
           allowUnsafe: true,
           amountIn: convertDenomToMicroDenom(fromAmount, fromToken.decimals),
@@ -44,9 +48,9 @@ export const Swap: React.FC = () => {
       } else {
         const simulation = await simulate({
           destAssetChainID: babylonTestnet.id as unknown as string,
-          destAssetDenom: toToken.denom,
+          destAssetDenom,
           sourceAssetChainID: babylonTestnet.id as unknown as string,
-          sourceAssetDenom: fromToken.denom,
+          sourceAssetDenom,
           allowSwaps: true,
           allowUnsafe: true,
           amountOut: convertDenomToMicroDenom(toAmount, toToken.decimals),

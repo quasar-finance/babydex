@@ -27,9 +27,9 @@ export const Swap: React.FC = () => {
     if (!skipClient || !isDirty || (!toAmount && !fromAmount)) return;
 
     (async () => {
-
       const destAssetDenom = toToken.type === "cw-20" ? `cw20:${toToken.denom}` : toToken.denom;
-      const sourceAssetDenom = fromToken.type === "cw-20" ? `cw20:${fromToken.denom}` : fromToken.denom;
+      const sourceAssetDenom =
+        fromToken.type === "cw-20" ? `cw20:${fromToken.denom}` : fromToken.denom;
 
       if (activeInput === "from") {
         const simulation = await simulate({

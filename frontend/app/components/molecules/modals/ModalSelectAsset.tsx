@@ -7,6 +7,7 @@ import BasicModal from "~/app/components/templates/BasicModal";
 import { useModal } from "~/app/providers/ModalProvider";
 import { convertMicroDenomToDenom } from "~/utils/intl";
 import TruncateText from "../../atoms/TruncateText";
+import { useUserBalances } from "~/app/hooks/useUserBalances";
 
 type ModalSelectAssetProps = {
   assets: Currency[];
@@ -18,8 +19,7 @@ const ModalSelectAsset: React.FC<ModalSelectAssetProps> = ({ onSelectAsset, onCl
   const { hideModal } = useModal();
   const [search, setSearch] = useState("");
   const [filteredTokens, setFilteredTokens] = useState(assets);
-  const { address } = useAccount();
-  const { data: balances } = useBalances({ address });
+  const { data: balances } = useUserBalances({ assets });
 
   const searchToken = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);

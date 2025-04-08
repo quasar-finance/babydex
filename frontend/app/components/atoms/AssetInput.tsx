@@ -9,6 +9,7 @@ import { useModal } from "~/app/providers/ModalProvider";
 import { Assets } from "~/config";
 import { useBalances } from "@cosmi/react";
 import { assetNumberMask } from "~/utils/masks";
+import { useUserBalances } from "~/app/hooks/useUserBalances";
 
 type AssetInputProps = {
   assets: Currency[];
@@ -52,7 +53,9 @@ export const AssetInput: React.FC<AssetInputProps> = ({
 
   const setValue = (value: string) => inputField.onChange(value);
 
-  const { data: balances = [] } = useBalances();
+  const { data: balances = [] } = useUserBalances({
+    assets: assetsSelected,
+  });
 
   const selectAsset = async () => {
     const { promise, resolve, reject } = Promise.withResolvers<Currency>();

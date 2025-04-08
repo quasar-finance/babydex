@@ -1,5 +1,5 @@
 import { useAccount, useBalances } from "@cosmi/react";
-import type { BaseCurrency } from "@towerfi/types";
+import type { Currency } from "@towerfi/types";
 import { useCallback, useState } from "react";
 
 import Input from "~/app/components/atoms/Input";
@@ -9,8 +9,8 @@ import { convertMicroDenomToDenom } from "~/utils/intl";
 import TruncateText from "../../atoms/TruncateText";
 
 type ModalSelectAssetProps = {
-  assets: BaseCurrency[];
-  onSelectAsset: (asset: BaseCurrency) => void;
+  assets: Currency[];
+  onSelectAsset: (asset: Currency) => void;
   onClose: () => void;
 };
 

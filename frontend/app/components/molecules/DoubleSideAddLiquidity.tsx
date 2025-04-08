@@ -1,7 +1,7 @@
 import { useFormContext } from "react-hook-form";
 import type { PoolInfo } from "@towerfi/types";
 import type React from "react";
-import { useAccount, useBalances } from "@cosmi/react";
+import { useAccount } from "@cosmi/react";
 import { convertDenomToMicroDenom, convertMicroDenomToDenom, formatDecimals } from "~/utils/intl";
 import { useToast } from "~/app/hooks";
 import { IconWallet } from "@tabler/icons-react";
@@ -9,9 +9,11 @@ import { trpc } from "~/trpc/client";
 import { useModal } from "~/app/providers/ModalProvider";
 import { ModalTypes } from "~/types/modal";
 import type { DepositFormData } from "./modals/ModalAddLiquidity";
-import { useImperativeHandle } from "react";
+import { useImperativeHandle, useMemo } from "react";
 import { useDexClient } from "~/app/hooks/useDexClient";
 import { TxError } from "~/utils/formatTxErrors";
+import { useUserBalances } from "~/app/hooks/useUserBalances";
+import { useCw20Allowance } from "~/app/hooks/useCw20Allowance";
 
 interface Props {
   pool: PoolInfo;
@@ -23,31 +25,30 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
   const { address } = useAccount();
   const { register, watch, setValue } = useFormContext();
   const { data: signingClient } = useDexClient();
-  const [token0, token1] = pool.assets;
   const { showModal } = useModal();
 
-  const token0Amount = watch(token0.symbol, "");
-  const token1Amount = watch(token1.symbol, "");
+  const { mutateAsync: increaseAllowance } = useCw20Allowance();
 
-  const { data: balances = [], refetch: refreshBalances } = useBalances({
-    address: address as string,
+  const { data: balances = [], refetch: refreshBalances } = useUserBalances({
+    assets: pool.assets,
   });
 
   const { data: optimalRatio = 1 } = trpc.local.pools.getOptimalRatio.useQuery({
     address: pool.poolAddress,
   });
 
-  const { t0Balance, t1Balance } = balances.reduce(
-    (acc, { denom, amount }) => {
-      if (denom === token0.denom) acc.t0Balance = amount;
-      if (denom === token1.denom) acc.t1Balance = amount;
-      return acc;
-    },
-    { t0Balance: "0", t1Balance: "0" },
-  );
+  const [token0, token1] = pool.assets;
 
-  const t0DenomBalance = convertMicroDenomToDenom(t0Balance, token0.decimals);
-  const t1DenomBalance = convertMicroDenomToDenom(t1Balance, token1.decimals);
+  const token0Amount = watch(token0.symbol, "");
+  const token1Amount = watch(token1.symbol, "");
+
+  const [t0DenomBalance, t1DenomBalance] = useMemo(() => {
+    const [balance0, balance1] = balances;
+    return [
+      balance0 ? convertMicroDenomToDenom(balance0.amount, balance0.decimals) : 0,
+      balance1 ? convertMicroDenomToDenom(balance1.amount, balance1.decimals) : 0,
+    ];
+  }, [balances]);
 
   useImperativeHandle(submitRef, () => ({
     onSubmit: async ({ slipageTolerance, ...data }) => {
@@ -60,16 +61,34 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
       );
       try {
         if (!signingClient) throw new Error("we couldn't submit the tx");
+
         const token0Amount = convertDenomToMicroDenom(data[token0.symbol], token0.decimals);
         const token1Amount = convertDenomToMicroDenom(data[token1.symbol], token1.decimals);
+
+        if (token0.type === "cw-20") {
+          await increaseAllowance({
+            address: token0.denom,
+            spender: pool.poolAddress,
+            amount: BigInt(token0Amount),
+          });
+        }
+
+        if (token1.type === "cw-20") {
+          await increaseAllowance({
+            address: token1.denom,
+            spender: pool.poolAddress,
+            amount: BigInt(token1Amount),
+          });
+        }
+
         await signingClient.addLiquidity({
           slipageTolerance,
           sender: address as string,
           poolAddress: pool.poolAddress,
           autoStake: true,
           assets: [
-            { amount: token0Amount, info: { native_token: { denom: token0.denom } } },
-            { amount: token1Amount, info: { native_token: { denom: token1.denom } } },
+            { amount: token0Amount, info: token0 },
+            { amount: token1Amount, info: token1 },
           ],
         });
 
@@ -87,8 +106,9 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
           title: "Deposit failed",
           description: `Failed to deposit ${data[token0.symbol]} ${token0.symbol} and ${data[token1.symbol]} ${token1.symbol} to the pool. ${new TxError(message).pretty()}`,
         });
+      } finally {
+        toast.dismiss(id);
       }
-      toast.dismiss(id);
     },
   }));
 
@@ -126,7 +146,7 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
         <div className="flex gap-2 items-center justify-between text-white/50 text-xs">
           <div
             className="flex gap-1 items-center cursor-pointer"
-            onClick={() => {   
+            onClick={() => {
               setValue(token0.symbol, formatDecimals(t0DenomBalance), { shouldValidate: true });
               setValue(token1.symbol, formatDecimals(t0DenomBalance * optimalRatio, 6), {
                 shouldValidate: true,

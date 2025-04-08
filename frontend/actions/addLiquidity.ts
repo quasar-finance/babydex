@@ -1,7 +1,8 @@
 import type { Account, Chain, Client, CometBftRpcSchema, Transport } from "cosmi/types";
-import type { AssetInfo } from "@towerfi/types";
+import type { Currency } from "@towerfi/types";
 
 import { execute, type ExecuteReturnType } from "cosmi/client";
+import { setInnerValueToAsset } from "@towerfi/trpc";
 
 export type AddLiquidityParameters = {
   sender: string;
@@ -12,7 +13,7 @@ export type AddLiquidityParameters = {
   slipageTolerance: string;
   assets: {
     amount: string;
-    info: AssetInfo;
+    info: Currency;
   }[];
 };
 
@@ -36,14 +37,19 @@ export async function addLiquidity<
           receiver,
           auto_stake: autoStake,
           min_lp_to_receive: minLpToReceive,
-          assets: assets,
+          assets: assets.map(({ info, amount }) => ({
+            info: setInnerValueToAsset(info),
+            amount,
+          })),
           slippage_tolerance: slipageTolerance,
         },
       },
-      funds: assets.map(({ info, amount }) => ({
-        denom: (info as { native_token: { denom: string } }).native_token.denom,
-        amount,
-      })),
+      funds: assets
+        .filter((a) => a.info.type !== "cw-20")
+        .map(({ info, amount }) => ({
+          denom: info.denom,
+          amount,
+        })),
     },
     sender,
   });

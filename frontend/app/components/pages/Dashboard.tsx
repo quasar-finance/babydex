@@ -25,11 +25,10 @@ const Dashboard: React.FC = () => {
   });
 
   const filteredPools = pools.filter((pool) => {
-    if (pool.poolInfo.poolType === 'xyk') {
+    if (pool.poolInfo.poolType === "xyk") {
       return pool.userBalance.staked_share_amount > 100;
-    } else {
-      return pool.userBalance.staked_share_amount > 0;
     }
+    return pool.userBalance.staked_share_amount > 0;
   });
 
   const { mutateAsync: claimAll, isLoading } = useMutation({
@@ -85,7 +84,11 @@ const Dashboard: React.FC = () => {
           </Button>
         </div>
       </div>
-      <UserPools pools={filteredPools} isLoading={isPoolLoading} refreshUserPools={refreshUserPools} />
+      <UserPools
+        pools={filteredPools}
+        isLoading={isPoolLoading}
+        refreshUserPools={refreshUserPools}
+      />
     </div>
   );
 };

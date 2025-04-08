@@ -12,6 +12,8 @@ import { ModalTypes } from "~/types/modal";
 import type { DepositFormData } from "./modals/ModalAddLiquidity";
 import { useDexClient } from "~/app/hooks/useDexClient";
 import { TxError } from "~/utils/formatTxErrors";
+import { useUserBalances } from "~/app/hooks/useUserBalances";
+import { useCw20Allowance } from "~/app/hooks/useCw20Allowance";
 interface Props {
   pool: PoolInfo;
   submitRef: React.MutableRefObject<{ onSubmit: (data: DepositFormData) => Promise<void> } | null>;
@@ -25,11 +27,12 @@ export const SingleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
   const { register, watch, setValue } = useFormContext();
   const { assets } = pool;
   const { showModal } = useModal();
+  const { mutateAsync: increaseAllowance } = useCw20Allowance();
 
   const asset = assets[selectedToken];
 
-  const { data: balances = [], refetch: refreshBalances } = useBalances({
-    address: address as string,
+  const { data: balances = [], refetch: refreshBalances } = useUserBalances({
+    assets: pool.assets,
   });
 
   useImperativeHandle(
@@ -47,12 +50,21 @@ export const SingleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
           if (!signingClient) throw new Error("we couldn't submit the tx");
 
           const tokenAmount = convertDenomToMicroDenom(data[asset.symbol], asset.decimals);
+
+          if (asset.type === "cw-20") {
+            await increaseAllowance({
+              address: asset.denom,
+              spender: pool.poolAddress,
+              amount: BigInt(tokenAmount),
+            });
+          }
+
           await signingClient.addLiquidity({
             sender: address as string,
             autoStake: true,
             poolAddress: pool.poolAddress,
-            slipageTolerance,
-            assets: [{ amount: tokenAmount, info: { native_token: { denom: asset.denom } } }],
+            slipageTolerance: slipageTolerance,
+            assets: [{ amount: tokenAmount, info: asset }],
           });
 
           await refreshBalances();
@@ -66,8 +78,9 @@ export const SingleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
             title: "Deposit failed",
             description: `Failed to deposit ${data[asset.symbol]} ${asset.symbol} to the pool. ${new TxError(message).pretty()}`,
           });
+        } finally {
+          toast.dismiss(id);
         }
-        toast.dismiss(id);
       },
     }),
     [signingClient],

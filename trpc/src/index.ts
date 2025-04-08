@@ -1,4 +1,4 @@
-export { getInnerValueFromAsset } from "./utils/assets.js";
+export { getInnerValueFromAsset, setInnerValueToAsset } from "./utils/assets.js";
 export { createRedisService } from "./services/redis.js";
 export { createCoingeckoService } from "./services/coingecko.js";
 export { createLruService } from "./services/lru.js";

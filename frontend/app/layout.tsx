@@ -58,7 +58,10 @@ export default function RootLayout({
           `}
         </Script>
 
-        <Script src="https://www.googletagmanager.com/gtag/js?id=G-HJ1CN9LZHF" />
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-HJ1CN9LZHF"
+          strategy="afterInteractive"
+        />
         <Script id="google-analytics" strategy="afterInteractive">
           {`
             window.dataLayer = window.dataLayer || [];
@@ -70,6 +73,7 @@ export default function RootLayout({
 
         <Script
           defer
+          strategy="afterInteractive"
           src="https://widget.mava.app"
           widget-version="v2"
           id="MavaWebChat"

@@ -1,4 +1,4 @@
-import type { BaseCurrency, WithPrice } from "./currency.js";
+import type { Currency, WithPrice } from "./currency.js";
 
 export type PoolType = "concentrated" | "xyk";
 
@@ -24,7 +24,7 @@ export type PoolInfo = {
   poolAddress: string;
   lpAddress: string;
   poolType: PoolType;
-  assets: WithPrice<BaseCurrency>[];
+  assets: WithPrice<Currency>[];
   poolLiquidity: string;
   rewards: [];
 };

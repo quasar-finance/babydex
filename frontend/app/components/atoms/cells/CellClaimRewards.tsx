@@ -65,7 +65,10 @@ export const CellClaimRewards: React.FC<Props> = ({
   });
 
   const { data: assets, isLoading: isLoadingAssets } = trpc.local.assets.getAssets.useQuery({
-    assets: rewards.map((r) => getInnerValueFromAsset(r.info)),
+    assets: rewards.map((r) => {
+      const { denom } = getInnerValueFromAsset(r.info);
+      return denom;
+    }),
   });
 
   if (!stakedAmount) {

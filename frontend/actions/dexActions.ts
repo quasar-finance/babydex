@@ -30,6 +30,23 @@ import {
   type ClaimRewardsReturnType,
 } from "./claimRewards";
 
+import {
+  getCw20Allowance,
+  type GetCw20AllowanceParameters,
+  type GetCw20AllowanceReturnType,
+} from "./getCw20Allowance";
+import {
+  getCw20Balance,
+  type GetCw20BalanceParameters,
+  type GetCw20BalanceReturnType,
+} from "./getCw20Balance";
+
+import {
+  increaseAllowance,
+  type IncreaseAllowanceParameters,
+  type IncreaseAllowanceReturnType,
+} from "./increaseAllowance";
+
 export type DexActions<
   _transport extends Transport = Transport,
   _chain extends Chain | undefined = Chain | undefined,
@@ -40,6 +57,9 @@ export type DexActions<
   stakeLiquidity: (args: StakeLiquidityParameters) => StakeLiquidityReturnType;
   unstakeLiquidity: (args: UnstakeLiquidityParameters) => UnstakeLiquidityReturnType;
   claimRewards: (args: ClaimRewardsParameters) => ClaimRewardsReturnType;
+  getCw20Allowance: (args: GetCw20AllowanceParameters) => GetCw20AllowanceReturnType;
+  getCw20Balance: (args: GetCw20BalanceParameters) => GetCw20BalanceReturnType;
+  increaseAllowance: (args: IncreaseAllowanceParameters) => IncreaseAllowanceReturnType;
 };
 
 export function dexActions<
@@ -53,5 +73,8 @@ export function dexActions<
     stakeLiquidity: (args) => stakeLiquidity(client, args),
     unstakeLiquidity: (args) => unstakeLiquidity(client, args),
     claimRewards: (args) => claimRewards(client, args),
+    getCw20Allowance: (args) => getCw20Allowance(client, args),
+    getCw20Balance: (args) => getCw20Balance(client, args),
+    increaseAllowance: (args) => increaseAllowance(client, args),
   };
 }

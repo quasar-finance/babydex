@@ -15,6 +15,7 @@ import { ModalTypes } from "~/types/modal";
 import Link from "next/link";
 import { CellDataToken } from "../../atoms/cells/CellDataToken";
 import type { Asset, PoolInfo, UserPoolBalances } from "@towerfi/types";
+import { Menu, MenuButton, MenuItems, MenuItem } from "@headlessui/react";
 
 const columns = [
   { key: "name", title: "Pool" },
@@ -91,37 +92,19 @@ export const UserPools: React.FC<Props> = ({ pools, isLoading, refreshUserPools 
               className="order-6 w-[45%] lg:w-auto"
             />
             <div className="order-2 lg:order-7 flex items-end justify-end w-fit lg:w-auto">
-              <Popover triggerType="listbox">
-                <PopoverTrigger>
-                  <Button color="tertiary" radius="sm" size="icon" className="mt-4 lg:mt-0">
-                    <IconDots className="w-6 h-6" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="min-w-[10rem] p-1">
-                  <ul className="w-full">
-                    {/* <li
-                      className="px-3 py-2 rounded-lg hover:text-tw-orange-400 hover:bg-tw-orange-400/20 w-full transition-all cursor-pointer"
-                      onClick={() =>
-                        showModal(ModalTypes.stake_liquidity, false, {
-                          pool: poolInfo,
-                          balance: userBalance,
-                        })
-                      }
-                    >
-                      Stake
-                    </li> */}
-                    {/* <li
-                      className="px-3 py-2 rounded-lg hover:text-tw-orange-400 hover:bg-tw-orange-400/20 w-full transition-all cursor-pointer"
-                      onClick={() =>
-                        showModal(ModalTypes.unstake_liquidity, false, {
-                          pool: poolInfo,
-                          balance: userBalance,
-                        })
-                      }
-                    >
-                      Unstake
-                    </li> */}
-                    <li
+              <Menu>
+                <MenuButton className="mt-4 lg:mt-0">
+                  <IconDots className="w-6 h-6" />
+                </MenuButton>
+
+                <MenuItems
+                  transition
+                  className="min-w-[10rem] p-1 z-20 bg-tw-bg border border-white/10 rounded-lg"
+                  anchor="bottom end"
+                >
+                  <MenuItem>
+                    <button
+                      type="button"
                       className="px-3 py-2 rounded-lg hover:text-tw-orange-400 hover:bg-tw-orange-400/20 w-full transition-all cursor-pointer"
                       onClick={() =>
                         showModal(ModalTypes.add_liquidity, false, {
@@ -131,8 +114,11 @@ export const UserPools: React.FC<Props> = ({ pools, isLoading, refreshUserPools 
                       }
                     >
                       Add
-                    </li>
-                    <li
+                    </button>
+                  </MenuItem>
+                  <MenuItem>
+                    <button
+                      type="button"
                       className="px-3 py-2 rounded-lg hover:text-tw-orange-400 hover:bg-tw-orange-400/20 w-full transition-all cursor-pointer"
                       onClick={() =>
                         showModal(ModalTypes.remove_liquidity, false, {
@@ -143,10 +129,10 @@ export const UserPools: React.FC<Props> = ({ pools, isLoading, refreshUserPools 
                       }
                     >
                       Remove
-                    </li>
-                  </ul>
-                </PopoverContent>
-              </Popover>
+                    </button>
+                  </MenuItem>
+                </MenuItems>
+              </Menu>
             </div>
           </TableRow>
         );

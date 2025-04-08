@@ -14,7 +14,7 @@ const MaxSlippageSwitcher: React.FC<Props> = ({ maxSlippage, setMaxSlippage }) =
       <motion.button
         onClick={() => setMaxSlippage("auto")}
         className={twMerge(
-          "rounded-full px-2 transition-all duration-300",
+          "rounded-full px-3 transition-all duration-300",
           isCustom ? "text-tw-orange-400 bg-orange-400/10" : "text-white/50",
         )}
       >
@@ -31,7 +31,7 @@ const MaxSlippageSwitcher: React.FC<Props> = ({ maxSlippage, setMaxSlippage }) =
           onFocus={() => setMaxSlippage(isCustom ? "0.5" : maxSlippage)}
           value={isCustom ? "0.5" : maxSlippage}
           onChange={(e) => setMaxSlippage(e.target.value)}
-          className="bg-transparent outline-none focus:border-none max-w-[1.5rem] text-right"
+          className="bg-transparent outline-none focus:border-none max-w-[2rem] text-right"
         />
         <p>%</p>
       </motion.button>

@@ -1,11 +1,11 @@
-import type { BaseCurrency } from "@towerfi/types";
+import type { Currency } from "@towerfi/types";
 import type React from "react";
 import { convertMicroDenomToDenom } from "~/utils/intl";
 import { twMerge } from "~/utils/twMerge";
 import Skeleton from "./Skeleton";
 
 interface Props {
-  asset: BaseCurrency;
+  asset: Currency;
   balance: number | string;
   style?: "bordered" | "background";
   isLoading?: boolean;

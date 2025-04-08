@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  IconArrowsLeftRight,
-  IconReload,
-  IconRepeat,
-  IconSettingsFilled,
-} from "@tabler/icons-react";
+import { IconArrowsLeftRight, IconRepeat, IconSettingsFilled } from "@tabler/icons-react";
 import { Button } from "../atoms/Button";
 import { ModalTypes } from "~/types/modal";
 import { useModal } from "~/app/providers/ModalProvider";

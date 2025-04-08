@@ -14,6 +14,9 @@ import { DoubleSideAddLiquidity } from "../DoubleSideAddLiquidity";
 import { FormProvider, useForm } from "react-hook-form";
 import { Tab, TabList, Tabs } from "../../atoms/Tabs";
 import AssetsStacked from "../../atoms/AssetsStacked";
+import { Popover, PopoverContent, PopoverTrigger } from "../../atoms/Popover";
+import MaxSlippageSwitcher from "../MaxSlippageSwitcher";
+import { IconSettingsFilled } from "@tabler/icons-react";
 
 interface Props {
   pool: PoolInfo;
@@ -47,7 +50,10 @@ export const ModalAddLiquidity: React.FC<Props> = ({ pool, successAction }) => {
   }, [isValid, methods.formState]);
 
   const onSubmit = methods.handleSubmit(async (data) => {
-    await submitRef.current?.onSubmit({ ...data, slipageTolerance });
+    await submitRef.current?.onSubmit({
+      ...data,
+      slipageTolerance: slipageTolerance === "auto" ? "0.05" : slipageTolerance,
+    });
     if (successAction) successAction();
   });
 
@@ -55,6 +61,27 @@ export const ModalAddLiquidity: React.FC<Props> = ({ pool, successAction }) => {
     <BasicModal title="Add Liquidity" classNames={{ wrapper: "max-w-xl", container: "p-0" }}>
       <FormProvider {...methods}>
         <form className="flex flex-col max-w-xl" onSubmit={onSubmit}>
+          <Popover>
+            <PopoverTrigger>
+              <Button
+                color="secondary"
+                className="absolute top-[10px] right-12 p-2"
+                type="button"
+                isIconOnly
+              >
+                <IconSettingsFilled className="w-5 h-5" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent>
+              <div className="flex w-full items-center justify-between gap-2 mt-2">
+                <p className="text-white/50">Max Slippage</p>
+                <MaxSlippageSwitcher
+                  maxSlippage={slipageTolerance}
+                  setMaxSlippage={setSlipageTolerance}
+                />
+              </div>
+            </PopoverContent>
+          </Popover>
           <div className="flex flex-col gap-5 px-4 py-5">
             <div className="flex flex-col gap-4">
               <div className="bg-white/5 w-full rounded-xl p-4 flex lg:items-center justify-between gap-4 lg:gap-1 flex-col lg:flex-row">
@@ -62,7 +89,7 @@ export const ModalAddLiquidity: React.FC<Props> = ({ pool, successAction }) => {
                   <AssetsStacked assets={pool.assets} />
                   <span>{name}</span>
                 </div>
-                {pool.poolType === 'concentrated' && (
+                {pool.poolType === "concentrated" && (
                   <div className="flex gap-2 lg:py-1 lg:px-[6px]">
                     <Tabs
                       color="orange"
@@ -82,7 +109,7 @@ export const ModalAddLiquidity: React.FC<Props> = ({ pool, successAction }) => {
               <div className="flex flex-col gap-2">
                 <p className="text-white/50 text-sm">Deposit Amount</p>
                 <div className="flex gap-4 flex-col">
-                  {side === "single" && pool.poolType === 'concentrated' ? (
+                  {side === "single" && pool.poolType === "concentrated" ? (
                     <SingleSideAddLiquidity submitRef={submitRef} pool={pool} />
                   ) : (
                     <DoubleSideAddLiquidity submitRef={submitRef} pool={pool} />

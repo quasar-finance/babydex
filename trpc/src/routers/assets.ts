@@ -1,15 +1,18 @@
 import { createCallerFactory, createTRPCPublicProcedure, createTRPCRouter } from "../config.js";
 import { z } from "zod";
 
-import type { BaseCurrency, NativeCurrency, CW20Currency, WithPrice } from "@towerfi/types";
+import type { WithPrice, Currency, CW20Currency } from "@towerfi/types";
 import { appRouter } from "../router.js";
 
 export const assetsRouter = createTRPCRouter({
   getAsset: createTRPCPublicProcedure
     .input(z.object({ asset: z.string() }))
-    .query<WithPrice<BaseCurrency>>(async ({ input, ctx }) => {
+    .query<WithPrice<Currency>>(async ({ input, ctx }) => {
       const { asset: denomOrAddress } = input;
       const { assets, publicClient, cacheService, coingeckoService } = ctx;
+      const cachedAsset = await cacheService.getItem<WithPrice<Currency>>(denomOrAddress);
+      if (cachedAsset) return cachedAsset;
+
       const asset =
         assets[denomOrAddress] ||
         Object.values(assets).find(
@@ -21,10 +24,11 @@ export const assetsRouter = createTRPCRouter({
         return await coingeckoService.getPrice(asset.coingeckoId);
       })();
 
-      if (asset) return { ...asset, price };
-
-      const cachedAsset = await cacheService.getItem<WithPrice<NativeCurrency>>(denomOrAddress);
-      if (cachedAsset) return cachedAsset;
+      if (asset) {
+        const assetWithPrice = { ...asset, price };
+        await cacheService.setItem(denomOrAddress, assetWithPrice);
+        return assetWithPrice;
+      }
 
       const { metadata } = await publicClient
         .queryDenomMetadata({ denom: denomOrAddress })
@@ -40,6 +44,7 @@ export const assetsRouter = createTRPCRouter({
 
       const unknownAsset = {
         symbol,
+        type: "ibc",
         decimals: 6 + decimals,
         denom: denomOrAddress,
         logoURI: "/assets/default.png",
@@ -47,14 +52,14 @@ export const assetsRouter = createTRPCRouter({
       };
 
       await cacheService.setItem(denomOrAddress, unknownAsset);
-      return unknownAsset;
+      return unknownAsset as WithPrice<Currency>;
     }),
 
   getAssets: createTRPCPublicProcedure
     .input(z.object({ assets: z.array(z.string()) }))
-    .query<WithPrice<BaseCurrency>[]>(async ({ ctx, input }) => {
+    .query<WithPrice<Currency>[]>(async ({ ctx, input }) => {
       const caller = createCallerFactory(appRouter)(ctx);
-      const responses: WithPrice<BaseCurrency>[] = await Promise.all(
+      const responses: WithPrice<Currency>[] = await Promise.all(
         input.assets.map((asset) => caller.local.assets.getAsset({ asset })),
       );
       return responses;

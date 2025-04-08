@@ -1,4 +1,4 @@
-import type { BaseCurrency } from "@towerfi/types";
+import type { Currency } from "@towerfi/types";
 import { useController, type Control } from "react-hook-form";
 import { convertMicroDenomToDenom } from "~/utils/intl";
 import { motion } from "motion/react";
@@ -11,10 +11,10 @@ import { useBalances } from "@cosmi/react";
 import { assetNumberMask } from "~/utils/masks";
 
 type AssetInputProps = {
-  assets: BaseCurrency[];
+  assets: Currency[];
   name: string;
   disabled?: boolean;
-  onSelect: (asset: BaseCurrency) => void;
+  onSelect: (asset: Currency) => void;
   control: Control;
   mask?: (v: string) => string | null;
   onFocus?: () => void;
@@ -55,7 +55,7 @@ export const AssetInput: React.FC<AssetInputProps> = ({
   const { data: balances = [] } = useBalances();
 
   const selectAsset = async () => {
-    const { promise, resolve, reject } = Promise.withResolvers<BaseCurrency>();
+    const { promise, resolve, reject } = Promise.withResolvers<Currency>();
 
     const filteredTokens = assets.filter(
       (a) => !assetsSelected.some((selected) => selected.symbol === a.symbol),

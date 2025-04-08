@@ -5,7 +5,6 @@ import { appRouter } from "../router.js";
 
 import type {
   PoolInfo,
-  BaseCurrency,
   ConfigResponse,
   CumulativePricesResponse,
   PairInfo,
@@ -14,6 +13,7 @@ import type {
   WithPrice,
   UserPoolBalances,
   Asset,
+  Currency,
 } from "@towerfi/types";
 import { fromBase64, fromUtf8 } from "cosmi/utils";
 import { getInnerValueFromAsset } from "../utils/assets.js";
@@ -118,11 +118,14 @@ export const poolsRouter = createTRPCRouter({
       const { amount: token0Amount } = token0;
       const { amount: token1Amount } = token1;
 
+      const { denom: denom0 } = getInnerValueFromAsset(token0.info);
       const assetInfo0 = await caller.local.assets.getAsset({
-        asset: getInnerValueFromAsset(token0.info),
+        asset: denom0,
       });
+
+      const { denom: denom1 } = getInnerValueFromAsset(token1.info);
       const assetInfo1 = await caller.local.assets.getAsset({
-        asset: getInnerValueFromAsset(token1.info),
+        asset: denom1,
       });
 
       const poolAmount0 = Number(token0Amount) / 10 ** assetInfo0.decimals;
@@ -174,13 +177,15 @@ export const poolsRouter = createTRPCRouter({
       const [token1, token2] = pool.asset_infos;
       if (!token1 || !token2) throw new Error("Invalid pool");
 
-      const t1: WithPrice<BaseCurrency> = await caller.local.assets.getAsset({
-        asset: getInnerValueFromAsset(token1),
-      });
+      const { denom: denom1 } = getInnerValueFromAsset(token1);
+      const t1 = (await caller.local.assets.getAsset({
+        asset: denom1,
+      })) as WithPrice<Currency>;
 
-      const t2: WithPrice<BaseCurrency> = await caller.local.assets.getAsset({
-        asset: getInnerValueFromAsset(token2),
-      });
+      const { denom: denom2 } = getInnerValueFromAsset(token2);
+      const t2 = (await caller.local.assets.getAsset({
+        asset: denom2,
+      })) as WithPrice<Currency>;
 
       const name = `${t1.symbol} / ${t2.symbol}`;
 
@@ -193,7 +198,7 @@ export const poolsRouter = createTRPCRouter({
         assets: [t1, t2],
         poolLiquidity: shares.total_share,
         rewards: [],
-      };
+      } as PoolInfo;
     }),
   getPools: createTRPCPublicProcedure.query<PoolInfo[]>(async ({ ctx }) => {
     const { publicClient, contracts } = ctx;

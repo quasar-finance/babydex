@@ -1,16 +1,16 @@
 import { usePublicClient } from "@cosmi/react";
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { getInnerValueFromAsset } from "@towerfi/trpc";
-import type { Asset, BaseCurrency, PoolInfo, WithAmount, WithPrice } from "@towerfi/types";
+import type { Asset, Currency, WithAmount, WithPrice } from "@towerfi/types";
 
 type UseWithdrawSimulationParameters = {
   amount: number | string;
-  assets: WithPrice<BaseCurrency>[];
+  assets: WithPrice<Currency>[];
   poolAddress: string;
 };
 
 type UseWithdrawSimulationReturnType = {
-  simulation: WithAmount<WithPrice<BaseCurrency>>[];
+  simulation: WithAmount<WithPrice<Currency>>[];
   query: Omit<UseQueryResult, "data">;
 };
 
@@ -35,9 +35,10 @@ export function useWithdrawSimulation(
 
       if (!response) throw new Error("Failed to simulate withdraw");
 
-      const sortedTokens = response.sort((a: Asset) =>
-        getInnerValueFromAsset(a.info) === assets[0].denom ? -1 : 1,
-      );
+      const sortedTokens = response.sort((a: Asset) => {
+        const { denom } = getInnerValueFromAsset(a.info);
+        return denom === assets[0].denom ? -1 : 1;
+      });
 
       return [sortedTokens[0].amount, sortedTokens[1].amount];
     },

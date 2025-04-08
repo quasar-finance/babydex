@@ -1,20 +1,17 @@
 import type React from "react";
 import { twMerge } from "~/utils/twMerge";
 import Tooltip from "../Tooltip";
-import type { BaseCurrency, WithPrice } from "@towerfi/types";
+import type { Currency, WithPrice } from "@towerfi/types";
 import { useWithdrawSimulation } from "~/app/hooks/useWithdrawSimulation";
-import {
-  convertDenomToMicroDenom,
-  convertMicroDenomToDenom,
-  toFullNumberString,
-} from "~/utils/intl";
+
+import { convertMicroDenomToDenom, toFullNumberString } from "~/utils/intl";
 
 interface Props {
   title: string;
   amount: string | number;
   className?: string;
   poolAddress: string;
-  tokens: WithPrice<BaseCurrency>[];
+  tokens: WithPrice<Currency>[];
 }
 
 export const CellDataToken: React.FC<Props> = ({

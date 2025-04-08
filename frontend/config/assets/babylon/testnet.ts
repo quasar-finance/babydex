@@ -1,6 +1,9 @@
+import type { Currency } from "@towerfi/types";
+
 export const BabylonTestnetAssets = {
   ubbn: {
     denom: "ubbn",
+    name: "Babylon Testnet Native Token",
     type: "native",
     decimals: 6,
     symbol: "BABY",
@@ -64,4 +67,4 @@ export const BabylonTestnetAssets = {
     logoURI:
       "https://raw.githubusercontent.com/cosmos/chain-registry/master/testnets/babylontestnet/images/eBABY.svg",
   },
-};
+} as unknown as Record<string, Currency>;

@@ -9,6 +9,7 @@ export type WithGasPriceStep<T> = T & {
 };
 
 export type BaseCurrency = {
+  readonly name: string;
   readonly symbol: string;
   readonly denom: string;
   readonly decimals: number;

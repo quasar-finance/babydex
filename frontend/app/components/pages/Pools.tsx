@@ -36,6 +36,11 @@ const Pools: React.FC = () => {
     pool.name.toLowerCase().includes(searchText.toLowerCase()),
   );
 
+  const { data: poolsInfo } = trpc.edge.indexer.getPoolBalancesByAddresses.useQuery({
+    addresses: filteredPools.map((pool) => pool.poolAddress)
+  })
+  console.log(poolsInfo);
+
   useEffect(() => {
     setCurrentPage(0);
   }, [searchText]);

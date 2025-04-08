@@ -39,7 +39,14 @@ const Pools: React.FC = () => {
   const { data: poolsInfo } = trpc.edge.indexer.getPoolBalancesByAddresses.useQuery({
     addresses: filteredPools.map((pool) => pool.poolAddress)
   })
-  console.log(poolsInfo);
+
+  useEffect(() => {
+    if (poolsInfo) {
+      poolsInfo.forEach((record, index) => {
+        console.log(`Pool Balance Record ${index + 1}:`, record);
+      });
+    }
+  }, [poolsInfo]);
 
   useEffect(() => {
     setCurrentPage(0);

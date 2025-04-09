@@ -22,6 +22,7 @@ import { useToast } from "~/app/hooks";
 import { Suspense, useMemo, useState } from "react";
 import { useSwapStore } from "~/app/hooks/useSwapStore";
 import TruncateText from "../atoms/TruncateText";
+import { Spinner } from "../atoms/Spinner";
 
 const SwapComponent: React.FC = () => {
   const [action, setAction] = useState("swap");
@@ -108,7 +109,7 @@ const SwapComponent: React.FC = () => {
   });
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Spinner />}>
       <div className="flex flex-col min-h-[65vh] gap-8 w-full items-center relative">
         <form
           className="flex flex-col gap-4 max-w-[434px] mx-auto py-8 px-4 relative z-20 w-full"

@@ -17,7 +17,7 @@ import {
 } from "./drizzle/schema.js";
 import {integer, pgSchema, serial, text} from "drizzle-orm/pg-core";
 
-export type poolMetric = {
+type poolMetric = {
   pool_address: string,
   height: bigint,
   token0_denom: string,
@@ -100,7 +100,7 @@ export type Indexer = {
   ) => Promise<Record<string, unknown>[] | null>;
   getCurrentPoolVolumes: (page: number, limit: number) => Promise<Record<string, unknown>[] | null>;
   getPoolVolumesByPoolAddresses: (addresses: string[]) => Promise<Record<string, unknown>[] | null>;
-  getPoolMetricsByPoolAddresses: (addresses: string[], startDate?: Date | null, endDate?: Date | null) => Promise<poolMetric[]> | null;
+  getPoolMetricsByPoolAddresses: (addresses: string[], startDate?: Date | null, endDate?: Date | null) => Promise<Record<string, poolMetric>[] | null>;
 };
 
 export type IndexerFilters = {
@@ -512,7 +512,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     addresses: string[],
     startDate?: Date,
     endDate?: Date,
-  ): Promise<poolMetric[] | null> {
+  ): Promise<Record<string, poolMetric>[] | null> {
     const now = new Date();
     const start = startDate ? new Date(startDate) : new Date(0);
     const end = endDate ? new Date(endDate) : now;
@@ -668,9 +668,9 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     `;
 
     try {
-      const result = await client.execute(query);
+      const response = await client.execute(query);
 
-      return result.rows as poolMetric[];
+      return response.rows.map(row => ({[row.pool_address as string]: row as poolMetric}));
     } catch (error) {
       console.error("Error executing raw query:", error);
 

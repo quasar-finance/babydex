@@ -19,7 +19,7 @@ const main = async () => {
             address,
             contracts["astroport_native_coin_registry"]!,
             {owner: config.admin} as CoinRegistryInitMsg,
-            "Coin registry",
+            "Tower Coin registry",
             "auto",
             {admin: config.admin}
         )
@@ -49,7 +49,7 @@ const main = async () => {
     } as FactoryInitMsg;
 
     deployed.factory = await client
-        .instantiate(address, contracts["astroport_factory"]!, init_msg, "Factory", "auto", {admin: config.admin})
+        .instantiate(address, contracts["astroport_factory"]!, init_msg, "Tower Factory", "auto", {admin: config.admin})
         .then((resp) => resp.contractAddress)
 
     // Init incentives
@@ -64,13 +64,13 @@ const main = async () => {
     } as IncentivesInitMsg;
 
     deployed.incentives = await client
-        .instantiate(address, contracts["astroport_incentives"]!, incentives_init_msg, "Incentives", "auto", {admin: config.admin})
+        .instantiate(address, contracts["astroport_incentives"]!, incentives_init_msg, "Tower Incentives", "auto", {admin: config.admin})
         .then((resp) => resp.contractAddress);
 
     // Init router
     console.log("Init router");
     deployed.router = await client
-        .instantiate(address, contracts["astroport_router"]!, incentives_init_msg, "Router", "auto", {admin: config.admin})
+        .instantiate(address, contracts["astroport_router"]!, incentives_init_msg, "Tower Router", "auto", {admin: config.admin})
         .then((resp) => resp.contractAddress);
 
     console.log("Contracts deployed");

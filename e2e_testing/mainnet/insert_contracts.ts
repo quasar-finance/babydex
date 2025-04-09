@@ -7,7 +7,7 @@ import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 
 // PostgreSQL connection details
 const client = new Client({
-  user: "",
+  user: "postgres",
   host: "",
   database: "",
   password: "",

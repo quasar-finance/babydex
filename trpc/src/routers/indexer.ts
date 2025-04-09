@@ -105,4 +105,13 @@ export const indexerRouter = createTRPCRouter({
         input.addresses,
       );
     }),
+  getPoolMetricsByAddresses: createTRPCPublicProcedure
+    .input(z.object({ addresses: z.string().array(),  startDate: z.date().nullish(), endDate: z.date().nullish() }))
+    .query(async ({ ctx, input }) => {
+      return await ctx.indexerService.getPoolMetricsByPoolAddresses(
+        input.addresses,
+        input.startDate,
+        input.endDate,
+      );
+    }),
 });

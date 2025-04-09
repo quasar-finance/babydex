@@ -82,3 +82,66 @@ test('get pool incentives by addresses', async () => {
 
   expect(res.length).toBeGreaterThan(0);
 });
+
+test('get pool metrics by addresses', async () => {
+  const res = await indexer.getPoolMetricsByPoolAddresses([
+    "bbn10vzynuvh08kssssdrj9k2vaxxl9uqn0f08jaq8zq6h7vxmd9cnuqa3putu",
+    "bbn17xgsxm4vll7trsd59e26wg9f0unwmx2ktfhtvhu35jeel5wrakcqvnwzyu",
+  ]);
+
+  console.log(res);
+
+  expect(res.length).toBeGreaterThan(0);
+});
+
+test('get pool metrics by addresses with start date', async () => {
+  const now = new Date();
+  const startDate = new Date(now);
+
+  // 7 days ago
+  startDate.setDate(now.getDate() - 7);
+
+  const res = await indexer.getPoolMetricsByPoolAddresses([
+    "bbn10vzynuvh08kssssdrj9k2vaxxl9uqn0f08jaq8zq6h7vxmd9cnuqa3putu",
+    "bbn17xgsxm4vll7trsd59e26wg9f0unwmx2ktfhtvhu35jeel5wrakcqvnwzyu",
+  ], startDate);
+
+  console.log(res);
+
+  expect(res.length).toBeGreaterThan(0);
+});
+
+test('get pool metrics by addresses with end date', async () => {
+  const now = new Date();
+  const endDate = new Date(now);
+
+  // 7 days ago
+  endDate.setDate(now.getDate() - 7);
+
+  const res = await indexer.getPoolMetricsByPoolAddresses([
+    "bbn10vzynuvh08kssssdrj9k2vaxxl9uqn0f08jaq8zq6h7vxmd9cnuqa3putu",
+    "bbn17xgsxm4vll7trsd59e26wg9f0unwmx2ktfhtvhu35jeel5wrakcqvnwzyu",
+  ], null, endDate);
+
+  console.log(res);
+
+  expect(res.length).toBeGreaterThan(0);
+});
+
+test('get pool metrics by addresses with start and end date', async () => {
+  const now = new Date();
+  const startDate = new Date(now);
+  const endDate = new Date(now);
+
+  startDate.setDate(now.getDate() - 2);
+  endDate.setDate(now.getDate() - 1);
+
+  const res = await indexer.getPoolMetricsByPoolAddresses([
+    "bbn10vzynuvh08kssssdrj9k2vaxxl9uqn0f08jaq8zq6h7vxmd9cnuqa3putu",
+    "bbn17xgsxm4vll7trsd59e26wg9f0unwmx2ktfhtvhu35jeel5wrakcqvnwzyu",
+  ], null, endDate);
+
+  console.log(res);
+
+  expect(res.length).toBeGreaterThan(0);
+});

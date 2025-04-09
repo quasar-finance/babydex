@@ -19,7 +19,7 @@ import { Bridge } from "../organisms/swap/Bridge";
 import { useSkipClient } from "~/app/hooks/useSkipClient";
 import { FormProvider, useForm } from "react-hook-form";
 import { useToast } from "~/app/hooks";
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { useSwapStore } from "~/app/hooks/useSwapStore";
 import TruncateText from "../atoms/TruncateText";
 
@@ -108,14 +108,15 @@ const SwapComponent: React.FC = () => {
   });
 
   return (
-    <div className="flex flex-col min-h-[65vh] gap-8 w-full items-center relative">
-      <form
-        className="flex flex-col gap-4 max-w-[434px] mx-auto py-8 px-4 relative z-20 w-full"
-        onSubmit={onSubmit}
-      >
-        <FormProvider {...methods}>
-          <div className="w-full flex-1 flex items-center justify-center bg-tw-sub-bg rounded-2xl p-2 flex-col relative">
-            {/* {action === "bridge" && (
+    <Suspense fallback={<div>Loading...</div>}>
+      <div className="flex flex-col min-h-[65vh] gap-8 w-full items-center relative">
+        <form
+          className="flex flex-col gap-4 max-w-[434px] mx-auto py-8 px-4 relative z-20 w-full"
+          onSubmit={onSubmit}
+        >
+          <FormProvider {...methods}>
+            <div className="w-full flex-1 flex items-center justify-center bg-tw-sub-bg rounded-2xl p-2 flex-col relative">
+              {/* {action === "bridge" && (
               <motion.button
                 type="button"
                 whileHover={{ scale: 1.1 }}
@@ -127,65 +128,66 @@ const SwapComponent: React.FC = () => {
               </motion.button>
             )} */}
 
-            <motion.button
-              type="button"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => showModal(ModalTypes.swap_settings, true)}
-              className="absolute top-[10px] right-2 p-2 bg-tw-bg rounded-full z-10"
-            >
-              <IconSettingsFilled className="w-5 h-5" />
-            </motion.button>
+              <motion.button
+                type="button"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => showModal(ModalTypes.swap_settings, true)}
+                className="absolute top-[10px] right-2 p-2 bg-tw-bg rounded-full z-10"
+              >
+                <IconSettingsFilled className="w-5 h-5" />
+              </motion.button>
 
-            <Tabs
-              defaultKey="swap"
-              selectedKey={action}
-              onSelectionChange={(a) => [reset(), setAction(a)]}
-            >
-              <TabList>
-                <Tab tabKey="swap">
-                  <IconRepeat className="w-5 h-5" />
-                  <p>Swap</p>
-                </Tab>
-                <Tab tabKey="bridge">
-                  <IconArrowsLeftRight className="w-5 h-5" />
-                  <p>Bridge</p>
-                </Tab>
-              </TabList>
+              <Tabs
+                defaultKey="swap"
+                selectedKey={action}
+                onSelectionChange={(a) => [reset(), setAction(a)]}
+              >
+                <TabList>
+                  <Tab tabKey="swap">
+                    <IconRepeat className="w-5 h-5" />
+                    <p>Swap</p>
+                  </Tab>
+                  <Tab tabKey="bridge">
+                    <IconArrowsLeftRight className="w-5 h-5" />
+                    <p>Bridge</p>
+                  </Tab>
+                </TabList>
 
-              <TabContent tabKey="swap">
-                <Swap />
-              </TabContent>
-              <TabContent tabKey="bridge">
-                <Bridge />
-              </TabContent>
-            </Tabs>
-          </div>
-          {action === "swap" && (
-            <div className="w-full flex flex-col gap-6  relative z-20">
-              <div className="backdrop-blur-md rounded-2xl">
-                {isConnected ? (
-                  <Button
-                    fullWidth
-                    type="submit"
-                    isDisabled={isDisabled}
-                    isLoading={isLoading}
-                    className="backdrop-blur-md"
-                  >
-                    {text}
-                  </Button>
-                ) : (
-                  <Button onPress={() => showModal(ModalTypes.connect_wallet)} fullWidth>
-                    Connect Wallet
-                  </Button>
-                )}
-              </div>
-              <SwapInfoAccordion simulation={simulation} className="absolute w-full top-14" />
+                <TabContent tabKey="swap">
+                  <Swap />
+                </TabContent>
+                <TabContent tabKey="bridge">
+                  <Bridge />
+                </TabContent>
+              </Tabs>
             </div>
-          )}
-        </FormProvider>
-      </form>
-    </div>
+            {action === "swap" && (
+              <div className="w-full flex flex-col gap-6  relative z-20">
+                <div className="backdrop-blur-md rounded-2xl">
+                  {isConnected ? (
+                    <Button
+                      fullWidth
+                      type="submit"
+                      isDisabled={isDisabled}
+                      isLoading={isLoading}
+                      className="backdrop-blur-md"
+                    >
+                      {text}
+                    </Button>
+                  ) : (
+                    <Button onPress={() => showModal(ModalTypes.connect_wallet)} fullWidth>
+                      Connect Wallet
+                    </Button>
+                  )}
+                </div>
+                <SwapInfoAccordion simulation={simulation} className="absolute w-full top-14" />
+              </div>
+            )}
+          </FormProvider>
+        </form>
+      </div>
+    </Suspense>
   );
 };
 

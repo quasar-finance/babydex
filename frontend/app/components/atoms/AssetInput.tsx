@@ -111,7 +111,10 @@ export const AssetInput: React.FC<AssetInputProps> = ({
       </div>
 
       <div className="flex items-center justify-between text-white/50 text-xs">
-        <div className="flex items-center gap-1" onClick={() => setValue(denomBalance.toString())}>
+        <div
+          className="flex items-center gap-1  cursor-pointer"
+          onClick={() => setValue(denomBalance.toString())}
+        >
           <IconWallet className="w-4 h-4" />
           <p>{denomBalance}</p>
         </div>

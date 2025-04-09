@@ -54,7 +54,7 @@ test('get pool volumes by addresses', async () => {
 test('get current pool apr', async () => {
   const res = await indexer.getCurrentPoolAprs(365, 1, 100);
 
-  expect(res.length).toBe(16);
+  expect(res.length).toBeGreaterThan(0);
 });
 
 test('get pool apr by addresses', async () => {

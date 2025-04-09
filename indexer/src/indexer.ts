@@ -17,6 +17,25 @@ import {
 } from "./drizzle/schema.js";
 import {integer, pgSchema, serial, text} from "drizzle-orm/pg-core";
 
+export type poolMetric = {
+  pool_address: string,
+  height: bigint,
+  token0_denom: string,
+  token0_balance: bigint,
+  token0_decimals: number,
+  token0_price: number,
+  token0_swap_volume: number,
+  token1_denom: string,
+  token1_balance: bigint,
+  token1_decimals: number,
+  token1_price: number,
+  token1_swap_volume: number,
+  tvl_usd: number,
+  average_apr: number,
+  lp_token_address: string,
+  total_incentives: bigint
+}
+
 const v1Cosmos = pgSchema("v1_cosmos");
 const userShares = v1Cosmos.table("pool_user_shares", {
   pool_address: text("pool_address").notNull(),
@@ -81,7 +100,7 @@ export type Indexer = {
   ) => Promise<Record<string, unknown>[] | null>;
   getCurrentPoolVolumes: (page: number, limit: number) => Promise<Record<string, unknown>[] | null>;
   getPoolVolumesByPoolAddresses: (addresses: string[]) => Promise<Record<string, unknown>[] | null>;
-  getPoolMetricsByPoolAddresses: (addresses: string[], startDate?: Date | null, endDate?: Date | null) => Promise<Record<string, unknown>[] | null>;
+  getPoolMetricsByPoolAddresses: (addresses: string[], startDate?: Date | null, endDate?: Date | null) => Promise<poolMetric[]> | null;
 };
 
 export type IndexerFilters = {
@@ -493,7 +512,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     addresses: string[],
     startDate?: Date,
     endDate?: Date,
-  ): Promise<Record<string, unknown>[] | null> {
+  ): Promise<poolMetric[] | null> {
     const now = new Date();
     const start = startDate ? new Date(startDate) : new Date(0);
     const end = endDate ? new Date(endDate) : now;
@@ -651,7 +670,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     try {
       const result = await client.execute(query);
 
-      return result.rows;
+      return result.rows as poolMetric[];
     } catch (error) {
       console.error("Error executing raw query:", error);
 

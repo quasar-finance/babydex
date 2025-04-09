@@ -28,7 +28,7 @@ export const WalletDetails: React.FC = () => {
               <span className="text-tw-orange-400">{connector?.name} Wallet</span>
             </p>
             <CopyMessage textToCopy={address}>
-              <p className="flex gap-2">
+              <p className="flex gap-2 items-center">
                 {IntlAddress(address)} <IconCopy className="w-4 h-4" />
               </p>
             </CopyMessage>

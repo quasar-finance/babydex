@@ -1,6 +1,6 @@
 import { defineChain } from "@cosmi/react";
 
-export const babylonTestnet = defineChain({
+export const babylon = defineChain({
   id: "bbn-1",
   name: "babylon",
   icon: "https://raw.githubusercontent.com/cosmos/chain-registry/master/babylon/images/logo.svg",

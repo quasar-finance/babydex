@@ -30,6 +30,14 @@ export const Button = extendVariants(NextButton, {
   },
   compoundVariants: [
     {
+      color: "secondary",
+      class: "bg-tw-orange-400/20 text-tw-orange-400 hover:bg-tw-orange-400/10",
+    },
+    {
+      color: "tertiary",
+      class: "bg-white/10 text-white",
+    },
+    {
       color: "primary",
       class: "bg-tw-orange-400 text-tw-bg font-medium -tracking-wide",
     },
@@ -41,7 +49,8 @@ export const Button = extendVariants(NextButton, {
     {
       variant: "flat",
       color: "primary",
-      class: "bg-tw-orange-400/10 text-tw-orange-400 hover:opacity-hover font-medium -tracking-wide",
+      class:
+        "bg-tw-orange-400/10 text-tw-orange-400 hover:opacity-hover font-medium -tracking-wide",
     },
     {
       variant: "ghost",
@@ -50,17 +59,14 @@ export const Button = extendVariants(NextButton, {
         "bg-transparent border-tw-orange-400 text-tw-orange-400 hover:!bg-tw-orange-400 hover:!text-tw-bg",
     },
     {
+      variant: "ghost",
+      color: "tertiary",
+      class: "bg-transparent border-tw-gray-900 text-white hover:!bg-tw-gray-900",
+    },
+    {
       variant: "light",
       color: "primary",
       class: "bg-transparent hover:text-tw-orange-400 hover:bg-transparent",
-    },
-    {
-      color: "secondary",
-      class: "bg-tw-orange-400/20 text-tw-orange-400 hover:bg-tw-orange-400/10",
-    },
-    {
-      color: "tertiary",
-      class: "bg-white/10 text-white",
     },
   ],
 });

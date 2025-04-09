@@ -1,0 +1,11 @@
+{
+    "admin": "",
+    "fee_address": "bbn1knv468atwzjk4v0d22jwa497v0sd0zez3lh7g3",
+    "incentivize_fee": {
+      "fee": {
+        "denom": "ubbn",
+        "amount": "1000000000" 
+      },
+      "fee_receiver": "bbn1knv468atwzjk4v0d22jwa497v0sd0zez3lh7g3"
+    }
+  }

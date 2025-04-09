@@ -1,0 +1,9 @@
+{
+  "astroport_factory": 0,
+  "astroport_incentives": 0,
+  "astroport_native_coin_registry": 0,
+  "astroport_pair": 0,
+  "astroport_pair_concentrated": 0,
+  "astroport_router": 0,
+  "cw20_token": 0
+}

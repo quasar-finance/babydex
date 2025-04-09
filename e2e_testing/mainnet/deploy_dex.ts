@@ -42,7 +42,7 @@ const main = async () => {
                 code_id: contracts["astroport_pair_concentrated"]!,
                 maker_fee_bps: 1000,
                 pair_type: {concentrated: {}},
-                total_fee_bps: 0
+                total_fee_bps: 3000,
             } as PairConfig
         ],
         token_code_id: contracts["cw20_token"]!

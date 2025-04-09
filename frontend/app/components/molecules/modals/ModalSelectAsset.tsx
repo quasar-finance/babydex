@@ -21,24 +21,33 @@ const ModalSelectAsset: React.FC<ModalSelectAssetProps> = ({ onSelectAsset, onCl
   const [filteredTokens, setFilteredTokens] = useState(assets);
   const { data: balances } = useUserBalances({ assets });
 
-  const searchToken = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value);
-    setFilteredTokens(
-      assets.filter((token) => {
-        return (
-          token.symbol.toLowerCase().includes(e.target.value.toLowerCase()) ||
-          token.denom.toLowerCase().includes(e.target.value.toLowerCase())
-        );
-      }),
-    );
-  };
-
   const getBalance = useCallback(
     (denom: string) => {
       return balances?.find((balance) => balance.denom === denom)?.amount;
     },
     [balances],
   );
+
+  const getNumericBalance = (denom: string, decimals: number) => {
+    const balance = getBalance(denom);
+    return balance ? convertMicroDenomToDenom(balance, decimals) : 0;
+  };
+
+  const searchToken = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+    setFilteredTokens(
+      assets
+        .filter((token) => {
+          return (
+            token.symbol.toLowerCase().includes(e.target.value.toLowerCase()) ||
+            token.denom.toLowerCase().includes(e.target.value.toLowerCase())
+          );
+        })
+        .sort(
+          (a, b) => getNumericBalance(b.denom, b.decimals) - getNumericBalance(a.denom, a.decimals),
+        ),
+    );
+  };
 
   return (
     <BasicModal title="Select Asset" classNames={{ wrapper: "overflow-hidden" }} onClose={onClose}>

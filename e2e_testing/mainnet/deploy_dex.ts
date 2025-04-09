@@ -9,11 +9,6 @@ import {IncentivizationFeeInfo, InstantiateMsg as IncentivesInitMsg} from "../sd
 import {AssetInfo} from "../sdk/AstroportPair.types";
 
 
-const toBase64 = (object: any) => {
-    return Buffer.from(JSON.stringify(object)).toString('base64');
-}
-
-
 const main = async () => {
     const {client, address} = await getClientAndAddress();
 

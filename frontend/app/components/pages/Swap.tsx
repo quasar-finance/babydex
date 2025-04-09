@@ -115,7 +115,7 @@ const SwapComponent: React.FC = () => {
       >
         <FormProvider {...methods}>
           <div className="w-full flex-1 flex items-center justify-center bg-tw-sub-bg rounded-2xl p-2 flex-col relative">
-            {action === "bridge" && (
+            {/* {action === "bridge" && (
               <motion.button
                 type="button"
                 whileHover={{ scale: 1.1 }}
@@ -125,7 +125,7 @@ const SwapComponent: React.FC = () => {
               >
                 <IconWallet className="w-5 h-5" />
               </motion.button>
-            )}
+            )} */}
 
             <motion.button
               type="button"

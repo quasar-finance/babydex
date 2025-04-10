@@ -31,7 +31,7 @@ const ModalSelectAsset: React.FC<ModalSelectAssetProps> = ({ onSelectAsset, onCl
 
   const getNumericBalance = (denom: string, decimals: number) => {
     const balance = getBalance(denom);
-    return balance ? convertMicroDenomToDenom(balance, decimals) : 0;
+    return balance ? convertMicroDenomToDenom(balance, decimals, decimals, false) : 0;
   };
 
   const searchToken = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,27 +64,36 @@ const ModalSelectAsset: React.FC<ModalSelectAssetProps> = ({ onSelectAsset, onCl
           />
         </div>
         <div className="flex flex-col gap-2">
-          {filteredTokens.map((token, index) => (
-            <div
-              key={index}
-              className="flex items-center gap-3 rounded-2xl px-3 py-3 justify-between hover:bg-white/10 transition-all cursor-pointer"
-              onClick={() => [hideModal(), onSelectAsset(token)]}
-            >
-              <div className="flex gap-3 items-center">
-                <img src={token.logoURI} alt={token.symbol} className="h-8 w-8" />
-                <div className="flex flex-col min-w-0 gap-1">
-                  <p>{token.symbol}</p>
-                  <TruncateText text={token.denom} className="text-sm text-white/50" />
+          {filteredTokens.map((token, index) => {
+            return (
+              <div
+                key={index}
+                className="flex items-center gap-3 rounded-2xl px-3 py-3 justify-between hover:bg-white/10 transition-all cursor-pointer"
+                onClick={() => [hideModal(), onSelectAsset(token)]}
+              >
+                <div className="flex gap-3 items-center">
+                  <img src={token.logoURI} alt={token.symbol} className="h-8 w-8" />
+                  <div className="flex flex-col min-w-0 gap-1">
+                    <p>{token.symbol}</p>
+                    <TruncateText text={token.denom} className="text-sm text-white/50" />
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1 text-end">
+                  <p>
+                    {convertMicroDenomToDenom(
+                      getBalance(token.denom),
+                      token.decimals,
+                      token.decimals,
+                      false,
+                    )}
+                  </p>
+                  <p className="text-sm text-white/50">
+                    {getPrice(getNumericBalance(token.denom, token.decimals), token.denom)}
+                  </p>
                 </div>
               </div>
-              <div className="flex flex-col gap-1">
-                <p>{convertMicroDenomToDenom(getBalance(token.denom), token.decimals)}</p>
-                <p className="text-sm text-white/50">
-                  {getPrice(getNumericBalance(token.denom, token.decimals), token.denom)}
-                </p>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </BasicModal>

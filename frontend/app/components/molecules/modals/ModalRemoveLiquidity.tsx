@@ -45,6 +45,8 @@ const ModalRemoveLiquidity: React.FC<ModalRemoveLiquidityProps> = ({
       if (!signingClient) return;
       console.log(pool.poolAddress);
       console.log(balance.lpToken);
+      
+      console.log("pool", pool);
       console.log(pool.lpAddress);
       console.log((staked_share_amount * (percentage / 100)).toFixed(0));
       console.log(contracts.incentives);
@@ -52,7 +54,6 @@ const ModalRemoveLiquidity: React.FC<ModalRemoveLiquidityProps> = ({
         sender: address as string,
         poolAddress: pool.poolAddress,
         lpTokenAddress: pool.lpAddress,
-        lpBalanceTokenAddress: balance.lpToken,
         amount: (staked_share_amount * (percentage / 100)).toFixed(0),
         incentiveAddress: contracts.incentives,
       });

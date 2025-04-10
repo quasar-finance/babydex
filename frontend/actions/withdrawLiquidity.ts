@@ -5,7 +5,6 @@ import { toUtf8, toBase64 } from "cosmi/utils";
 export type WithdrawLiquidityParameters = {
   sender: string;
   lpTokenAddress: string;
-  lpBalanceTokenAddress: string;
   poolAddress: string;
   amount: string;
   incentiveAddress: string;
@@ -20,7 +19,7 @@ export async function withdrawLiquidity<
   client: Client<Transport, C, A, CometBftRpcSchema>,
   parameters: WithdrawLiquidityParameters,
 ): WithdrawLiquidityReturnType {
-  const { sender, lpTokenAddress, poolAddress, amount, incentiveAddress, lpBalanceTokenAddress } =
+  const { sender, lpTokenAddress, poolAddress, amount, incentiveAddress } =
     parameters;
 
   return await executeMultiple(client, {
@@ -36,7 +35,7 @@ export async function withdrawLiquidity<
         },
       },
       {
-        address: lpBalanceTokenAddress,
+        address: lpTokenAddress,
         message: {
           send: {
             contract: poolAddress,

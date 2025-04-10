@@ -28,7 +28,7 @@ const bridgeExternalLinks = {
     message:
       "Axelar is a secure cross-chain network that lets you transfer tokens and messages from any chain to Babylon via their GMP protocol.",
     url: "https://app.squidrouter.com/",
-    isDisabled: true,
+    isDisabled: false,
   },
 };
 

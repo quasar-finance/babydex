@@ -26,6 +26,7 @@ export function useUserBalances(parameters: UseUserBalancesParameters): UseUserB
               address: address as string,
               denom: asset.denom,
             });
+            console.log(balance);
             return { ...asset, amount: balance?.amount || "0" };
           }
 

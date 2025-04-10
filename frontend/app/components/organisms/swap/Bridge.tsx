@@ -10,16 +10,19 @@ const assets = Object.values(Assets);
 
 const bridgeExternalLinks = {
   union: {
+    label: "Union",
     message:
       "Union is a zero-knowledge interoperability protocol that allows fast, trustless bridging of assets and messages between chains.",
     url: "https://btc.union.build",
   },
   eureka: {
+    label: "IBC Eureka",
     message:
       "Eureka, by Skip, discovers the most efficient IBC routes to bridge tokens into Babylon with optimal speed and cost.",
     url: "https://go.cosmos.network/?src_asset=0x8236a87084f8B84306f72007F36F2618A5634494&src_chain=1&dest_asset=ibc%2F89EE10FCF78800B572BAAC7080AEFA301B5F3BBC51C5371E907EB129C5B900E7&dest_chain=bbn-1&amount_in=1&amount_out=0.999986",
   },
   axelar: {
+    label: "Axelar",
     message:
       "Axelar is a secure cross-chain network that lets you transfer tokens and messages from any chain to Babylon via their GMP protocol.",
     url: "https://app.squidrouter.com/",
@@ -94,7 +97,6 @@ export const Bridge: React.FC = () => {
     <div className="flex flex-col gap-2 w-full items-center justify-center pt-2">
       <div className="flex items-center gap-2 w-full">
         {Object.keys(bridgeExternalLinks).map((bridge) => {
-          console.log(bridge);
           return (
             <Button
               key={bridge}
@@ -108,7 +110,7 @@ export const Bridge: React.FC = () => {
               )}
               onClick={() => setActiveBridge(bridge)}
             >
-              {bridge}
+              {bridgeExternalLinks[bridge as keyof typeof bridgeExternalLinks].label}
             </Button>
           );
         })}
@@ -133,7 +135,9 @@ export const Bridge: React.FC = () => {
               className="gap-1"
             >
               Bridge your assets with{" "}
-              <span className="capitalize font-extrabold">{activeBridge}</span>
+              <span className="capitalize font-extrabold">
+                {bridgeExternalLinks[activeBridge as keyof typeof bridgeExternalLinks].label}
+              </span>
             </Button>
           </motion.div>
         </AnimatePresence>

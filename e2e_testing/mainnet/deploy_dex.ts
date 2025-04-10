@@ -34,13 +34,13 @@ const main = async () => {
         pair_configs: [
             {
                 code_id: contracts["astroport_pair"]!,
-                maker_fee_bps: 1000,
+                maker_fee_bps: 0,
                 pair_type: {xyk: {}},
-                total_fee_bps: 3000
+                total_fee_bps: 30
             } as PairConfig,
             {
                 code_id: contracts["astroport_pair_concentrated"]!,
-                maker_fee_bps: 1000,
+                maker_fee_bps: 0,
                 pair_type: {concentrated: {}},
                 total_fee_bps: 3000,
             } as PairConfig

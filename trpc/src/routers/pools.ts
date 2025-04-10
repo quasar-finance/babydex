@@ -139,7 +139,7 @@ export const poolsRouter = createTRPCRouter({
 
       const priceScale = Number(params.price_scale);
 
-      const optimalRatio: number = poolAmount0 / (poolAmount1 * priceScale);
+      const optimalRatio: number = poolAmount0 / (poolAmount1 / priceScale);
 
       return optimalRatio;
     }),

@@ -1,4 +1,3 @@
-import { useAccount, useBalances } from "@cosmi/react";
 import type { Currency } from "@towerfi/types";
 import { useCallback, useState } from "react";
 
@@ -8,6 +7,7 @@ import { useModal } from "~/app/providers/ModalProvider";
 import { convertMicroDenomToDenom } from "~/utils/intl";
 import TruncateText from "../../atoms/TruncateText";
 import { useUserBalances } from "~/app/hooks/useUserBalances";
+import { usePrices } from "~/app/hooks/usePrices";
 
 type ModalSelectAssetProps = {
   assets: Currency[];
@@ -17,6 +17,7 @@ type ModalSelectAssetProps = {
 
 const ModalSelectAsset: React.FC<ModalSelectAssetProps> = ({ onSelectAsset, onClose, assets }) => {
   const { hideModal } = useModal();
+  const { getPrice } = usePrices();
   const [search, setSearch] = useState("");
   const [filteredTokens, setFilteredTokens] = useState(assets);
   const { data: balances } = useUserBalances({ assets });
@@ -78,7 +79,9 @@ const ModalSelectAsset: React.FC<ModalSelectAssetProps> = ({ onSelectAsset, onCl
               </div>
               <div className="flex flex-col gap-1">
                 <p>{convertMicroDenomToDenom(getBalance(token.denom), token.decimals)}</p>
-                <p className="text-sm text-white/50">$0</p>
+                <p className="text-sm text-white/50">
+                  {getPrice(getNumericBalance(token.denom, token.decimals), token.denom)}
+                </p>
               </div>
             </div>
           ))}

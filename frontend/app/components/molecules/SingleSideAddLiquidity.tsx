@@ -14,6 +14,7 @@ import { useDexClient } from "~/app/hooks/useDexClient";
 import { TxError } from "~/utils/formatTxErrors";
 import { useUserBalances } from "~/app/hooks/useUserBalances";
 import { useCw20Allowance } from "~/app/hooks/useCw20Allowance";
+import { usePrices } from "~/app/hooks/usePrices";
 interface Props {
   pool: PoolInfo;
   submitRef: React.MutableRefObject<{ onSubmit: (data: DepositFormData) => Promise<void> } | null>;
@@ -23,6 +24,7 @@ export const SingleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
   const [selectedToken, setSelectedToken] = useState(0);
   const { address } = useAccount();
   const { toast } = useToast();
+  const { getPrice } = usePrices();
   const { data: signingClient } = useDexClient();
   const { register, watch, setValue } = useFormContext();
   const { assets } = pool;
@@ -148,7 +150,7 @@ export const SingleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
           <IconWallet className="h-4 w-4" />
           <p>{denomBalance}</p>
         </div>
-        <p>$0</p>
+        <p>{getPrice(watch(asset.symbol, ""), asset.denom)}</p>
       </div>
     </div>
   );

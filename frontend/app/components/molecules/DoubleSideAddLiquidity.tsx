@@ -14,6 +14,7 @@ import { useDexClient } from "~/app/hooks/useDexClient";
 import { TxError } from "~/utils/formatTxErrors";
 import { useUserBalances } from "~/app/hooks/useUserBalances";
 import { useCw20Allowance } from "~/app/hooks/useCw20Allowance";
+import { usePrices } from "~/app/hooks/usePrices";
 
 interface Props {
   pool: PoolInfo;
@@ -23,6 +24,7 @@ interface Props {
 export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => {
   const { toast } = useToast();
   const { address } = useAccount();
+  const { getPrice } = usePrices();
   const { register, watch, setValue } = useFormContext();
   const { data: signingClient } = useDexClient();
   const { showModal } = useModal();
@@ -158,7 +160,7 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
             <IconWallet className="h-4 w-4" />
             <p>{t0DenomBalance}</p>
           </div>
-          <p>$0</p>
+          <p>{getPrice(token0Amount, token0.denom)}</p>
         </div>
       </div>
 
@@ -204,7 +206,7 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
             <IconWallet className="h-4 w-4" />
             <p>{t1DenomBalance}</p>
           </div>
-          <p>$0</p>
+          <p>{getPrice(token1Amount, token1.denom)}</p>
         </div>
       </div>
     </div>

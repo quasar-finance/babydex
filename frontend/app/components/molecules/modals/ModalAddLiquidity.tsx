@@ -17,6 +17,7 @@ import AssetsStacked from "../../atoms/AssetsStacked";
 import { Popover, PopoverContent, PopoverTrigger } from "../../atoms/Popover";
 import MaxSlippageSwitcher from "../MaxSlippageSwitcher";
 import { IconSettingsFilled } from "@tabler/icons-react";
+import { usePrices } from "~/app/hooks/usePrices";
 
 interface Props {
   pool: PoolInfo;
@@ -30,6 +31,7 @@ export interface DepositFormData {
 
 export const ModalAddLiquidity: React.FC<Props> = ({ pool, successAction }) => {
   const { name } = pool;
+
   const { showModal } = useModal();
   const [side, setSide] = useState<"double" | "single">("double");
   const [slipageTolerance, setSlipageTolerance] = useState("0.04");
@@ -52,7 +54,9 @@ export const ModalAddLiquidity: React.FC<Props> = ({ pool, successAction }) => {
   const onSubmit = methods.handleSubmit(async (data) => {
     await submitRef.current?.onSubmit({
       ...data,
-      slipageTolerance: (Number(slipageTolerance === "auto" ? "0.05" : slipageTolerance) / 100).toString(),
+      slipageTolerance: (
+        Number(slipageTolerance === "auto" ? "0.05" : slipageTolerance) / 100
+      ).toString(),
     });
     if (successAction) successAction();
   });

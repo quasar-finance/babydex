@@ -10,6 +10,7 @@ import { Assets } from "~/config";
 import { useBalances } from "@cosmi/react";
 import { assetNumberMask } from "~/utils/masks";
 import { useUserBalances } from "~/app/hooks/useUserBalances";
+import { usePrices } from "~/app/hooks/usePrices";
 
 type AssetInputProps = {
   assets: Currency[];
@@ -35,6 +36,7 @@ export const AssetInput: React.FC<AssetInputProps> = ({
   mask = assetNumberMask,
 }) => {
   const { showModal } = useModal();
+  const { getPrice } = usePrices();
 
   const { field: inputField } = useController({
     name,
@@ -118,7 +120,7 @@ export const AssetInput: React.FC<AssetInputProps> = ({
           <IconWallet className="w-4 h-4" />
           <p>{denomBalance}</p>
         </div>
-        <p>$0</p>
+        <p>{getPrice(inputField.value, asset.denom)}</p>
       </div>
     </div>
   );

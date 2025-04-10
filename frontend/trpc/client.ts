@@ -29,7 +29,9 @@ export const createClient = () =>
           contracts,
           assets: Assets,
           publicClient: createPublicClient({
-            transport: http(babylon.rpcUrls.default.http.at(0)),
+            transport: http(babylon.rpcUrls.default.http.at(0), {
+              batch: { batchSize: 10, wait: 200 },
+            }),
           }),
         }),
         false: httpBatchLink({

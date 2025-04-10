@@ -53,7 +53,7 @@ export const Swap: React.FC = () => {
           amountIn: convertDenomToMicroDenom(fromAmount, fromToken.decimals),
         });
 
-        setValue("toAmount", convertMicroDenomToDenom(simulation?.amountOut, toToken.decimals), {
+        setValue("toAmount", convertMicroDenomToDenom(simulation?.amountOut, toToken.decimals, toToken.decimals), {
           shouldValidate: true,
         });
       } else {
@@ -67,7 +67,7 @@ export const Swap: React.FC = () => {
           amountOut: convertDenomToMicroDenom(toAmount, toToken.decimals),
         });
 
-        setValue("fromAmount", convertMicroDenomToDenom(simulation?.amountIn, fromToken.decimals), {
+        setValue("fromAmount", convertMicroDenomToDenom(simulation?.amountIn, fromToken.decimals, fromToken.decimals), {
           shouldValidate: true,
         });
       }

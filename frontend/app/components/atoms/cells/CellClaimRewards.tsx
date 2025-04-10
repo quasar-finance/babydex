@@ -123,7 +123,7 @@ export const CellClaimRewards: React.FC<Props> = ({
           size="sm"
           onClick={() => claimReward()}
           isLoading={isLoading}
-          isDisabled={isLoading}
+          isDisabled={isLoading || rewards.length === 0 || rewards.every(r => Number(r.amount) === 0)}
         >
           Claim
         </Button>

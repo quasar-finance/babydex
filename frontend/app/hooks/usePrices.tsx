@@ -62,7 +62,7 @@ export function usePrices(parameters: UsePricesParameters = {}) {
     defaultFormatOptions = {
       maximumFractionDigits: 2,
       minFractionDigits: 2,
-      language: navigator.language,
+      language: typeof navigator !== "undefined" ? navigator.language : "en-US",
     },
   } = parameters;
 
@@ -143,8 +143,14 @@ export function usePrices(parameters: UsePricesParameters = {}) {
       return prices;
     },
     initialData: () => {
-      const prices = localStorage.getItem("prices");
-      return (prices ? JSON.parse(prices) : {}) as Prices;
+      if (typeof window === "undefined") return {};
+
+      try {
+        const prices = localStorage.getItem("prices");
+        return prices ? JSON.parse(prices) : {};
+      } catch {
+        return {};
+      }
     },
     refetchInterval,
   });

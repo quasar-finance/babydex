@@ -42,6 +42,12 @@ export const Swap: React.FC = () => {
 
       if (activeInput === "from") {
         const simulation = await simulate({
+          swapVenues: [
+            {
+              chainID: babylon.id as unknown as string,
+              name: "babylon-tower",
+            },
+          ],
           destAssetChainID: babylon.id as unknown as string,
           destAssetDenom,
           sourceAssetChainID: babylon.id as unknown as string,

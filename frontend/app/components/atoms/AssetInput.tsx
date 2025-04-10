@@ -87,7 +87,7 @@ export const AssetInput: React.FC<AssetInputProps> = ({
         <motion.button
           type="button"
           disabled={disabled}
-          className="flex items-center gap-2 p-2 bg-white/5 rounded-full"
+          className="flex items-center gap-2 p-2 bg-white/5 rounded-full min-w-fit"
           onClick={selectAsset}
         >
           <img src={asset.logoURI} alt={asset.symbol} className="w-7 h-7" />
@@ -97,7 +97,7 @@ export const AssetInput: React.FC<AssetInputProps> = ({
 
         <input
           {...inputField}
-          className="text-2xl bg-transparent text-right w-[8rem]"
+          className="text-2xl bg-transparent text-right w-full"
           placeholder="0"
           onFocus={onFocus}
           disabled={disabled}

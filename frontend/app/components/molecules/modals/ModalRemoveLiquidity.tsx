@@ -45,8 +45,9 @@ const ModalRemoveLiquidity: React.FC<ModalRemoveLiquidityProps> = ({
       if (!signingClient) return;
       console.log(pool.poolAddress);
       console.log(balance.lpToken);
-      console.log(balance.lpToken);
-      console.log((staked_share_amount * (percentage / 100)).toFixed(0))
+      console.log(pool.lpAddress);
+      console.log((staked_share_amount * (percentage / 100)).toFixed(0));
+      console.log(contracts.incentives);
       return await signingClient.withdrawLiquidity({
         sender: address as string,
         poolAddress: pool.poolAddress,

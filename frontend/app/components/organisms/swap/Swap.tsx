@@ -11,6 +11,7 @@ import { AssetInput } from "../../atoms/AssetInput";
 import { Assets } from "~/config";
 
 import { useSearchParams } from "next/navigation";
+import type { Currency } from "@towerfi/types";
 
 const assets = Object.values(Assets);
 
@@ -87,8 +88,14 @@ export const Swap: React.FC = () => {
     const fromSymbol = searchParams.get("from");
     const toSymbol = searchParams.get("to");
 
-    const fromAsset = getAssetBySymbol(fromSymbol ?? assets[0].symbol);
-    const toAsset = getAssetBySymbol(toSymbol ?? assets[1].symbol);
+    const fromAsset: Currency | undefined =
+      getAssetBySymbol(fromSymbol ?? assets[0].symbol) ||
+      assets.find((asset) => asset.symbol.toLowerCase() !== toSymbol?.toLowerCase());
+
+    const toAsset: Currency | undefined =
+      toSymbol?.toLowerCase() === (fromAsset?.symbol.toLowerCase() || fromSymbol?.toLowerCase())
+        ? assets.find((asset) => asset.denom !== fromAsset?.denom)
+        : getAssetBySymbol(toSymbol ?? assets[1].symbol);
 
     if (fromAsset) setFromToken(fromAsset);
     if (toAsset) setToToken(toAsset);

@@ -85,12 +85,14 @@ const Pools: React.FC = () => {
             </TableRow>
           ))}
       </Table>
-      <Pagination
-        total={totalPools}
-        onPageChange={(page) => setCurrentPage(page - 1)}
-        initialPage={currentPage + 1}
-        className={{ base: "self-center backdrop-blur-xl rounded-3xl p-1" }}
-      />
+      {filteredPools.length > numberPerPage && (
+        <Pagination
+          total={totalPools}
+          onPageChange={(page) => setCurrentPage(page - 1)}
+          initialPage={currentPage + 1}
+          className={{ base: "self-center backdrop-blur-xl rounded-3xl p-1" }}
+        />
+      )}
     </div>
   );
 };

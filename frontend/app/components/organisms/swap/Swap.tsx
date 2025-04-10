@@ -5,7 +5,7 @@ import RotateButton from "../../atoms/RotateButton";
 import { useFormContext } from "react-hook-form";
 import { convertDenomToMicroDenom, convertMicroDenomToDenom } from "~/utils/intl";
 import { useSkipClient } from "~/app/hooks/useSkipClient";
-import { babylonTestnet } from "~/config/chains/babylon-testnet";
+import { babylon } from "~/config/chains/babylon";
 import { AssetInput } from "../../atoms/AssetInput";
 import { Assets } from "~/config";
 
@@ -33,9 +33,9 @@ export const Swap: React.FC = () => {
 
       if (activeInput === "from") {
         const simulation = await simulate({
-          destAssetChainID: babylonTestnet.id as unknown as string,
+          destAssetChainID: babylon.id as unknown as string,
           destAssetDenom,
-          sourceAssetChainID: babylonTestnet.id as unknown as string,
+          sourceAssetChainID: babylon.id as unknown as string,
           sourceAssetDenom,
           allowSwaps: true,
           allowUnsafe: true,
@@ -47,9 +47,9 @@ export const Swap: React.FC = () => {
         });
       } else {
         const simulation = await simulate({
-          destAssetChainID: babylonTestnet.id as unknown as string,
+          destAssetChainID: babylon.id as unknown as string,
           destAssetDenom,
-          sourceAssetChainID: babylonTestnet.id as unknown as string,
+          sourceAssetChainID: babylon.id as unknown as string,
           sourceAssetDenom,
           allowSwaps: true,
           allowUnsafe: true,

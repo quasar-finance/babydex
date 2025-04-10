@@ -5,7 +5,7 @@ import type { AppRouter } from "@towerfi/trpc";
 import { createLocalTRPCLink } from "./router";
 import { contracts, Assets } from "~/config";
 import { createPublicClient, http } from "cosmi";
-import { babylonTestnet } from "~/config/chains/babylon-testnet";
+import { babylon } from "~/config/chains/babylon";
 
 const cacheService = createLruService();
 const coingeckoService = createCoingeckoService({ cacheService });
@@ -29,7 +29,7 @@ export const createClient = () =>
           contracts,
           assets: Assets,
           publicClient: createPublicClient({
-            transport: http(babylonTestnet.rpcUrls.default.http.at(0)),
+            transport: http(babylon.rpcUrls.default.http.at(0)),
           }),
         }),
         false: httpBatchLink({

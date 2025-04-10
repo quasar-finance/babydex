@@ -1,8 +1,8 @@
 import { createConfig, http, keplrish } from "@cosmi/react";
-import { babylonTestnet } from "~/config/chains/babylon-testnet";
+import { babylon } from "~/config/chains/babylon";
 
 export const cosmi = createConfig({
-  chains: [babylonTestnet],
+  chains: [babylon],
   ssr: true,
   connectors: [
     keplrish({
@@ -29,6 +29,6 @@ export const cosmi = createConfig({
   ],
   batch: { multicall: { batchSize: 10, wait: 200 } },
   transports: {
-    [babylonTestnet.id]: http(undefined, { batch: { batchSize: 10, wait: 200 } }),
+    [babylon.id]: http(undefined, { batch: { batchSize: 10, wait: 200 } }),
   },
 });

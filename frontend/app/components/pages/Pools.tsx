@@ -31,6 +31,7 @@ const Pools: React.FC = () => {
   const { data: pools = [], isLoading } = trpc.local.pools.getPools.useQuery({
     limit: 100,
   });
+
   const [searchText, setSearchText] = useState("");
 
   const filteredPools = pools
@@ -71,7 +72,11 @@ const Pools: React.FC = () => {
                 poolType={pool.poolType}
                 config={pool.config}
               />
-              <CellTVL poolLiquidity={pool.poolLiquidity} />
+              <CellTVL
+                poolLiquidity={pool.poolLiquidity}
+                poolAddress={pool.poolAddress}
+                assets={pool.assets}
+              />
               <CellData title="APR" />
               {/* <CellData title="Volume 24h" />
             <CellData title="Fees 24h" /> */}

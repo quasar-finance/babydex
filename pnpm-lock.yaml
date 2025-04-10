@@ -39,8 +39,8 @@ importers:
         specifier: ^2.13.0
         version: 2.13.0
       '@cosmi/react':
-        specifier: ^0.2.5
-        version: 0.2.5(@tanstack/query-core@5.67.2)(@tanstack/react-query@4.36.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@18.3.18)(bufferutil@4.0.9)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(viem@2.23.14(bufferutil@4.0.9)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2))(zod@3.24.2)
+        specifier: ^0.2.6
+        version: 0.2.6(@tanstack/query-core@5.67.2)(@tanstack/react-query@4.36.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@18.3.18)(bufferutil@4.0.9)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(viem@2.23.14(bufferutil@4.0.9)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2))(zod@3.24.2)
       '@dicebear/collection':
         specifier: ^9.2.2
         version: 9.2.2(@dicebear/core@9.2.2)
@@ -99,8 +99,8 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1
       cosmi:
-        specifier: ^0.2.5
-        version: 0.2.5(@tanstack/query-core@5.67.2)(@tanstack/react-query@4.36.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@18.3.18)(bufferutil@4.0.9)(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2)
+        specifier: ^0.2.6
+        version: 0.2.6(@tanstack/query-core@5.67.2)(@tanstack/react-query@4.36.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@18.3.18)(bufferutil@4.0.9)(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2)
       ky:
         specifier: ^1.7.5
         version: 1.7.5
@@ -216,7 +216,7 @@ importers:
         version: 10.45.2
       cosmi:
         specifier: ^0.1.0
-        version: 0.1.0(@tanstack/query-core@5.67.2)(@tanstack/react-query@4.36.1(react@19.0.0))(bufferutil@4.0.9)(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2)
+        version: 0.1.0(@tanstack/query-core@5.67.2)(@tanstack/react-query@4.36.1(react@19.0.0))(@types/react@18.3.18)(bufferutil@4.0.9)(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2)
       ky:
         specifier: ^1.7.5
         version: 1.7.5
@@ -410,8 +410,8 @@ packages:
     resolution: {integrity: sha512-wB6uo+3A50m0sW/EWcU64xpV/8wShZ6bMTa7pF8eYsTrSkQA7oLUIJcs/wb8g4y2Oyq701BaGiO6n/ak5WXO1w==}
     deprecated: Unmaintained. The codebase for this package was moved to https://github.com/cosmos/ics23 but then the JS implementation was removed in https://github.com/cosmos/ics23/pull/353. Please consult the maintainers of https://github.com/cosmos for further assistance.
 
-  '@cosmi/react@0.2.5':
-    resolution: {integrity: sha512-e3mEBBETP/KU0hkzbcr7d+vEJs5+sAFhnJkSPCtCaZsehn5i5/E2MQPL3yR2a1rfnum6H680G0wKDxnJZR/ssQ==}
+  '@cosmi/react@0.2.6':
+    resolution: {integrity: sha512-40yH+h+TqHeud/weg2VVG2d8xEStav7AgWSHbJUI9e9n89HOW3CJb6RbYTMhClgashg2QkLRxg/XM8oAdEgJKA==}
     peerDependencies:
       '@tanstack/react-query': ^4.0.0
       react: '>=18.0.0'
@@ -3742,8 +3742,8 @@ packages:
   cosmi@0.1.0:
     resolution: {integrity: sha512-hDUTzHZgZ7Ax8hZJl5rXtDeeO6EuYSuVDjXOHtPKAvuoHmtweln1EJdXQhpDAEbaZXoFsD0NP42AhLOJDkl0wA==}
 
-  cosmi@0.2.5:
-    resolution: {integrity: sha512-wm+8sV9fCeGZSqmOZ1//JEjIKVi23Q8MQ1Q25OXPZ8Sxf+WpB0GW+LfuvbWn7VqvJPvWx37h6+odhpjQ+Y+I5g==}
+  cosmi@0.2.6:
+    resolution: {integrity: sha512-t/7lOKiwZMIxqUtHU/1LEaJ9U1aOub+7fm2ImRmd2eLRk/bvwpkqiPInkWRf3cCySyW2YVrFBu4/X+5rVFW37g==}
 
   cosmjs-types@0.7.2:
     resolution: {integrity: sha512-vf2uLyktjr/XVAgEq0DjMxeAWh1yYREe7AMHDKd7EiHVqxBPCaBS+qEEQUkXbR9ndnckqr1sUG8BQhazh4X5lA==}
@@ -6388,14 +6388,14 @@ snapshots:
       '@noble/hashes': 1.7.1
       protobufjs: 6.11.4
 
-  '@cosmi/react@0.2.5(@tanstack/query-core@5.67.2)(@tanstack/react-query@4.36.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@18.3.18)(bufferutil@4.0.9)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(viem@2.23.14(bufferutil@4.0.9)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2))(zod@3.24.2)':
+  '@cosmi/react@0.2.6(@tanstack/query-core@5.67.2)(@tanstack/react-query@4.36.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@18.3.18)(bufferutil@4.0.9)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(viem@2.23.14(bufferutil@4.0.9)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2))(zod@3.24.2)':
     dependencies:
       '@tanstack/react-query': 4.36.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
-      cosmi: 0.2.5(@tanstack/query-core@5.67.2)(@tanstack/react-query@4.36.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@18.3.18)(bufferutil@4.0.9)(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2)
+      cosmi: 0.2.6(@tanstack/query-core@5.67.2)(@tanstack/react-query@4.36.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@18.3.18)(bufferutil@4.0.9)(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2)
       react: 19.0.0
       react-dom: 19.0.0(react@19.0.0)
       use-sync-external-store: 1.4.0(react@19.0.0)
-      wagmi: 2.14.12(@tanstack/query-core@5.67.2)(@tanstack/react-query@4.36.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@18.3.18)(bufferutil@4.0.9)(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(viem@2.23.14(bufferutil@4.0.9)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2))(zod@3.24.2)
+      wagmi: 2.14.12(@tanstack/query-core@5.67.2)(@tanstack/react-query@4.36.1(react@19.0.0))(@types/react@18.3.18)(bufferutil@4.0.9)(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(viem@2.23.14(bufferutil@4.0.9)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2))(zod@3.24.2)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -11142,11 +11142,11 @@ snapshots:
 
   core-util-is@1.0.3: {}
 
-  cosmi@0.1.0(@tanstack/query-core@5.67.2)(@tanstack/react-query@4.36.1(react@19.0.0))(bufferutil@4.0.9)(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2):
+  cosmi@0.1.0(@tanstack/query-core@5.67.2)(@tanstack/react-query@4.36.1(react@19.0.0))(@types/react@18.3.18)(bufferutil@4.0.9)(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2):
     dependencies:
       cosmjs-types: 0.9.0
       viem: 2.23.14(bufferutil@4.0.9)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2)
-      wagmi: 2.14.12(@tanstack/query-core@5.67.2)(@tanstack/react-query@4.36.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@18.3.18)(bufferutil@4.0.9)(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(viem@2.23.14(bufferutil@4.0.9)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2))(zod@3.24.2)
+      wagmi: 2.14.12(@tanstack/query-core@5.67.2)(@tanstack/react-query@4.36.1(react@19.0.0))(@types/react@18.3.18)(bufferutil@4.0.9)(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(viem@2.23.14(bufferutil@4.0.9)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2))(zod@3.24.2)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -11178,11 +11178,11 @@ snapshots:
       - utf-8-validate
       - zod
 
-  cosmi@0.2.5(@tanstack/query-core@5.67.2)(@tanstack/react-query@4.36.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@18.3.18)(bufferutil@4.0.9)(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2):
+  cosmi@0.2.6(@tanstack/query-core@5.67.2)(@tanstack/react-query@4.36.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@18.3.18)(bufferutil@4.0.9)(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2):
     dependencies:
       cosmjs-types: 0.9.0
       viem: 2.23.14(bufferutil@4.0.9)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2)
-      wagmi: 2.14.12(@tanstack/query-core@5.67.2)(@tanstack/react-query@4.36.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@18.3.18)(bufferutil@4.0.9)(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(viem@2.23.14(bufferutil@4.0.9)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2))(zod@3.24.2)
+      wagmi: 2.14.12(@tanstack/query-core@5.67.2)(@tanstack/react-query@4.36.1(react@19.0.0))(@types/react@18.3.18)(bufferutil@4.0.9)(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(viem@2.23.14(bufferutil@4.0.9)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2))(zod@3.24.2)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -13572,7 +13572,7 @@ snapshots:
       - tsx
       - yaml
 
-  wagmi@2.14.12(@tanstack/query-core@5.67.2)(@tanstack/react-query@4.36.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@18.3.18)(bufferutil@4.0.9)(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(viem@2.23.14(bufferutil@4.0.9)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2))(zod@3.24.2):
+  wagmi@2.14.12(@tanstack/query-core@5.67.2)(@tanstack/react-query@4.36.1(react@19.0.0))(@types/react@18.3.18)(bufferutil@4.0.9)(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(viem@2.23.14(bufferutil@4.0.9)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2))(zod@3.24.2):
     dependencies:
       '@tanstack/react-query': 4.36.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@wagmi/connectors': 5.7.8(@types/react@18.3.18)(@wagmi/core@2.16.5(@tanstack/query-core@5.67.2)(@types/react@18.3.18)(react@19.0.0)(typescript@5.8.2)(use-sync-external-store@1.4.0(react@19.0.0))(viem@2.23.14(bufferutil@4.0.9)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2)))(bufferutil@4.0.9)(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(viem@2.23.14(bufferutil@4.0.9)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2))(zod@3.24.2)

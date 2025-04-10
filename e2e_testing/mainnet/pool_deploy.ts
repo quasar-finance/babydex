@@ -82,8 +82,8 @@ const main = async () => {
     // 1 * BABY = PriceScale * USDC 
     // 1 BABY = 0.076 USDC
     // 1 BABY = 0.076 USDC = x BTC
-    const baby_usdc = 0.076
-    const btc_usd = 82364;
+    const baby_usdc = 0.074
+    const btc_usd = 81896;
     const baby_btc = baby_usdc / btc_usd;
     const baby_btc_decimals = Number(baby_btc).toFixed(10);
     console.log(baby_btc_decimals);
@@ -147,9 +147,9 @@ const main = async () => {
     console.log(JSON.stringify(pairs, null, 2))
     
     // Update config with new incentives address
-    await factoryClient.updateConfig({
-        incentivesAddress: deployed.incentives,
-    }, "auto").then(console.log);
+    // await factoryClient.updateConfig({
+    //     incentivesAddress: deployed.incentives,
+    // }, "auto").then(console.log);}
 }
 
 main()

@@ -14,6 +14,7 @@ import { CellData } from "../atoms/cells/CellData";
 import { Table, TableRow } from "../atoms/Table";
 import { useEffect, useState } from "react";
 import { Pagination } from "../atoms/Pagination";
+import { blockedPoolAddresses } from "~/utils/consts";
 
 const columns = [
   { key: "name", title: "Pool", className: "col-span-2 lg:col-span-1" },
@@ -32,9 +33,9 @@ const Pools: React.FC = () => {
   });
   const [searchText, setSearchText] = useState("");
 
-  const filteredPools = pools.filter((pool) =>
-    pool.name.toLowerCase().includes(searchText.toLowerCase()),
-  );
+  const filteredPools = pools
+    .filter((pool) => !blockedPoolAddresses.includes(pool.poolAddress))
+    .filter((pool) => pool.name.toLowerCase().includes(searchText.toLowerCase()));
 
   useEffect(() => {
     setCurrentPage(0);

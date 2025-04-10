@@ -46,6 +46,7 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
 
   const [t0DenomBalance, t1DenomBalance] = useMemo(() => {
     const [balance0, balance1] = balances;
+    console.log('User Balances:', balances);
     return [
       balance0 ? convertMicroDenomToDenom(balance0.amount, balance0.decimals) : 0,
       balance1 ? convertMicroDenomToDenom(balance1.amount, balance1.decimals) : 0,

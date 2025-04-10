@@ -16,9 +16,7 @@ import type { Currency } from "@towerfi/types";
 const assets = Object.values(Assets);
 
 const getAssetBySymbol = (symbol: string) => {
-  const asset = assets.find((asset) => asset.symbol.toLowerCase() === symbol.toLowerCase());
-  console.log(asset);
-  return asset;
+  return assets.find((asset) => asset.symbol.toLowerCase() === symbol.toLowerCase());
 };
 
 export const Swap: React.FC = () => {

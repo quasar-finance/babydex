@@ -79,7 +79,12 @@ export const AssetInput: React.FC<AssetInputProps> = ({
 
   const { amount: balance = "0" } = balances.find(({ denom }) => denom === asset.denom) || {};
 
-  const denomBalance = convertMicroDenomToDenom(balance, asset.decimals);
+  const denomBalance = convertMicroDenomToDenom(
+    balance,
+    asset.decimals,
+    asset.decimals === 6 ? 2 : asset.decimals,
+    false,
+  );
 
   return (
     <div className="w-full rounded-xl p-4 bg-tw-bg flex flex-col gap-2">

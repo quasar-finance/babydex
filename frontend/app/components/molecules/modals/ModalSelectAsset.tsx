@@ -83,7 +83,7 @@ const ModalSelectAsset: React.FC<ModalSelectAssetProps> = ({ onSelectAsset, onCl
                     {convertMicroDenomToDenom(
                       getBalance(token.denom),
                       token.decimals,
-                      token.decimals,
+                      token.decimals === 6 ? 2 : token.decimals,
                       false,
                     )}
                   </p>

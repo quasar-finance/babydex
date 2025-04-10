@@ -21,7 +21,7 @@ const bridgeExternalLinks = {
     message:
       "Eureka, by Skip, discovers the most efficient IBC routes to bridge tokens into Babylon with optimal speed and cost.",
     url: "https://go.cosmos.network/?src_asset=0x8236a87084f8B84306f72007F36F2618A5634494&src_chain=1&dest_asset=ibc%2F89EE10FCF78800B572BAAC7080AEFA301B5F3BBC51C5371E907EB129C5B900E7&dest_chain=bbn-1&amount_in=1&amount_out=0.999986",
-    isDisabled: true,
+    isDisabled: false,
   },
   axelar: {
     label: "Axelar",

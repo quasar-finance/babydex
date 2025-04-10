@@ -23,7 +23,7 @@ export const BabylonMainnetAssets = {
     type: "ibc",
     denom: "ibc/89EE10FCF78800B572BAAC7080AEFA301B5F3BBC51C5371E907EB129C5B900E7",
     name: "Lombard BTC",
-    decimals: 18,
+    decimals: 8,
     logoURI: "/assets/default.png",
   },
 } as unknown as Record<string, Currency>;

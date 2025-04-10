@@ -9,23 +9,26 @@ import { motion, AnimatePresence } from "motion/react";
 const assets = Object.values(Assets);
 
 const bridgeExternalLinks = {
-  union: {
-    label: "Union",
-    message:
-      "Union is a zero-knowledge interoperability protocol that allows fast, trustless bridging of assets and messages between chains.",
-    url: "https://btc.union.build",
-  },
   eureka: {
     label: "IBC Eureka",
     message:
       "Eureka, by Skip, discovers the most efficient IBC routes to bridge tokens into Babylon with optimal speed and cost.",
-    url: "https://go.cosmos.network/?src_asset=0x8236a87084f8B84306f72007F36F2618A5634494&src_chain=1&dest_asset=ibc%2F89EE10FCF78800B572BAAC7080AEFA301B5F3BBC51C5371E907EB129C5B900E7&dest_chain=bbn-1&amount_in=1&amount_out=0.999986",
+    url: "https://go.skip.build/",
+    isDisabled: false,
   },
   axelar: {
     label: "Axelar",
     message:
       "Axelar is a secure cross-chain network that lets you transfer tokens and messages from any chain to Babylon via their GMP protocol.",
-    url: "https://app.squidrouter.com/",
+    url: "https://axelarscan.io/",
+    isDisabled: false,
+  },
+  union: {
+    label: "Union",
+    message:
+      "Union is a zero-knowledge interoperability protocol that allows fast, trustless bridging of assets and messages between chains.",
+    url: "https://union.network/",
+    isDisabled: true,
   },
 };
 
@@ -133,11 +136,18 @@ export const Bridge: React.FC = () => {
               href={bridgeExternalLinks[activeBridge as keyof typeof bridgeExternalLinks].url}
               target="_blank"
               className="gap-1"
+              isDisabled={
+                bridgeExternalLinks[activeBridge as keyof typeof bridgeExternalLinks].isDisabled
+              }
             >
-              Bridge your assets with{" "}
-              <span className="capitalize font-extrabold">
-                {bridgeExternalLinks[activeBridge as keyof typeof bridgeExternalLinks].label}
-              </span>
+              {bridgeExternalLinks[activeBridge as keyof typeof bridgeExternalLinks].isDisabled ? (
+                "Coming soon"
+              ) : (
+                <p>
+                  Bridge your assets with{" "}
+                  <span className="capitalize font-extrabold">{activeBridge}</span>
+                </p>
+              )}
             </Button>
           </motion.div>
         </AnimatePresence>

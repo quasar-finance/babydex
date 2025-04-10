@@ -1,3 +1,5 @@
+import { isMainnet } from "~/utils/global";
+
 const productionContracts = {
   coinRegistry: "bbn1hrpna9v7vs3stzyd4z3xf00676kf78zpe2u5ksvljswn2vnjp3ysx8e0sz",
   factory: "bbn1suhgf5svhu4usrurvxzlgn54ksxmn8gljarjtxqnapv8kjnp4nrs3tkuvr",
@@ -12,5 +14,4 @@ const testnetContracts = {
   router: "bbn1p7fncg0xajvcssh4zzeejmmf2h573259qzqzyn44ylpxwru25laqwan6zr",
 };
 
-export const contracts =
-  process.env.NODE_ENV === "production" ? productionContracts : testnetContracts;
+export const contracts = isMainnet ? productionContracts : testnetContracts;

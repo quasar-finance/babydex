@@ -1,4 +1,4 @@
-export const environment = process.env.NODE_ENV as string;
+export const environment = process.env.NEXT_PUBLIC_ENV as string;
 export const isTestnet = environment === "testnet";
-export const isMainnet = environment === "mainnet";
-export const isAxelar = environment === "axelar";
+export const isMainnet = environment === "production";
+export const isStaging = environment === "staging";

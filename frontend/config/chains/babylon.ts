@@ -1,4 +1,5 @@
 import { defineChain } from "@cosmi/react";
+import { isMainnet } from "~/utils/global";
 
 export const babylonTestnet = defineChain({
   id: "bbn-test-5",
@@ -60,7 +61,7 @@ export const babylonMainnet = defineChain({
   fees: {
     baseFeeMultiplier: 1.4,
   },
-  testnet: true,
+  testnet: false,
   custom: {
     registry: {
       assets:
@@ -74,4 +75,4 @@ export const babylonMainnet = defineChain({
   },
 });
 
-export const babylon = process.env.NODE_ENV === "production" ? babylonMainnet : babylonTestnet;
+export const babylon = isMainnet ? babylonMainnet : babylonTestnet;

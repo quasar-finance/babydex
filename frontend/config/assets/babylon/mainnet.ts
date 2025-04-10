@@ -17,6 +17,7 @@ export const BabylonMainnetAssets = {
     name: "USDC Noble",
     decimals: 6,
     logoURI: "/assets/default.png",
+    coingeckoId: "usd-coin",
   },
   "ibc/89EE10FCF78800B572BAAC7080AEFA301B5F3BBC51C5371E907EB129C5B900E7": {
     symbol: "LBTC",
@@ -25,5 +26,6 @@ export const BabylonMainnetAssets = {
     name: "Lombard BTC",
     decimals: 8,
     logoURI: "/assets/default.png",
+    coingeckoId: "lombard-staked-btc",
   },
 } as unknown as Record<string, Currency>;

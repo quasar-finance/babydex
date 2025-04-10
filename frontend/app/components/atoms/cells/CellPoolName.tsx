@@ -20,7 +20,12 @@ export const CellPoolName: React.FC<Props> = ({ assets, name, poolType, config, 
           <Pill color={poolType === "xyk" ? "green" : "blue"} className="uppercase">
             {poolType.replace("concentrated", "pcl")}
           </Pill>
-          <Pill>{config.params.fee_gamma || 0}%</Pill>
+          <Pill>
+            {poolType === "concentrated" 
+              ? `${(Number(config.params.mid_fee || 0) * 100).toFixed(2)}% - ${(Number(config.params.out_fee || 0) * 100).toFixed(2)}%`
+              : "0.30%" // TODO make this dynamic after launch
+            }
+          </Pill>
         </div>
       </div>
     </div>

@@ -12,9 +12,9 @@ import Dropdown from "../atoms/Dropdown";
 import Input from "../atoms/Input";
 import { useToast } from "~/app/hooks";
 
-import { Assets } from "~/config";
 import Link from "next/link";
 import { useMutation } from "@tanstack/react-query";
+import { BabylonTestnetAssets as Assets } from "~/config/assets/babylon/testnet";
 
 const FAUCET_API_URL = process.env.NEXT_PUBLIC_FAUCET_API_URL ?? "";
 const TURNSTILE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_KEY ?? "";

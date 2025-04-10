@@ -9,6 +9,7 @@ import { useDexClient } from "~/app/hooks/useDexClient";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { contracts } from "~/config";
 import { useToast } from "~/app/hooks";
+import Link from "next/link";
 
 const Dashboard: React.FC = () => {
   const { address, chain } = useAccount();
@@ -76,7 +77,7 @@ const Dashboard: React.FC = () => {
       <div className="flex flex-col lg:flex-row gap-3 justify-between items-start lg:items-center lg:pl-3 lg:pr-2 pl-3">
         <h1 className="text-xl">My Liquidity Positions</h1>
         <div className="flex gap-3 h-[42px] items-center lg:px-2">
-          <Button color="tertiary" isDisabled>
+          <Button color="tertiary" as={Link} href="/pools">
             New Position
           </Button>
           <Button onClick={() => claimAll()} isDisabled={!address} isLoading={isLoading}>

@@ -94,7 +94,7 @@ export const Bridge: React.FC = () => {
     setActiveInput("from");
   }; */
 
-  const [activeBridge, setActiveBridge] = useState("union");
+  const [activeBridge, setActiveBridge] = useState("eureka");
 
   return (
     <div className="flex flex-col gap-2 w-full items-center justify-center pt-2">

@@ -39,7 +39,7 @@ export const CellTVL: React.FC<Props> = ({ poolLiquidity, poolAddress, assets, c
       currency: "USD",
       language: navigator.language,
     });
-  }, []);
+  }, [simulation]);
 
   return (
     <div className={twMerge("flex flex-col gap-2", className)}>

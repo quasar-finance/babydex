@@ -119,13 +119,13 @@ export function usePrices(parameters: UsePricesParameters = {}) {
       );
 
       const coinPrices = await (async () => {
-        if (window.location.protocol !== "https:") {
-          return Object.keys(coinsByCoingeckoId).reduce((acc, key) => {
-            const usd = Math.random() * 100_000;
-            acc[key] = { usd, eur: usd * 0.95 };
-            return acc;
-          }, Object.create({}));
-        }
+        // if (window.location.protocol !== "https:") {
+        //   return Object.keys(coinsByCoingeckoId).reduce((acc, key) => {
+        //     const usd = Math.random() * 100_000;
+        //     acc[key] = { usd, eur: usd * 0.95 };
+        //     return acc;
+        //   }, Object.create({}));
+        // }
         const response = await fetch(
           `https://api.coingecko.com/api/v3/simple/price?ids=${Object.keys(coinsByCoingeckoId).join(",")}&vs_currencies=${currencies.join(",")}`,
         );

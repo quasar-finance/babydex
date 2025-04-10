@@ -45,7 +45,7 @@ export const babylonMainnet = defineChain({
   blockExplorers: {
     default: {
       name: "Babylon Testnet Explorer",
-      url: "https://hub-mintscan--main-u8lpz0wb.web.app",
+      url: "https://babylon.l2scan.co",
     },
   },
   nativeCurrency: {

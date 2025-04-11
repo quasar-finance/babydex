@@ -93,59 +93,25 @@ const main = async () => {
         {
             assetInfos: [
                 {native_token: {denom: BABY}},
-                {native_token: {denom: USDC}}
+                {native_token: {denom: USDC}},
             ],
-            pairType: {concentrated: {}},
-            // add price scale
-            initParams: toBase64(pclWideParams(baby_usdc.toString()))
+            pairType: {xyk: {}}
         },
         "auto"
     ).then(console.log)
+
 
     await factoryClient.createPair(
         {
             assetInfos: [
                 {native_token: {denom: BABY}},
-                {native_token: {denom: LBTC}}
+                {native_token: {denom: LBTC}},
             ],
-            pairType: {concentrated: {}},
-            // add price scale
-            initParams: toBase64(pclWideParams(baby_btc_decimals))
+            pairType: {xyk: {}}
         },
         "auto"
     ).then(console.log)
 
-    
-    // // Create wide PCL pairs
-    // // calculate price scales like 1 x\[0] = price_scale * x\[1].
-    await factoryClient.createPair(
-        {
-            assetInfos: [
-                {native_token: {denom: BABY}},
-                {native_token: {denom: USDC}}
-            ],
-            pairType: {concentrated: {}},
-            initParams: toBase64(pclNarrowParams(baby_usdc.toString()))
-        },
-        "auto"
-    ).then(console.log)
-
-    // // calculate price scales like 1 x\[0] = price_scale * x\[1].
-    await factoryClient.createPair(
-        {
-            assetInfos: [
-                {native_token: {denom: BABY}},
-                {native_token: {denom: LBTC}}
-            ],
-            pairType: {concentrated: {}},
-            initParams: toBase64(pclNarrowParams(baby_btc_decimals))
-        },
-        "auto"
-    ).then(console.log)
-
-    const pairs = await factoryClient.pairs({})
-    console.log(JSON.stringify(pairs, null, 2))
-    
     // Update config with new incentives address
     // await factoryClient.updateConfig({
     //     incentivesAddress: deployed.incentives,

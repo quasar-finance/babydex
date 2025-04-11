@@ -3,7 +3,7 @@
 # Generates an code upload transaction. This tx has to be executed by a whitelisted address
 
 NODE="https://babylon.nodes.guru:443/rpc"
-CONTRACT="astroport_factory.wasm"
+CONTRACT="cw20_base.wasm"
 MULTISIG="bbn1v3lucy6ugmdlut0385afdq27d07zhur3tjazrc"
 CHAINID="bbn-1"
 

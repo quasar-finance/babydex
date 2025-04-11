@@ -9,11 +9,6 @@ import {IncentivizationFeeInfo, InstantiateMsg as IncentivesInitMsg} from "../sd
 import {AssetInfo} from "../sdk/AstroportPair.types";
 
 
-const toBase64 = (object: any) => {
-    return Buffer.from(JSON.stringify(object)).toString('base64');
-}
-
-
 const main = async () => {
     const {client, address} = await getClientAndAddress();
 
@@ -24,7 +19,7 @@ const main = async () => {
             address,
             contracts["astroport_native_coin_registry"]!,
             {owner: config.admin} as CoinRegistryInitMsg,
-            "Coin registry",
+            "Tower Coin registry",
             "auto",
             {admin: config.admin}
         )
@@ -39,22 +34,22 @@ const main = async () => {
         pair_configs: [
             {
                 code_id: contracts["astroport_pair"]!,
-                maker_fee_bps: 1000,
+                maker_fee_bps: 0,
                 pair_type: {xyk: {}},
-                total_fee_bps: 3000
+                total_fee_bps: 30
             } as PairConfig,
             {
                 code_id: contracts["astroport_pair_concentrated"]!,
-                maker_fee_bps: 1000,
+                maker_fee_bps: 0,
                 pair_type: {concentrated: {}},
-                total_fee_bps: 0
+                total_fee_bps: 3000,
             } as PairConfig
         ],
         token_code_id: contracts["cw20_token"]!
     } as FactoryInitMsg;
 
     deployed.factory = await client
-        .instantiate(address, contracts["astroport_factory"]!, init_msg, "Factory", "auto", {admin: config.admin})
+        .instantiate(address, contracts["astroport_factory"]!, init_msg, "Tower Factory", "auto", {admin: config.admin})
         .then((resp) => resp.contractAddress)
 
     // Init incentives
@@ -69,13 +64,13 @@ const main = async () => {
     } as IncentivesInitMsg;
 
     deployed.incentives = await client
-        .instantiate(address, contracts["astroport_incentives"]!, incentives_init_msg, "Incentives", "auto", {admin: config.admin})
+        .instantiate(address, contracts["astroport_incentives"]!, incentives_init_msg, "Tower Incentives", "auto", {admin: config.admin})
         .then((resp) => resp.contractAddress);
 
     // Init router
     console.log("Init router");
     deployed.router = await client
-        .instantiate(address, contracts["astroport_router"]!, incentives_init_msg, "Router", "auto", {admin: config.admin})
+        .instantiate(address, contracts["astroport_router"]!, incentives_init_msg, "Tower Router", "auto", {admin: config.admin})
         .then((resp) => resp.contractAddress);
 
     console.log("Contracts deployed");

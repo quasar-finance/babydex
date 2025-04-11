@@ -108,40 +108,36 @@ export const poolsRouter = createTRPCRouter({
         caller.local.pools.getCumulativePrices({ address }),
       ]);
 
-      const { params } = config;
       const pairType = pool.poolType;
 
-      if (!cumulativePrices) throw new Error("Pool not found or invalid");
-      const [token0, token1] = cumulativePrices.assets;
-      if (!token0 || !token1) throw new Error("Invalid number of tokens");
+      if (pairType === "xyk") {      
+        if (!cumulativePrices) throw new Error("Pool not found or invalid");
+        const [token0, token1] = cumulativePrices.assets;
+        if (!token0 || !token1) throw new Error("Invalid number of tokens");
+        const { amount: token0Amount } = token0;
+        const { amount: token1Amount } = token1;
 
-      const { amount: token0Amount } = token0;
-      const { amount: token1Amount } = token1;
+        const { denom: denom0 } = getInnerValueFromAsset(token0.info);
+        const assetInfo0 = await caller.local.assets.getAsset({
+          asset: denom0,
+        });
 
-      const { denom: denom0 } = getInnerValueFromAsset(token0.info);
-      const assetInfo0 = await caller.local.assets.getAsset({
-        asset: denom0,
-      });
+        const { denom: denom1 } = getInnerValueFromAsset(token1.info);
+        const assetInfo1 = await caller.local.assets.getAsset({
+          asset: denom1,
+        });
 
-      const { denom: denom1 } = getInnerValueFromAsset(token1.info);
-      const assetInfo1 = await caller.local.assets.getAsset({
-        asset: denom1,
-      });
-
-      const poolAmount0 = Number(token0Amount) / 10 ** assetInfo0.decimals;
-      const poolAmount1 = Number(token1Amount) / 10 ** assetInfo1.decimals;
-
-      if (pairType === "xyk") {
-        const optimalRatio: number = poolAmount1 / poolAmount0;
+        const poolAmount0 = Number(token0Amount) / 10 ** assetInfo0.decimals;
+        const poolAmount1 = Number(token1Amount) / 10 ** assetInfo1.decimals;
+        const optimalRatio: number = poolAmount0 / poolAmount1;
 
         return Number.isNaN(optimalRatio) ? 1 : optimalRatio;
+      } else {
+        const { params } = config;
+        const priceScale: number = Number(params.price_scale);
+
+        return priceScale;
       }
-
-      const priceScale = Number(params.price_scale);
-
-      const optimalRatio: number = poolAmount0 / (poolAmount1 * priceScale);
-
-      return optimalRatio;
     }),
   getPool: createTRPCPublicProcedure
     .input(z.object({ address: z.string() }))

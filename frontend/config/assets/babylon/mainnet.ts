@@ -3,12 +3,12 @@ import type { Currency } from "@towerfi/types";
 export const BabylonMainnetAssets = {
   ubbn: {
     denom: "ubbn",
-    name: "Babylon Testnet Native Token",
+    name: "Babylon Native Token",
     type: "native",
     decimals: 6,
     symbol: "BABY",
     logoURI:
-      "https://raw.githubusercontent.com/cosmos/chain-registry/master/testnets/babylontestnet/images/logo.svg",
+      "https://raw.githubusercontent.com/cosmos/chain-registry/master/babylon/images/logo.svg",
     coingeckoId: "babylon",
   },
   "ibc/65D0BEC6DAD96C7F5043D1E54E54B6BB5D5B3AEC3FF6CEBB75B9E059F3580EA3": {
@@ -30,5 +30,14 @@ export const BabylonMainnetAssets = {
     logoURI:
       "https://raw.githubusercontent.com/quasar-finance/quasar-resources/main/assets/coins/lbtc.svg",
     coingeckoId: "lombard-staked-btc",
+  },
+  bbn1s7jzz7cyuqmy5xpr07yepka5ngktexsferu2cr4xeww897ftj77sv30f5s: {
+    symbol: "eBABY",
+    type: "cw-20",
+    denom: "bbn1s7jzz7cyuqmy5xpr07yepka5ngktexsferu2cr4xeww897ftj77sv30f5s",
+    name: "Babylon Escher LST",
+    decimals: 6,
+    logoURI:
+      "https://raw.githubusercontent.com/cosmos/chain-registry/master/babylon/images/eBABY.svg",
   },
 } as unknown as Record<string, Currency>;

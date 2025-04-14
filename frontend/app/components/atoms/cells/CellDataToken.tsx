@@ -58,14 +58,14 @@ export const CellDataToken: React.FC<Props> = ({
                 />
                 <p>{token0.symbol}</p>
               </div>
-              <p>{convertMicroDenomToDenom(token0Amount, token0.decimals)}</p>
+              <p>{convertMicroDenomToDenom(token0Amount, token0.decimals, token0.decimals, false)}</p>
             </div>
             <div className="flex items-center justify-between gap-2 text-sm">
               <div className="flex items-center gap-1 text-gray-500 ">
                 <img src={token1.logoURI} alt="BTC" className="grayscale w-3 h-3" />
                 <p>{token1.symbol}</p>
               </div>
-              <p>{convertMicroDenomToDenom(token1Amount, token1.decimals)}</p>
+              <p>{convertMicroDenomToDenom(token1Amount, token1.decimals, token1.decimals, false)}</p>
             </div>
           </div>
         </div>

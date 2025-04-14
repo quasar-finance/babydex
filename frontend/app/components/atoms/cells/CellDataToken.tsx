@@ -5,6 +5,7 @@ import type { Currency, WithPrice } from "@towerfi/types";
 import { useWithdrawSimulation } from "~/app/hooks/useWithdrawSimulation";
 
 import { convertMicroDenomToDenom, toFullNumberString } from "~/utils/intl";
+import { formatNumber, usePrices } from "~/app/hooks/usePrices";
 
 interface Props {
   title: string;
@@ -22,6 +23,7 @@ export const CellDataToken: React.FC<Props> = ({
   tokens,
 }) => {
   const [token0, token1] = tokens;
+  const { getPrice } = usePrices();
 
   const parsedAmount = toFullNumberString(amount);
 
@@ -40,6 +42,21 @@ export const CellDataToken: React.FC<Props> = ({
       </div>
     );
   }
+
+  const token0Price = getPrice(
+    convertMicroDenomToDenom(token0Amount, token0.decimals, token0.decimals, false),
+    token0.denom,
+    { format: false },
+  );
+  const token1Price = getPrice(
+    convertMicroDenomToDenom(token1Amount, token1.decimals, token1.decimals, false),
+    token1.denom,
+    { format: false },
+  );
+  const dollarValueAmount = formatNumber(token0Price + token1Price, {
+    currency: "USD",
+    language: navigator.language,
+  });
 
   return (
     <Tooltip
@@ -74,7 +91,7 @@ export const CellDataToken: React.FC<Props> = ({
       <div className={twMerge("flex flex-col gap-2", className)}>
         <p className="text-xs text-white/50 lg:hidden">{title}</p>
         <div className="flex items-center  justify-between gap-3">
-          <p>{convertMicroDenomToDenom(parsedAmount, 6)}</p>
+          <p>{dollarValueAmount}</p>
         </div>
       </div>
     </Tooltip>

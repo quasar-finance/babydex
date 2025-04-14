@@ -14,11 +14,6 @@ if (typeof window !== "undefined") {
 
 const Layout: React.FC<PropsWithChildren> = ({ children }) => {
   useEffect(() => {
-    //AMPLITUDE
-    amplitude.init("ea5eb25990baaab354865581cff0c417", undefined, {
-      defaultTracking: { sessions: true, pageViews: true, formInteractions: true },
-    });
-
     //MIXPANNEL
     const trackMixpanel = (event: MouseEvent) => {
       if (!event.target) return;

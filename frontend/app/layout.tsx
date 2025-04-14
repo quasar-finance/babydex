@@ -58,6 +58,16 @@ export default function RootLayout({
           `}
         </Script>
 
+        <Script src="https://cdn.amplitude.com/script/725b9fbe2f3fa2add70ba50e93721bbb.js" />
+        <Script id="amplitude-init">
+          {`
+            window.amplitude.init('725b9fbe2f3fa2add70ba50e93721bbb', {
+              fetchRemoteConfig: true,
+              autocapture: true
+            });
+          `}
+        </Script>
+
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-HJ1CN9LZHF"
           strategy="afterInteractive"

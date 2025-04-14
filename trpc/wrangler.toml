@@ -1,19 +1,28 @@
 compatibility_date  = "2024-10-04"
 compatibility_flags = ["nodejs_compat"]
 main                = "src/worker/index.ts"
+
+[env.testnet]
 name                = "trpc-tower"
 
-[build]
+[env.testnet.build]
 command   = "pnpm build"
 watch_dir = "src"
 
-[observability]
+[env.testnet.observability]
+enabled = true
+
+[env.staging]
+name                = "trpc-tower-staging"
+
+[env.staging.build]
+command   = "pnpm build"
+watch_dir = "src"
+
+[env.staging.observability]
 enabled = true
 
 [env.production]
-compatibility_date  = "2024-10-04"
-compatibility_flags = ["nodejs_compat"]
-main                = "src/worker/index.ts"
 name                = "trpc-tower-production"
 
 [env.production.build]

@@ -134,6 +134,7 @@ export const poolsRouter = createTRPCRouter({
         return Number.isNaN(optimalRatio) ? 1 : optimalRatio;
       } else {
         const { params } = config;
+        console.log(params)
         const priceScale: number = Number(params.price_scale);
 
         return priceScale;

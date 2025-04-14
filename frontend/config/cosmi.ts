@@ -6,6 +6,7 @@ export const cosmi = createConfig({
   ssr: true,
   connectors: [
     keplrish({
+      shimDisconnect: true,
       target: {
         id: "keplr",
         name: "Keplr",
@@ -13,6 +14,7 @@ export const cosmi = createConfig({
       },
     }),
     keplrish({
+      shimDisconnect: true,
       target: {
         id: "leap",
         name: "Leap",
@@ -20,6 +22,7 @@ export const cosmi = createConfig({
       },
     }),
     keplrish({
+      shimDisconnect: true,
       target: {
         id: "cosmostation",
         name: "Cosmostation",

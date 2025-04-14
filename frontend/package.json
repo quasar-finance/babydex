@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@amplitude/analytics-browser": "^2.13.0",
-    "@cosmi/react": "^0.2.6",
+    "@cosmi/react": "^0.2.7",
     "@dicebear/collection": "^9.2.2",
     "@dicebear/core": "^9.2.2",
     "@headlessui/react": "^2.2.0",
@@ -29,7 +29,7 @@
     "@types/mixpanel-browser": "^2.54.0",
     "bignumber.js": "^9.1.2",
     "clsx": "^2.1.1",
-    "cosmi": "^0.2.6",
+    "cosmi": "^0.2.7",
     "ky": "^1.7.5",
     "lru-cache": "^11.0.2",
     "mipd": "^0.0.7",

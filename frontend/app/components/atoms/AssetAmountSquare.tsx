@@ -38,7 +38,14 @@ export const AssetAmountSquare: React.FC<Props> = ({
             />
             <p className="text-white/50 text-sm">{asset.symbol}</p>
           </div>
-          <p>{convertMicroDenomToDenom(balance, asset.decimals)}</p>
+          <p>
+            {convertMicroDenomToDenom(
+              balance,
+              asset.decimals,
+              asset.decimals === 6 ? 2 : asset.decimals,
+              true,
+            )}
+          </p>
         </>
       )}
     </div>

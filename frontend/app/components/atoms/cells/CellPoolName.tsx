@@ -16,13 +16,13 @@ const getPoolTypeDescription = (poolType: string, params?: any) => {
     const gamma = params.gamma;
 
     if (amp && gamma) {
-      if (amp === 12) {
+      if (amp == 12) {
         return "PCL Wide";
       }
-      if (amp === 75) {
+      if (amp == 75) {
         return "PCL Narrow";
       }
-      if (amp === 950) {
+      if (amp == 950) {
         return "PCL Correlated";
       }
       return `PCL Custom ${amp}/${gamma}`;

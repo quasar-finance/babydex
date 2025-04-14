@@ -16,7 +16,7 @@ export const createClient = () =>
   trpc.createClient({
     links: [
       loggerLink({
-        enabled: () => true,
+        enabled: () => !(process.env.NEXT_PUBLIC_ENV === "production"),
       }),
       splitLink({
         condition: (op) => {

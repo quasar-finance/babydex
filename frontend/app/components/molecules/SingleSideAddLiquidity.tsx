@@ -89,7 +89,7 @@ export const SingleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
   );
 
   const balance = balances.find((balance) => balance.denom === asset.denom)?.amount ?? "0";
-  const denomBalance = convertMicroDenomToDenom(balance, asset.decimals);
+  const denomBalance = convertMicroDenomToDenom(balance, asset.decimals, asset.decimals, false);
 
   return (
     <div className="flex flex-col gap-4 bg-white/5 w-full rounded-xl p-4 flex-1">

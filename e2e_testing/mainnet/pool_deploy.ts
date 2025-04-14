@@ -3,53 +3,10 @@ import config from "./config.json";
 import {AstroportFactoryClient} from "../sdk/AstroportFactory.client";
 import {getClientAndAddress} from "./lib";
 import {AstroportIncentivesClient} from "../sdk/AstroportIncentives.client";
+import { pclNarrowParams, pclWideParams } from "./pcl_params";
 
 const toBase64 = (object: any) => {
     return Buffer.from(JSON.stringify(object)).toString('base64');
-}
-
-const pclWideParams = (priceScale: string) => {
-    return {
-        amp: "12",
-        gamma: "0.000215",
-        mid_fee: "0.0022",
-        out_fee: "0.01",
-        fee_gamma: "0.000235",
-        repeg_profit_threshold: "0.000002",
-        min_price_scale_delta: "0.000146",
-        price_scale: priceScale,
-        ma_half_time: 600
-    }
-}
-
-// TODO adapt params
-const pclNarrowParams = (priceScale: string) => {
-    return {
-        amp: "75",
-        gamma: "0.0003",
-        mid_fee: "0.0025",
-        out_fee: "0.01",
-        fee_gamma: "0.000285",
-        repeg_profit_threshold: "0.000002",
-        min_price_scale_delta: "0.000146",
-        price_scale: priceScale,
-        ma_half_time: 600
-    }
-}
-
-// TODO adapt params
-const pclLSDParams = (priceScale: number) => {
-    return {
-        amp: "950",
-        gamma: "0.015",
-        mid_fee: "0.00025",
-        out_fee: "0.004",
-        fee_gamma: "0.4",
-        repeg_profit_threshold: "0.000000025",
-        min_price_scale_delta: "0.000005",
-        price_scale: `${priceScale}`,
-        ma_half_time: 600
-    }
 }
 
 const main = async () => {

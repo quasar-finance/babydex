@@ -102,15 +102,15 @@ export const poolsRouter = createTRPCRouter({
       const { address } = input;
       const caller = createCallerFactory(appRouter)(ctx);
 
-      const [pool, config, cumulativePrices] = await Promise.all([
+      const [pool, config] = await Promise.all([
         caller.local.pools.getPool({ address }),
         caller.local.pools.getPoolConfig({ address }),
-        caller.local.pools.getCumulativePrices({ address }),
       ]);
 
       const pairType = pool.poolType;
 
-      if (pairType === "xyk") {      
+      if (pairType === "xyk") {
+        const cumulativePrices = await caller.local.pools.getCumulativePrices({ address });
         if (!cumulativePrices) throw new Error("Pool not found or invalid");
         const [token0, token1] = cumulativePrices.assets;
         if (!token0 || !token1) throw new Error("Invalid number of tokens");
@@ -129,11 +129,12 @@ export const poolsRouter = createTRPCRouter({
 
         const poolAmount0 = Number(token0Amount) / 10 ** assetInfo0.decimals;
         const poolAmount1 = Number(token1Amount) / 10 ** assetInfo1.decimals;
-        const optimalRatio: number = poolAmount0 / poolAmount1;
+        const optimalRatio: number = poolAmount1 / poolAmount0;
 
         return Number.isNaN(optimalRatio) ? 1 : optimalRatio;
       } else {
         const { params } = config;
+        console.log(params)
         const priceScale: number = Number(params.price_scale);
 
         return priceScale;

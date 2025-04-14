@@ -9,39 +9,30 @@ interface Props extends Pick<PoolInfo, "assets" | "name" | "poolType" | "config"
 }
 
 const getPoolTypeDescription = (poolType: string, params?: any) => {
-  if (poolType === 'concentrated') {
-    if (!params) return 'Concentrated';
-    
+  if (poolType === "concentrated") {
+    if (!params) return "Concentrated";
+
     const amp = params.amp;
     const gamma = params.gamma;
-    
+
     if (amp && gamma) {
-      console.log(amp)
-      console.log(gamma)
-      // Check for Wide PCL params
-      if (amp == 12) {
+      if (amp === 12) {
         return "PCL Wide";
       }
-      
-      // Check for Narrow PCL params
-      if (amp == 75) {
+      if (amp === 75) {
         return "PCL Narrow";
       }
-      
-      // Check for LSD PCL params
-      if (amp == 950) {
+      if (amp === 950) {
         return "PCL Correlated";
       }
-
-      // If none match, it's a custom configuration
       return `PCL Custom ${amp}/${gamma}`;
     }
-    
-    return 'PCL';
+
+    return "PCL";
   }
-  
+
   return poolType.toUpperCase();
-}
+};
 
 export const CellPoolName: React.FC<Props> = ({ assets, name, poolType, config, className }) => {
   return (
@@ -57,9 +48,10 @@ export const CellPoolName: React.FC<Props> = ({ assets, name, poolType, config, 
             {getPoolTypeDescription(poolType, config.params)}
           </Pill>
           <Pill>
-            {poolType === "concentrated" 
-              ? `${(Number(config.params.mid_fee || 0) * 100).toFixed(2)}% - ${(Number(config.params.out_fee || 0) * 100).toFixed(2)}%`
-              : "0.30%" // TODO make this dynamic after launch
+            {
+              poolType === "concentrated"
+                ? `${(Number(config.params.mid_fee || 0) * 100).toFixed(2)}% - ${(Number(config.params.out_fee || 0) * 100).toFixed(2)}%`
+                : "0.30%" // TODO make this dynamic after launch
             }
           </Pill>
         </div>

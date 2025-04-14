@@ -35,6 +35,6 @@ next-env.d.ts
 **/.dev.vars
 
 # Supabase
-**/.branches
-**/.temp
-**/.env
+/supabase/.branches
+/supabase/.temp
+/supabase/.env

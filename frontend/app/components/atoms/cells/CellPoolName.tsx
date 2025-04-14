@@ -3,8 +3,44 @@ import AssetsStacked from "../AssetsStacked";
 import Pill from "../Pill";
 import type { PoolInfo } from "@towerfi/types";
 import { twMerge } from "~/utils/twMerge";
+
 interface Props extends Pick<PoolInfo, "assets" | "name" | "poolType" | "config"> {
   className?: string;
+}
+
+const getPoolTypeDescription = (poolType: string, params?: any) => {
+  if (poolType === 'concentrated') {
+    if (!params) return 'Concentrated';
+    
+    const amp = params.amp;
+    const gamma = params.gamma;
+    
+    if (amp && gamma) {
+      console.log(amp)
+      console.log(gamma)
+      // Check for Wide PCL params
+      if (amp == 12) {
+        return "PCL Wide";
+      }
+      
+      // Check for Narrow PCL params
+      if (amp == 75) {
+        return "PCL Narrow";
+      }
+      
+      // Check for LSD PCL params
+      if (amp == 950) {
+        return "PCL Correlated";
+      }
+
+      // If none match, it's a custom configuration
+      return `PCL Custom ${amp}/${gamma}`;
+    }
+    
+    return 'PCL';
+  }
+  
+  return poolType.toUpperCase();
 }
 
 export const CellPoolName: React.FC<Props> = ({ assets, name, poolType, config, className }) => {
@@ -17,8 +53,8 @@ export const CellPoolName: React.FC<Props> = ({ assets, name, poolType, config, 
           <span>{name}</span>
         </div>
         <div className="flex gap-1 items-center">
-          <Pill color={poolType === "xyk" ? "green" : "blue"} className="uppercase">
-            {poolType.replace("concentrated", "pcl")}
+          <Pill color={poolType === "xyk" ? "green" : "blue"} className="">
+            {getPoolTypeDescription(poolType, config.params)}
           </Pill>
           <Pill>
             {poolType === "concentrated" 

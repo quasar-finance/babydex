@@ -10,7 +10,7 @@ interface Props extends Pick<PoolInfo, "assets" | "name" | "poolType" | "config"
 
 const getPoolTypeDescription = (poolType: string, params?: any) => {
   if (poolType === "concentrated") {
-    if (!params) return "Concentrated";
+    if (!params) return "PCL";
 
     const amp = params.amp;
     const gamma = params.gamma;

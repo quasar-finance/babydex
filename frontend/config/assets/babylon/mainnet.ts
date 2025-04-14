@@ -40,4 +40,13 @@ export const BabylonMainnetAssets = {
     logoURI:
       "https://raw.githubusercontent.com/cosmos/chain-registry/master/babylon/images/eBABY.svg",
   },
+  bbn17y5zvse30629t7r37xsdj73xsqp7qsdr7gpnh966wf5aslpn66rq5ekwsz: {
+    symbol: "cBABY",
+    type: "cw-20",
+    denom: "bbn17y5zvse30629t7r37xsdj73xsqp7qsdr7gpnh966wf5aslpn66rq5ekwsz",
+    name: "Babylon Cube By SatLayer LST",
+    decimals: 6,
+    logoURI:
+      "https://raw.githubusercontent.com/cosmos/chain-registry/master/babylon/images/cbaby.svg",
+  },
 } as unknown as Record<string, Currency>;

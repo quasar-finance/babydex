@@ -14,7 +14,7 @@ const bridgeExternalLinks = {
     message:
       "Union is a zero-knowledge interoperability protocol that allows fast, trustless bridging of assets and messages between chains.",
     url: "https://btc.union.build",
-    isDisabled: true,
+    isDisabled: false,
   },
   eureka: {
     label: "IBC Eureka",
@@ -95,7 +95,7 @@ export const Bridge: React.FC = () => {
     setActiveInput("from");
   }; */
 
-  const [activeBridge, setActiveBridge] = useState("eureka");
+  const [activeBridge, setActiveBridge] = useState("union");
 
   return (
     <div className="flex flex-col gap-2 w-full items-center justify-center pt-2">

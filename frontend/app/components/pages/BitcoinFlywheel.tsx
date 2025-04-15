@@ -59,7 +59,7 @@ const Pools: React.FC = () => {
     limit: 100,
   });
 
-  const [calculatorState, setCalculatorState] = useState<CalculatorState>(PRESETS.custom);
+  const [calculatorState, setCalculatorState] = useState<CalculatorState>(PRESETS.bull);
 
   const handlePreset = (preset: keyof typeof PRESETS) => {
     setCalculatorState(PRESETS[preset]);

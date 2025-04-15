@@ -73,11 +73,57 @@ const Pools: React.FC = () => {
             These pools are carefully chosen to ensure optimal returns and sustainable growth of the ecosystem. The Bitcoin Flywheel
             bootstraps
           </p>
+        <ul className="flex flex-col gap-3 list-disc list-inside text-gray-300">
+          <li>Step 1: Do a thing</li>
+          <li>Step 2: Do a thing</li>
+          <li>Step 3: Do a thing</li>
+          <li>Step 4: Do a thing</li>
+        </ul>
         </div>
 
         <div className="flex flex-col gap-4 p-6 bg-white/5 rounded-xl">
           <h3 className="text-xl font-semibold">APR Calculator</h3>
-          <div className="grid grid-cols-1 gap-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-2">
+              <label className="text-sm text-gray-400">FDV (USD)</label>
+              <Input
+                type="number"
+                placeholder="Enter FDV"
+                value={fdv}
+                onChange={(e) => setFdv(e.target.value)}
+                className="bg-white/5"
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm text-gray-400">Token Supply</label>
+              <Input
+                type="number"
+                placeholder="Enter token supply"
+                value={tokenSupply}
+                onChange={(e) => setTokenSupply(e.target.value)}
+                className="bg-white/5"
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm text-gray-400">FDV (USD)</label>
+              <Input
+                type="number"
+                placeholder="Enter FDV"
+                value={fdv}
+                onChange={(e) => setFdv(e.target.value)}
+                className="bg-white/5"
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm text-gray-400">Token Supply</label>
+              <Input
+                type="number"
+                placeholder="Enter token supply"
+                value={tokenSupply}
+                onChange={(e) => setTokenSupply(e.target.value)}
+                className="bg-white/5"
+              />
+            </div>
             <div className="flex flex-col gap-2">
               <label className="text-sm text-gray-400">FDV (USD)</label>
               <Input

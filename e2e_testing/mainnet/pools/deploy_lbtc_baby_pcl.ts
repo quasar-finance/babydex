@@ -1,10 +1,10 @@
-import deployed from "./deployed.json";
-import config from "./config.json";
-import {AstroportFactoryClient} from "../sdk/AstroportFactory.client";
-import {getClientAndAddress} from "./lib";
-import {AstroportIncentivesClient} from "../sdk/AstroportIncentives.client";
-import { pclNarrowParams, pclWideParams } from "./pcl_params";
-import { BABY, LBTC } from "./assets";
+import deployed from "../../deployed.json";
+import config from "../../config.json";
+import {AstroportFactoryClient} from "../../sdk/AstroportFactory.client";
+import {getClientAndAddress} from "../../lib";
+import {AstroportIncentivesClient} from "../../sdk/AstroportIncentives.client";
+import { pclNarrowParams, pclWideParams } from "../pcl_params";
+import { BABY, LBTC } from "../assets";
 
 const toBase64 = (object: any) => {
     return Buffer.from(JSON.stringify(object)).toString('base64');

@@ -1,10 +1,10 @@
-import deployed from "./deployed.json";
-import config from "./config.json";
-import {AstroportFactoryClient} from "../sdk/AstroportFactory.client";
-import {getClientAndAddress} from "./lib";
-import {AstroportIncentivesClient} from "../sdk/AstroportIncentives.client";
+import deployed from "../deployed.json";
+import config from "../config.json";
+import {AstroportFactoryClient} from "../../sdk/AstroportFactory.client";
+import {getClientAndAddress} from "../lib";
+import {AstroportIncentivesClient} from "../../sdk/AstroportIncentives.client";
 import { coin, Coin } from "@cosmjs/stargate";
-import { AstroportPairClient } from "../sdk/AstroportPair.client";
+import { AstroportPairClient } from "../../sdk/AstroportPair.client";
 
 const toBase64 = (object: any) => {
     return Buffer.from(JSON.stringify(object)).toString('base64');

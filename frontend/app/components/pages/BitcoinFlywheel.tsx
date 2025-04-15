@@ -136,97 +136,9 @@ const Pools: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-8 px-4 pb-20 max-w-[84.5rem] mx-auto w-full min-h-[65vh] lg:pt-8">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="flex flex-col gap-4 p-6 bg-white/5 rounded-xl">
-          <h2 className="text-2xl font-semibold">Bitcoin Flywheel</h2>
-          <p className="text-gray-300">
-            The Bitcoin Flywheel is a mechanism that allows you to earn additional rewards by providing liquidity to selected pools. 
-            These pools are carefully chosen to ensure optimal returns and sustainable growth of the ecosystem. The Bitcoin Flywheel
-            bootstraps
-          </p>
-        <ul className="flex flex-col gap-3 list-disc list-inside text-gray-300">
-          <li>Step 1: Do a thing</li>
-          <li>Step 2: Do a thing</li>
-          <li>Step 3: Do a thing</li>
-          <li>Step 4: Do a thing</li>
-        </ul>
-        </div>
-
-        <div className="flex flex-col gap-4 p-6 bg-white/5 rounded-xl">
-          <h3 className="text-xl font-semibold">APR Calculator</h3>
-          <div className="grid grid-cols-1 gap-6">
-            <div className="grid grid-cols-[80px_1fr_1fr] gap-4">
-              <div></div>
-              <div className="flex flex-col gap-2">
-                <label className="text-sm text-gray-400">FDV (USD)</label>
-              </div>
-              <div className="flex flex-col gap-2">
-                <label className="text-sm text-gray-400">Token Supply</label>
-              </div>
-            </div>
-            {Object.entries(calculatorState).map(([key, inputs]) => (
-              <div key={key} className="grid grid-cols-[80px_1fr_1fr] gap-4">
-                <div className="flex items-center">
-                  <span className="text-sm font-medium">{key.charAt(0).toUpperCase() + key.slice(1)}</span>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <Input
-                    type="text"
-                    placeholder="Enter FDV (e.g. 1M)"
-                    value={inputs.fdv}
-                    onChange={(e) => handleInputChange(key, 'fdv', e.target.value)}
-                    className="bg-white/5"
-                  />
-                </div>
-                <div className="flex flex-col gap-2">
-                  <Input
-                    type="text"
-                    placeholder="Enter %"
-                    value={inputs.tokenSupply}
-                    onChange={(e) => handleInputChange(key, 'tokenSupply', e.target.value)}
-                    className="bg-white/5"
-                  />
-                </div>
-              </div>
-            ))}
-            <div className="mt-4 p-4 bg-white/10 rounded-lg">
-              <div className="flex justify-between items-center">
-                <span className="text-gray-400">Combined Estimated APR</span>
-                <span className="text-2xl font-semibold">
-                  {calculateCombinedAPR().toFixed(2)}%
-                </span>
-              </div>
-            </div>
-            <div className="flex gap-4 justify-center">
-              <Button
-                variant="flat"
-                onPress={() => handlePreset('bear')}
-                className="bg-gray-500/20 hover:bg-gray-500/30"
-              >
-                Bear Case
-              </Button>
-              <Button
-                variant="flat"
-                onPress={() => handlePreset('bull')}
-                className="bg-yellow-500/20 hover:bg-yellow-500/30"
-              >
-                Bull Case
-              </Button>
-              <Button
-                variant="flat"
-                onPress={() => handlePreset('custom')}
-                className="bg-gray-500/20 hover:bg-gray-500/30"
-              >
-                Custom
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex gap-3 justify-between items-center lg:pl-3 lg:pr-2 pl-3">
-        <h1 className="text-xl">Pools</h1>
-        <div className="flex gap-3 h-[42px] items-center px-2">
+      <div className="flex flex-col lg:flex-row gap-3 justify-between items-start lg:items-center lg:pl-3 lg:pr-2 pl-3">
+        <h1 className="text-xl">Bitcoin Flywheel</h1>
+        <div className="flex gap-3 h-[42px] items-center lg:px-2">
           <Input
             isSearch
             placeholder="Search"
@@ -234,6 +146,95 @@ const Pools: React.FC = () => {
             onChange={(e) => setSearchText(e.target.value)}
           />
         </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="flex flex-col gap-4 p-6 bg-white/5 rounded-xl">
+          <h2 className="text-2xl font-semibold">How it Works</h2>
+          <p className="text-gray-300">
+            The Bitcoin Flywheel is a mechanism that allows you to earn additional rewards by providing liquidity to selected pools. 
+            These pools are carefully chosen to ensure optimal returns and sustainable growth of the ecosystem.
+          </p>
+          <ul className="flex flex-col gap-3 list-disc list-inside text-gray-300">
+            <li>Step 1: Do a thing</li>
+            <li>Step 2: Do a thing</li>
+            <li>Step 3: Do a thing</li>
+            <li>Step 4: Do a thing</li>
+          </ul>
+        </div>
+
+        <div className="flex flex-col gap-4 p-6 bg-white/5 rounded-xl">
+          <h3 className="text-xl font-semibold">APR Calculator</h3>
+          <div className="grid grid-cols-[80px_1fr_1fr] gap-4">
+            <div></div>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm text-gray-400">FDV (USD)</label>
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm text-gray-400">Token Supply</label>
+            </div>
+          </div>
+          {Object.entries(calculatorState).map(([key, inputs]) => (
+            <div key={key} className="grid grid-cols-[80px_1fr_1fr] gap-4">
+              <div className="flex items-center">
+                <span className="text-sm font-medium">{key.charAt(0).toUpperCase() + key.slice(1)}</span>
+              </div>
+              <div className="flex flex-col gap-2">
+                <Input
+                  type="text"
+                  placeholder="Enter FDV (e.g. 1M)"
+                  value={inputs.fdv}
+                  onChange={(e) => handleInputChange(key, 'fdv', e.target.value)}
+                  className="bg-white/5"
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Input
+                  type="text"
+                  placeholder="Enter %"
+                  value={inputs.tokenSupply}
+                  onChange={(e) => handleInputChange(key, 'tokenSupply', e.target.value)}
+                  className="bg-white/5"
+                />
+              </div>
+            </div>
+          ))}
+          <div className="mt-4 p-4 bg-white/10 rounded-lg">
+            <div className="flex justify-between items-center">
+              <span className="text-gray-400">Combined Estimated APR</span>
+              <span className="text-2xl font-semibold">
+                {calculateCombinedAPR().toFixed(2)}%
+              </span>
+            </div>
+          </div>
+          <div className="flex gap-4 justify-center">
+            <Button
+              variant="flat"
+              onPress={() => handlePreset('bear')}
+              className="bg-gray-500/20 hover:bg-gray-500/30"
+            >
+              Bear Case
+            </Button>
+            <Button
+              variant="flat"
+              onPress={() => handlePreset('bull')}
+              className="bg-yellow-500/20 hover:bg-yellow-500/30"
+            >
+              Bull Case
+            </Button>
+            <Button
+              variant="flat"
+              onPress={() => handlePreset('custom')}
+              className="bg-gray-500/20 hover:bg-gray-500/30"
+            >
+              Custom
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col lg:flex-row gap-3 justify-between items-start lg:items-center lg:pl-3 lg:pr-2 pl-3">
+        <h2 className="text-xl">Available Pools</h2>
       </div>
 
       <Table columns={columns} gridClass={gridClass}>

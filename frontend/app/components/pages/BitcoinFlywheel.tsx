@@ -25,12 +25,53 @@ const columns = [
   { key: "actions", title: "" },
 ];
 
+interface CalculatorInputs {
+  fdv: string;
+  tokenSupply: string;
+}
+
+interface CalculatorState {
+  [key: string]: CalculatorInputs;
+}
+
 const Pools: React.FC = () => {
   const { showModal } = useModal();
   const gridClass = "grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-3";
   const { data: pools = [], isLoading } = trpc.local.pools.getPools.useQuery({
     limit: 100,
   });
+
+  const [calculatorState, setCalculatorState] = useState<CalculatorState>({
+    union: { fdv: "", tokenSupply: "" },
+    tower: { fdv: "", tokenSupply: "" },
+    escher: { fdv: "", tokenSupply: "" },
+  });
+
+  const handleInputChange = (key: string, field: keyof CalculatorInputs, value: string) => {
+    setCalculatorState(prev => ({
+      ...prev,
+      [key]: {
+        ...prev[key],
+        [field]: value
+      }
+    }));
+  };
+
+  const calculateAPR = (inputs: CalculatorInputs) => {
+    const fdvValue = parseFloat(inputs.fdv);
+    const tokenSupplyValue = parseFloat(inputs.tokenSupply);
+    if (fdvValue > 0 && tokenSupplyValue > 0) {
+      return (fdvValue / tokenSupplyValue) * 100;
+    }
+    return 0;
+  };
+
+  const calculateCombinedAPR = () => {
+    const totalAPR = Object.values(calculatorState).reduce((sum, inputs) => {
+      return sum + calculateAPR(inputs);
+    }, 0);
+    return totalAPR;
+  };
 
   const [searchText, setSearchText] = useState("");
 
@@ -50,18 +91,6 @@ const Pools: React.FC = () => {
   const sortedPools = [...filteredPools].sort(
     (a, b) => Number(b.poolLiquidity) - Number(a.poolLiquidity),
   );
-
-  const [fdv, setFdv] = useState("");
-  const [tokenSupply, setTokenSupply] = useState("");
-
-  const calculateAPR = () => {
-    const fdvValue = parseFloat(fdv);
-    const tokenSupplyValue = parseFloat(tokenSupply);
-    if (fdvValue > 0 && tokenSupplyValue > 0) {
-      return (fdvValue / tokenSupplyValue) * 100;
-    }
-    return null;
-  };
 
   return (
     <div className="flex flex-col gap-8 px-4 pb-20 max-w-[84.5rem] mx-auto w-full min-h-[65vh] lg:pt-8">
@@ -83,77 +112,48 @@ const Pools: React.FC = () => {
 
         <div className="flex flex-col gap-4 p-6 bg-white/5 rounded-xl">
           <h3 className="text-xl font-semibold">APR Calculator</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex flex-col gap-2">
-              <label className="text-sm text-gray-400">FDV (USD)</label>
-              <Input
-                type="number"
-                placeholder="Enter FDV"
-                value={fdv}
-                onChange={(e) => setFdv(e.target.value)}
-                className="bg-white/5"
-              />
+          <div className="grid grid-cols-1 gap-6">
+            <div className="grid grid-cols-[80px_1fr_1fr] gap-4">
+              <div></div>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm text-gray-400">FDV (USD)</label>
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm text-gray-400">Token Supply</label>
+              </div>
             </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-sm text-gray-400">Token Supply</label>
-              <Input
-                type="number"
-                placeholder="Enter token supply"
-                value={tokenSupply}
-                onChange={(e) => setTokenSupply(e.target.value)}
-                className="bg-white/5"
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-sm text-gray-400">FDV (USD)</label>
-              <Input
-                type="number"
-                placeholder="Enter FDV"
-                value={fdv}
-                onChange={(e) => setFdv(e.target.value)}
-                className="bg-white/5"
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-sm text-gray-400">Token Supply</label>
-              <Input
-                type="number"
-                placeholder="Enter token supply"
-                value={tokenSupply}
-                onChange={(e) => setTokenSupply(e.target.value)}
-                className="bg-white/5"
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-sm text-gray-400">FDV (USD)</label>
-              <Input
-                type="number"
-                placeholder="Enter FDV"
-                value={fdv}
-                onChange={(e) => setFdv(e.target.value)}
-                className="bg-white/5"
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-sm text-gray-400">Token Supply</label>
-              <Input
-                type="number"
-                placeholder="Enter token supply"
-                value={tokenSupply}
-                onChange={(e) => setTokenSupply(e.target.value)}
-                className="bg-white/5"
-              />
-            </div>
-          </div>
-          <div className="mt-4 p-4 bg-white/10 rounded-lg">
-            <div className="flex justify-between items-center">
-              <span className="text-gray-400">Estimated APR</span>
-              <span className="text-2xl font-semibold">
-                {(() => {
-                  const apr = calculateAPR();
-                  return apr !== null ? `${apr.toFixed(2)}%` : '0%';
-                })()}
-              </span>
+            {Object.entries(calculatorState).map(([key, inputs]) => (
+              <div key={key} className="grid grid-cols-[80px_1fr_1fr] gap-4">
+                <div className="flex items-center">
+                  <span className="text-sm font-medium">{key.charAt(0).toUpperCase() + key.slice(1)}</span>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <Input
+                    type="number"
+                    placeholder="Enter FDV"
+                    value={inputs.fdv}
+                    onChange={(e) => handleInputChange(key, 'fdv', e.target.value)}
+                    className="bg-white/5"
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <Input
+                    type="number"
+                    placeholder="Enter token supply"
+                    value={inputs.tokenSupply}
+                    onChange={(e) => handleInputChange(key, 'tokenSupply', e.target.value)}
+                    className="bg-white/5"
+                  />
+                </div>
+              </div>
+            ))}
+            <div className="mt-4 p-4 bg-white/10 rounded-lg">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-400">Combined Estimated APR</span>
+                <span className="text-2xl font-semibold">
+                  {calculateCombinedAPR().toFixed(2)}%
+                </span>
+              </div>
             </div>
           </div>
         </div>

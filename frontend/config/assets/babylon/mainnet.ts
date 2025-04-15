@@ -59,6 +59,6 @@ export const BabylonMainnetAssets = {
     decimals: 18,
     logoURI:
       "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/SolvBTC.png",
+    coingeckoId: "solv-btc",
   },
-  coingeckoId: "solv-btc",
 } as unknown as Record<string, Currency>;

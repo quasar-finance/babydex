@@ -40,3 +40,7 @@ next-env.d.ts
 /supabase/.env
 
 .env
+
+# Shuttle
+Secrets.toml
+.shuttle

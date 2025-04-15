@@ -72,6 +72,9 @@ const Dashboard: React.FC = () => {
     },
   });
 
+  //TODO: Replace for !address when there is rewards
+  const claimAllDisabled = true;
+
   return (
     <div className="flex flex-col gap-8 px-4 max-w-[84.5rem] mx-auto w-full min-h-[65vh] lg:pt-8">
       <div className="flex flex-col lg:flex-row gap-3 justify-between items-start lg:items-center lg:pl-3 lg:pr-2 pl-3">
@@ -80,7 +83,7 @@ const Dashboard: React.FC = () => {
           <Button color="tertiary" as={Link} href="/pools">
             New Position
           </Button>
-          <Button onClick={() => claimAll()} isDisabled={!address} isLoading={isLoading}>
+          <Button onClick={() => claimAll()} isDisabled={claimAllDisabled} isLoading={isLoading}>
             Claim All
           </Button>
         </div>

@@ -46,6 +46,10 @@ const Pools: React.FC = () => {
   const numberPerPage = 10;
   const totalPools = Math.ceil(filteredPools.length / numberPerPage);
 
+  const sortedPools = [...filteredPools].sort(
+    (a, b) => Number(b.poolLiquidity) - Number(a.poolLiquidity),
+  );
+
   return (
     <div className="flex flex-col gap-8 px-4 pb-20 max-w-[84.5rem] mx-auto w-full min-h-[65vh] lg:pt-8">
       <div className="flex gap-3 justify-between items-center lg:pl-3 lg:pr-2 pl-3">
@@ -62,7 +66,7 @@ const Pools: React.FC = () => {
 
       <Table columns={columns} gridClass={gridClass}>
         {isLoading && <PoolsSkeleton className={twMerge("grid", gridClass)} />}
-        {filteredPools
+        {sortedPools
           .slice(currentPage * numberPerPage, currentPage * numberPerPage + numberPerPage)
           .map((pool, i) => (
             <TableRow key={i} gridClass={twMerge("grid", gridClass)}>

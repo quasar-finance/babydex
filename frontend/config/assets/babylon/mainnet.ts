@@ -39,6 +39,7 @@ export const BabylonMainnetAssets = {
     decimals: 6,
     logoURI:
       "https://raw.githubusercontent.com/cosmos/chain-registry/master/babylon/images/eBABY.svg",
+    coingeckoId: "babylon",
   },
   bbn17y5zvse30629t7r37xsdj73xsqp7qsdr7gpnh966wf5aslpn66rq5ekwsz: {
     symbol: "cBABY",
@@ -48,5 +49,16 @@ export const BabylonMainnetAssets = {
     decimals: 6,
     logoURI:
       "https://raw.githubusercontent.com/cosmos/chain-registry/master/babylon/images/cbaby.svg",
+    coingeckoId: "babylon",
   },
+  "ibc/2CC08A10459B40B0251B8CB9C036C98BED1ABBD5F03772E371DCD0FFDA3EC7F3": {
+    symbol: "SolvBTC",
+    type: "native",
+    denom: "ibc/2CC08A10459B40B0251B8CB9C036C98BED1ABBD5F03772E371DCD0FFDA3EC7F3",
+    name: "SolvBTC",
+    decimals: 18,
+    logoURI:
+      "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/SolvBTC.png",
+  },
+  coingeckoId: "solv-btc",
 } as unknown as Record<string, Currency>;

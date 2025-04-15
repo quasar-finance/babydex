@@ -19,9 +19,9 @@ import { blockedPoolAddresses, unionFlywheelPools } from "~/utils/consts";
 const columns = [
   { key: "name", title: "Pool", className: "col-span-2 lg:col-span-1" },
   { key: "poolLiquidity", title: "TVL" },
-  { key: "apr", title: "APR" },
-  { key: "pointsApr", title: "points apr" },
-  // { key: "fees", title: "Fees 24h" },
+  { key: "poolApr", title: "pool APR" },
+  { key: "pointsApr", title: "points APR" },
+  { key: "totalApr", title: "Total APR" },
   { key: "actions", title: "" },
 ];
 
@@ -54,7 +54,7 @@ const PRESETS = {
 
 const Pools: React.FC = () => {
   const { showModal } = useModal();
-  const gridClass = "grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-3";
+  const gridClass = "grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr] gap-3";
   const { data: pools = [], isLoading } = trpc.local.pools.getPools.useQuery({
     limit: 100,
   });
@@ -253,10 +253,10 @@ const Pools: React.FC = () => {
                 poolAddress={pool.poolAddress}
                 assets={pool.assets}
               />
-              <CellData title="Points APR" data="0%" />
-              <CellData title="APR" data="0%" />
-              {/* {/* <CellData title="Volume 24h" /> */}
-              <div className="flex lg:items-end lg:justify-end">
+              <CellData title="Points APR" data="80%" />
+              <CellData title="Pool APR" data="20%" />
+              <CellData title="Total APR" data="100%" />
+              <div className="flex items-center justify-end">
                 <Button
                   variant="flat"
                   onPress={() => showModal(ModalTypes.add_liquidity, false, { pool })}

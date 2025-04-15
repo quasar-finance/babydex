@@ -614,6 +614,12 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
                                      lb.height
                               FROM LatestBalances lb
                               WHERE lb.rn = 1),
+             LatestTokenPrices AS (SELECT tp.token,
+                                          tp.price,
+                                          tp.created_at,
+                                          ROW_NUMBER() OVER (PARTITION BY tp.token ORDER BY tp.created_at DESC) as rn
+                                   from v1_cosmos.token_prices tp),
+             TokenPrices AS (select * from LatestTokenPrices ltp where ltp.rn = 1),
              SwapVolumes AS (SELECT s.pool_address,
                                     SUM(
                                             CASE
@@ -715,14 +721,8 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
         FROM PoolBalances pb
                  LEFT JOIN v1_cosmos.token t0 ON pb.token0_denom = t0.denomination
                  LEFT JOIN v1_cosmos.token t1 ON pb.token1_denom = t1.denomination
-                 LEFT JOIN v1_cosmos.token_prices tp0 ON t0.token_name = tp0.token
-            AND tp0.created_at = (SELECT MAX(tp.created_at)
-                                  FROM v1_cosmos.token_prices tp
-                                  WHERE tp.token = tp0.token)
-                 LEFT JOIN v1_cosmos.token_prices tp1 ON t1.token_name = tp1.token
-            AND tp1.created_at = (SELECT MAX(tp.created_at)
-                                  FROM v1_cosmos.token_prices tp
-                                  WHERE tp.token = tp1.token)
+                 LEFT JOIN TokenPrices tp0 ON t0.token_name = tp0.token
+                 LEFT JOIN TokenPrices tp1 ON t1.token_name = tp1.token
                  LEFT JOIN SwapVolumes sv ON pb.pool_address = sv.pool_address
                  LEFT JOIN AvgDailyYield ady ON pb.pool_address = ady.pool_address
                  LEFT JOIN Incentives i ON pb.pool_address = i.pool_address

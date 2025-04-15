@@ -26,12 +26,12 @@ export const CellTVL: React.FC<Props> = ({ poolLiquidity, poolAddress, assets, c
     if (!simulation) return null;
     const [token0, token1] = simulation;
     const token0Price = getPrice(
-      convertMicroDenomToDenom(token0.amount, token0.decimals),
+      convertMicroDenomToDenom(token0.amount, token0.decimals, token0.decimals, false),
       token0.denom,
       { format: false },
     );
     const token1Price = getPrice(
-      convertMicroDenomToDenom(token1.amount, token1.decimals),
+      convertMicroDenomToDenom(token1.amount, token1.decimals, token1.decimals, false),
       token1.denom,
       { format: false },
     );

@@ -6,13 +6,15 @@ export const cosmi = createConfig({
   ssr: true,
   connectors: [
     keplrish({
+      shimDisconnect: true,
       target: {
         id: "keplr",
         name: "Keplr",
         provider: (w) => w?.keplr,
       },
     }),
-    /* keplrish({
+    keplrish({
+      shimDisconnect: true,
       target: {
         id: "leap",
         name: "Leap",
@@ -20,12 +22,13 @@ export const cosmi = createConfig({
       },
     }),
     keplrish({
+      shimDisconnect: true,
       target: {
         id: "cosmostation",
         name: "Cosmostation",
         provider: (w) => w?.cosmostation?.providers.keplr,
       },
-    }), */
+    }),
   ],
   batch: { multicall: { batchSize: 10, wait: 200 } },
   transports: {

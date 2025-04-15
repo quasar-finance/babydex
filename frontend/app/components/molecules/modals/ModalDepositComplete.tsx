@@ -35,7 +35,14 @@ const ModalDepositCompleted: React.FC = () => {
           <div className="flex items-center justify-center gap-1">
             <div className="flex items-center justify-center gap-1">
               <img src={token0?.logoURI} alt={token0?.symbol} className="w-5 h-5" />
-              <p>{convertMicroDenomToDenom(token0?.amount, token0?.decimals)}</p>
+              <p>
+                {convertMicroDenomToDenom(
+                  token0?.amount,
+                  token0?.decimals,
+                  token0?.decimals === 6 ? 2 : token0?.decimals,
+                  false,
+                )}
+              </p>
               <p className="text-white">{token0?.symbol}</p>
             </div>
             {tokens.length > 1 && (
@@ -43,7 +50,14 @@ const ModalDepositCompleted: React.FC = () => {
                 <p>and</p>
                 <div className="flex items-center justify-center gap-1">
                   <img src={token1?.logoURI} alt={token1?.symbol} className="w-5 h-5" />
-                  <p>{convertMicroDenomToDenom(token1?.amount, token1?.decimals)}</p>
+                  <p>
+                    {convertMicroDenomToDenom(
+                      token1?.amount,
+                      token1?.decimals,
+                      token1?.decimals === 6 ? 2 : token1?.decimals,
+                      false,
+                    )}
+                  </p>
                   <p className="text-white">{token1?.symbol}</p>
                 </div>
               </>

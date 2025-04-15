@@ -34,6 +34,24 @@ interface CalculatorState {
   [key: string]: CalculatorInputs;
 }
 
+const PRESETS = {
+  bear: {
+    union: { fdv: "1M", tokenSupply: "10" },
+    tower: { fdv: "0.5M", tokenSupply: "20" },
+    escher: { fdv: "0.25M", tokenSupply: "30" }
+  },
+  bull: {
+    union: { fdv: "5M", tokenSupply: "10" },
+    tower: { fdv: "2.5M", tokenSupply: "20" },
+    escher: { fdv: "1.25M", tokenSupply: "30" }
+  },
+  custom: {
+    union: { fdv: "", tokenSupply: "" },
+    tower: { fdv: "", tokenSupply: "" },
+    escher: { fdv: "", tokenSupply: "" }
+  }
+};
+
 const Pools: React.FC = () => {
   const { showModal } = useModal();
   const gridClass = "grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-3";
@@ -41,25 +59,39 @@ const Pools: React.FC = () => {
     limit: 100,
   });
 
-  const [calculatorState, setCalculatorState] = useState<CalculatorState>({
-    union: { fdv: "", tokenSupply: "" },
-    tower: { fdv: "", tokenSupply: "" },
-    escher: { fdv: "", tokenSupply: "" },
-  });
+  const [calculatorState, setCalculatorState] = useState<CalculatorState>(PRESETS.custom);
 
-  const handleInputChange = (key: string, field: keyof CalculatorInputs, value: string) => {
-    setCalculatorState(prev => ({
-      ...prev,
-      [key]: {
-        ...prev[key],
-        [field]: value
-      }
-    }));
+  const handlePreset = (preset: keyof typeof PRESETS) => {
+    setCalculatorState(PRESETS[preset]);
+  };
+
+  const parseFDV = (value: string): number => {
+    if (!value) return 0;
+    const numericValue = parseFloat(value.replace('M', ''));
+    return isNaN(numericValue) ? 0 : numericValue * 1000000;
+  };
+
+  const formatFDV = (value: string): string => {
+    if (!value) return '';
+    const numericValue = parseFloat(value);
+    return isNaN(numericValue) ? '' : `${(numericValue / 1000000).toFixed(2)}M`;
+  };
+
+  const parseTokenSupply = (value: string): number => {
+    if (!value) return 0;
+    const numericValue = parseFloat(value);
+    return isNaN(numericValue) ? 0 : numericValue;
+  };
+
+  const formatTokenSupply = (value: string): string => {
+    if (!value) return '';
+    const numericValue = parseFloat(value);
+    return isNaN(numericValue) ? '' : numericValue.toString();
   };
 
   const calculateAPR = (inputs: CalculatorInputs) => {
-    const fdvValue = parseFloat(inputs.fdv);
-    const tokenSupplyValue = parseFloat(inputs.tokenSupply);
+    const fdvValue = parseFDV(inputs.fdv);
+    const tokenSupplyValue = parseTokenSupply(inputs.tokenSupply);
     if (fdvValue > 0 && tokenSupplyValue > 0) {
       return (fdvValue / tokenSupplyValue) * 100;
     }
@@ -91,6 +123,16 @@ const Pools: React.FC = () => {
   const sortedPools = [...filteredPools].sort(
     (a, b) => Number(b.poolLiquidity) - Number(a.poolLiquidity),
   );
+
+  const handleInputChange = (key: string, field: keyof CalculatorInputs, value: string) => {
+    setCalculatorState(prev => ({
+      ...prev,
+      [key]: {
+        ...prev[key],
+        [field]: value
+      }
+    }));
+  };
 
   return (
     <div className="flex flex-col gap-8 px-4 pb-20 max-w-[84.5rem] mx-auto w-full min-h-[65vh] lg:pt-8">
@@ -129,8 +171,8 @@ const Pools: React.FC = () => {
                 </div>
                 <div className="flex flex-col gap-2">
                   <Input
-                    type="number"
-                    placeholder="Enter FDV"
+                    type="text"
+                    placeholder="Enter FDV (e.g. 1M)"
                     value={inputs.fdv}
                     onChange={(e) => handleInputChange(key, 'fdv', e.target.value)}
                     className="bg-white/5"
@@ -138,8 +180,8 @@ const Pools: React.FC = () => {
                 </div>
                 <div className="flex flex-col gap-2">
                   <Input
-                    type="number"
-                    placeholder="Enter token supply"
+                    type="text"
+                    placeholder="Enter %"
                     value={inputs.tokenSupply}
                     onChange={(e) => handleInputChange(key, 'tokenSupply', e.target.value)}
                     className="bg-white/5"
@@ -154,6 +196,29 @@ const Pools: React.FC = () => {
                   {calculateCombinedAPR().toFixed(2)}%
                 </span>
               </div>
+            </div>
+            <div className="flex gap-4 justify-center">
+              <Button
+                variant="flat"
+                onPress={() => handlePreset('bear')}
+                className="bg-red-500/20 hover:bg-red-500/30"
+              >
+                Bear Case
+              </Button>
+              <Button
+                variant="flat"
+                onPress={() => handlePreset('bull')}
+                className="bg-green-500/20 hover:bg-green-500/30"
+              >
+                Bull Case
+              </Button>
+              <Button
+                variant="flat"
+                onPress={() => handlePreset('custom')}
+                className="bg-gray-500/20 hover:bg-gray-500/30"
+              >
+                Custom
+              </Button>
             </div>
           </div>
         </div>

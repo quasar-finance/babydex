@@ -201,14 +201,14 @@ const Pools: React.FC = () => {
               <Button
                 variant="flat"
                 onPress={() => handlePreset('bear')}
-                className="bg-red-500/20 hover:bg-red-500/30"
+                className="bg-gray-500/20 hover:bg-gray-500/30"
               >
                 Bear Case
               </Button>
               <Button
                 variant="flat"
                 onPress={() => handlePreset('bull')}
-                className="bg-green-500/20 hover:bg-green-500/30"
+                className="bg-yellow-500/20 hover:bg-yellow-500/30"
               >
                 Bull Case
               </Button>

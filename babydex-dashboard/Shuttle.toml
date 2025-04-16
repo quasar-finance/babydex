@@ -1,0 +1,9 @@
+[deploy]
+include = [
+    "static/*",
+    "templates/*",
+]
+[build]
+assets = [
+    "static",
+]

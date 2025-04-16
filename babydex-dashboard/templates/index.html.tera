@@ -45,7 +45,7 @@
 <body>
     <section class="hero is-primary is-bold">
         <div class="hero-body">
-            <div class="container">
+            <div class="container is-fluid">
                 <h1 class="title header-animate">
                     Pool Metrics
                 </h1>
@@ -56,7 +56,7 @@
         </div>
     </section>
     <section class="section">
-        <div class="container">
+        <div class="container is-fluid">
             {% if pool_metrics %}
             <div class="table-container">
                 <table class="table is-bordered is-striped is-fullwidth">
@@ -81,10 +81,10 @@
                             <td class="value-animate">{{ metric.height }}</td>
                             <td class="value-animate">{{ metric.token0_balance }}</td>
                             <td class="value-animate">{{ metric.token1_balance }}</td>
-                            <td class="has-text-right value-animate">${{ metric.tvl_usd|float }}</td>
-                            <td class="has-text-right value-animate">{{ metric.average_apr|float }}%</td>
-                            <td class="value-animate">{{ metric.lp_token_address }}</td>
-                            <td class="has-text-right value-animate">{{ metric.total_incentives }}</td>
+                            <td class="has-text-right value-animate">${{ metric.tvl_usd }}</td>
+                            <td class="has-text-right value-animate">{{ metric.average_apr|default(value="N/A") }}%</td>
+                            <td class="value-animate">{{ metric.lp_token_address|default(value="N/A") }}</td>
+                            <td class="has-text-right value-animate">{{ metric.total_incentives|default(value="N/A") }}</td>
                             <td class="value-animate">{{ metric.metric_start_height|default(value="N/A") }}</td>
                             <td class="value-animate">{{ metric.metric_end_height|default(value="N/A") }}</td>
                         </tr>

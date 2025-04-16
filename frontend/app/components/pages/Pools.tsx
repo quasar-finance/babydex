@@ -50,6 +50,14 @@ const Pools: React.FC = () => {
     (a, b) => Number(b.poolLiquidity) - Number(a.poolLiquidity),
   );
 
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+  const { data: metrics, isLoading: isMetricsLoading } = trpc.edge.indexer.getPoolMetricsByAddresses.useQuery({ 
+    addresses: sortedPools.map(pool => pool.poolAddress), 
+    startDate: sevenDaysAgo 
+  });
+
   return (
     <div className="flex flex-col gap-8 px-4 pb-20 max-w-[84.5rem] mx-auto w-full min-h-[65vh] lg:pt-8">
       <div className="flex gap-3 justify-between items-center lg:pl-3 lg:pr-2 pl-3">
@@ -81,7 +89,10 @@ const Pools: React.FC = () => {
                 poolAddress={pool.poolAddress}
                 assets={pool.assets}
               />
-              <CellData title="APR" />
+              <CellData 
+                title="APR" 
+                data={isMetricsLoading ? "..." : (metrics?.[pool.poolAddress]?.average_apr ? `${(metrics[pool.poolAddress].average_apr).toFixed(2)}%` : "-")} 
+              />
               {/* <CellData title="Volume 24h" />
             <CellData title="Fees 24h" /> */}
               <div className="flex lg:items-end lg:justify-end">

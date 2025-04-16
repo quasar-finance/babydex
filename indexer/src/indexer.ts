@@ -122,7 +122,7 @@ export type Indexer = {
   ) => Promise<Record<string, unknown>[] | null>;
   getCurrentPoolVolumes: (page: number, limit: number) => Promise<Record<string, unknown>[] | null>;
   getPoolVolumesByPoolAddresses: (addresses: string[]) => Promise<Record<string, unknown>[] | null>;
-  getPoolMetricsByPoolAddresses: (addresses: string[], startDate?: Date | null, endDate?: Date | null) => Promise<Record<string, PoolMetric>[] | null>;
+  getPoolMetricsByPoolAddresses: (addresses: string[], startDate?: Date | null, endDate?: Date | null) => Promise<Record<string, PoolMetric> | null>;
 };
 
 export type IndexerFilters = {
@@ -574,7 +574,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     addresses: string[],
     startDate?: Date,
     endDate?: Date,
-  ): Promise<Record<string, PoolMetric>[] | null> {
+  ): Promise<Record<string, PoolMetric> | null> {
     const now = new Date();
     const start = startDate ? new Date(startDate) : new Date(0);
     const end = endDate ? new Date(endDate) : now;
@@ -732,13 +732,14 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     try {
       const response = await client.execute(query);
 
-      return response.rows.map(row => ({
+      return response.rows.reduce<Record<string, PoolMetric>>((acc, row) => ({
+        ...acc,
         [row.pool_address as string]: {
-          ...row as Omit<PoolMetric, 'metric_start_height' | 'metric_end_height'>,
+          ...row,
           metric_start_height: startHeight ? BigInt(startHeight) : null,
           metric_end_height: endHeight ? BigInt(endHeight) : null,
         } as PoolMetric,
-      }));
+      }), {} as Record<string, PoolMetric>);
     } catch (error) {
       console.error("Error executing raw query:", error);
 

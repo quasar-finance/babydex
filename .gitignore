@@ -35,8 +35,12 @@ next-env.d.ts
 **/.dev.vars
 
 # Supabase
-**/.branches
-**/.temp
-**/.env
-babydex-dashboard/Secrets.toml
-babydex-dashboard/.shuttle/config.toml
+/supabase/.branches
+/supabase/.temp
+/supabase/.env
+
+.env
+
+# Shuttle
+Secrets.toml
+.shuttle

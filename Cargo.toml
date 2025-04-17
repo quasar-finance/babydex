@@ -9,7 +9,9 @@ members = [
     "contracts/periphery/*",
     "contracts/tokenomics/*",
 ]
-
+exclude = [
+    "babydex-dashboard"
+]
 [workspace.dependencies]
 cosmwasm-std = "2.2"
 cw-storage-plus = { version = "2.0", features = ["macro"] }

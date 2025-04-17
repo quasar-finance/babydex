@@ -1,7 +1,7 @@
 import path = require('path');
 import dotenv = require('dotenv');
 
-dotenv.config({ path: path.resolve(__dirname, "../.env.testing") });
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 interface ENV {
   NODE_ENV: string | undefined;

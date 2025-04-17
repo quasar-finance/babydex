@@ -43,7 +43,7 @@ const Pools: React.FC = () => {
   }, [searchText]);
 
   const [currentPage, setCurrentPage] = useState(0);
-  const numberPerPage = 10;
+  const numberPerPage = 40;
   const totalPools = Math.ceil(filteredPools.length / numberPerPage);
 
   const sortedPools = [...filteredPools].sort(

@@ -75,6 +75,11 @@ async fn index(State(state): State<Arc<AppState>>) -> impl IntoResponse {
             "bbn1kghjaevh56r347v2luwngsdd2qg5hqyhzm20wgp6hllz3eteuv7q27q26f",
             "bbn17a6uvlrd7xyw3t4j2nrgy4kz0v3w8pwasweleqffvptxk6wjs6pqxvpzxw",
             "bbn1etp6acwkfv8kkuurskdepw8aqdwau5gnhjn88nfv5j6zgajdt7lq2dxukh",
+            "bbn1qew58vlyt7sx0pf73qq56qrl749456c9ft6tyv2w7q6camhkc7cs8stvlk",
+            "bbn1g6yxz0avc7c6mzc6k64lm4t9fh668s0yp5fpm9u32wu4leg4yuhs0e54h2",
+            "bbn16slnlmtu7w5hjfwyzucwm75c3kuz40jztckp2766zttdu962tndqy2zks5",
+            "bbn1cduudfszcm9slm8qxlaqvnpzg2u0hkus94fe3pwt9x446dtw6eeqwvlnpk",
+            "bbn1hs95lgvuy0p6jn4v7js5x8plfdqw867lsuh5xv6d2ua20jprkgeslpzjvl",
         ]),
     );
     invoke_options.body = Some(InvokeBody::Json(json_body));

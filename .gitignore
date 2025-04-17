@@ -38,3 +38,5 @@ next-env.d.ts
 **/.branches
 **/.temp
 **/.env
+babydex-dashboard/Secrets.toml
+babydex-dashboard/.shuttle/config.toml

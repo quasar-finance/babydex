@@ -26,7 +26,7 @@ export const pclNarrowParams = (priceScale: string) => {
     }
 }
 
-export const pclLSDParams = (priceScale: number) => {
+export const pclLSDParams = (priceScale: string) => {
     return {
         amp: "950",
         gamma: "0.015",
@@ -35,7 +35,7 @@ export const pclLSDParams = (priceScale: number) => {
         fee_gamma: "0.4",
         repeg_profit_threshold: "0.000000025",
         min_price_scale_delta: "0.000005",
-        price_scale: `${priceScale}`,
+        price_scale: priceScale,
         ma_half_time: 600
     }
 }

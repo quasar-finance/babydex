@@ -48,7 +48,7 @@ export const CellPoints: React.FC<Props> = ({ assets, className }) => {
         )}
         
         {/* Union Points */}
-        {true &&  (
+        {hasUnion &&  (
           <div className="flex items-center gap-1">
             <img 
               src="/union-logo.svg" 

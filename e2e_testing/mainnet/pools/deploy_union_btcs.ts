@@ -1,10 +1,8 @@
-import deployed from "../../deployed.json";
-import config from "../../config.json";
+import deployed from "../deployed.json";
 import {AstroportFactoryClient} from "../../sdk/AstroportFactory.client";
-import {getClientAndAddress} from "../../lib";
-import {AstroportIncentivesClient} from "../../sdk/AstroportIncentives.client";
+import {getClientAndAddress} from "../lib";
 import { pclNarrowParams, pclWideParams } from "../pcl_params";
-import { BABY, LBTC, uniBTCUnion, LBTCUnion, SolvBTCUnion, PumpBTCUnion, stBTCUnion } from "../assets";
+import { BABY, LBTC, uniBTCUnion, LBTCUnion, SolvBTCUnion, PumpBTCUnion, stBTCUnion, EBABY } from "../assets";
 
 const toBase64 = (object: any) => {
     return Buffer.from(JSON.stringify(object)).toString('base64');
@@ -32,14 +30,14 @@ const main = async () => {
     ];
 
     for (const asset of unionAssets) {
-        console.log(`Creating pairs for ${asset.name}Union-BABY...`);
+        console.log(`Creating pairs for ${asset.name}Union-EBABY...`);
         
         // Create wide pair
         await factoryClient.createPair(
             {
                 assetInfos: [
-                    { native_token: { denom: asset.denom } },
-                    { native_token: { denom: BABY } }
+                    { token: { contract_addr: asset.denom } },
+                    { token: { contract_addr: EBABY } }
                 ],
                 pairType: { concentrated: {} },
                 initParams: toBase64(pclWideParams(baby_btc_decimals))
@@ -51,8 +49,8 @@ const main = async () => {
         await factoryClient.createPair(
             {
                 assetInfos: [
-                    { native_token: { denom: asset.denom } },
-                    { native_token: { denom: BABY } }
+                    { token: { contract_addr: asset.denom } },
+                    { token: { contract_addr: EBABY } }
                 ],
                 pairType: { concentrated: {} },
                 initParams: toBase64(pclNarrowParams(baby_btc_decimals))

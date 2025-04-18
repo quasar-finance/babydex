@@ -55,7 +55,7 @@ const Pools: React.FC = () => {
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
   const {data: metrics, isLoading: isMetricLoading} = trpc.edge.indexer.getPoolMetricsByAddresses.useQuery({
     addresses: filteredPools.map((pool) => pool.poolAddress),
-    // startDate: sevenDaysAgo.toDateString()
+    startDate: sevenDaysAgo.toDateString()
   })
 
   return (

@@ -18,15 +18,6 @@ import { blockedPoolAddresses } from "~/utils/consts";
 import type { PoolMetric } from "@towerfi/types";
 import { CellVolume } from "../atoms/cells/CellVolume";
 
-const columns = [
-  { key: "name", title: "Pool", className: "col-span-2 lg:col-span-1" },
-  { key: "poolLiquidity", title: "TVL" },
-  { key: "apr", title: "APR" },
-  { key: "volume", title: "Volume 24h" },
-  /* { key: "fees", title: "Fees 24h" }, */
-  { key: "actions", title: "" },
-];
-
 const Pools: React.FC = () => {
   const { showModal } = useModal();
   const gridClass = "grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-4";
@@ -36,6 +27,14 @@ const Pools: React.FC = () => {
 
   const [searchText, setSearchText] = useState("");
   const [aprTimeframe, setAprTimeframe] = useState<'1d' | '7d'>('7d');
+
+  const columns = [
+    { key: "name", title: "Pool", className: "col-span-2 lg:col-span-1" },
+    { key: "poolLiquidity", title: "TVL" },
+    { key: "apr", title: "APR" },
+    { key: "volume", title: `Volume ${aprTimeframe === '1d' ? '24h' : '7d'}` },
+    { key: "actions", title: "" },
+  ];
 
   const filteredPools = pools
     .filter((pool) => !blockedPoolAddresses.includes(pool.poolAddress))
@@ -117,7 +116,7 @@ const Pools: React.FC = () => {
                 className="w-full"
               />
               <CellVolume
-                title="Volume"
+                title={`Volume ${aprTimeframe === '1d' ? '24h' : '7d'}`}
                 metrics={metrics?.[pool.poolAddress]}
                 assets={pool.assets}
                 timeframe={aprTimeframe}

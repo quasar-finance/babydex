@@ -21,15 +21,6 @@ import type { PoolMetric } from "@towerfi/types";
 import Input from "../../atoms/Input";
 import { CellVolume } from "../../atoms/cells/CellVolume";
 
-const columns = [
-  { key: "name", title: "Pool" },
-  { key: "deposit", title: "Total Value" },
-  { key: "apr", title: "APR" },
-  { key: "volume", title: "Volume 24h" },
-  { key: "claimableIncentives", title: "Claimable Incentives" },
-  { key: "actions", title: "" },
-];
-
 interface Props {
   pools: { poolInfo: PoolInfo; userBalance: UserPoolBalances; incentives: Asset[] }[];
   isLoading: boolean;
@@ -42,6 +33,15 @@ export const UserPools: React.FC<Props> = ({ pools, isLoading, refreshUserPools 
   const { address } = useAccount();
   const [aprTimeframe, setAprTimeframe] = useState<'1d' | '7d'>('7d');
   const [searchText, setSearchText] = useState("");
+
+  const columns = [
+    { key: "name", title: "Pool" },
+    { key: "deposit", title: "Total Value" },
+    { key: "apr", title: "APR" },
+    { key: "volume", title: `Volume ${aprTimeframe === '1d' ? '24h' : '7d'}` },
+    { key: "claimableIncentives", title: "Claimable Incentives" },
+    { key: "actions", title: "" },
+  ];
 
   const filteredPools = pools.filter(({ poolInfo }) => 
     poolInfo.name.toLowerCase().includes(searchText.toLowerCase())
@@ -136,7 +136,7 @@ export const UserPools: React.FC<Props> = ({ pools, isLoading, refreshUserPools 
                   className="order-4 w-full" 
                 />
                 <CellVolume
-                  title="Volume"
+                  title={`Volume ${aprTimeframe === '1d' ? '24h' : '7d'}`}
                   metrics={metrics?.[poolInfo.poolAddress]}
                   assets={poolInfo.assets}
                   timeframe={aprTimeframe}

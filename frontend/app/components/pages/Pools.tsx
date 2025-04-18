@@ -104,31 +104,31 @@ const Pools: React.FC = () => {
                 name={pool.name}
                 poolType={pool.poolType}
                 config={pool.config}
-                className="w-full"
+                className="w-full pr-4"
               />
               <CellTVL
                 poolLiquidity={pool.poolLiquidity}
                 poolAddress={pool.poolAddress}
                 assets={pool.assets}
-                className="w-full"
+                className="w-full pl-4"
               />
               <CellData 
                 title={`APR (${aprTimeframe})`} 
                 data={isMetricLoading || !metrics ? "..." : ((metrics as Record<string, PoolMetric>)[pool.poolAddress]?.average_apr ? `${((metrics as Record<string, PoolMetric>)[pool.poolAddress].average_apr).toFixed(2)}%` : "0%")}
-                className="w-full"
+                className="w-full px-4"
               />
               <CellVolume
                 title={`Volume ${aprTimeframe === '1d' ? '24h' : '7d'}`}
                 metrics={metrics?.[pool.poolAddress]}
                 assets={pool.assets}
                 timeframe={aprTimeframe}
-                className="w-full"
+                className="w-full px-4"
               />
               <CellPoints
                 assets={pool.assets}
-                className="w-full"
+                className="w-full px-4"
               />
-              <div className="flex items-end justify-end w-full">
+              <div className="flex items-end justify-end w-full px-4">
                 <Button
                   variant="flat"
                   onPress={() => showModal(ModalTypes.add_liquidity, false, { pool })}

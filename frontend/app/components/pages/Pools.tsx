@@ -16,19 +16,20 @@ import { useEffect, useState } from "react";
 import { Pagination } from "../atoms/Pagination";
 import { blockedPoolAddresses } from "~/utils/consts";
 import type { PoolMetric } from "@towerfi/types";
+import { CellVolume } from "../atoms/cells/CellVolume";
 
 const columns = [
   { key: "name", title: "Pool", className: "col-span-2 lg:col-span-1" },
   { key: "poolLiquidity", title: "TVL" },
   { key: "apr", title: "APR" },
-  /* { key: "volume", title: "Volume 24h" },
-  { key: "fees", title: "Fees 24h" }, */
+  { key: "volume", title: "Volume 24h" },
+  /* { key: "fees", title: "Fees 24h" }, */
   { key: "actions", title: "" },
 ];
 
 const Pools: React.FC = () => {
   const { showModal } = useModal();
-  const gridClass = "grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr] gap-3";
+  const gridClass = "grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-4";
   const { data: pools = [], isLoading } = trpc.local.pools.getPools.useQuery({
     limit: 100,
   });
@@ -102,19 +103,28 @@ const Pools: React.FC = () => {
                 name={pool.name}
                 poolType={pool.poolType}
                 config={pool.config}
+                className="w-full"
               />
               <CellTVL
                 poolLiquidity={pool.poolLiquidity}
                 poolAddress={pool.poolAddress}
                 assets={pool.assets}
+                className="w-full"
               />
               <CellData 
                 title={`APR (${aprTimeframe})`} 
                 data={isMetricLoading || !metrics ? "..." : ((metrics as Record<string, PoolMetric>)[pool.poolAddress]?.average_apr ? `${((metrics as Record<string, PoolMetric>)[pool.poolAddress].average_apr).toFixed(2)}%` : "0%")}
+                className="w-full"
               />
-              {/* <CellData title="Volume 24h" />
-            <CellData title="Fees 24h" /> */}
-              <div className="flex lg:items-end lg:justify-end">
+              <CellVolume
+                title="Volume"
+                metrics={metrics?.[pool.poolAddress]}
+                assets={pool.assets}
+                timeframe={aprTimeframe}
+                className="w-full"
+              />
+            {/*<CellData title="Fees 24h" /> */}
+              <div className="flex items-end justify-end w-full">
                 <Button
                   variant="flat"
                   onPress={() => showModal(ModalTypes.add_liquidity, false, { pool })}

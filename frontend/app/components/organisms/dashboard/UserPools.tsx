@@ -19,12 +19,13 @@ import { Menu, MenuButton, MenuItems, MenuItem } from "@headlessui/react";
 import { useState } from "react";
 import type { PoolMetric } from "@towerfi/types";
 import Input from "../../atoms/Input";
+import { CellVolume } from "../../atoms/cells/CellVolume";
 
 const columns = [
   { key: "name", title: "Pool" },
   { key: "deposit", title: "Total Value" },
   { key: "apr", title: "APR" },
-  /*  { key: "unstaked", title: "Unstaked" }, */
+  { key: "volume", title: "Volume 24h" },
   { key: "claimableIncentives", title: "Claimable Incentives" },
   { key: "actions", title: "" },
 ];
@@ -36,7 +37,7 @@ interface Props {
 }
 
 export const UserPools: React.FC<Props> = ({ pools, isLoading, refreshUserPools }) => {
-  const gridClass = "grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_8rem] gap-4";
+  const gridClass = "grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr_8rem] gap-4";
   const { showModal } = useModal();
   const { address } = useAccount();
   const [aprTimeframe, setAprTimeframe] = useState<'1d' | '7d'>('7d');
@@ -120,27 +121,34 @@ export const UserPools: React.FC<Props> = ({ pools, isLoading, refreshUserPools 
                   name={poolInfo.name}
                   poolType={poolInfo.poolType}
                   config={poolInfo.config}
-                  className="order-1 col-span-1 w-[80%] lg:w-auto"
+                  className="order-1 w-full"
                 />
                 <CellDataToken
                   title="Staked"
                   poolAddress={poolInfo.poolAddress}
                   amount={userBalance.staked_share_amount}
                   tokens={poolInfo.assets}
-                  className="order-3 w-[45%] lg:w-auto"
+                  className="order-3 w-full"
                 />
                 <CellData 
                   title={`APR (${aprTimeframe})`} 
                   data={isMetricLoading || !metrics ? "..." : ((metrics as Record<string, PoolMetric>)[poolInfo.poolAddress]?.average_apr ? `${((metrics as Record<string, PoolMetric>)[poolInfo.poolAddress].average_apr).toFixed(2)}%` : "0%")}
-                  className="order-4 w-[45%] lg:w-auto" 
+                  className="order-4 w-full" 
+                />
+                <CellVolume
+                  title="Volume"
+                  metrics={metrics?.[poolInfo.poolAddress]}
+                  assets={poolInfo.assets}
+                  timeframe={aprTimeframe}
+                  className="order-5 w-full"
                 />
                 <CellClaimRewards
                   rewards={incentives}
                   poolToken={userBalance.lpToken}
                   stakedAmount={userBalance.staked_share_amount}
-                  className="order-6 w-[45%] lg:w-auto"
+                  className="order-6 w-full"
                 />
-                <div className="order-2 lg:order-7 flex items-end justify-end w-fit lg:w-auto">
+                <div className="order-2 lg:order-7 flex items-end justify-end w-full">
                   <Menu>
                     <MenuButton className="mt-4 lg:mt-0">
                       <IconDots className="w-6 h-6" />

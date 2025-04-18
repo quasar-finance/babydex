@@ -733,7 +733,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
       const minMaxHeightsQuery = sql`
           SELECT MIN(mp.height) AS min_height,
                  MAX(mp.height) AS max_height
-          FROM v1_cosmos.materialized_pools mp
+          FROM v1_cosmos.materialized_swap mp
           WHERE mp.timestamp >= ${startDate || new Date(0)}
             AND mp.timestamp <= ${endDate || new Date()};
       `;

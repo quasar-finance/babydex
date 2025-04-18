@@ -34,6 +34,7 @@ const Pools: React.FC = () => {
   });
 
   const [searchText, setSearchText] = useState("");
+  const [aprTimeframe, setAprTimeframe] = useState<'1d' | '7d'>('7d');
 
   const filteredPools = pools
     .filter((pool) => !blockedPoolAddresses.includes(pool.poolAddress))
@@ -51,11 +52,11 @@ const Pools: React.FC = () => {
     (a, b) => Number(b.poolLiquidity) - Number(a.poolLiquidity),
   );
 
-  const sevenDaysAgo = new Date();
-  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  const startDate = new Date();
+  startDate.setUTCDate(startDate.getUTCDate() - (aprTimeframe === '7d' ? 7 : 1));
   const {data: metrics, isLoading: isMetricLoading} = trpc.edge.indexer.getPoolMetricsByAddresses.useQuery({
     addresses: filteredPools.map((pool) => pool.poolAddress),
-    startDate: sevenDaysAgo.toDateString()
+    startDate: startDate.toUTCString()
   })
 
   return (
@@ -63,6 +64,24 @@ const Pools: React.FC = () => {
       <div className="flex gap-3 justify-between items-center lg:pl-3 lg:pr-2 pl-3">
         <h1 className="text-xl">Pools</h1>
         <div className="flex gap-3 h-[42px] items-center px-2">
+          <div className="flex items-center gap-2 bg-white/5 rounded-lg p-1">
+            <button
+              onClick={() => setAprTimeframe('1d')}
+              className={`px-3 py-1 rounded-md text-sm transition-colors ${
+                aprTimeframe === '1d' ? 'bg-white/10' : 'hover:bg-white/5'
+              }`}
+            >
+              1D
+            </button>
+            <button
+              onClick={() => setAprTimeframe('7d')}
+              className={`px-3 py-1 rounded-md text-sm transition-colors ${
+                aprTimeframe === '7d' ? 'bg-white/10' : 'hover:bg-white/5'
+              }`}
+            >
+              7D
+            </button>
+          </div>
           <Input
             isSearch
             placeholder="Search"
@@ -90,8 +109,8 @@ const Pools: React.FC = () => {
                 assets={pool.assets}
               />
               <CellData 
-                title="APR" 
-                data={isMetricLoading || !metrics ? "..." : ((metrics as Record<string, PoolMetric>)[pool.poolAddress]?.average_apr ? `${((metrics as Record<string, PoolMetric>)[pool.poolAddress].average_apr).toFixed(2)}%` : "0")}
+                title={`APR (${aprTimeframe})`} 
+                data={isMetricLoading || !metrics ? "..." : ((metrics as Record<string, PoolMetric>)[pool.poolAddress]?.average_apr ? `${((metrics as Record<string, PoolMetric>)[pool.poolAddress].average_apr).toFixed(2)}%` : "0%")}
               />
               {/* <CellData title="Volume 24h" />
             <CellData title="Fees 24h" /> */}

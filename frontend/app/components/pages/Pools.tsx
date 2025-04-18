@@ -53,10 +53,10 @@ const Pools: React.FC = () => {
   );
 
   const startDate = new Date();
-  startDate.setDate(startDate.getDate() - (aprTimeframe === '7d' ? 7 : 1));
+  startDate.setUTCDate(startDate.getUTCDate() - (aprTimeframe === '7d' ? 7 : 1));
   const {data: metrics, isLoading: isMetricLoading} = trpc.edge.indexer.getPoolMetricsByAddresses.useQuery({
     addresses: filteredPools.map((pool) => pool.poolAddress),
-    startDate: startDate.toDateString()
+    startDate: startDate.toUTCString()
   })
 
   return (
@@ -110,7 +110,7 @@ const Pools: React.FC = () => {
               />
               <CellData 
                 title={`APR (${aprTimeframe})`} 
-                data={isMetricLoading || !metrics ? "..." : ((metrics as Record<string, PoolMetric>)[pool.poolAddress]?.average_apr ? `${((metrics as Record<string, PoolMetric>)[pool.poolAddress].average_apr).toFixed(2)}%` : "0")}
+                data={isMetricLoading || !metrics ? "..." : ((metrics as Record<string, PoolMetric>)[pool.poolAddress]?.average_apr ? `${((metrics as Record<string, PoolMetric>)[pool.poolAddress].average_apr).toFixed(2)}%` : "0%")}
               />
               {/* <CellData title="Volume 24h" />
             <CellData title="Fees 24h" /> */}

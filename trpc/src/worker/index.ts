@@ -18,6 +18,20 @@ interface Env {
   SUPABASE_READONLY_SSL: string;
 }
 
+// const allowedOrigins = [
+//   "https://tower-frontend-git-feat-add-pool-metrics-quasar-fi.vercel.app",
+//   "https://tower.fi",
+//   "http://localhost:3000"
+// ] as const;
+
+// const getOrigin = (request: Request): string => {
+//   const origin = request.headers.get("origin");
+//   return origin && allowedOrigins.includes(origin as typeof allowedOrigins[number]) 
+//     ? origin 
+//     : allowedOrigins[0];
+// };
+
+
 const headers = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",

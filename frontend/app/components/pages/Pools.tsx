@@ -15,6 +15,7 @@ import { Table, TableRow } from "../atoms/Table";
 import { useEffect, useState } from "react";
 import { Pagination } from "../atoms/Pagination";
 import { blockedPoolAddresses } from "~/utils/consts";
+import type { PoolMetric } from "@towerfi/types";
 
 const columns = [
   { key: "name", title: "Pool", className: "col-span-2 lg:col-span-1" },
@@ -50,6 +51,13 @@ const Pools: React.FC = () => {
     (a, b) => Number(b.poolLiquidity) - Number(a.poolLiquidity),
   );
 
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  const {data: metrics, isLoading: isMetricLoading} = trpc.edge.indexer.getPoolMetricsByAddresses.useQuery({
+    addresses: filteredPools.map((pool) => pool.poolAddress),
+    // startDate: sevenDaysAgo.toDateString()
+  })
+
   return (
     <div className="flex flex-col gap-8 px-4 pb-20 max-w-[84.5rem] mx-auto w-full min-h-[65vh] lg:pt-8">
       <div className="flex gap-3 justify-between items-center lg:pl-3 lg:pr-2 pl-3">
@@ -81,7 +89,10 @@ const Pools: React.FC = () => {
                 poolAddress={pool.poolAddress}
                 assets={pool.assets}
               />
-              <CellData title="APR" />
+              <CellData 
+                title="APR" 
+                data={isMetricLoading || !metrics ? "..." : ((metrics as Record<string, PoolMetric>)[pool.poolAddress]?.average_apr ? `${((metrics as Record<string, PoolMetric>)[pool.poolAddress].average_apr).toFixed(2)}%` : "0")}
+              />
               {/* <CellData title="Volume 24h" />
             <CellData title="Fees 24h" /> */}
               <div className="flex lg:items-end lg:justify-end">

@@ -38,6 +38,8 @@ export const CellPoints: React.FC<Props> = ({ assets, className }) => {
   
   // Determine which Union logo to show based on multiplier
   const getUnionLogo = () => {
+    if (unionMultiplier >= 3.75) return "/union/3.75x.svg";
+    if (unionMultiplier >= 2.5) return "/union/2.5x.svg";
     if (unionMultiplier >= 2.0) return "/union/2x.svg";
     if (unionMultiplier >= 1.5) return "/union/1.5x.svg";
     if (unionMultiplier >= 1.25) return "/union/1.25x.svg";

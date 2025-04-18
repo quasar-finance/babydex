@@ -31,7 +31,7 @@ export const CellPoints: React.FC<Props> = ({ assets, className }) => {
     if (hasEBaby) multipliers.push(1.5);
     
     if (multipliers.length === 0) return 0;
-    return multipliers.reduce((a, b) => a + b, 0) / multipliers.length;
+    return multipliers.reduce((a, b) => a + b, 0) / multipliers.length * 2;
   };
 
   const unionMultiplier = getUnionMultiplier();

@@ -17,10 +17,11 @@ import { Pagination } from "../atoms/Pagination";
 import { blockedPoolAddresses } from "~/utils/consts";
 import type { PoolMetric } from "@towerfi/types";
 import { CellVolume } from "../atoms/cells/CellVolume";
+import { CellPoints } from "../atoms/cells/CellPoints";
 
 const Pools: React.FC = () => {
   const { showModal } = useModal();
-  const gridClass = "grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-4";
+  const gridClass = "grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr] gap-4";
   const { data: pools = [], isLoading } = trpc.local.pools.getPools.useQuery({
     limit: 100,
   });
@@ -33,6 +34,7 @@ const Pools: React.FC = () => {
     { key: "poolLiquidity", title: "TVL" },
     { key: "apr", title: "APR" },
     { key: "volume", title: `Volume ${aprTimeframe === '1d' ? '24h' : '7d'}` },
+    { key: "points", title: "Points" },
     { key: "actions", title: "" },
   ];
 
@@ -122,7 +124,10 @@ const Pools: React.FC = () => {
                 timeframe={aprTimeframe}
                 className="w-full"
               />
-            {/*<CellData title="Fees 24h" /> */}
+              <CellPoints
+                assets={pool.assets}
+                className="w-full"
+              />
               <div className="flex items-end justify-end w-full">
                 <Button
                   variant="flat"

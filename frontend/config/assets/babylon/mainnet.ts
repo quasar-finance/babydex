@@ -68,7 +68,7 @@ export const BabylonMainnetAssets = {
     name: "UniBTC",
     decimals: 8,
     logoURI:
-      "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/btc.svg",
+      "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/uniBTC.svg",
     coingeckoId: "universal-btc",
   },
   bbn1z5gne4pe84tqerdrjta5sp966m98zgg5czqe4xu2yzxqfqv5tfkqed0jyy: {
@@ -98,7 +98,7 @@ export const BabylonMainnetAssets = {
     name: "PumpBTC",
     decimals: 8,
     logoURI:
-      "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/btc.svg",
+      "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/pumpBTC.svg",
     coingeckoId: "pumpbtc",
   },
   bbn1ccylwef8yfhafxpmtzq4ps24kxce9cfnz0wnkucsvf2rylfh0jzswhk5ks: {
@@ -108,7 +108,7 @@ export const BabylonMainnetAssets = {
     name: "Lorenzo BTC",
     decimals: 8,
     logoURI:
-      "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/btc.svg",
+      "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/stbtc.svg",
     coingeckoId: "bitcoin",
   },
 } as unknown as Record<string, Currency>;

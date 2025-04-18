@@ -20,6 +20,7 @@ import { useState } from "react";
 import type { PoolMetric } from "@towerfi/types";
 import Input from "../../atoms/Input";
 import { CellVolume } from "../../atoms/cells/CellVolume";
+import { CellPoints } from "../../atoms/cells/CellPoints";
 
 interface Props {
   pools: { poolInfo: PoolInfo; userBalance: UserPoolBalances; incentives: Asset[] }[];
@@ -28,7 +29,7 @@ interface Props {
 }
 
 export const UserPools: React.FC<Props> = ({ pools, isLoading, refreshUserPools }) => {
-  const gridClass = "grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr_8rem] gap-4";
+  const gridClass = "grid-cols-1 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_8rem] gap-4";
   const { showModal } = useModal();
   const { address } = useAccount();
   const [aprTimeframe, setAprTimeframe] = useState<'1d' | '7d'>('7d');
@@ -39,6 +40,7 @@ export const UserPools: React.FC<Props> = ({ pools, isLoading, refreshUserPools 
     { key: "deposit", title: "Total Value" },
     { key: "apr", title: "APR" },
     { key: "volume", title: `Volume ${aprTimeframe === '1d' ? '24h' : '7d'}` },
+    { key: "points", title: "Points" },
     { key: "claimableIncentives", title: "Claimable Incentives" },
     { key: "actions", title: "" },
   ];
@@ -115,78 +117,51 @@ export const UserPools: React.FC<Props> = ({ pools, isLoading, refreshUserPools 
           )
           .map(({ poolInfo, userBalance, incentives }, i) => {
             return (
-              <TableRow key={i} gridClass={twMerge("flex flex-wrap lg:grid ", gridClass)}>
+              <TableRow key={i} gridClass={twMerge("grid", gridClass)}>
                 <CellPoolName
                   assets={poolInfo.assets}
                   name={poolInfo.name}
                   poolType={poolInfo.poolType}
                   config={poolInfo.config}
-                  className="order-1 w-full"
+                  className="w-full pr-4"
                 />
                 <CellDataToken
                   title="Staked"
                   poolAddress={poolInfo.poolAddress}
                   amount={userBalance.staked_share_amount}
                   tokens={poolInfo.assets}
-                  className="order-3 w-full"
+                  className="w-full pl-4"
                 />
                 <CellData 
                   title={`APR (${aprTimeframe})`} 
                   data={isMetricLoading || !metrics ? "..." : ((metrics as Record<string, PoolMetric>)[poolInfo.poolAddress]?.average_apr ? `${((metrics as Record<string, PoolMetric>)[poolInfo.poolAddress].average_apr).toFixed(2)}%` : "0%")}
-                  className="order-4 w-full" 
+                  className="w-full px-4" 
                 />
                 <CellVolume
                   title={`Volume ${aprTimeframe === '1d' ? '24h' : '7d'}`}
                   metrics={metrics?.[poolInfo.poolAddress]}
                   assets={poolInfo.assets}
                   timeframe={aprTimeframe}
-                  className="order-5 w-full"
+                  className="w-full px-4"
+                />
+                <CellPoints
+                  assets={poolInfo.assets}
+                  className="w-full px-4"
                 />
                 <CellClaimRewards
                   rewards={incentives}
                   poolToken={userBalance.lpToken}
                   stakedAmount={userBalance.staked_share_amount}
-                  className="order-6 w-full"
+                  className="w-full px-4"
                 />
-                <div className="order-2 lg:order-7 flex items-end justify-end w-full">
+                <div className="flex items-end justify-end w-full px-4">
                   <Menu>
-                    <MenuButton className="mt-4 lg:mt-0">
+                    <MenuButton>
                       <IconDots className="w-6 h-6" />
                     </MenuButton>
-
-                    <MenuItems
-                      transition
-                      className="min-w-[10rem] p-1 z-20 bg-tw-bg border border-white/10 rounded-lg"
-                      anchor="bottom end"
-                    >
+                    <MenuItems>
                       <MenuItem>
-                        <button
-                          type="button"
-                          className="px-3 py-2 rounded-lg hover:text-tw-orange-400 hover:bg-tw-orange-400/20 w-full transition-all cursor-pointer"
-                          onClick={() =>
-                            showModal(ModalTypes.add_liquidity, false, {
-                              pool: poolInfo,
-                              refreshUserPools,
-                            })
-                          }
-                        >
-                          Add
-                        </button>
-                      </MenuItem>
-                      <MenuItem>
-                        <button
-                          type="button"
-                          className="px-3 py-2 rounded-lg hover:text-tw-orange-400 hover:bg-tw-orange-400/20 w-full transition-all cursor-pointer"
-                          onClick={() =>
-                            showModal(ModalTypes.remove_liquidity, false, {
-                              pool: poolInfo,
-                              balance: userBalance,
-                              refreshUserPools,
-                            })
-                          }
-                        >
-                          Remove
-                        </button>
+                        {/* Add your menu item content here */}
                       </MenuItem>
                     </MenuItems>
                   </Menu>

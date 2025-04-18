@@ -18,18 +18,18 @@ interface Env {
   SUPABASE_READONLY_SSL: string;
 }
 
-const allowedOrigins = [
-  "https://tower-frontend-git-feat-add-pool-metrics-quasar-fi.vercel.app",
-  "https://tower.fi",
-  "http://localhost:3000"
-] as const;
+// const allowedOrigins = [
+//   "https://tower-frontend-git-feat-add-pool-metrics-quasar-fi.vercel.app",
+//   "https://tower.fi",
+//   "http://localhost:3000"
+// ] as const;
 
-const getOrigin = (request: Request): string => {
-  const origin = request.headers.get("origin");
-  return origin && allowedOrigins.includes(origin as typeof allowedOrigins[number]) 
-    ? origin 
-    : allowedOrigins[0];
-};
+// const getOrigin = (request: Request): string => {
+//   const origin = request.headers.get("origin");
+//   return origin && allowedOrigins.includes(origin as typeof allowedOrigins[number]) 
+//     ? origin 
+//     : allowedOrigins[0];
+// };
 
 
 const headers = {
@@ -42,8 +42,7 @@ export default {
       return new Response(null, {
         status: 204,
         headers: {
-          "Access-Control-Allow-Origin": getOrigin(request),
-          "Access-Control-Allow-Credentials": "true",
+          "Access-Control-Allow-Origin": "*",
           "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
           "Access-Control-Allow-Headers":
             request.headers.get("Access-Control-Request-Headers") || "*",
@@ -88,8 +87,7 @@ export default {
       status: response.status,
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": getOrigin(request),
-        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
         "Access-Control-Allow-Headers":
           request.headers.get("Access-Control-Request-Headers") || "*",

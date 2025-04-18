@@ -61,4 +61,54 @@ export const BabylonMainnetAssets = {
       "https://raw.githubusercontent.com/cosmos/chain-registry/refs/heads/master/_non-cosmos/ethereum/images/solvBTC.svg",
     coingeckoId: "solv-btc",
   },
+  bbn1fkz8dcvsqyfy3apfh8ufexdn4ag00w5jts99zjw9nkjue0zhs4ts6hfdz2: {
+    symbol: "uniBTC",
+    type: "cw-20",
+    denom: "bbn1fkz8dcvsqyfy3apfh8ufexdn4ag00w5jts99zjw9nkjue0zhs4ts6hfdz2",
+    name: "UniBTC",
+    decimals: 8,
+    logoURI:
+      "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/btc.svg",
+    coingeckoId: "universal-btc",
+  },
+  bbn1z5gne4pe84tqerdrjta5sp966m98zgg5czqe4xu2yzxqfqv5tfkqed0jyy: {
+    symbol: "uno.LBTC",
+    type: "cw-20",
+    denom: "bbn1z5gne4pe84tqerdrjta5sp966m98zgg5czqe4xu2yzxqfqv5tfkqed0jyy",
+    name: "Lombard BTC",
+    decimals: 8,
+    logoURI:
+      "https://raw.githubusercontent.com/quasar-finance/quasar-resources/main/assets/coins/lbtc.svg",
+    coingeckoId: "lombard-staked-btc",
+  },
+  bbn1tyvxlr8qjt7yx48lhhle7xzxfxkyqwzkaxey3jekrl0gql260jlqlxgfst: {
+    symbol: "uno.solvBTC",
+    type: "cw-20",
+    denom: "bbn1tyvxlr8qjt7yx48lhhle7xzxfxkyqwzkaxey3jekrl0gql260jlqlxgfst",
+    name: "SolvBTC",
+    decimals: 18,
+    logoURI:
+      "https://raw.githubusercontent.com/cosmos/chain-registry/refs/heads/master/_non-cosmos/ethereum/images/solvBTC.svg",
+    coingeckoId: "solv-btc",
+  },
+  bbn1jr0xpgy90hqmaafdq3jtapr2p63tv59s9hcced5j4qqgs5ed9x7sr3sv0d: {
+    symbol: "PumpBTC",
+    type: "cw-20",
+    denom: "bbn1jr0xpgy90hqmaafdq3jtapr2p63tv59s9hcced5j4qqgs5ed9x7sr3sv0d",
+    name: "PumpBTC",
+    decimals: 8,
+    logoURI:
+      "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/btc.svg",
+    coingeckoId: "pumpbtc",
+  },
+  bbn1ccylwef8yfhafxpmtzq4ps24kxce9cfnz0wnkucsvf2rylfh0jzswhk5ks: {
+    symbol: "stBTC",
+    type: "cw-20",
+    denom: "bbn1ccylwef8yfhafxpmtzq4ps24kxce9cfnz0wnkucsvf2rylfh0jzswhk5ks",
+    name: "Lorenzo BTC",
+    decimals: 8,
+    logoURI:
+      "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/btc.svg",
+    coingeckoId: "bitcoin",
+  },
 } as unknown as Record<string, Currency>;

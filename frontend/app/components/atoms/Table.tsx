@@ -4,8 +4,9 @@ import { twMerge } from "~/utils/twMerge";
 
 interface Column {
   key: string;
-  title: string;
+  title: ReactNode;
   className?: string;
+  sortable?: boolean;
 }
 
 interface TableProps {
@@ -20,9 +21,9 @@ export const Table: React.FC<TableProps> = ({ columns, children, gridClass, clas
     <div className={twMerge("flex flex-col gap-3", className)}>
       <div className={twMerge("hidden lg:grid px-4 text-xs text-white/50", gridClass)}>
         {columns.map((col) => (
-          <p key={col.key} className={col.className}>
+          <div key={col.key} className={col.className}>
             {col.title}
-          </p>
+          </div>
         ))}
       </div>
       <div className="flex flex-col gap-4 lg:gap-0">{children}</div>

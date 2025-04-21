@@ -28,12 +28,21 @@ const Pools: React.FC = () => {
 
   const [searchText, setSearchText] = useState("");
   const [aprTimeframe, setAprTimeframe] = useState<'1d' | '7d'>('7d');
+  const [sortField, setSortField] = useState<'poolLiquidity' | 'apr' | 'volume'>('poolLiquidity');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+
+  const startDate = new Date();
+  startDate.setUTCDate(startDate.getUTCDate() - (aprTimeframe === '7d' ? 7 : 1));
+  const {data: metrics, isLoading: isMetricLoading} = trpc.edge.indexer.getPoolMetricsByAddresses.useQuery({
+    addresses: pools.map((pool) => pool.poolAddress),
+    startDate: startDate.toUTCString()
+  });
 
   const columns = [
     { key: "name", title: "Pool", className: "col-span-2 lg:col-span-1" },
-    { key: "poolLiquidity", title: "TVL" },
-    { key: "apr", title: "APR" },
-    { key: "volume", title: `Volume ${aprTimeframe === '1d' ? '24h' : '7d'}` },
+    { key: "poolLiquidity", title: "TVL", sortable: true },
+    { key: "apr", title: "APR", sortable: true },
+    { key: "volume", title: `Volume ${aprTimeframe === '1d' ? '24h' : '7d'}`, sortable: true },
     { key: "points", title: "Points" },
     { key: "actions", title: "" },
   ];
@@ -50,16 +59,49 @@ const Pools: React.FC = () => {
   const numberPerPage = 40;
   const totalPools = Math.ceil(filteredPools.length / numberPerPage);
 
-  const sortedPools = [...filteredPools].sort(
-    (a, b) => Number(b.poolLiquidity) - Number(a.poolLiquidity),
-  );
+  const sortedPools = [...filteredPools].sort((a, b) => {
+    if (isMetricLoading || !metrics) {
+      // Default sort by poolLiquidity when metrics aren't loaded
+      return sortDirection === 'desc' 
+        ? Number(b.poolLiquidity) - Number(a.poolLiquidity)
+        : Number(a.poolLiquidity) - Number(b.poolLiquidity);
+    }
 
-  const startDate = new Date();
-  startDate.setUTCDate(startDate.getUTCDate() - (aprTimeframe === '7d' ? 7 : 1));
-  const {data: metrics, isLoading: isMetricLoading} = trpc.edge.indexer.getPoolMetricsByAddresses.useQuery({
-    addresses: filteredPools.map((pool) => pool.poolAddress),
-    startDate: startDate.toUTCString()
-  })
+    const metricA = metrics[a.poolAddress];
+    const metricB = metrics[b.poolAddress];
+
+    let valueA: number;
+    let valueB: number;
+
+    switch (sortField) {
+      case 'apr':
+        valueA = metricA?.average_apr || 0;
+        valueB = metricB?.average_apr || 0;
+        break;
+      case 'volume':
+        valueA = (metricA?.token0_swap_volume || 0) + (metricA?.token1_swap_volume || 0);
+        valueB = (metricB?.token0_swap_volume || 0) + (metricB?.token1_swap_volume || 0);
+        break;
+      case 'poolLiquidity':
+        valueA = metricA?.tvl_usd || 0;
+        valueB = metricB?.tvl_usd || 0;
+        break;
+      default:
+        valueA = Number(a.poolLiquidity);
+        valueB = Number(b.poolLiquidity);
+    }
+
+    return sortDirection === 'desc' ? valueB - valueA : valueA - valueB;
+  });
+
+  const handleSort = (field: 'poolLiquidity' | 'apr' | 'volume') => {
+    if (field === sortField) {
+      setSortDirection(sortDirection === 'desc' ? 'asc' : 'desc');
+    } else {
+      setSortField(field);
+      setSortDirection('desc');
+    }
+  };
 
   return (
     <div className="flex flex-col gap-8 px-4 pb-20 max-w-[84.5rem] mx-auto w-full min-h-[65vh] lg:pt-8">
@@ -93,7 +135,23 @@ const Pools: React.FC = () => {
         </div>
       </div>
 
-      <Table columns={columns} gridClass={gridClass}>
+      <Table 
+        columns={columns.map(col => ({
+          ...col,
+          title: col.sortable ? (
+            <div 
+              className="flex items-center gap-2 cursor-pointer hover:text-white"
+              onClick={() => handleSort(col.key as 'poolLiquidity' | 'apr' | 'volume')}
+            >
+              {col.title}
+              {col.sortable && sortField === col.key && (
+                <span>{sortDirection === 'desc' ? '↓' : '↑'}</span>
+              )}
+            </div>
+          ) : col.title
+        }))} 
+        gridClass={gridClass}
+      >
         {isLoading && <PoolsSkeleton className={twMerge("grid", gridClass)} />}
         {sortedPools
           .slice(currentPage * numberPerPage, currentPage * numberPerPage + numberPerPage)

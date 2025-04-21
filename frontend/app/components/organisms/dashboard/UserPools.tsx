@@ -159,9 +159,35 @@ export const UserPools: React.FC<Props> = ({ pools, isLoading, refreshUserPools 
                     <MenuButton>
                       <IconDots className="w-6 h-6" />
                     </MenuButton>
-                    <MenuItems>
+                    <MenuItems className="absolute right-0 mt-2 w-48 origin-top-right bg-black/90 backdrop-blur-xl border border-white/10 rounded-xl p-1 shadow-lg z-50">
                       <MenuItem>
-                        {/* Add your menu item content here */}
+                        <button
+                          type="button"
+                          className="px-3 py-2 rounded-lg hover:text-tw-orange-400 hover:bg-tw-orange-400/20 w-full transition-all cursor-pointer"
+                          onClick={() =>
+                            showModal(ModalTypes.add_liquidity, false, {
+                              pool: poolInfo,
+                              refreshUserPools,
+                            })
+                          }
+                        >
+                          Add
+                        </button>
+                      </MenuItem>
+                      <MenuItem>
+                        <button
+                          type="button"
+                          className="px-3 py-2 rounded-lg hover:text-tw-orange-400 hover:bg-tw-orange-400/20 w-full transition-all cursor-pointer"
+                          onClick={() =>
+                            showModal(ModalTypes.remove_liquidity, false, {
+                              pool: poolInfo,
+                              balance: userBalance,
+                              refreshUserPools,
+                            })
+                          }
+                        >
+                          Remove
+                        </button>
                       </MenuItem>
                     </MenuItems>
                   </Menu>

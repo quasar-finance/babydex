@@ -5,6 +5,11 @@ import { twMerge } from "~/utils/twMerge";
 import { useModal } from "~/app/providers/ModalProvider";
 import { ModalTypes } from "~/types/modal";
 import { trpc } from "~/trpc/client";
+import { Menu, MenuButton, MenuItems, MenuItem } from "@headlessui/react";
+import { useEffect, useState } from "react";
+import type { PoolMetric } from "@towerfi/types";
+import { PoolInfo } from "@towerfi/types";
+import { calculateTowerPoints } from "~/config/points/tower";
 
 import type React from "react";
 import PoolsSkeleton from "../molecules/skeletons/PoolsSkeleton";
@@ -12,7 +17,6 @@ import { CellPoolName } from "../atoms/cells/CellPoolName";
 import { CellTVL } from "../atoms/cells/CellTVL";
 import { CellData } from "../atoms/cells/CellData";
 import { Table, TableRow } from "../atoms/Table";
-import { useEffect, useState } from "react";
 import { Pagination } from "../atoms/Pagination";
 import { blockedPoolAddresses, unionFlywheelPools } from "~/utils/consts";
 
@@ -28,6 +32,13 @@ const columns = [
 interface CalculatorInputs {
   fdv: string;
   tokenSupply: string;
+  pool: PoolInfo;
+}
+
+interface CalculatorOutputs {
+  pointsPerHour: number;
+  usdValuePerPoint: number;
+  apr: number;
 }
 
 interface ProjectCalculator {
@@ -40,7 +51,7 @@ interface ProjectCalculator {
 const PROJECT_CALCULATORS: Record<string, ProjectCalculator> = {
   union: {
     name: "Union",
-    calculateAPR: (inputs) => {
+    calculateAPR: (inputs: CalculatorInputs): number => {
       const fdvValue = parseFloat(inputs.fdv.replace('M', '')) * 1000000;
       const tokenSupplyValue = parseFloat(inputs.tokenSupply);
       return fdvValue > 0 && tokenSupplyValue > 0 ? (fdvValue / tokenSupplyValue) * 100 : 0;
@@ -58,11 +69,9 @@ const PROJECT_CALCULATORS: Record<string, ProjectCalculator> = {
   },
   tower: {
     name: "Tower",
-    calculateAPR: (inputs) => {
-      const fdvValue = parseFloat(inputs.fdv.replace('M', '')) * 1000000;
-      const tokenSupplyValue = parseFloat(inputs.tokenSupply);
-      // Tower might have a different calculation, e.g. with a multiplier
-      return fdvValue > 0 && tokenSupplyValue > 0 ? (fdvValue / tokenSupplyValue) * 100 * 1.5 : 0;
+    calculateAPR: (inputs: CalculatorInputs): number => {
+      const { apr } = calculateTowerPoints(inputs);
+      return apr;
     },
     formatInput: (value) => {
       if (!value) return '';
@@ -77,10 +86,9 @@ const PROJECT_CALCULATORS: Record<string, ProjectCalculator> = {
   },
   escher: {
     name: "Escher",
-    calculateAPR: (inputs) => {
+    calculateAPR: (inputs: CalculatorInputs): number => {
       const fdvValue = parseFloat(inputs.fdv.replace('M', '')) * 1000000;
       const tokenSupplyValue = parseFloat(inputs.tokenSupply);
-      // Escher might have a different calculation, e.g. with a different formula
       return fdvValue > 0 && tokenSupplyValue > 0 ? (fdvValue / (tokenSupplyValue * 2)) * 100 : 0;
     },
     formatInput: (value) => {
@@ -97,24 +105,28 @@ const PROJECT_CALCULATORS: Record<string, ProjectCalculator> = {
 };
 
 interface CalculatorState {
-  [key: string]: CalculatorInputs;
+  [key: string]: {
+    fdv: string;
+    tokenSupply: string;
+    pool: PoolInfo;
+  };
 }
 
 const PRESETS = {
   bear: {
-    union: { fdv: "1M", tokenSupply: "10" },
-    tower: { fdv: "0.5M", tokenSupply: "20" },
-    escher: { fdv: "0.25M", tokenSupply: "30" }
+    union: { fdv: "1M", tokenSupply: "10", pool: { poolType: "xyk" } as PoolInfo },
+    tower: { fdv: "0.5M", tokenSupply: "20", pool: { poolType: "xyk" } as PoolInfo },
+    escher: { fdv: "0.25M", tokenSupply: "30", pool: { poolType: "xyk" } as PoolInfo }
   },
   bull: {
-    union: { fdv: "5M", tokenSupply: "10" },
-    tower: { fdv: "2.5M", tokenSupply: "20" },
-    escher: { fdv: "1.25M", tokenSupply: "30" }
+    union: { fdv: "5M", tokenSupply: "10", pool: { poolType: "xyk" } as PoolInfo },
+    tower: { fdv: "2.5M", tokenSupply: "20", pool: { poolType: "xyk" } as PoolInfo },
+    escher: { fdv: "1.25M", tokenSupply: "30", pool: { poolType: "xyk" } as PoolInfo }
   },
   custom: {
-    union: { fdv: "", tokenSupply: "" },
-    tower: { fdv: "", tokenSupply: "" },
-    escher: { fdv: "", tokenSupply: "" }
+    union: { fdv: "", tokenSupply: "", pool: { poolType: "xyk" } as PoolInfo },
+    tower: { fdv: "", tokenSupply: "", pool: { poolType: "xyk" } as PoolInfo },
+    escher: { fdv: "", tokenSupply: "", pool: { poolType: "xyk" } as PoolInfo }
   }
 };
 

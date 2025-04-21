@@ -30,6 +30,72 @@ interface CalculatorInputs {
   tokenSupply: string;
 }
 
+interface ProjectCalculator {
+  name: string;
+  calculateAPR: (inputs: CalculatorInputs) => number;
+  formatInput: (value: string) => string;
+  parseInput: (value: string) => number;
+}
+
+const PROJECT_CALCULATORS: Record<string, ProjectCalculator> = {
+  union: {
+    name: "Union",
+    calculateAPR: (inputs) => {
+      const fdvValue = parseFloat(inputs.fdv.replace('M', '')) * 1000000;
+      const tokenSupplyValue = parseFloat(inputs.tokenSupply);
+      return fdvValue > 0 && tokenSupplyValue > 0 ? (fdvValue / tokenSupplyValue) * 100 : 0;
+    },
+    formatInput: (value) => {
+      if (!value) return '';
+      const numericValue = parseFloat(value);
+      return isNaN(numericValue) ? '' : `${(numericValue / 1000000).toFixed(2)}M`;
+    },
+    parseInput: (value) => {
+      if (!value) return 0;
+      const numericValue = parseFloat(value.replace('M', ''));
+      return isNaN(numericValue) ? 0 : numericValue * 1000000;
+    }
+  },
+  tower: {
+    name: "Tower",
+    calculateAPR: (inputs) => {
+      const fdvValue = parseFloat(inputs.fdv.replace('M', '')) * 1000000;
+      const tokenSupplyValue = parseFloat(inputs.tokenSupply);
+      // Tower might have a different calculation, e.g. with a multiplier
+      return fdvValue > 0 && tokenSupplyValue > 0 ? (fdvValue / tokenSupplyValue) * 100 * 1.5 : 0;
+    },
+    formatInput: (value) => {
+      if (!value) return '';
+      const numericValue = parseFloat(value);
+      return isNaN(numericValue) ? '' : `${(numericValue / 1000000).toFixed(2)}M`;
+    },
+    parseInput: (value) => {
+      if (!value) return 0;
+      const numericValue = parseFloat(value.replace('M', ''));
+      return isNaN(numericValue) ? 0 : numericValue * 1000000;
+    }
+  },
+  escher: {
+    name: "Escher",
+    calculateAPR: (inputs) => {
+      const fdvValue = parseFloat(inputs.fdv.replace('M', '')) * 1000000;
+      const tokenSupplyValue = parseFloat(inputs.tokenSupply);
+      // Escher might have a different calculation, e.g. with a different formula
+      return fdvValue > 0 && tokenSupplyValue > 0 ? (fdvValue / (tokenSupplyValue * 2)) * 100 : 0;
+    },
+    formatInput: (value) => {
+      if (!value) return '';
+      const numericValue = parseFloat(value);
+      return isNaN(numericValue) ? '' : `${(numericValue / 1000000).toFixed(2)}M`;
+    },
+    parseInput: (value) => {
+      if (!value) return 0;
+      const numericValue = parseFloat(value.replace('M', ''));
+      return isNaN(numericValue) ? 0 : numericValue * 1000000;
+    }
+  }
+};
+
 interface CalculatorState {
   [key: string]: CalculatorInputs;
 }
@@ -65,42 +131,25 @@ const Pools: React.FC = () => {
     setCalculatorState(PRESETS[preset]);
   };
 
-  const parseFDV = (value: string): number => {
-    if (!value) return 0;
-    const numericValue = parseFloat(value.replace('M', ''));
-    return isNaN(numericValue) ? 0 : numericValue * 1000000;
-  };
+  const handleInputChange = (key: string, field: keyof CalculatorInputs, value: string) => {
+    const calculator = PROJECT_CALCULATORS[key];
+    if (!calculator) return;
 
-  const formatFDV = (value: string): string => {
-    if (!value) return '';
-    const numericValue = parseFloat(value);
-    return isNaN(numericValue) ? '' : `${(numericValue / 1000000).toFixed(2)}M`;
-  };
-
-  const parseTokenSupply = (value: string): number => {
-    if (!value) return 0;
-    const numericValue = parseFloat(value);
-    return isNaN(numericValue) ? 0 : numericValue;
-  };
-
-  const formatTokenSupply = (value: string): string => {
-    if (!value) return '';
-    const numericValue = parseFloat(value);
-    return isNaN(numericValue) ? '' : numericValue.toString();
-  };
-
-  const calculateAPR = (inputs: CalculatorInputs) => {
-    const fdvValue = parseFDV(inputs.fdv);
-    const tokenSupplyValue = parseTokenSupply(inputs.tokenSupply);
-    if (fdvValue > 0 && tokenSupplyValue > 0) {
-      return (fdvValue / tokenSupplyValue) * 100;
-    }
-    return 0;
+    const formattedValue = calculator.formatInput(value);
+    setCalculatorState(prev => ({
+      ...prev,
+      [key]: {
+        ...prev[key],
+        [field]: formattedValue
+      }
+    }));
   };
 
   const calculateCombinedAPR = () => {
-    const totalAPR = Object.values(calculatorState).reduce((sum, inputs) => {
-      return sum + calculateAPR(inputs);
+    const totalAPR = Object.entries(calculatorState).reduce((sum, [key, inputs]) => {
+      const calculator = PROJECT_CALCULATORS[key];
+      if (!calculator) return sum;
+      return sum + calculator.calculateAPR(inputs);
     }, 0);
     return totalAPR;
   };
@@ -123,16 +172,6 @@ const Pools: React.FC = () => {
   const sortedPools = [...filteredPools].sort(
     (a, b) => Number(b.poolLiquidity) - Number(a.poolLiquidity),
   );
-
-  const handleInputChange = (key: string, field: keyof CalculatorInputs, value: string) => {
-    setCalculatorState(prev => ({
-      ...prev,
-      [key]: {
-        ...prev[key],
-        [field]: value
-      }
-    }));
-  };
 
   return (
     <div className="flex flex-col gap-8 px-4 pb-20 max-w-[84.5rem] mx-auto w-full min-h-[65vh] lg:pt-8">
@@ -174,31 +213,36 @@ const Pools: React.FC = () => {
               <label className="text-sm text-gray-400">Token Supply</label>
             </div>
           </div>
-          {Object.entries(calculatorState).map(([key, inputs]) => (
-            <div key={key} className="grid grid-cols-[80px_1fr_1fr] gap-4">
-              <div className="flex items-center">
-                <span className="text-sm font-medium">{key.charAt(0).toUpperCase() + key.slice(1)}</span>
+          {Object.entries(calculatorState).map(([key, inputs]) => {
+            const calculator = PROJECT_CALCULATORS[key];
+            if (!calculator) return null;
+
+            return (
+              <div key={key} className="grid grid-cols-[80px_1fr_1fr] gap-4">
+                <div className="flex items-center">
+                  <span className="text-sm font-medium">{calculator.name}</span>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <Input
+                    type="text"
+                    placeholder="Enter FDV (e.g. 1M)"
+                    value={inputs.fdv}
+                    onChange={(e) => handleInputChange(key, 'fdv', e.target.value)}
+                    className="bg-white/5"
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <Input
+                    type="text"
+                    placeholder="Enter %"
+                    value={inputs.tokenSupply}
+                    onChange={(e) => handleInputChange(key, 'tokenSupply', e.target.value)}
+                    className="bg-white/5"
+                  />
+                </div>
               </div>
-              <div className="flex flex-col gap-2">
-                <Input
-                  type="text"
-                  placeholder="Enter FDV (e.g. 1M)"
-                  value={inputs.fdv}
-                  onChange={(e) => handleInputChange(key, 'fdv', e.target.value)}
-                  className="bg-white/5"
-                />
-              </div>
-              <div className="flex flex-col gap-2">
-                <Input
-                  type="text"
-                  placeholder="Enter %"
-                  value={inputs.tokenSupply}
-                  onChange={(e) => handleInputChange(key, 'tokenSupply', e.target.value)}
-                  className="bg-white/5"
-                />
-              </div>
-            </div>
-          ))}
+            );
+          })}
           <div className="mt-4 p-4 bg-white/10 rounded-lg">
             <div className="flex justify-between items-center">
               <span className="text-gray-400">Combined Estimated APR</span>

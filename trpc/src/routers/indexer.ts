@@ -105,6 +105,23 @@ export const indexerRouter = createTRPCRouter({
         input.addresses,
       );
     }),
+  getPoolIncentiveAprsByAddresses: createTRPCPublicProcedure
+    .input(z.object({
+      addresses: z.string().array(),
+      startDate: z.string().refine(str => !isNaN(Date.parse(str)), {
+        message: "Invalid date string"
+      }).transform(str => new Date(str)).nullish(),
+      endDate: z.string().refine(str => !isNaN(Date.parse(str)), {
+        message: "Invalid date string"
+      }).transform(str => new Date(str)).nullish()
+    }))
+    .query(async ({ ctx, input }) => {
+      return await ctx.indexerService.getPoolIncentiveAprsByPoolAddresses(
+        input.addresses,
+        input.startDate,
+        input.endDate,
+      );
+    }),
   getPoolMetricsByAddresses: createTRPCPublicProcedure
     .input(z.object({ 
       addresses: z.string().array(), 

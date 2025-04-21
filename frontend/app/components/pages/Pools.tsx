@@ -18,9 +18,12 @@ import { blockedPoolAddresses } from "~/utils/consts";
 import type { PoolMetric } from "@towerfi/types";
 import { CellVolume } from "../atoms/cells/CellVolume";
 import { CellPoints } from "../atoms/cells/CellPoints";
+import { usePrices } from "~/app/hooks/usePrices";
+import { convertMicroDenomToDenom } from "~/utils/intl";
 
 const Pools: React.FC = () => {
   const { showModal } = useModal();
+  const { getPrice } = usePrices();
   const gridClass = "grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr] gap-4";
   const { data: pools = [], isLoading } = trpc.local.pools.getPools.useQuery({
     limit: 100,
@@ -95,9 +98,33 @@ const Pools: React.FC = () => {
         valueA = metricA?.average_apr || 0;
         valueB = metricB?.average_apr || 0;
         break;
+      // TODO once the token price is fetched from the indexer, use that to sort
       case 'volume':
-        valueA = (metricA?.token0_swap_volume || 0) + (metricA?.token1_swap_volume || 0);
-        valueB = (metricB?.token0_swap_volume || 0) + (metricB?.token1_swap_volume || 0);
+        // Convert token0 volume to USD
+        const token0VolumeA = getPrice(
+          convertMicroDenomToDenom(metricA?.token0_swap_volume || 0, metricA?.token0_decimals || 0, metricA?.token0_decimals || 0, false),
+          metricA?.token0_denom || '',
+          { format: false }
+        );
+        const token0VolumeB = getPrice(
+          convertMicroDenomToDenom(metricB?.token0_swap_volume || 0, metricB?.token0_decimals || 0, metricB?.token0_decimals || 0, false),
+          metricB?.token0_denom || '',
+          { format: false }
+        );
+        // Convert token1 volume to USD
+        const token1VolumeA = getPrice(
+          convertMicroDenomToDenom(metricA?.token1_swap_volume || 0, metricA?.token1_decimals || 0, metricA?.token1_decimals || 0, false),
+          metricA?.token1_denom || '',
+          { format: false }
+        );
+        const token1VolumeB = getPrice(
+          convertMicroDenomToDenom(metricB?.token1_swap_volume || 0, metricB?.token1_decimals || 0, metricB?.token1_decimals || 0, false),
+          metricB?.token1_denom || '',
+          { format: false }
+        );
+        // Sum USD volumes
+        valueA = token0VolumeA + token1VolumeA;
+        valueB = token0VolumeB + token1VolumeB;
         break;
       case 'poolLiquidity':
         valueA = metricA?.tvl_usd || 0;

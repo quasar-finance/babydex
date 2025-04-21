@@ -5,6 +5,7 @@ import { Button } from "../../atoms/Button";
 import Link from "next/link";
 import { twMerge } from "~/utils/twMerge";
 import { motion, AnimatePresence } from "motion/react";
+import { Eureka } from "./bridge/Eureka";
 
 const assets = Object.values(Assets);
 
@@ -32,69 +33,7 @@ const bridgeExternalLinks = {
   },
 };
 
-
 export const Bridge: React.FC = () => {
-  /* const [activeInput, setActiveInput] = useState<"from" | "to">("from");
-  const [fromToken, setFromToken] = useState(assets[0]);
-  const [toToken, setToToken] = useState(assets[1]);
-  const { watch, setValue, formState } = useFormContext();
-  const { isDirty } = formState;
-  const toAmount = watch("toAmount");
-  const fromAmount = watch("fromAmount");
-
-  const { simulation, simulate, skipClient } = useSkipClient({ cacheKey: "swap" });
-  const { isLoading } = simulation;
-
-  useEffect(() => {
-    if (!skipClient || !isDirty || (!toAmount && !fromAmount)) return;
-
-    (async () => {
-      const destAssetDenom = toToken.type === "cw-20" ? `cw20:${toToken.denom}` : toToken.denom;
-      const sourceAssetDenom =
-        fromToken.type === "cw-20" ? `cw20:${fromToken.denom}` : fromToken.denom;
-
-      if (activeInput === "from") {
-        const simulation = await simulate({
-          destAssetChainID: babylonTestnet.id as unknown as string,
-          destAssetDenom,
-          sourceAssetChainID: babylonTestnet.id as unknown as string,
-          sourceAssetDenom,
-          allowSwaps: true,
-          allowUnsafe: true,
-          amountIn: convertDenomToMicroDenom(fromAmount, fromToken.decimals),
-        });
-
-        setValue("toAmount", convertMicroDenomToDenom(simulation?.amountOut, toToken.decimals), {
-          shouldValidate: true,
-        });
-      } else {
-        const simulation = await simulate({
-          destAssetChainID: babylonTestnet.id as unknown as string,
-          destAssetDenom,
-          sourceAssetChainID: babylonTestnet.id as unknown as string,
-          sourceAssetDenom,
-          allowSwaps: true,
-          allowUnsafe: true,
-          amountOut: convertDenomToMicroDenom(toAmount, toToken.decimals),
-        });
-
-        setValue("fromAmount", convertMicroDenomToDenom(simulation?.amountIn, fromToken.decimals), {
-          shouldValidate: true,
-        });
-      }
-    })();
-  }, [fromAmount, toAmount, fromToken, toToken]);
-
-  const onRotate = () => {
-    const fToken = { ...fromToken };
-    const tToken = { ...toToken };
-    setFromToken(tToken);
-    setToToken(fToken);
-    setValue("fromAmount", toAmount);
-    setValue("toAmount", fromAmount);
-    setActiveInput("from");
-  }; */
-
   const [activeBridge, setActiveBridge] = useState("eureka");
 
   return (
@@ -119,40 +58,45 @@ export const Bridge: React.FC = () => {
           );
         })}
       </div>
-      <div className="bg-tw-bg rounded-2xl px-4 py-8 ">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeBridge}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3 }}
-            className="flex flex-col gap-6 w-full items-center justify-center text-center"
-          >
-            <p className="text-sm text-white/50">
-              {bridgeExternalLinks[activeBridge as keyof typeof bridgeExternalLinks].message}
-            </p>
-            <Button
-              as={Link}
-              href={bridgeExternalLinks[activeBridge as keyof typeof bridgeExternalLinks].url}
-              target="_blank"
-              className="gap-1"
-              isDisabled={
-                bridgeExternalLinks[activeBridge as keyof typeof bridgeExternalLinks].isDisabled
-              }
+      <AnimatePresence mode="wait">
+        {activeBridge === "eureka" ? (
+          <Eureka />
+        ) : (
+          <div className="bg-tw-bg rounded-2xl px-4 py-8 ">
+            <motion.div
+              key={activeBridge}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+              className="flex flex-col gap-6 w-full items-center justify-center text-center"
             >
-              {bridgeExternalLinks[activeBridge as keyof typeof bridgeExternalLinks].isDisabled ? (
-                "Coming soon"
-              ) : (
-                <p>
-                  Bridge your assets with{" "}
-                  <span className="capitalize font-extrabold">{activeBridge}</span>
-                </p>
-              )}
-            </Button>
-          </motion.div>
-        </AnimatePresence>
-      </div>
+              <p className="text-sm text-white/50">
+                {bridgeExternalLinks[activeBridge as keyof typeof bridgeExternalLinks].message}
+              </p>
+              <Button
+                as={Link}
+                href={bridgeExternalLinks[activeBridge as keyof typeof bridgeExternalLinks].url}
+                target="_blank"
+                className="gap-1"
+                isDisabled={
+                  bridgeExternalLinks[activeBridge as keyof typeof bridgeExternalLinks].isDisabled
+                }
+              >
+                {bridgeExternalLinks[activeBridge as keyof typeof bridgeExternalLinks]
+                  .isDisabled ? (
+                  "Coming soon"
+                ) : (
+                  <p>
+                    Bridge your assets with{" "}
+                    <span className="capitalize font-extrabold">{activeBridge}</span>
+                  </p>
+                )}
+              </Button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
       {/*  <BridgeAssetInput
         name="fromAmount"
         control={control}

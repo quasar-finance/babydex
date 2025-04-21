@@ -1,9 +1,15 @@
 import { useAccount } from "@cosmi/react";
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
-import { type RouteRequest, type RouteResponse, SkipClient } from "@skip-go/client";
+import {
+  type Chain,
+  type RouteRequest,
+  type RouteResponse,
+  SkipClient,
+  type Asset,
+} from "@skip-go/client";
 import type { WalletClient } from "viem";
 import { useRef } from "react";
-import { sleep } from "~/utils/promises";
+import { isTestnet } from "~/utils/global";
 
 type UseSkipClientParameters = {
   cacheKey?: string;
@@ -13,6 +19,7 @@ type UseSkipClientParameters = {
 export function useSkipClient(parameters: UseSkipClientParameters = {}): {
   simulate: (request: RouteRequest) => Promise<RouteResponse>;
   simulation: UseQueryResult<RouteResponse | null>;
+  chainsAndAssets: UseQueryResult<{ chains: Chain[]; assets: Record<string, Asset[]> }>;
   skipClient: SkipClient | undefined;
 } {
   const { connector, address } = useAccount();
@@ -32,6 +39,23 @@ export function useSkipClient(parameters: UseSkipClientParameters = {}): {
           return (await provider.getOfflineSignerAuto(chainID)) as any;
         },
       });
+    },
+  });
+
+  const chainsAndAssets = useQuery({
+    enabled: Boolean(skipClient),
+    queryKey: ["query", "chainsAndAssets", cacheKey],
+    queryFn: async () => {
+      if (!skipClient) throw new Error("skip client: no client");
+      const chains = await skipClient.getMainnetAndTestnetChains();
+      const filteredChains = chains.filter((chain) => chain.isTestnet === isTestnet);
+
+      const assets = await skipClient.assets({
+        includeCW20Assets: true,
+        includeEvmAssets: true,
+      });
+
+      return { chains: filteredChains, assets };
     },
   });
 
@@ -55,6 +79,7 @@ export function useSkipClient(parameters: UseSkipClientParameters = {}): {
   return {
     simulate,
     simulation,
+    chainsAndAssets,
     skipClient,
   };
 }

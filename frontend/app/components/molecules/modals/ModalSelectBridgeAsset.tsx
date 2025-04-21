@@ -11,9 +11,11 @@ import { useUserBalances } from "~/app/hooks/useUserBalances";
 import { Button } from "../../atoms/Button";
 import { twMerge } from "~/utils/twMerge";
 import Divider from "../../atoms/Divider";
+import { useSkipClient } from "~/app/hooks/useSkipClient";
+import { babylonMainnet } from "~/config/chains/babylon";
+import type { Asset } from "@skip-go/client";
 
 type ModalSelectBridgeAssetProps = {
-  assets: Currency[];
   onSelectAsset: (asset: Currency) => void;
   onClose: () => void;
 };
@@ -21,41 +23,16 @@ type ModalSelectBridgeAssetProps = {
 const ModalSelectBridgeAsset: React.FC<ModalSelectBridgeAssetProps> = ({
   onSelectAsset,
   onClose,
-  assets,
 }) => {
   const { hideModal } = useModal();
   const [search, setSearch] = useState("");
-  const [filteredTokens, setFilteredTokens] = useState(assets);
-  const { data: balances } = useUserBalances({ assets });
   const [selectingAction, setSelectingAction] = useState("network");
+  const [network, setNetwork] = useState<string>(babylonMainnet.id as unknown as string);
+  const [asset, setAsset] = useState<Asset>();
+  const { skipClient, chainsAndAssets } = useSkipClient();
 
-  const getBalance = useCallback(
-    (denom: string) => {
-      return balances?.find((balance) => balance.denom === denom)?.amount;
-    },
-    [balances],
-  );
-
-  const getNumericBalance = (denom: string, decimals: number) => {
-    const balance = getBalance(denom);
-    return balance ? convertMicroDenomToDenom(balance, decimals) : 0;
-  };
-
-  const searchToken = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value);
-    setFilteredTokens(
-      assets
-        .filter((token) => {
-          return (
-            token.symbol.toLowerCase().includes(e.target.value.toLowerCase()) ||
-            token.denom.toLowerCase().includes(e.target.value.toLowerCase())
-          );
-        })
-        .sort(
-          (a, b) => getNumericBalance(b.denom, b.decimals) - getNumericBalance(a.denom, a.decimals),
-        ),
-    );
-  };
+  const chain = chainsAndAssets.data?.chains.find((chain) => chain.chainID === network);
+  const chainAssets = chainsAndAssets.data?.assets[network] || [];
 
   return (
     <BasicModal
@@ -76,12 +53,8 @@ const ModalSelectBridgeAsset: React.FC<ModalSelectBridgeAssetProps> = ({
             )}
             onClick={() => setSelectingAction("network")}
           >
-            <img
-              src="https://osmosis.zone/assets/icons/osmo-logo-icon.svg"
-              alt="evm"
-              className="h-[26px] w-[26px]"
-            />
-            <p className="text-sm">Osmosis</p>
+            <img src={chain?.logoURI} alt="evm" className="h-[26px] w-[26px]" />
+            <p className="text-sm">{chain?.prettyName}</p>
           </Button>
         </div>
         <div className="flex flex-col gap-2 flex-1">
@@ -113,30 +86,48 @@ const ModalSelectBridgeAsset: React.FC<ModalSelectBridgeAssetProps> = ({
             isSearch
             fullWidth
             classNames={{ wrapperClassName: "bg-tw-gray-925 py-1" }}
-            onChange={searchToken}
             value={search}
           />
         </div>
         <div className="flex flex-col gap-2  overflow-scroll scrollbar-none h-[25rem] ">
-          {filteredTokens.map((token, index) => (
-            <div
-              key={index}
-              className="flex items-center gap-3 rounded-2xl px-3 py-3 justify-between hover:bg-white/10 transition-all cursor-pointer"
-              onClick={() => [hideModal(), onSelectAsset(token)]}
-            >
-              <div className="flex gap-3 items-center">
-                <img src={token.logoURI} alt={token.symbol} className="h-8 w-8" />
-                <div className="flex flex-col min-w-0 gap-1">
-                  <p>{token.symbol}</p>
-                  <TruncateText text={token.denom} className="text-sm text-white/50" />
-                </div>
-              </div>
-              <div className="flex flex-col gap-1">
-                <p>{convertMicroDenomToDenom(getBalance(token.denom), token.decimals)}</p>
-                <p className="text-sm text-white/50">$0</p>
-              </div>
-            </div>
-          ))}
+          {selectingAction === "network"
+            ? chainsAndAssets.data?.chains.map((chain) => {
+                return (
+                  <div
+                    key={chain.chainID}
+                    className="flex items-center gap-3 rounded-2xl px-3 py-3 justify-between hover:bg-white/10 transition-all cursor-pointer"
+                    onClick={() => setNetwork(chain.chainID)}
+                  >
+                    <div className="flex gap-3 items-center">
+                      <img src={chain.logoURI} alt={chain.prettyName} className="h-8 w-8" />
+                      <div className="flex flex-col min-w-0 gap-1">
+                        <p>{chain.prettyName}</p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            : chainAssets?.map((asset) => {
+                return (
+                  <div
+                    key={asset.denom}
+                    className="flex items-center gap-3 rounded-2xl px-3 py-3 justify-between hover:bg-white/10 transition-all cursor-pointer"
+                    onClick={() => [hideModal(), onSelectAsset(asset)]}
+                  >
+                    <div className="flex gap-3 items-center">
+                      <img src={asset.logoURI} alt={asset.symbol} className="h-8 w-8" />
+                      <div className="flex flex-col min-w-0 gap-1">
+                        <p>{asset.symbol}</p>
+                        <TruncateText text={asset.denom} className="text-sm text-white/50" />
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <p>0</p>
+                      <p className="text-sm text-white/50">$0</p>
+                    </div>
+                  </div>
+                );
+              })}
         </div>
       </div>
     </BasicModal>

@@ -1,8 +1,6 @@
 "use client";
 
 import type React from "react";
-import AssetsStacked from "../AssetsStacked";
-import Pill from "../Pill";
 import type { PoolInfo } from "@towerfi/types";
 import { twMerge } from "~/utils/twMerge";
 import { convertMicroDenomToDenom } from "~/utils/intl";

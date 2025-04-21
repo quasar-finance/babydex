@@ -117,17 +117,17 @@ const SwapComponent: React.FC = () => {
         <FormProvider {...methods}>
           <Suspense fallback={<Spinner />}>
             <div className="w-full flex-1 flex items-center justify-center bg-tw-sub-bg rounded-2xl p-2 flex-col relative">
-              {/* {action === "bridge" && (
-              <motion.button
-                type="button"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={() => showModal(ModalTypes.connect_bridge, true)}
-                className="absolute top-[10px] right-12 p-2 bg-tw-bg rounded-full z-10"
-              >
-                <IconWallet className="w-5 h-5" />
-              </motion.button>
-            )} */}
+              {action === "bridge" && (
+                <motion.button
+                  type="button"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => showModal(ModalTypes.connect_bridge, true)}
+                  className="absolute top-[10px] right-12 p-2 bg-tw-bg rounded-full z-10"
+                >
+                  <IconWallet className="w-5 h-5" />
+                </motion.button>
+              )}
               <motion.button
                 type="button"
                 whileHover={{ scale: 1.1 }}
@@ -162,7 +162,7 @@ const SwapComponent: React.FC = () => {
                 </TabContent>
               </Tabs>
             </div>
-            {action === "swap" && (
+            {action === "swap" ? (
               <div className="w-full flex flex-col gap-6  relative z-20">
                 <div className="backdrop-blur-md rounded-2xl">
                   {isConnected ? (
@@ -182,6 +182,27 @@ const SwapComponent: React.FC = () => {
                   )}
                 </div>
                 <SwapInfoAccordion simulation={simulation} className="absolute w-full top-14" />
+              </div>
+            ) : (
+              <div className="w-full flex flex-col gap-6  relative z-20">
+                <div className="backdrop-blur-md rounded-2xl">
+                  {isConnected ? (
+                    <Button
+                      fullWidth
+                      type="submit"
+                      isDisabled={isDisabled}
+                      isLoading={isLoading}
+                      className="backdrop-blur-md"
+                    >
+                      {text}
+                    </Button>
+                  ) : (
+                    <Button onPress={() => showModal(ModalTypes.connect_wallet)} fullWidth>
+                      Connect Wallet
+                    </Button>
+                  )}
+                </div>
+                {/* <SwapInfoAccordion simulation={simulation} className="absolute w-full top-14" /> */}
               </div>
             )}
           </Suspense>

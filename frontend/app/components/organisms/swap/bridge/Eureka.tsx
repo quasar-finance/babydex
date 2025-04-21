@@ -1,0 +1,97 @@
+"use client";
+import type React from "react";
+import { useEffect, useState } from "react";
+import { useFormContext } from "react-hook-form";
+import { BridgeAssetInput } from "~/app/components/atoms/BridgeAssetInput";
+import RotateButton from "~/app/components/atoms/RotateButton";
+import { useSkipClient } from "~/app/hooks/useSkipClient";
+import { Assets } from "~/config";
+import { babylonTestnet } from "~/config/chains/babylon";
+import { convertDenomToMicroDenom, convertMicroDenomToDenom } from "~/utils/intl";
+
+const assets = Object.values(Assets);
+
+export const Eureka: React.FC = () => {
+  const [activeInput, setActiveInput] = useState<"from" | "to">("from");
+  const [fromToken, setFromToken] = useState(assets[0]);
+  const [toToken, setToToken] = useState(assets[1]);
+  const { watch, setValue, formState, control } = useFormContext();
+  const { isDirty, isSubmitting } = formState;
+  const toAmount = watch("toAmount");
+  const fromAmount = watch("fromAmount");
+
+  const { simulation, simulate, skipClient } = useSkipClient({ cacheKey: "swap" });
+  const { isLoading } = simulation;
+
+  useEffect(() => {
+    if (!skipClient || !isDirty || (!toAmount && !fromAmount)) return;
+
+    (async () => {
+      const destAssetDenom = toToken.type === "cw-20" ? `cw20:${toToken.denom}` : toToken.denom;
+      const sourceAssetDenom =
+        fromToken.type === "cw-20" ? `cw20:${fromToken.denom}` : fromToken.denom;
+
+      if (activeInput === "from") {
+        const simulation = await simulate({
+          destAssetChainID: babylonTestnet.id as unknown as string,
+          destAssetDenom,
+          sourceAssetChainID: babylonTestnet.id as unknown as string,
+          sourceAssetDenom,
+          allowSwaps: true,
+          allowUnsafe: true,
+          amountIn: convertDenomToMicroDenom(fromAmount, fromToken.decimals),
+        });
+
+        setValue("toAmount", convertMicroDenomToDenom(simulation?.amountOut, toToken.decimals), {
+          shouldValidate: true,
+        });
+      } else {
+        const simulation = await simulate({
+          destAssetChainID: babylonTestnet.id as unknown as string,
+          destAssetDenom,
+          sourceAssetChainID: babylonTestnet.id as unknown as string,
+          sourceAssetDenom,
+          allowSwaps: true,
+          allowUnsafe: true,
+          amountOut: convertDenomToMicroDenom(toAmount, toToken.decimals),
+        });
+
+        setValue("fromAmount", convertMicroDenomToDenom(simulation?.amountIn, fromToken.decimals), {
+          shouldValidate: true,
+        });
+      }
+    })();
+  }, [fromAmount, toAmount, fromToken, toToken]);
+
+  const onRotate = () => {
+    const fToken = { ...fromToken };
+    const tToken = { ...toToken };
+    setFromToken(tToken);
+    setToToken(fToken);
+    setValue("fromAmount", toAmount);
+    setValue("toAmount", fromAmount);
+    setActiveInput("from");
+  };
+  return (
+    <>
+      <BridgeAssetInput
+        name="fromAmount"
+        control={control}
+        assets={[fromToken, toToken]}
+        disabled={isSubmitting || (isLoading && activeInput === "to")}
+        onSelect={setFromToken}
+        onFocus={() => setActiveInput("from")}
+      />
+      <RotateButton onClick={onRotate} />
+      <BridgeAssetInput
+        name="toAmount"
+        control={control}
+        assets={[toToken, fromToken]}
+        disabled={isSubmitting || (isLoading && activeInput === "from")}
+        onSelect={setToToken}
+        onFocus={() => setActiveInput("to")}
+        validateBalance={false}
+      />
+    </>
+  );
+};

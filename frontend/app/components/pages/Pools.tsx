@@ -12,7 +12,7 @@ import { CellPoolName } from "../atoms/cells/CellPoolName";
 import { CellTVL } from "../atoms/cells/CellTVL";
 import { CellData } from "../atoms/cells/CellData";
 import { Table, TableRow } from "../atoms/Table";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Pagination } from "../atoms/Pagination";
 import { blockedPoolAddresses } from "~/utils/consts";
 import type { PoolMetric } from "@towerfi/types";
@@ -31,11 +31,28 @@ const Pools: React.FC = () => {
   const [sortField, setSortField] = useState<'poolLiquidity' | 'apr' | 'volume'>('poolLiquidity');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
 
-  const startDate = new Date();
-  startDate.setUTCDate(startDate.getUTCDate() - (aprTimeframe === '7d' ? 7 : 1));
-  const {data: metrics, isLoading: isMetricLoading} = trpc.edge.indexer.getPoolMetricsByAddresses.useQuery({
-    addresses: pools.map((pool) => pool.poolAddress),
-    startDate: startDate.toUTCString()
+  const poolAddresses = useMemo(() => 
+    [...pools.map(pool => pool.poolAddress)].sort(),
+  [pools]
+  );
+
+  const startDate = useMemo(() => {
+    const date = new Date();
+    date.setUTCDate(date.getUTCDate() - (aprTimeframe === '7d' ? 7 : 1));
+    return date.toUTCString();
+  }, [aprTimeframe]);
+
+  const queryInput = useMemo(() => ({
+    addresses: poolAddresses,
+    startDate
+  }), [poolAddresses, startDate]);
+
+  const {data: metrics, isLoading: isMetricLoading} = trpc.edge.indexer.getPoolMetricsByAddresses.useQuery(queryInput, {
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    enabled: poolAddresses.length > 0,
+    staleTime: 1000 * 60 * 5 // 5 minutes
   });
 
   const columns = [

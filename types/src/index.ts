@@ -12,7 +12,7 @@ export type {
   WithAmount,
 } from "./currency.js";
 
-export type { PoolType, PoolInfo } from "./pool.js";
+export type { PoolType, PoolInfo, RewardInfo } from "./pool.js";
 
 export type {
   Addr,

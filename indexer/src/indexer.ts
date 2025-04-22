@@ -2,7 +2,7 @@ import {drizzle} from "drizzle-orm/node-postgres";
 import {Pool} from "pg";
 import {asc, desc, eq, sql, type SQL} from "drizzle-orm";
 import {StringChunk} from "drizzle-orm/sql/sql";
-import type { PoolMetric } from "@towerfi/types";
+import type {PoolMetric} from "@towerfi/types";
 
 import {
   materializedAddLiquidityInV1Cosmos,
@@ -490,7 +490,6 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     }
   }
 
-
   /**
    * Explanation of how using start and end dates affects the PoolMetric:
    *
@@ -536,7 +535,6 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     endDate?: Date,
   ): Promise<Record<string, PoolMetric> | null> {
     const now = new Date();
-    console.log("date passed " + startDate)
     const start = startDate ? new Date(startDate) : new Date(0);
     const end = endDate ? new Date(endDate) : now;
 
@@ -555,6 +553,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     const interval = calculateIntervalInDays(startDate, endDate);
     const intervalSql = createIntervalSql(interval);
     const dayInSecondsSql = sql.raw("86400");
+    const daysPerYearSql = sql.raw("365.25");
 
     const query = sql`
         WITH LatestBalances AS (SELECT p.pool_address,
@@ -599,26 +598,25 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
                              WHERE s.pool_address = ${poolAddressesSql}
                                  ${createHeightsFilterSql("s", startHeight, endHeight)}
                              GROUP BY s.pool_address),
-             DailyYield AS (SELECT hpy.pool_address,
-                                   CASE
-                                       WHEN hpy.total_liquidity_usd > 0 AND
-                                            (EXTRACT(EPOCH FROM (LEAD(hpy.timestamp, 1, NOW())
-                                                                 OVER (PARTITION BY hpy.pool_address ORDER BY hpy.timestamp) -
-                                                                 hpy.timestamp)) / 86400) > 0
-                                           THEN hpy.fees_usd / hpy.total_liquidity_usd / (EXTRACT(EPOCH FROM (
-                                                   LEAD(hpy.timestamp, 1, NOW())
-                                                   OVER (PARTITION BY hpy.pool_address ORDER BY hpy.timestamp) -
-                                                   hpy.timestamp)) /
-                                                                                          86400)
-                                       ELSE 0
-                                       END AS daily_yield
-                            FROM v1_cosmos.materialized_historic_pool_yield hpy
-                            WHERE hpy.pool_address = ${poolAddressesSql}
-                                ${createHeightsFilterSql("hpy", startHeight, endHeight)}),
-             AvgDailyYield AS (SELECT pool_address,
-                                      AVG(daily_yield) * 365 AS avg_apr
-                               FROM DailyYield
-                               GROUP BY pool_address),
+             DailyFees AS (SELECT hpy.pool_address,
+                                  CASE
+                                      WHEN hpy.total_liquidity_usd > 0 AND
+                                           (EXTRACT(EPOCH FROM (LEAD(hpy.timestamp, 1, NOW())
+                                                                OVER (PARTITION BY hpy.pool_address ORDER BY hpy.timestamp) -
+                                                                hpy.timestamp)) / ${dayInSecondsSql}) > 0
+                                          THEN hpy.fees_usd / hpy.total_liquidity_usd / (EXTRACT(EPOCH FROM (
+                                                  LEAD(hpy.timestamp, 1, NOW())
+                                                  OVER (PARTITION BY hpy.pool_address ORDER BY hpy.timestamp) -
+                                                  hpy.timestamp)) / ${dayInSecondsSql})
+                                      ELSE 0
+                                      END AS daily_fees
+                           FROM v1_cosmos.materialized_historic_pool_yield hpy
+                           WHERE hpy.pool_address = ${poolAddressesSql}
+                               ${createHeightsFilterSql("hpy", startHeight, endHeight)}),
+             AvgDailyFees AS (SELECT pool_address,
+                                     AVG(daily_fees) AS avg_fees
+                              FROM DailyFees
+                              GROUP BY pool_address),
              Incentives As (SELECT plt.pool     AS pool_address,
                                    plt.lp_token AS lp_token_address,
                                    CASE
@@ -648,52 +646,78 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
                                  v1_cosmos.materialized_incentivize i ON plt.lp_token = i.lp_token
                             WHERE i.timestamp >= NOW() - (${intervalSql} || ' days')::INTERVAL
                               AND plt.pool = ${poolAddressesSql}
-                            GROUP BY plt.pool, plt.lp_token)
+                            GROUP BY plt.pool, plt.lp_token),
+             TokenInfo as (select pb.pool_address,
+                                  tp0.price       as token0_price,
+                                  t0.decimals     as token0_decimals,
+                                  t0.denomination as token0_denom,
+                                  tp1.price       as token1_price,
+                                  t1.decimals     as token1_decimals,
+                                  t1.denomination as token1_denom,
+                                  COALESCE(
+                                          CASE
+                                              WHEN tp0.price IS NOT NULL AND t0.decimals IS NOT NULL
+                                                  THEN (pb.token0_balance / POWER(10, t0.decimals)) * tp0.price
+                                              ELSE 0
+                                              END,
+                                          0
+                                  ) + COALESCE(
+                                          CASE
+                                              WHEN tp1.price IS NOT NULL AND t1.decimals IS NOT NULL
+                                                  THEN (pb.token1_balance / POWER(10, t1.decimals)) * tp1.price
+                                              ELSE 0
+                                              END,
+                                          0
+                                      )           AS tvl_usd
+
+                           from PoolBalances pb
+                                    LEFT JOIN v1_cosmos.token t0 ON pb.token0_denom = t0.denomination
+                                    LEFT JOIN v1_cosmos.token t1 ON pb.token1_denom = t1.denomination
+                                    LEFT JOIN TokenPrices tp0 ON t0.token_name = tp0.token
+                                    LEFT JOIN TokenPrices tp1 ON t1.token_name = tp1.token
+                           where pb.pool_address = ${poolAddressesSql})
         SELECT pb.pool_address,
                pb.height,
                pb.token0_denom,
                pb.token0_balance,
-               t0.decimals        AS token0_decimals,
-               tp0.price          AS token0_price,
-               sv.token0_volume   AS token0_swap_volume,
+               ti.token0_decimals,
+               ti.token0_price,
+               sv.token0_volume                                                        AS token0_swap_volume,
                pb.token1_denom,
                pb.token1_balance,
-               t1.decimals        AS token1_decimals,
-               tp1.price          AS token1_price,
-               sv.token1_volume   AS token1_swap_volume,
-               COALESCE(
-                       CASE
-                           WHEN tp0.price IS NOT NULL AND t0.decimals IS NOT NULL
-                               THEN (pb.token0_balance / POWER(10, t0.decimals)) * tp0.price
-                           ELSE 0
-                           END,
-                       0
-               ) + COALESCE(
-                       CASE
-                           WHEN tp1.price IS NOT NULL AND t1.decimals IS NOT NULL
-                               THEN (pb.token1_balance / POWER(10, t1.decimals)) * tp1.price
-                           ELSE 0
-                           END,
-                       0
-                   )              AS tvl_usd,
-               ady.avg_apr        AS average_apr,
-               i.lp_token_address AS lp_token_address,
-               i.total_incentives AS total_incentives
+               ti.token1_decimals,
+               ti.token1_price,
+               sv.token1_volume                                                        AS token1_swap_volume,
+               ti.tvl_usd,
+               (COALESCE(
+                        CASE
+                            WHEN ti.token0_price IS NOT NULL AND ti.token0_decimals IS NOT NULL
+                                THEN (sv.token0_volume / POWER(10, ti.token0_decimals)) * ti.token0_price
+                            ELSE 0
+                            END,
+                        0
+                ) + COALESCE(
+                        CASE
+                            WHEN ti.token1_price IS NOT NULL AND ti.token1_decimals IS NOT NULL
+                                THEN (sv.token1_volume / POWER(10, ti.token1_decimals)) * ti.token1_price
+                            ELSE 0
+                            END,
+                        0
+                    )) * adf.avg_fees * (${daysPerYearSql} / ${interval}) / ti.tvl_usd AS average_apr,
+               i.lp_token_address                                                      AS lp_token_address,
+               i.total_incentives                                                      AS total_incentives
         FROM PoolBalances pb
-                 LEFT JOIN v1_cosmos.token t0 ON pb.token0_denom = t0.denomination
-                 LEFT JOIN v1_cosmos.token t1 ON pb.token1_denom = t1.denomination
-                 LEFT JOIN TokenPrices tp0 ON t0.token_name = tp0.token
-                 LEFT JOIN TokenPrices tp1 ON t1.token_name = tp1.token
+                 LEFT JOIN TokenInfo ti ON pb.pool_address = ti.pool_address
                  LEFT JOIN SwapVolumes sv ON pb.pool_address = sv.pool_address
-                 LEFT JOIN AvgDailyYield ady ON pb.pool_address = ady.pool_address
+                 LEFT JOIN AvgDailyFees adf ON pb.pool_address = adf.pool_address
                  LEFT JOIN Incentives i ON pb.pool_address = i.pool_address
         ORDER BY pb.pool_address;
     `;
 
     try {
-      const response = await client.execute(query);
+      const result = await client.execute(query);
 
-      return response.rows.reduce<Record<string, PoolMetric>>((acc, row) => ({
+      return result.rows.reduce<Record<string, PoolMetric>>((acc, row) => ({
         ...acc,
         [row.pool_address as string]: {
           ...row as Omit<PoolMetric, 'metric_start_height' | 'metric_end_height'>,

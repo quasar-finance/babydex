@@ -2,7 +2,7 @@ import {drizzle} from "drizzle-orm/node-postgres";
 import {Pool} from "pg";
 import {asc, desc, eq, sql, type SQL} from "drizzle-orm";
 import {StringChunk} from "drizzle-orm/sql/sql";
-import type {PoolMetric} from "@towerfi/types";
+import type {PoolIncentive, PoolMetric} from "@towerfi/types";
 
 import {
   materializedAddLiquidityInV1Cosmos,
@@ -79,11 +79,11 @@ export type Indexer = {
   getPoolIncentivesByPoolAddresses: (
     interval: number,
     addresses: string[],
-  ) => Promise<Record<string, unknown>[] | null>;
+  ) => Promise<Record<string, PoolIncentive> | null>;
   getCurrentPoolVolumes: (page: number, limit: number) => Promise<Record<string, unknown>[] | null>;
   getPoolVolumesByPoolAddresses: (addresses: string[]) => Promise<Record<string, unknown>[] | null>;
   getPoolMetricsByPoolAddresses: (addresses: string[], startDate?: Date | null, endDate?: Date | null) => Promise<Record<string, PoolMetric> | null>;
-  getPoolIncentiveAprsByPoolAddresses: (addresses: string[], startDate?: Date | null, endDate?: Date | null) => Promise<Record<string, PoolMetric> | null>;
+  getPoolIncentiveAprsByPoolAddresses: (addresses: string[], startDate?: Date | null, endDate?: Date | null) => Promise<Record<string, unknown> | null>;
 };
 
 export type IndexerFilters = {
@@ -398,6 +398,8 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     const query = sql`
         SELECT plt.pool     AS pool_address,
                plt.lp_token AS lp_token_address,
+               i.rewards_per_second, as rewards_per_second,
+               i.reward as reward_token,
                CASE
                    WHEN SUM(i.rewards_per_second * (
                        CASE
@@ -421,8 +423,9 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
         FROM v1_cosmos.pool_lp_token plt
                  LEFT JOIN
              v1_cosmos.materialized_incentivize i ON plt.lp_token = i.lp_token
+                LEFT JOIN v1_cosmos.token t0 ON i.reward = t0.denomination
         WHERE i.timestamp >= NOW() - (${intervalSql} || ' days')::INTERVAL
-        GROUP BY plt.pool, plt.lp_token
+        GROUP BY plt.pool, plt.lp_token, i.rewards_per_second, i.reward
         ORDER BY plt.pool
         LIMIT ${limit} OFFSET ${offset};
     `;
@@ -446,13 +449,16 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
   async function getPoolIncentivesByPoolAddresses(
     interval: number,
     addresses: string[],
-  ): Promise<Record<string, unknown>[] | null> {
+  ): Promise<Record<string, PoolIncentive> | null> {
     const intervalSql = createIntervalSql(interval);
     const poolAddressesSql = createPoolAddressArraySql(addresses);
     const dayInSecondsSql = sql.raw("86400");
     const query = sql`
         SELECT plt.pool     AS pool_address,
                plt.lp_token AS lp_token_address,
+               i.rewards_per_second AS rewards_per_second,
+               i.reward AS reward_token,
+               t0.decimals AS token_decimals,
                CASE
                    WHEN SUM(i.rewards_per_second * (
                        CASE
@@ -476,16 +482,21 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
         FROM v1_cosmos.pool_lp_token plt
                  LEFT JOIN
              v1_cosmos.materialized_incentivize i ON plt.lp_token = i.lp_token
+                LEFT JOIN v1_cosmos.token t0 ON i.reward = t0.denomination
         WHERE i.timestamp >= NOW() - (${intervalSql} || ' days')::INTERVAL
           AND plt.pool = ${poolAddressesSql}
-        GROUP BY plt.pool, plt.lp_token
+        GROUP BY plt.pool, plt.lp_token, i.rewards_per_second, i.reward, t0.decimals
         ORDER BY plt.pool;
     `;
 
     try {
       const result = await client.execute(query);
-      return result.rows;
-    } catch (error) {
+      return result.rows.reduce<Record<string, PoolIncentive>>((acc, row) => ({
+        ...acc,
+        [row.pool_address as string]: {
+          ...row as unknown as PoolIncentive
+        } as PoolIncentive,
+      }), {});    } catch (error) {
       console.error("Error executing raw query:", error);
       throw error;
     }

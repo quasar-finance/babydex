@@ -59,6 +59,12 @@ const Pools: React.FC = () => {
     staleTime: 1000 * 60 * 5 // 5 minutes
   });
 
+  const {data: incentiveAprs} = trpc.edge.indexer.getPoolIncentivesByAddresses.useQuery({ 
+    addresses: poolAddresses, 
+    interval: aprTimeframe === '7d' ? 7 : 1
+  });
+  console.log(incentiveAprs)
+
   const columns = [
     { key: "name", title: "Pool", className: "col-span-2 lg:col-span-1" },
     { key: "poolLiquidity", title: "TVL", sortable: true },
@@ -207,6 +213,7 @@ const Pools: React.FC = () => {
                 name={pool.name}
                 poolType={pool.poolType}
                 config={pool.config}
+                incentivized={!!incentiveAprs?.[pool.poolAddress]}
                 className="w-full pr-4"
               />
               <CellTVL
@@ -223,6 +230,7 @@ const Pools: React.FC = () => {
               <CellApr
                 title={`APR (${aprTimeframe})`}
                 metrics={metrics?.[pool.poolAddress]}
+                incentives={incentiveAprs?.[pool.poolAddress]}
                 isLoading={isMetricLoading}
 >>>>>>> c1e043e8 (add cell apr)
                 className="w-full px-4"

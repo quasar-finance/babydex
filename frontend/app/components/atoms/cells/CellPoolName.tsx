@@ -56,9 +56,13 @@ export const CellPoolName: React.FC<Props> = ({ assets, name, poolType, config, 
               : "0.30%" // TODO make this dynamic after launch
           }
         </Pill>
-        <Pill color="yellow">
-          Incentivized
-        </Pill>
+        <div className="flex items-center gap-2">
+          {incentivized && (
+            <Pill color="yellow">
+              Incentivized
+            </Pill>
+          )}
+        </div>
       </div>
     </div>
   );

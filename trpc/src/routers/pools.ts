@@ -159,22 +159,6 @@ export const poolsRouter = createTRPCRouter({
       const response: PoolInfo = await caller.local.pools.getPoolInfo({ pool });
       return response;
     }),
-  getPoolIncentives: createTRPCPublicProcedure
-  .input(z.object({ lp_token: z.string() }))
-  .query<number>(async ({ ctx, input }) => {
-    const { publicClient } = ctx;
-    const { lp_token } = input;
-    const rps = await publicClient
-    .queryContractSmart<RewardInfo>({
-      address: ctx.contracts.incentives,
-      msg: {
-          reward_info: {
-            lp_token
-          }
-        },
-      });
-    return [rps]
-  }),
   getPoolInfo: createTRPCPublicProcedure
     .input(z.object({ pool: z.any() }))
     .query<PoolInfo>(async ({ ctx, input }) => {

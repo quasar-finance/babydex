@@ -553,7 +553,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     const interval = calculateIntervalInDays(startDate, endDate);
     const intervalSql = createIntervalSql(interval);
     const dayInSecondsSql = sql.raw("86400");
-    const daysPerYearSql = sql.raw("365.25");
+    const yearInSecondsSql = sql.raw("31557600"); // 86400 * 365.25
 
     const query = sql`
         WITH LatestBalances AS (SELECT p.pool_address,
@@ -614,10 +614,10 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
                                 pool_address,
                                 total_yield_usd,
                                 total_liquidity_usd,
-                                EXTRACT(EPOCH FROM (next_timestamp - timestamp)) / 31556952.0 AS duration_years,
+                                EXTRACT(EPOCH FROM (next_timestamp - timestamp)) / ${yearInSecondsSql} AS duration_years,
                                 CASE
                                   WHEN total_liquidity_usd > 0 AND (next_timestamp IS NOT NULL)
-                                    THEN (total_yield_usd / total_liquidity_usd) / (EXTRACT(EPOCH FROM (next_timestamp - timestamp)) / 31556952.0)
+                                    THEN (total_yield_usd / total_liquidity_usd) / (EXTRACT(EPOCH FROM (next_timestamp - timestamp)) / ${yearInSecondsSql})
                                   ELSE 0
                                 END AS apr_row
                               FROM YieldPeriods

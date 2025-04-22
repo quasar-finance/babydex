@@ -216,7 +216,7 @@ const Pools: React.FC = () => {
               />
               <CellData 
                 title={`APR (${aprTimeframe})`} 
-                data={isMetricLoading || !metrics ? "..." : ((metrics as Record<string, PoolMetric>)[pool.poolAddress]?.average_apr ? `${((metrics as Record<string, PoolMetric>)[pool.poolAddress].average_apr).toFixed(2)}%` : "0%")}
+                data={isMetricLoading || !metrics ? "..." : ((metrics as Record<string, PoolMetric>)[pool.poolAddress]?.average_apr ? `${((metrics as Record<string, PoolMetric>)[pool.poolAddress].average_apr * 100).toFixed(2)}%` : "0%")}
                 className="w-full px-4"
               />
               <CellVolume

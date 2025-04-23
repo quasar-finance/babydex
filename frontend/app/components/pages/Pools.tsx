@@ -63,7 +63,6 @@ const Pools: React.FC = () => {
     addresses: poolAddresses, 
     interval: aprTimeframe === '7d' ? 7 : 1
   });
-  console.log(incentiveAprs)
 
   const columns = [
     { key: "name", title: "Pool", className: "col-span-2 lg:col-span-1" },
@@ -213,7 +212,7 @@ const Pools: React.FC = () => {
                 name={pool.name}
                 poolType={pool.poolType}
                 config={pool.config}
-                incentivized={!!incentiveAprs?.[pool.poolAddress]}
+                incentives={incentiveAprs?.[pool.poolAddress]}
                 className="w-full pr-4"
               />
               <CellTVL

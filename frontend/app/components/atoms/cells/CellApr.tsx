@@ -21,13 +21,13 @@ const CellApr: React.FC<Props> = ({ title, metrics, incentives, isLoading, class
   const formattedApr = isLoading || !metrics ? "..." : `${apr.toFixed(2)}%`;
 
   const yearInSeconds = 31557600;
+  const total_incentives = !isLoading && incentives?.rewards_per_second ? incentives.rewards_per_second * yearInSeconds : 0;
   const incentives_apr = !isLoading && incentives?.rewards_per_second && metrics?.tvl_usd ? 
     getPrice(
-      convertMicroDenomToDenom((incentives.rewards_per_second * yearInSeconds) || 0, incentives.token_decimals || 0, incentives.token_decimals || 0, false),
-      incentives.reward_token || '',
+      convertMicroDenomToDenom(total_incentives || 0, incentives?.token_decimals || 0, incentives?.token_decimals || 0, false),
+      incentives?.reward_token || '',
       { format: false }
-    ) / metrics.tvl_usd : 0;
-
+    ) / metrics.tvl_usd * 100 : 0;
   const formattedIncentives = isLoading ? "..." : `${incentives_apr.toFixed(2)}%`;
   const total_apr = apr + incentives_apr;
   const formatted_total_apr = isLoading ? "..." : `${total_apr.toFixed(2)}%`;
@@ -39,7 +39,6 @@ const CellApr: React.FC<Props> = ({ title, metrics, incentives, isLoading, class
         <span className="text-white/50">Swap Fees</span>
         <span>{formattedApr}</span>
       </div>
-      <div className="h-[1px] bg-white/10" />
       <div className="flex justify-between gap-4">
         <span className="text-white/50">Incentives</span>
         <span>{formattedIncentives}</span>

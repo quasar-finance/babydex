@@ -57,4 +57,6 @@ export interface PoolIncentive {
   reward_token: string,
   total_incentives: string;
   token_decimals: number;
+  start_ts: string;
+  end_ts: string;
 }

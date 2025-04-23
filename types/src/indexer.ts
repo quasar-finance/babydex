@@ -45,6 +45,7 @@ export type PoolMetric = {
   average_apr: number;
   lp_token_address: string;
   total_incentives: bigint;
+  incentive_apr: number | null;
   metric_start_height: bigint | null;
   metric_end_height: bigint | null;
 };

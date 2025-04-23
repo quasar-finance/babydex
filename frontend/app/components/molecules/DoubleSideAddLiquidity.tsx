@@ -86,7 +86,20 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
         const sortedTokens = [
           { amount: token0Amount, info: token0 },
           { amount: token1Amount, info: token1 },
-        ].sort((a, b) => a.info.denom.localeCompare(b.info.denom));
+        ].sort((a, b) => {
+          if (a.info.type === 'cw-20' || b.info.type === 'cw-20') {
+            return 0;
+          }
+          return a.info.denom.localeCompare(b.info.denom);
+        });
+
+        console.log({
+          slipageTolerance,
+          sender: address as string,
+          poolAddress: pool.poolAddress,
+          autoStake: true,
+          assets: sortedTokens,
+        })
 
         await signingClient.addLiquidity({
           slipageTolerance,

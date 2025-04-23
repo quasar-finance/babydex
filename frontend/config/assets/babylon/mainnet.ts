@@ -111,4 +111,14 @@ export const BabylonMainnetAssets = {
       "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/stbtc.svg",
     coingeckoId: "bitcoin",
   },
+  bbn1j2nchmpuhkq0yj93g84txe33j5lhw2y7p3anhqjhvamqxsev6rmsneu85x: {
+    symbol: "satUniBTC",
+    type: "cw-20",
+    denom: "bbn1j2nchmpuhkq0yj93g84txe33j5lhw2y7p3anhqjhvamqxsev6rmsneu85x",
+    name: "Satlayer uniBTC",
+    decimals: 8,
+    logoURI:
+      "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/uniBTC.svg",
+    coingeckoId: "universal-btc",
+  }
 } as unknown as Record<string, Currency>;

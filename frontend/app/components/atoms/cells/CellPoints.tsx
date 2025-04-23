@@ -6,6 +6,8 @@ interface Props {
   className?: string;
 }
 
+const EBABY_ADDRESS = "bbn1s7jzz7cyuqmy5xpr07yepka5ngktexsferu2cr4xeww897ftj77sv30f5s";
+
 // Union assets with their multipliers
 const UNION_ASSETS: Record<string, number> = {
   "bbn1fkz8dcvsqyfy3apfh8ufexdn4ag00w5jts99zjw9nkjue0zhs4ts6hfdz2": 1.0, // uniBTC
@@ -13,9 +15,10 @@ const UNION_ASSETS: Record<string, number> = {
   "bbn1tyvxlr8qjt7yx48lhhle7xzxfxkyqwzkaxey3jekrl0gql260jlqlxgfst": 1.0, // SolvBTC
   "bbn1jr0xpgy90hqmaafdq3jtapr2p63tv59s9hcced5j4qqgs5ed9x7sr3sv0d": 1.0, // PumpBTC
   "bbn1ccylwef8yfhafxpmtzq4ps24kxce9cfnz0wnkucsvf2rylfh0jzswhk5ks": 1.0, // stBTC
+  "bbn1j2nchmpuhkq0yj93g84txe33j5lhw2y7p3anhqjhvamqxsev6rmsneu85x": 1.5, //sat.uniBTC
+  EBABY_ADDRESS: 1.0,
 };
 
-const EBABY_ADDRESS = "bbn1s7jzz7cyuqmy5xpr07yepka5ngktexsferu2cr4xeww897ftj77sv30f5s";
 
 export const CellPoints: React.FC<Props> = ({ assets, className }) => {
   const [token0, token1] = assets;

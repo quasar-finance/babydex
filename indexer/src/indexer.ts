@@ -459,6 +459,8 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
                i.rewards_per_second AS rewards_per_second,
                i.reward AS reward_token,
                t0.decimals AS token_decimals,
+               i.start_ts,
+               i.end_ts,
                CASE
                    WHEN SUM(i.rewards_per_second * (
                        CASE
@@ -485,7 +487,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
                 LEFT JOIN v1_cosmos.token t0 ON i.reward = t0.denomination
         WHERE i.timestamp >= NOW() - (${intervalSql} || ' days')::INTERVAL
           AND plt.pool = ${poolAddressesSql}
-        GROUP BY plt.pool, plt.lp_token, i.rewards_per_second, i.reward, t0.decimals
+        GROUP BY plt.pool, plt.lp_token, i.rewards_per_second, i.reward, t0.decimals, i.start_ts, i.end_ts
         ORDER BY plt.pool;
     `;
 

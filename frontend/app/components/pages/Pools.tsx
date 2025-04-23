@@ -222,17 +222,11 @@ const Pools: React.FC = () => {
                 assets={pool.assets}
                 className="w-full pl-4"
               />
-<<<<<<< HEAD
-              <CellData 
-                title={`APR (${aprTimeframe})`} 
-                data={isMetricLoading || !metrics ? "..." : ((metrics as Record<string, PoolMetric>)[pool.poolAddress]?.average_apr ? `${((metrics as Record<string, PoolMetric>)[pool.poolAddress].average_apr * 100).toFixed(2)}%` : "0%")}
-=======
               <CellApr
                 title={`APR (${aprTimeframe})`}
                 metrics={metrics?.[pool.poolAddress]}
                 incentives={incentiveAprs?.[pool.poolAddress]}
                 isLoading={isMetricLoading}
->>>>>>> c1e043e8 (add cell apr)
                 className="w-full px-4"
               />
               <CellVolume

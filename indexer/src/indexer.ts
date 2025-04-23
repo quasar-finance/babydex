@@ -398,7 +398,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     const query = sql`
         SELECT plt.pool     AS pool_address,
                plt.lp_token AS lp_token_address,
-               i.rewards_per_second, as rewards_per_second,
+               i.rewards_per_second as rewards_per_second,
                i.reward as reward_token,
                CASE
                    WHEN SUM(i.rewards_per_second * (
@@ -682,39 +682,32 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
                              WHERE s.pool_address = ${poolAddressesSql}
                                  ${createHeightsFilterSql("s", startHeight, endHeight)}
                              GROUP BY s.pool_address),
-              YieldPeriods AS (
-                              SELECT
-                                hpy.pool_address,
-                                hpy.timestamp,
-                                hpy.total_liquidity_usd,
-                                hpy.fees_usd + hpy.incentives_usd AS total_yield_usd,
-                                LEAD(hpy.timestamp) OVER (PARTITION BY hpy.pool_address ORDER BY hpy.timestamp) AS next_timestamp
+             YieldPeriods AS (SELECT hpy.pool_address,
+                                     hpy.timestamp,
+                                     hpy.total_liquidity_usd,
+                                     hpy.fees_usd + hpy.incentives_usd                           AS total_yield_usd,
+                                     LEAD(hpy.timestamp)
+                                     OVER (PARTITION BY hpy.pool_address ORDER BY hpy.timestamp) AS next_timestamp
                               FROM v1_cosmos.materialized_historic_pool_yield hpy
                               WHERE hpy.pool_address = ${poolAddressesSql}
-                                ${createHeightsFilterSql("hpy", startHeight, endHeight)}
-                            ),
-              AnnualizedYields AS (
-                              SELECT
-                                pool_address,
-                                total_yield_usd,
-                                total_liquidity_usd,
-                                EXTRACT(EPOCH FROM (next_timestamp - timestamp)) / ${yearInSecondsSql} AS duration_years,
-                                CASE
-                                  WHEN total_liquidity_usd > 0 AND (next_timestamp IS NOT NULL)
-                                    THEN (total_yield_usd / total_liquidity_usd) / (EXTRACT(EPOCH FROM (next_timestamp - timestamp)) / ${yearInSecondsSql})
-                                  ELSE 0
-                                END AS apr_row
-                              FROM YieldPeriods
-                              WHERE next_timestamp IS NOT NULL
-                            ),
-              PoolAPR AS (
-                              SELECT
-                                pool_address,
+                                  ${createHeightsFilterSql("hpy", startHeight, endHeight)}),
+             AnnualizedYields AS (SELECT pool_address,
+                                         total_yield_usd,
+                                         total_liquidity_usd,
+                                         EXTRACT(EPOCH FROM (next_timestamp - timestamp)) / ${yearInSecondsSql} AS duration_years,
+                                         CASE
+                                             WHEN total_liquidity_usd > 0 AND (next_timestamp IS NOT NULL)
+                                                 THEN (total_yield_usd / total_liquidity_usd) /
+                                                      (EXTRACT(EPOCH FROM (next_timestamp - timestamp)) / ${yearInSecondsSql})
+                                             ELSE 0
+                                             END                                                                AS apr_row
+                                  FROM YieldPeriods
+                                  WHERE next_timestamp IS NOT NULL),
+             PoolAPR AS (SELECT pool_address,
                                 SUM(total_yield_usd) / SUM(total_liquidity_usd * duration_years) AS average_apr
-                              FROM AnnualizedYields
-                              GROUP BY pool_address
-                            ),
-              Incentives As (SELECT plt.pool     AS pool_address,
+                         FROM AnnualizedYields
+                         GROUP BY pool_address),
+             Incentives As (SELECT plt.pool     AS pool_address,
                                    plt.lp_token AS lp_token_address,
                                    CASE
                                        WHEN SUM(i.rewards_per_second * (
@@ -744,6 +737,48 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
                             WHERE i.timestamp >= NOW() - (${intervalSql} || ' days')::INTERVAL
                               AND plt.pool = ${poolAddressesSql}
                             GROUP BY plt.pool, plt.lp_token),
+             CurrentIncentives AS (SELECT i.lp_token,
+                                          i.reward AS incentive_token_denom,
+                                          i.rewards_per_second,
+                                          i.start_ts,
+                                          i.end_ts
+                                   FROM v1_cosmos.materialized_incentivize i
+                                   WHERE i.start_ts <= EXTRACT(EPOCH FROM ${end}::timestamp)
+                                     AND i.end_ts >= EXTRACT(EPOCH FROM ${start}::timestamp)),
+             IncentivesValueOverTime AS (SELECT ci.lp_token,
+                                                SUM(ci.rewards_per_second /
+                                                    power(10, t_incentive.decimals) *
+                                                    COALESCE(tp_incentive.price, 0) *
+                                                    (LEAST(ci.end_ts, EXTRACT(EPOCH FROM ${end}::timestamp)) -
+                                                     GREATEST(ci.start_ts, EXTRACT(EPOCH FROM ${start}::timestamp)))) AS total_incentive_value_usd
+                                         FROM CurrentIncentives ci
+                                                  JOIN v1_cosmos.token t_incentive
+                                                       ON ci.incentive_token_denom = t_incentive.token_name
+                                                  LEFT JOIN v1_cosmos.token_prices tp_incentive
+                                                            ON t_incentive.token_name = tp_incentive.token AND
+                                                               tp_incentive.created_at = (SELECT MAX(created_at)
+                                                                                          FROM v1_cosmos.token_prices
+                                                                                          WHERE token = t_incentive.token_name
+                                                                                            AND price IS NOT NULL
+                                                                                            AND created_at <= ${now}::timestamp)
+                                         GROUP BY ci.lp_token),
+             PoolInfo AS (SELECT DISTINCT plt.pool AS pool_address,
+                                          plt.lp_token
+                          FROM v1_cosmos.pool_lp_token plt
+                          WHERE plt.pool = ${poolAddressesSql}),
+             IncentiveAPR AS (SELECT pi.pool_address,
+                                     AVG(COALESCE(iv.total_incentive_value_usd, 0) /
+                                         NULLIF(mpl.total_liquidity_usd, 0) *
+                                         (365 * 24 * 3600) /
+                                         (EXTRACT(EPOCH FROM ${end}::timestamp) -
+                                          EXTRACT(EPOCH FROM ${start}::timestamp)) *
+                                         100) AS incentive_apr
+                              FROM PoolInfo pi
+                                       JOIN v1_cosmos.materialized_pool_liquidity mpl
+                                            ON pi.pool_address = mpl.pool_address
+                                       LEFT JOIN IncentivesValueOverTime iv ON pi.lp_token = iv.lp_token
+                              WHERE mpl.total_liquidity_usd > 0
+                              GROUP BY pi.pool_address),
              TokenInfo as (select pb.pool_address,
                                   tp0.price       as token0_price,
                                   t0.decimals     as token0_decimals,
@@ -779,21 +814,23 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
                pb.token0_balance,
                ti.token0_decimals,
                ti.token0_price,
-               sv.token0_volume                                                        AS token0_swap_volume,
+               sv.token0_volume   AS token0_swap_volume,
                pb.token1_denom,
                pb.token1_balance,
                ti.token1_decimals,
                ti.token1_price,
-               sv.token1_volume                                                        AS token1_swap_volume,
+               sv.token1_volume   AS token1_swap_volume,
                ti.tvl_usd,
-               apr.average_apr AS average_apr,
-               i.lp_token_address                                                      AS lp_token_address,
-               i.total_incentives                                                      AS total_incentives
+               apr.average_apr    AS average_apr,
+               i.lp_token_address AS lp_token_address,
+               i.total_incentives AS total_incentives,
+               iapr.incentive_apr AS incentive_apr
         FROM PoolBalances pb
                  LEFT JOIN TokenInfo ti ON pb.pool_address = ti.pool_address
                  LEFT JOIN SwapVolumes sv ON pb.pool_address = sv.pool_address
                  LEFT JOIN PoolAPR apr ON pb.pool_address = apr.pool_address
                  LEFT JOIN Incentives i ON pb.pool_address = i.pool_address
+                 LEFT JOIN IncentiveAPR iapr ON pb.pool_address = iapr.pool_address
         ORDER BY pb.pool_address;
     `;
 

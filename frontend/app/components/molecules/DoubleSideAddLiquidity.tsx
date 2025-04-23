@@ -40,12 +40,6 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
   });
 
   const [token0, token1] = pool.assets;
-  console.log('Token0:', {
-    symbol: token0.symbol,
-    denom: token0.denom,
-    type: token0.type,
-    decimals: token0.decimals
-  });
 
   // Handle nested form data for tokens with dots in their symbols
   const getFormValue = (data: any, symbol: string) => {
@@ -77,19 +71,10 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
         { duration: Number.POSITIVE_INFINITY },
       );
       try {
-        console.log('Form data:', {
-          token0Symbol: token0.symbol,
-          token0Data: getFormValue(data, token0.symbol),
-          token1Symbol: token1.symbol,
-          token1Data: getFormValue(data, token1.symbol),
-          allData: data
-        });
-
+        if (!signingClient) throw new Error("we couldn't submit the tx");
+        
         const token0Amount = convertDenomToMicroDenom(getFormValue(data, token0.symbol), token0.decimals);
         const token1Amount = convertDenomToMicroDenom(getFormValue(data, token1.symbol), token1.decimals);
-        console.log(token0Amount)
-
-        if (!signingClient) throw new Error("we couldn't submit the tx");
 
         if (token0.type === "cw-20") {
           await increaseAllowance({
@@ -116,14 +101,6 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
           }
           return a.info.denom.localeCompare(b.info.denom);
         });
-
-        console.log({
-          slipageTolerance,
-          sender: address as string,
-          poolAddress: pool.poolAddress,
-          autoStake: true,
-          assets: sortedTokens,
-        })
 
         await signingClient.addLiquidity({
           slipageTolerance,

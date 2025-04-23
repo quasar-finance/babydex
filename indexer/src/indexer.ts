@@ -707,6 +707,25 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
                                 SUM(total_yield_usd) / SUM(total_liquidity_usd * duration_years) AS average_apr
                          FROM AnnualizedYields
                          GROUP BY pool_address),
+             AllIncentives AS (SELECT plt.pool    AS pool_address,
+                                      mi.lp_token AS lp_token_address,
+                                      JSON_AGG(
+                                              JSON_BUILD_OBJECT(
+                                                      'rewards_per_second', mi.rewards_per_second,
+                                                      'reward_token', mi.reward,
+                                                      'reward_token_decimals', t.decimals,
+                                                      'start_ts', mi.start_ts,
+                                                      'end_ts', mi.end_ts,
+                                                      'height', mi.height
+                                              )
+                                      )           AS all_incentives
+                               FROM v1_cosmos.materialized_incentivize mi
+                                        JOIN v1_cosmos.pool_lp_token plt ON mi.lp_token = plt.lp_token
+                                        LEFT JOIN v1_cosmos.token t ON mi.reward = t.denomination
+                               WHERE mi.timestamp >= ${start}::timestamp
+                                 AND mi.timestamp <= ${end}::timestamp
+                                 AND plt.pool = ${poolAddressesSql}
+                               GROUP BY mi.lp_token, plt.pool),
              Incentives As (SELECT plt.pool     AS pool_address,
                                    plt.lp_token AS lp_token_address,
                                    CASE
@@ -823,12 +842,14 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
                ti.tvl_usd,
                apr.average_apr    AS average_apr,
                i.lp_token_address AS lp_token_address,
+               i.all_incentives   AS all_incentives,
                i.total_incentives AS total_incentives,
                iapr.incentive_apr AS incentive_apr
         FROM PoolBalances pb
                  LEFT JOIN TokenInfo ti ON pb.pool_address = ti.pool_address
                  LEFT JOIN SwapVolumes sv ON pb.pool_address = sv.pool_address
                  LEFT JOIN PoolAPR apr ON pb.pool_address = apr.pool_address
+                 LEFT JOIN AllIncentives i ON pb.pool_address = i.pool_address
                  LEFT JOIN Incentives i ON pb.pool_address = i.pool_address
                  LEFT JOIN IncentiveAPR iapr ON pb.pool_address = iapr.pool_address
         ORDER BY pb.pool_address;

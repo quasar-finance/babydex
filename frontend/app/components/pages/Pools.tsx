@@ -64,6 +64,23 @@ const Pools: React.FC = () => {
     interval: aprTimeframe === '7d' ? 7 : 1
   });
 
+  // Calculate total APR including incentives
+  const calculateTotalApr = (metric: PoolMetric | null | undefined, incentive: any) => {
+    if (!metric) return 0;
+    
+    const swapApr = metric.average_apr || 0;
+    const yearInSeconds = 31557600;
+    const total_incentives = incentive?.rewards_per_second ? incentive.rewards_per_second * yearInSeconds : 0;
+    const incentives_apr = incentive?.rewards_per_second && metric.tvl_usd ? 
+      getPrice(
+        convertMicroDenomToDenom(total_incentives || 0, incentive?.token_decimals || 0, incentive?.token_decimals || 0, false),
+        incentive?.reward_token || '',
+        { format: false }
+      ) / metric.tvl_usd * 100 : 0;
+
+    return swapApr + incentives_apr;
+  };
+
   const columns = [
     { key: "name", title: "Pool", className: "col-span-2 lg:col-span-1" },
     { key: "poolLiquidity", title: "TVL", sortable: true },
@@ -95,14 +112,16 @@ const Pools: React.FC = () => {
 
     const metricA = metrics[a.poolAddress];
     const metricB = metrics[b.poolAddress];
+    const incentiveA = incentiveAprs?.[a.poolAddress];
+    const incentiveB = incentiveAprs?.[b.poolAddress];
 
     let valueA: number;
     let valueB: number;
 
     switch (sortField) {
       case 'apr':
-        valueA = metricA?.average_apr || 0;
-        valueB = metricB?.average_apr || 0;
+        valueA = calculateTotalApr(metricA, incentiveA);
+        valueB = calculateTotalApr(metricB, incentiveB);
         break;
       // TODO once the token price is fetched from the indexer, use that to sort
       case 'volume':

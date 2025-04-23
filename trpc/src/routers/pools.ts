@@ -5,6 +5,7 @@ import { appRouter } from "../router.js";
 
 import type {
   PoolInfo,
+  RewardInfo,
   ConfigResponse,
   CumulativePricesResponse,
   PairInfo,

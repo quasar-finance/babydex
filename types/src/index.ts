@@ -12,7 +12,7 @@ export type {
   WithAmount,
 } from "./currency.js";
 
-export type { PoolType, PoolInfo } from "./pool.js";
+export type { PoolType, PoolInfo, RewardInfo } from "./pool.js";
 
 export type {
   Addr,
@@ -26,4 +26,4 @@ export type {
   CumulativePricesResponse,
 } from "./contracts.js";
 
-export type { UserPoolBalances, PoolMetric } from "./indexer.js";
+export type { UserPoolBalances, PoolMetric, PoolIncentive} from "./indexer.js";

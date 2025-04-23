@@ -20,6 +20,7 @@ import { CellVolume } from "../atoms/cells/CellVolume";
 import { CellPoints } from "../atoms/cells/CellPoints";
 import { usePrices } from "~/app/hooks/usePrices";
 import { convertMicroDenomToDenom } from "~/utils/intl";
+import CellApr from "../atoms/cells/CellApr";
 
 const Pools: React.FC = () => {
   const { showModal } = useModal();
@@ -57,6 +58,12 @@ const Pools: React.FC = () => {
     enabled: poolAddresses.length > 0,
     staleTime: 1000 * 60 * 5 // 5 minutes
   });
+
+  const {data: incentiveAprs} = trpc.edge.indexer.getPoolIncentivesByAddresses.useQuery({ 
+    addresses: poolAddresses, 
+    interval: aprTimeframe === '7d' ? 7 : 1
+  });
+  console.log(incentiveAprs)
 
   const columns = [
     { key: "name", title: "Pool", className: "col-span-2 lg:col-span-1" },
@@ -206,6 +213,7 @@ const Pools: React.FC = () => {
                 name={pool.name}
                 poolType={pool.poolType}
                 config={pool.config}
+                incentivized={!!incentiveAprs?.[pool.poolAddress]}
                 className="w-full pr-4"
               />
               <CellTVL
@@ -214,9 +222,11 @@ const Pools: React.FC = () => {
                 assets={pool.assets}
                 className="w-full pl-4"
               />
-              <CellData 
-                title={`APR (${aprTimeframe})`} 
-                data={isMetricLoading || !metrics ? "..." : ((metrics as Record<string, PoolMetric>)[pool.poolAddress]?.average_apr ? `${((metrics as Record<string, PoolMetric>)[pool.poolAddress].average_apr * 100).toFixed(2)}%` : "0%")}
+              <CellApr
+                title={`APR (${aprTimeframe})`}
+                metrics={metrics?.[pool.poolAddress]}
+                incentives={incentiveAprs?.[pool.poolAddress]}
+                isLoading={isMetricLoading}
                 className="w-full px-4"
               />
               <CellVolume

@@ -2,7 +2,7 @@ import {drizzle} from "drizzle-orm/node-postgres";
 import {Pool} from "pg";
 import {asc, desc, eq, sql, type SQL} from "drizzle-orm";
 import {StringChunk} from "drizzle-orm/sql/sql";
-import type {PoolMetric} from "@towerfi/types";
+import type {PoolIncentive, PoolMetric} from "@towerfi/types";
 
 import {
   materializedAddLiquidityInV1Cosmos,
@@ -79,10 +79,11 @@ export type Indexer = {
   getPoolIncentivesByPoolAddresses: (
     interval: number,
     addresses: string[],
-  ) => Promise<Record<string, unknown>[] | null>;
+  ) => Promise<Record<string, PoolIncentive> | null>;
   getCurrentPoolVolumes: (page: number, limit: number) => Promise<Record<string, unknown>[] | null>;
   getPoolVolumesByPoolAddresses: (addresses: string[]) => Promise<Record<string, unknown>[] | null>;
   getPoolMetricsByPoolAddresses: (addresses: string[], startDate?: Date | null, endDate?: Date | null) => Promise<Record<string, PoolMetric> | null>;
+  getPoolIncentiveAprsByPoolAddresses: (addresses: string[], startDate?: Date | null, endDate?: Date | null) => Promise<Record<string, unknown> | null>;
 };
 
 export type IndexerFilters = {
@@ -397,6 +398,8 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     const query = sql`
         SELECT plt.pool     AS pool_address,
                plt.lp_token AS lp_token_address,
+               i.rewards_per_second, as rewards_per_second,
+               i.reward as reward_token,
                CASE
                    WHEN SUM(i.rewards_per_second * (
                        CASE
@@ -420,8 +423,9 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
         FROM v1_cosmos.pool_lp_token plt
                  LEFT JOIN
              v1_cosmos.materialized_incentivize i ON plt.lp_token = i.lp_token
+                LEFT JOIN v1_cosmos.token t0 ON i.reward = t0.denomination
         WHERE i.timestamp >= NOW() - (${intervalSql} || ' days')::INTERVAL
-        GROUP BY plt.pool, plt.lp_token
+        GROUP BY plt.pool, plt.lp_token, i.rewards_per_second, i.reward
         ORDER BY plt.pool
         LIMIT ${limit} OFFSET ${offset};
     `;
@@ -445,13 +449,16 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
   async function getPoolIncentivesByPoolAddresses(
     interval: number,
     addresses: string[],
-  ): Promise<Record<string, unknown>[] | null> {
+  ): Promise<Record<string, PoolIncentive> | null> {
     const intervalSql = createIntervalSql(interval);
     const poolAddressesSql = createPoolAddressArraySql(addresses);
     const dayInSecondsSql = sql.raw("86400");
     const query = sql`
         SELECT plt.pool     AS pool_address,
                plt.lp_token AS lp_token_address,
+               i.rewards_per_second AS rewards_per_second,
+               i.reward AS reward_token,
+               t0.decimals AS token_decimals,
                CASE
                    WHEN SUM(i.rewards_per_second * (
                        CASE
@@ -475,18 +482,95 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
         FROM v1_cosmos.pool_lp_token plt
                  LEFT JOIN
              v1_cosmos.materialized_incentivize i ON plt.lp_token = i.lp_token
+                LEFT JOIN v1_cosmos.token t0 ON i.reward = t0.denomination
         WHERE i.timestamp >= NOW() - (${intervalSql} || ' days')::INTERVAL
           AND plt.pool = ${poolAddressesSql}
-        GROUP BY plt.pool, plt.lp_token
+        GROUP BY plt.pool, plt.lp_token, i.rewards_per_second, i.reward, t0.decimals
         ORDER BY plt.pool;
     `;
 
     try {
       const result = await client.execute(query);
-      return result.rows;
-    } catch (error) {
+      return result.rows.reduce<Record<string, PoolIncentive>>((acc, row) => ({
+        ...acc,
+        [row.pool_address as string]: {
+          ...row as unknown as PoolIncentive
+        } as PoolIncentive,
+      }), {});    } catch (error) {
       console.error("Error executing raw query:", error);
       throw error;
+    }
+  }
+
+
+
+  async function getPoolIncentiveAprsByPoolAddresses(
+    addresses: string[],
+    startDate?: Date,
+    endDate?: Date,
+  ): Promise<Record<string, unknown>[] | null> {
+    try {
+      const now = new Date();
+      const start = startDate ? new Date(startDate) : new Date(0);
+      const end = endDate ? new Date(endDate) : now;
+
+      if (startDate && start > now) {
+        throw new Error("Start date cannot be in the future.");
+      }
+
+      if (start > end) {
+        throw new Error("Start date cannot be after the end date.");
+      }
+
+      const poolAddressesSql = createPoolAddressArraySql(addresses);
+      const query = sql`
+          WITH current_incentives AS (SELECT i.lp_token,
+                                             i.reward AS incentive_token_denom,
+                                             i.rewards_per_second,
+                                             i.start_ts,
+                                             i.end_ts
+                                      FROM v1_cosmos.materialized_incentivize i
+                                      WHERE i.start_ts <= EXTRACT(EPOCH FROM ${end}::timestamp)
+                                        AND i.end_ts >= EXTRACT(EPOCH FROM ${start}::timestamp)),
+               incentives_value_over_time AS (SELECT ci.lp_token,
+                                                     SUM(ci.rewards_per_second /
+                                                         power(10, t_incentive.decimals) *
+                                                         COALESCE(tp_incentive.price, 0) *
+                                                         (LEAST(ci.end_ts, EXTRACT(EPOCH FROM ${end}::timestamp)) -
+                                                          GREATEST(ci.start_ts, EXTRACT(EPOCH FROM ${start}::timestamp)))) AS total_incentive_value_usd
+                                              FROM current_incentives ci
+                                                       JOIN v1_cosmos.token t_incentive
+                                                            ON ci.incentive_token_denom = t_incentive.token_name
+                                                       LEFT JOIN v1_cosmos.token_prices tp_incentive
+                                                                 ON t_incentive.token_name = tp_incentive.token AND
+                                                                    tp_incentive.created_at = (SELECT MAX(created_at)
+                                                                                               FROM v1_cosmos.token_prices
+                                                                                               WHERE token = t_incentive.token_name
+                                                                                                 AND price IS NOT NULL
+                                                                                                 AND created_at <= ${now}::timestamp)
+                                              GROUP BY ci.lp_token),
+               pool_info AS (SELECT DISTINCT plt.pool AS pool_address,
+                                             plt.lp_token
+                             FROM v1_cosmos.pool_lp_token plt
+                             WHERE plt.pool  = ${poolAddressesSql})
+          SELECT pi.pool_address,
+                 AVG(COALESCE(iv.total_incentive_value_usd, 0) / NULLIF(mpl.total_liquidity_usd, 0) *
+                     (365 * 24 * 3600) /
+                     (EXTRACT(EPOCH FROM ${end}::timestamp) - EXTRACT(EPOCH FROM ${start}::timestamp)) *
+                     100) AS incentive_apr
+          FROM pool_info pi
+                   JOIN v1_cosmos.materialized_pool_liquidity mpl ON pi.pool_address = mpl.pool_address
+                   LEFT JOIN incentives_value_over_time iv ON pi.lp_token = iv.lp_token
+          WHERE mpl.total_liquidity_usd > 0
+          GROUP BY pi.pool_address;
+      `;
+
+      const results = await client.execute(query);
+
+      return results.rows;
+    } catch (error) {
+      console.error('Error calculating incentive APR for pools (raw query):', error);
+      return [];
     }
   }
 
@@ -816,5 +900,6 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     getCurrentPoolIncentives,
     getPoolIncentivesByPoolAddresses,
     getPoolMetricsByPoolAddresses,
+    getPoolIncentiveAprsByPoolAddresses
   } as Indexer;
 };

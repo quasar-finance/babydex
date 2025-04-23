@@ -48,3 +48,13 @@ export type PoolMetric = {
   metric_start_height: bigint | null;
   metric_end_height: bigint | null;
 };
+
+
+export interface PoolIncentive {
+  lp_token_address: string;
+  pool_address: string;
+  rewards_per_second: number;
+  reward_token: string,
+  total_incentives: string;
+  token_decimals: number;
+}

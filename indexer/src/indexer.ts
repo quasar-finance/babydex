@@ -848,14 +848,14 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
                ti.tvl_usd,
                apr.average_apr    AS average_apr,
                i.lp_token_address AS lp_token_address,
-               i.all_incentives   AS all_incentives,
+               ai.all_incentives  AS all_incentives,
                i.total_incentives AS total_incentives,
                iapr.incentive_apr AS incentive_apr
         FROM PoolBalances pb
                  LEFT JOIN TokenInfo ti ON pb.pool_address = ti.pool_address
                  LEFT JOIN SwapVolumes sv ON pb.pool_address = sv.pool_address
                  LEFT JOIN PoolAPR apr ON pb.pool_address = apr.pool_address
-                 LEFT JOIN AllIncentives i ON pb.pool_address = i.pool_address
+                 LEFT JOIN AllIncentives ai ON pb.pool_address = ai.pool_address
                  LEFT JOIN Incentives i ON pb.pool_address = i.pool_address
                  LEFT JOIN IncentiveAPR iapr ON pb.pool_address = iapr.pool_address
         ORDER BY pb.pool_address;

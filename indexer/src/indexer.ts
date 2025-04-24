@@ -878,7 +878,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     addresses: string[],
     startDate?: Date,
     endDate?: Date,
-  ): Promise<Record<string, PoolMetric> | null> {
+  ): Promise<AggregatedMetrics | null> {
     const now = new Date();
     const start = startDate ? new Date(startDate) : new Date(0);
     const end = endDate ? new Date(endDate) : now;
@@ -1054,7 +1054,11 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     try {
       const result = await client.execute(query);
 
-      return result.rows as AggregatedMetrics[];
+      if (result.rows.length === 0) {
+        throw new Error("No data found for the given date range.");
+      }
+
+      return result.rows[0] as AggregatedMetrics;
     } catch (error) {
       console.error("Error executing raw query:", error);
 

@@ -246,5 +246,5 @@ test('get aggregated metrics by addresses', async () => {
 
   console.log(res);
 
-  expect(Object.keys(res).length).toBe(1);
+  expect(Object.keys(res).length).toBe(11);
 });

@@ -59,7 +59,7 @@ export type AggregatedMetrics = {
   total_liquidity_outflow: number;
   total_distinct_wallet_swaps: number;
   total_swaps_done: number;
-  total_incentives_done: number;
+  total_incentives_done: number | null;
   metric_start_height: bigint | null;
   metric_end_height: bigint | null;
 }

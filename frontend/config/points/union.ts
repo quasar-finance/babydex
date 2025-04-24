@@ -1,3 +1,4 @@
+import { EBABY_ADDRESS } from "./escher";
 
 // Union assets with their multipliers
 export const UNION_ASSETS: Record<string, number> = {
@@ -10,7 +11,7 @@ export const UNION_ASSETS: Record<string, number> = {
   EBABY_ADDRESS: 1.0,
 };
 
-export const getUnionMultiplier = (token0: string, token1: string, hasEBaby: boolean) => {
+export const getPointsRate = (token0: string, token1: string, hasEBaby: boolean) => {
   const multipliers = [];
   if (UNION_ASSETS[token0]) multipliers.push(UNION_ASSETS[token0]);
   if (UNION_ASSETS[token1]) multipliers.push(UNION_ASSETS[token1]);
@@ -20,6 +21,10 @@ export const getUnionMultiplier = (token0: string, token1: string, hasEBaby: boo
   return multipliers.reduce((a, b) => a + b, 0) / multipliers.length * 2;
 };
 
+export const calculateTowerPoints = (inputs: CalculatorInputs): CalculatorOutputs => {
+
+}
+
 export const getUnionLogo = (multiplier: number) => {
   if (multiplier >= 3.75) return "/union/3.75x.svg";
   if (multiplier >= 2.5) return "/union/2.5x.svg";
@@ -27,4 +32,3 @@ export const getUnionLogo = (multiplier: number) => {
   if (multiplier >= 1.5) return "/union/1.5x.svg";
   if (multiplier >= 1.25) return "/union/1.25x.svg";
   return "/union/1x.svg";
-}; 

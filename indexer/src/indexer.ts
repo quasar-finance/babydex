@@ -684,39 +684,36 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
                              WHERE s.pool_address = ${poolAddressesSql}
                                  ${createHeightsFilterSql("s", startHeight, endHeight)}
                              GROUP BY s.pool_address),
-              YieldPeriods AS (
-                              SELECT
-                                hpy.pool_address,
-                                hpy.timestamp,
-                                hpy.total_liquidity_usd,
-                                hpy.fees_usd + hpy.incentives_usd AS total_yield_usd,
-                                LEAD(hpy.timestamp) OVER (PARTITION BY hpy.pool_address ORDER BY hpy.timestamp) AS next_timestamp
+             YieldPeriods AS (SELECT hpy.pool_address,
+                                     hpy.timestamp,
+                                     hpy.total_liquidity_usd,
+                                     hpy.fees_usd + hpy.incentives_usd                                               AS total_yield_usd,
+                                     LEAD(hpy.timestamp)
+                                     OVER (PARTITION BY hpy.pool_address ORDER BY hpy.timestamp)                     AS next_timestamp
                               FROM v1_cosmos.materialized_historic_pool_yield hpy
                               WHERE hpy.pool_address = ${poolAddressesSql}
-                                ${createHeightsFilterSql("hpy", startHeight, endHeight)}
-                            ),
-              AnnualizedYields AS (
-                              SELECT
-                                pool_address,
-                                total_yield_usd,
-                                total_liquidity_usd,
-                                EXTRACT(EPOCH FROM (next_timestamp - timestamp)) / ${yearInSecondsSql} AS duration_years,
+                                  ${createHeightsFilterSql("hpy", startHeight, endHeight)}),
+             AnnualizedYields AS (SELECT pool_address,
+                                         total_yield_usd,
+                                         total_liquidity_usd,
+                                         EXTRACT(EPOCH FROM (next_timestamp - timestamp)) / ${yearInSecondsSql} AS duration_years,
+                                         CASE
+                                             WHEN total_liquidity_usd > 0 AND (next_timestamp IS NOT NULL)
+                                                 THEN (total_yield_usd / total_liquidity_usd) /
+                                                      (EXTRACT(EPOCH FROM (next_timestamp - timestamp)) / ${yearInSecondsSql})
+                                             ELSE 0
+                                             END                                                                AS apr_row
+                                  FROM YieldPeriods
+                                  WHERE next_timestamp IS NOT NULL),
+             PoolAPR AS (SELECT pool_address,
                                 CASE
-                                  WHEN total_liquidity_usd > 0 AND (next_timestamp IS NOT NULL)
-                                    THEN (total_yield_usd / total_liquidity_usd) / (EXTRACT(EPOCH FROM (next_timestamp - timestamp)) / ${yearInSecondsSql})
-                                  ELSE 0
-                                END AS apr_row
-                              FROM YieldPeriods
-                              WHERE next_timestamp IS NOT NULL
-                            ),
-              PoolAPR AS (
-                              SELECT
-                                pool_address,
-                                SUM(total_yield_usd) / SUM(total_liquidity_usd * duration_years) AS average_apr
-                              FROM AnnualizedYields
-                              GROUP BY pool_address
-                            ),
-              Incentives As (SELECT plt.pool     AS pool_address,
+                                    WHEN SUM(total_liquidity_usd * duration_years) > 0
+                                        THEN SUM(total_yield_usd) / SUM(total_liquidity_usd * duration_years)
+                                    ELSE 0
+                                    END AS average_apr
+                         FROM AnnualizedYields
+                         GROUP BY pool_address),
+             Incentives As (SELECT plt.pool     AS pool_address,
                                    plt.lp_token AS lp_token_address,
                                    CASE
                                        WHEN SUM(i.rewards_per_second * (
@@ -781,16 +778,16 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
                pb.token0_balance,
                ti.token0_decimals,
                ti.token0_price,
-               sv.token0_volume                                                        AS token0_swap_volume,
+               sv.token0_volume   AS token0_swap_volume,
                pb.token1_denom,
                pb.token1_balance,
                ti.token1_decimals,
                ti.token1_price,
-               sv.token1_volume                                                        AS token1_swap_volume,
+               sv.token1_volume   AS token1_swap_volume,
                ti.tvl_usd,
-               apr.average_apr AS average_apr,
-               i.lp_token_address                                                      AS lp_token_address,
-               i.total_incentives                                                      AS total_incentives
+               apr.average_apr    AS average_apr,
+               i.lp_token_address AS lp_token_address,
+               i.total_incentives AS total_incentives
         FROM PoolBalances pb
                  LEFT JOIN TokenInfo ti ON pb.pool_address = ti.pool_address
                  LEFT JOIN SwapVolumes sv ON pb.pool_address = sv.pool_address

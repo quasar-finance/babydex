@@ -29,7 +29,7 @@ export const Swap: React.FC = () => {
   const fromAmount = watch("fromAmount");
   const searchParams = useSearchParams();
   const { getPrice } = usePrices();
-    const { simulation, simulate, skipClient } = useSkipClient({ cacheKey: "swap" });
+  const { simulation, simulate, skipClient } = useSkipClient({ cacheKey: "swap" });
   const { isLoading, isFetching } = simulation;
 
   const { pendingSimulation, hasFreshSimulation } = useSimulationStatus({
@@ -95,8 +95,8 @@ export const Swap: React.FC = () => {
   const priceImpact = useMemo(() => {
     if (!simulation?.data || !hasFreshSimulation) return 0;
     
-    const amountInUSD = getPrice(Number(simulation.data.amountIn), simulation.data.sourceAssetDenom, { format: false });
-    const amountOutUSD = getPrice(Number(simulation.data.amountOut), simulation.data.destAssetDenom, { format: false });
+    const amountInUSD = getPrice(Number(fromAmount), simulation.data.sourceAssetDenom, { format: false });
+    const amountOutUSD = getPrice(Number(toAmount), simulation.data.destAssetDenom, { format: false });
     return amountInUSD > 0 ? ((amountInUSD - amountOutUSD) / amountInUSD) * 100 : 0;
   }, [simulation, hasFreshSimulation]);
 

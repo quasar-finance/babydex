@@ -107,7 +107,7 @@ export const CellPoints: React.FC<Props> = ({ assets, className }) => {
             <img 
               src={getSatLayerLogo()} 
               alt={`SatLayer ${satlayerMultiplier}x`} 
-              className="h-6 w-auto"
+              className="h-8 w-auto"
             />
           </div>
         )}

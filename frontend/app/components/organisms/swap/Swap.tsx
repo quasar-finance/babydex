@@ -67,7 +67,6 @@ export const Swap: React.FC = () => {
         setValue("toAmount", convertMicroDenomToDenom(simulation?.amountOut, toToken.decimals, toToken.decimals, false), {
           shouldValidate: true,
         });
-        markSimulationComplete();
       } else {
         const simulation = await simulate({
           swapVenues: [
@@ -88,7 +87,6 @@ export const Swap: React.FC = () => {
         setValue("fromAmount", convertMicroDenomToDenom(simulation?.amountIn, fromToken.decimals, fromToken.decimals, false), {
           shouldValidate: true,
         });
-        markSimulationComplete();
       }
     })();
   }, [fromAmount, toAmount, fromToken, toToken]);

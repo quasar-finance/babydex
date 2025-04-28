@@ -72,7 +72,7 @@ export const BabylonMainnetAssets = {
     coingeckoId: "universal-btc",
   },
   bbn1z5gne4pe84tqerdrjta5sp966m98zgg5czqe4xu2yzxqfqv5tfkqed0jyy: {
-    symbol: "uno.LBTC",
+    symbol: "LBTC.union",
     type: "cw-20",
     denom: "bbn1z5gne4pe84tqerdrjta5sp966m98zgg5czqe4xu2yzxqfqv5tfkqed0jyy",
     name: "Lombard BTC",
@@ -82,7 +82,7 @@ export const BabylonMainnetAssets = {
     coingeckoId: "lombard-staked-btc",
   },
   bbn1tyvxlr8qjt7yx48lhhle7xzxfxkyqwzkaxey3jekrl0gql260jlqlxgfst: {
-    symbol: "uno.solvBTC",
+    symbol: "solvBTC.union",
     type: "cw-20",
     denom: "bbn1tyvxlr8qjt7yx48lhhle7xzxfxkyqwzkaxey3jekrl0gql260jlqlxgfst",
     name: "SolvBTC",
@@ -112,7 +112,7 @@ export const BabylonMainnetAssets = {
     coingeckoId: "bitcoin",
   },
   bbn1j2nchmpuhkq0yj93g84txe33j5lhw2y7p3anhqjhvamqxsev6rmsneu85x: {
-    symbol: "satUniBTC",
+    symbol: "satUniBTC.e",
     type: "cw-20",
     denom: "bbn1j2nchmpuhkq0yj93g84txe33j5lhw2y7p3anhqjhvamqxsev6rmsneu85x",
     name: "Satlayer uniBTC",

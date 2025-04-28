@@ -5,6 +5,7 @@ export const navLinks: { label: string; to: string; isDisabled?: boolean; isExte
     { label: "Swap", to: "/swap" },
     { label: "Pools", to: "/pools" },
     { label: "Dashboard", to: "/dashboard" },
+    { label: "Bitcoin Flywheel", to: "/bitcoin-flywheel" },
     ...(isTestnet ? [{ label: "Faucet", to: "/faucet" }] : []),
   ];
 
@@ -62,3 +63,7 @@ export const blockedPoolAddresses = [
   "bbn1yum4v0v5l92jkxn8xpn9mjg7wuldk784ctg424ue8gqvdp88qzlqjpr05x",
   "bbn16slnlmtu7w5hjfwyzucwm75c3kuz40jztckp2766zttdu962tndqy2zks5"
 ];
+
+export const unionFlywheelPools: string[] = [
+  "bbn1xut80d09q0tgtch8p0z4k5f88d3uvt8cvtzm5h3tu3tsy4jk9xlsfjc5m7",
+]

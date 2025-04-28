@@ -2,16 +2,16 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 import RotateButton from "../../atoms/RotateButton";
-
 import { useFormContext } from "react-hook-form";
 import { convertDenomToMicroDenom, convertMicroDenomToDenom } from "~/utils/intl";
 import { useSkipClient } from "~/app/hooks/useSkipClient";
 import { babylon } from "~/config/chains/babylon";
 import { AssetInput } from "../../atoms/AssetInput";
 import { Assets } from "~/config";
-
 import { useSearchParams } from "next/navigation";
 import type { Currency } from "@towerfi/types";
+import { usePrices } from "~/app/hooks/usePrices";
+import { SwapPriceImpactWarning } from "../../molecules/Swap/SlippageImpactWarning.tsx";
 
 const assets = Object.values(Assets);
 
@@ -28,6 +28,7 @@ export const Swap: React.FC = () => {
   const toAmount = watch("toAmount");
   const fromAmount = watch("fromAmount");
   const searchParams = useSearchParams();
+  const { getPrice } = usePrices();
 
   const { simulation, simulate, skipClient } = useSkipClient({ cacheKey: "swap" });
   const { isLoading } = simulation;
@@ -111,6 +112,11 @@ export const Swap: React.FC = () => {
     if (toAsset) setToToken(toAsset);
   }, []);
 
+  // Calculate price impact
+  const amountInUSD = fromAmount ? getPrice(Number(fromAmount), fromToken.denom, { format: false }) : 0;
+  const amountOutUSD = toAmount ? getPrice(Number(toAmount), toToken.denom, { format: false }) : 0;
+  const priceImpact = amountInUSD > 0 ? ((amountInUSD - amountOutUSD) / amountInUSD) * 100 : 0;
+
   return (
     <div className="flex flex-col gap-2 w-full items-center justify-center">
       <AssetInput
@@ -122,6 +128,7 @@ export const Swap: React.FC = () => {
         onFocus={() => setActiveInput("from")}
       />
       <RotateButton onClick={onRotate} />
+      <SwapPriceImpactWarning priceImpact={priceImpact} />
       <AssetInput
         name="toAmount"
         control={control}

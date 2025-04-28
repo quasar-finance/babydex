@@ -15,8 +15,13 @@ const UNION_ASSETS: Record<string, number> = {
   "bbn1tyvxlr8qjt7yx48lhhle7xzxfxkyqwzkaxey3jekrl0gql260jlqlxgfst": 1.0, // SolvBTC
   "bbn1jr0xpgy90hqmaafdq3jtapr2p63tv59s9hcced5j4qqgs5ed9x7sr3sv0d": 1.0, // PumpBTC
   "bbn1ccylwef8yfhafxpmtzq4ps24kxce9cfnz0wnkucsvf2rylfh0jzswhk5ks": 1.0, // stBTC
-  "bbn1j2nchmpuhkq0yj93g84txe33j5lhw2y7p3anhqjhvamqxsev6rmsneu85x": 1.5, //sat.uniBTC
+  "bbn1j2nchmpuhkq0yj93g84txe33j5lhw2y7p3anhqjhvamqxsev6rmsneu85x": 1.5, //satuniBTC
   EBABY_ADDRESS: 1.0,
+};
+
+const SATLAYER_ASSETS: Record<string, number> = {
+  "bbn17y5zvse30629t7r37xsdj73xsqp7qsdr7gpnh966wf5aslpn66rq5ekwsz": 2.0, // uniBTC
+  "bbn1j2nchmpuhkq0yj93g84txe33j5lhw2y7p3anhqjhvamqxsev6rmsneu85x": 2.5, //satuniBTC.e
 };
 
 
@@ -25,6 +30,7 @@ export const CellPoints: React.FC<Props> = ({ assets, className }) => {
   
   const hasEBaby = token0.denom === EBABY_ADDRESS || token1.denom === EBABY_ADDRESS;
   const hasUnion = UNION_ASSETS[token0.denom] || UNION_ASSETS[token1.denom];
+  const hasSatlayer = SATLAYER_ASSETS[token0.denom] || SATLAYER_ASSETS[token1.denom];
   
   // Calculate average multiplier for Union assets
   const getUnionMultiplier = () => {
@@ -48,6 +54,18 @@ export const CellPoints: React.FC<Props> = ({ assets, className }) => {
     if (unionMultiplier >= 1.25) return "/union/1.25x.svg";
     return "/union/1x.svg";
   };
+
+  const getSatlayerMultiplier = () => {
+    // TODO add logic to differentiate between 2x and 2.5x
+    return 2.0
+  }
+
+  const satlayerMultiplier = getSatlayerMultiplier();
+
+  const getSatLayerLogo = () => {
+    if (satlayerMultiplier >= 2.5) return "/satlayer/2.5x.svg";
+    if (satlayerMultiplier >= 2.0) return "/satlayer/2x.svg";
+  };
   
   return (
     <div className={className}>
@@ -65,7 +83,7 @@ export const CellPoints: React.FC<Props> = ({ assets, className }) => {
         {hasEBaby && (
           <div className="flex items-center gap-1">
             <img 
-              src="https://raw.githubusercontent.com/cosmos/chain-registry/master/babylon/images/eBABY.svg" 
+              src="/escher/logo.svg" 
               alt="EBaby" 
               className="w-5 h-5"
             />
@@ -79,6 +97,17 @@ export const CellPoints: React.FC<Props> = ({ assets, className }) => {
               src={getUnionLogo()} 
               alt={`Union ${unionMultiplier}x`} 
               className="h-6 w-auto"
+            />
+          </div>
+        )}
+
+        {/* Satlayer point */}
+        {hasSatlayer && (
+          <div className="flex items-center gap-1">
+            <img 
+              src={getSatLayerLogo()} 
+              alt={`SatLayer ${satlayerMultiplier}x`} 
+              className="h-8 w-auto"
             />
           </div>
         )}

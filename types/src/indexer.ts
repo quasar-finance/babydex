@@ -50,6 +50,19 @@ export type PoolMetric = {
   metric_end_height: bigint | null;
 };
 
+export type AggregatedMetrics = {
+  total_liquidity_usd: number;
+  total_swap_fees: number;
+  total_tower_swap_fees: number;
+  total_active_liquidity_positions: number;
+  total_liquidity_inflow: number;
+  total_liquidity_outflow: number;
+  total_distinct_wallet_swaps: number;
+  total_swaps_done: number;
+  total_incentives_done: number | null;
+  metric_start_height: bigint | null;
+  metric_end_height: bigint | null;
+}
 
 export interface PoolIncentive {
   lp_token_address: string;

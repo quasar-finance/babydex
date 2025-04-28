@@ -7,20 +7,19 @@ interface Props {
 }
 
 const getPriceImpactWarning = (impact: number) => {
-  const absImpact = Math.abs(impact);
-  if (absImpact >= 25) {
+  if (impact >= 25) {
     return {
-      message: "Slippage is very high",
+      message: "Price Impact is very high",
       className: "bg-red-900/50 text-red-200",
     };
-  } else if (absImpact >= 10) {
+  } else if (impact >= 10) {
     return {
-      message: "Slippage is high",
+      message: "Price Impact is high",
       className: "bg-amber-900/50 text-amber-200",
     };
-  } else if (absImpact >= 2) {
+  } else if (impact >= 2) {
     return {
-      message: "Slippage is moderate",
+      message: "Price Impact is moderate",
       className: "bg-olive-900/50 text-olive-200",
     };
   }

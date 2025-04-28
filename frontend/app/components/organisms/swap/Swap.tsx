@@ -1,5 +1,5 @@
 "use client";
-import type React from "react";
+import React from "react";
 import { useEffect, useState } from "react";
 import RotateButton from "../../atoms/RotateButton";
 import { useFormContext } from "react-hook-form";
@@ -128,7 +128,6 @@ export const Swap: React.FC = () => {
         onFocus={() => setActiveInput("from")}
       />
       <RotateButton onClick={onRotate} />
-      <SwapPriceImpactWarning priceImpact={priceImpact} />
       <AssetInput
         name="toAmount"
         control={control}
@@ -138,6 +137,7 @@ export const Swap: React.FC = () => {
         onFocus={() => setActiveInput("to")}
         validateBalance={false}
       />
+      <SwapPriceImpactWarning priceImpact={priceImpact} />
     </div>
   );
 };

@@ -56,7 +56,16 @@ export const CellPoints: React.FC<Props> = ({ assets, className }) => {
   };
 
   const getSatlayerMultiplier = () => {
+    // TODO add logic to differentiate between 2x and 2.5x
+    return 2.0
   }
+
+  const satlayerMultiplier = getSatlayerMultiplier();
+
+  const getSatLayerLogo = () => {
+    if (satlayerMultiplier >= 2.5) return "/satlayer/2.5x.svg";
+    if (satlayerMultiplier >= 2.0) return "/satlayer/2x.svg";
+  };
   
   return (
     <div className={className}>
@@ -92,12 +101,12 @@ export const CellPoints: React.FC<Props> = ({ assets, className }) => {
           </div>
         )}
 
-        {/* Union Points */}
+        {/* Satlayer point */}
         {hasSatlayer && (
           <div className="flex items-center gap-1">
             <img 
-              src={getUnionLogo()} 
-              alt={`Union ${unionMultiplier}x`} 
+              src={getSatLayerLogo()} 
+              alt={`SatLayer ${satlayerMultiplier}x`} 
               className="h-6 w-auto"
             />
           </div>

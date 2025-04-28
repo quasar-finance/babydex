@@ -70,10 +70,6 @@ const SwapInfoAccordion: React.FC<Props> = ({ simulation, className }) => {
         </p>
       </div>
       <div className="flex items-center justify-between h-4">
-        <p>Price Impact</p>
-        <p className="text-white">{swapPriceImpactPercent}</p>
-      </div>
-      <div className="flex items-center justify-between h-4">
         <p>Max Slippage</p>
         <p className="text-white capitalize">{slippage}%</p>
       </div>

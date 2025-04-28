@@ -11,7 +11,7 @@ import { Assets } from "~/config";
 import { useSearchParams } from "next/navigation";
 import type { Currency } from "@towerfi/types";
 import { usePrices } from "~/app/hooks/usePrices";
-import { SwapPriceImpactWarning } from "../../molecules/Swap/SlippageImpactWarning.tsx";
+import { SwapPriceImpactWarning } from "../../molecules/Swap/SlippageImpactWarning";
 
 const assets = Object.values(Assets);
 

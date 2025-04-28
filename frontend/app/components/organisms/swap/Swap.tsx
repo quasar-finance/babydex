@@ -1,6 +1,5 @@
 "use client";
-import React from "react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import RotateButton from "../../atoms/RotateButton";
 import { useFormContext } from "react-hook-form";
 import { convertDenomToMicroDenom, convertMicroDenomToDenom } from "~/utils/intl";
@@ -12,6 +11,7 @@ import { useSearchParams } from "next/navigation";
 import type { Currency } from "@towerfi/types";
 import { usePrices } from "~/app/hooks/usePrices";
 import { SwapPriceImpactWarning } from "../../molecules/Swap/SlippageImpactWarning";
+import { useSimulationStatus } from "~/app/hooks/useSimulationStatus";
 
 const assets = Object.values(Assets);
 
@@ -29,9 +29,15 @@ export const Swap: React.FC = () => {
   const fromAmount = watch("fromAmount");
   const searchParams = useSearchParams();
   const { getPrice } = usePrices();
+    const { simulation, simulate, skipClient } = useSkipClient({ cacheKey: "swap" });
+  const { isLoading, isFetching } = simulation;
 
-  const { simulation, simulate, skipClient } = useSkipClient({ cacheKey: "swap" });
-  const { isLoading } = simulation;
+  const { pendingSimulation, hasFreshSimulation } = useSimulationStatus({
+    fromAmount,
+    toAmount,
+    activeInput,
+    isSimulationLoading: isLoading,
+  });
 
   useEffect(() => {
     if (!skipClient || !isDirty || (!toAmount && !fromAmount)) return;
@@ -61,6 +67,7 @@ export const Swap: React.FC = () => {
         setValue("toAmount", convertMicroDenomToDenom(simulation?.amountOut, toToken.decimals, toToken.decimals, false), {
           shouldValidate: true,
         });
+        markSimulationComplete();
       } else {
         const simulation = await simulate({
           swapVenues: [
@@ -81,9 +88,19 @@ export const Swap: React.FC = () => {
         setValue("fromAmount", convertMicroDenomToDenom(simulation?.amountIn, fromToken.decimals, fromToken.decimals, false), {
           shouldValidate: true,
         });
+        markSimulationComplete();
       }
     })();
   }, [fromAmount, toAmount, fromToken, toToken]);
+
+  // Calculate price impact only when we have fresh simulation data
+  const priceImpact = useMemo(() => {
+    if (!simulation?.data || !hasFreshSimulation) return 0;
+    
+    const amountInUSD = getPrice(Number(simulation.data.amountIn), simulation.data.sourceAssetDenom, { format: false });
+    const amountOutUSD = getPrice(Number(simulation.data.amountOut), simulation.data.destAssetDenom, { format: false });
+    return amountInUSD > 0 ? ((amountInUSD - amountOutUSD) / amountInUSD) * 100 : 0;
+  }, [simulation, hasFreshSimulation]);
 
   const onRotate = () => {
     const fToken = { ...fromToken };
@@ -112,11 +129,6 @@ export const Swap: React.FC = () => {
     if (toAsset) setToToken(toAsset);
   }, []);
 
-  // Calculate price impact
-  const amountInUSD = fromAmount ? getPrice(Number(fromAmount), fromToken.denom, { format: false }) : 0;
-  const amountOutUSD = toAmount ? getPrice(Number(toAmount), toToken.denom, { format: false }) : 0;
-  const priceImpact = amountInUSD > 0 ? ((amountInUSD - amountOutUSD) / amountInUSD) * 100 : 0;
-
   return (
     <div className="flex flex-col gap-2 w-full items-center justify-center">
       <AssetInput
@@ -137,7 +149,10 @@ export const Swap: React.FC = () => {
         onFocus={() => setActiveInput("to")}
         validateBalance={false}
       />
-      <SwapPriceImpactWarning priceImpact={priceImpact} />
+      <SwapPriceImpactWarning 
+        priceImpact={priceImpact} 
+        isLoading={pendingSimulation || isLoading} 
+      />
     </div>
   );
 };

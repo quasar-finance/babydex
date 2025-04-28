@@ -1,7 +1,8 @@
 import { Currency } from "@towerfi/types";
 import type React from "react";
-import { SATLAYER_ASSETS } from "~/config/points/satlayer";
-import { EBABY_ADDRESS, UNION_ASSETS, getUnionMultiplier, getUnionLogo } from "~/config/points/union";
+import { getSatLayerLogo, SATLAYER_ASSETS, satlayerMultiplier } from "~/config/points/satlayer";
+import { UNION_ASSETS, getPointsRate as getUnionPointsRate, getUnionLogo } from "~/config/points/union";
+import { EBABY_ADDRESS } from "~/config/points/escher";
 
 interface Props {
   assets: Currency[];
@@ -15,7 +16,7 @@ export const CellPoints: React.FC<Props> = ({ assets, className }) => {
   const hasUnion = UNION_ASSETS[token0.denom] || UNION_ASSETS[token1.denom];
   const hasSatlayer = SATLAYER_ASSETS[token0.denom] || SATLAYER_ASSETS[token1.denom];
   
-  const unionMultiplier = getUnionMultiplier(token0.denom, token1.denom, hasEBaby);
+  const unionMultiplier = getUnionPointsRate(token0.denom, token1.denom, hasEBaby);
   
   return (
     <div className={className}>

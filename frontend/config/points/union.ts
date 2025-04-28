@@ -32,3 +32,4 @@ export const getUnionLogo = (multiplier: number) => {
   if (multiplier >= 1.5) return "/union/1.5x.svg";
   if (multiplier >= 1.25) return "/union/1.25x.svg";
   return "/union/1x.svg";
+}

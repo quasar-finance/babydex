@@ -106,7 +106,7 @@ export const BabylonMainnetAssets = {
     type: "cw-20",
     denom: "bbn1ccylwef8yfhafxpmtzq4ps24kxce9cfnz0wnkucsvf2rylfh0jzswhk5ks",
     name: "Lorenzo BTC",
-    decimals: 8,
+    decimals: 18,
     logoURI:
       "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/stbtc.svg",
     coingeckoId: "bitcoin",

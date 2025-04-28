@@ -65,7 +65,7 @@ export const CellPoints: React.FC<Props> = ({ assets, className }) => {
         {hasEBaby && (
           <div className="flex items-center gap-1">
             <img 
-              src="https://raw.githubusercontent.com/cosmos/chain-registry/master/babylon/images/eBABY.svg" 
+              src="/escher/logo.svg" 
               alt="EBaby" 
               className="w-5 h-5"
             />

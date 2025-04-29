@@ -58,7 +58,7 @@ export const BabylonMainnetAssets = {
     name: "SolvBTC",
     decimals: 18,
     logoURI:
-      "https://raw.githubusercontent.com/cosmos/chain-registry/refs/heads/master/_non-cosmos/ethereum/images/solvBTC.svg",
+      "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/solvBTC.svg",
     coingeckoId: "solv-btc",
   },
   bbn1fkz8dcvsqyfy3apfh8ufexdn4ag00w5jts99zjw9nkjue0zhs4ts6hfdz2: {
@@ -88,7 +88,7 @@ export const BabylonMainnetAssets = {
     name: "SolvBTC",
     decimals: 18,
     logoURI:
-      "https://raw.githubusercontent.com/cosmos/chain-registry/refs/heads/master/_non-cosmos/ethereum/images/solvBTC.svg",
+      "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/solvBTC.svg",
     coingeckoId: "solv-btc",
   },
   bbn1jr0xpgy90hqmaafdq3jtapr2p63tv59s9hcced5j4qqgs5ed9x7sr3sv0d: {

@@ -7,6 +7,7 @@ interface Props {
 }
 
 const EBABY_ADDRESS = "bbn1s7jzz7cyuqmy5xpr07yepka5ngktexsferu2cr4xeww897ftj77sv30f5s";
+const BABY = "ubbn";
 
 // Union assets with their multipliers
 const UNION_ASSETS: Record<string, number> = {
@@ -16,7 +17,7 @@ const UNION_ASSETS: Record<string, number> = {
   "bbn1jr0xpgy90hqmaafdq3jtapr2p63tv59s9hcced5j4qqgs5ed9x7sr3sv0d": 1.0, // PumpBTC
   "bbn1ccylwef8yfhafxpmtzq4ps24kxce9cfnz0wnkucsvf2rylfh0jzswhk5ks": 1.0, // stBTC
   "bbn1j2nchmpuhkq0yj93g84txe33j5lhw2y7p3anhqjhvamqxsev6rmsneu85x": 1.5, //satuniBTC
-  EBABY_ADDRESS: 1.0,
+  EBABY_ADDRESS: 1.5,
 };
 
 const SATLAYER_ASSETS: Record<string, number> = {
@@ -29,7 +30,7 @@ export const CellPoints: React.FC<Props> = ({ assets, className }) => {
   const [token0, token1] = assets;
   
   const hasEBaby = token0.denom === EBABY_ADDRESS || token1.denom === EBABY_ADDRESS;
-  const hasUnion = UNION_ASSETS[token0.denom] || UNION_ASSETS[token1.denom];
+  const hasUnion = UNION_ASSETS[token0.denom] || UNION_ASSETS[token1.denom] || (token0.denom === EBABY_ADDRESS && token1.denom === BABY) || (token0.denom === BABY && token1.denom === EBABY_ADDRESS);
   const hasSatlayer = SATLAYER_ASSETS[token0.denom] || SATLAYER_ASSETS[token1.denom];
   
   // Calculate average multiplier for Union assets
@@ -37,6 +38,13 @@ export const CellPoints: React.FC<Props> = ({ assets, className }) => {
     const multipliers = [];
     if (UNION_ASSETS[token0.denom]) multipliers.push(UNION_ASSETS[token0.denom]);
     if (UNION_ASSETS[token1.denom]) multipliers.push(UNION_ASSETS[token1.denom]);
+    
+    // Special case for eBABY/BABY pool
+    if ((token0.denom === EBABY_ADDRESS && token1.denom === BABY) || 
+        (token0.denom === BABY && token1.denom === EBABY_ADDRESS)) {
+      return 1.25;
+    }
+    
     if (hasEBaby) multipliers.push(1.5);
     
     if (multipliers.length === 0) return 0;

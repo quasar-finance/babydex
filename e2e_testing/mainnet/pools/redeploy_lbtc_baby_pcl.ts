@@ -16,7 +16,7 @@ const main = async () => {
 
     const factoryClient = new AstroportFactoryClient(client, address, deployed.factory);
 
-    // calculate price scales like 1 x\[0] = price_scale * x\[1].
+    // calculate price scales like price_scale * asset0 = 1 * asset1.
     const baby_usdc = 0.09135;
     const btc_usd = 95028;
     const baby_btc = baby_usdc / btc_usd ;

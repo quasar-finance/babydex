@@ -77,45 +77,45 @@ export const CellPoints: React.FC<Props> = ({ assets, className }) => {
   
   return (
     <div className={className}>
-      <div className="flex items-center gap-2 relative">
+      <div className="flex flex-wrap items-center gap-2">
         {/* Tower Points - Always shown */}
         <div className="flex items-center gap-1">
           <img 
             src="/favicon.png" 
             alt="TowerFi" 
-            className="w-5 h-5"
+            className="w-5 h-5 overflow-x-auto"
           />
         </div>
         
         {/* EBaby Points */}
         {hasEBaby && (
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 overflow-x-auto">
             <img 
-              src="/escher/logo.svg" 
+              src="/escher/2.5x_no_background_all_white.svg" 
               alt="EBaby" 
-              className="w-5 h-5"
+              className="w-auto h-7 flex-shrink-0 overflow-x-auto"
             />
           </div>
         )}
         
         {/* Union Points */}
         {hasUnion && (
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 overflow-x-auto">
             <img 
               src={getUnionLogo()} 
               alt={`Union ${unionMultiplier}x`} 
-              className="h-6 w-auto"
+              className="h-6 w-auto flex-shrink-0 overflow-x-auto"
             />
           </div>
         )}
 
         {/* Satlayer point */}
         {hasSatlayer && (
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 overflow-x-auto">
             <img 
               src={getSatLayerLogo()} 
               alt={`SatLayer ${satlayerMultiplier}x`} 
-              className="h-8 w-auto"
+              className="h-8 w-auto flex-shrink-0 overflow-x-auto"
             />
           </div>
         )}

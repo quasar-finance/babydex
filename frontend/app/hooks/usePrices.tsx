@@ -144,11 +144,10 @@ export function usePrices(parameters: UsePricesParameters = {}) {
     },
     initialData: () => {
       if (typeof window === "undefined") return {};
-
       try {
         const prices = localStorage.getItem("prices");
         return prices ? JSON.parse(prices) : {};
-      } catch {
+      } catch (error) {
         return {};
       }
     },

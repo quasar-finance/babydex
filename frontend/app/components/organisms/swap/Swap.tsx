@@ -95,8 +95,8 @@ export const Swap: React.FC = () => {
   const priceImpact = useMemo(() => {
     if (!simulation?.data) return 0;
     
-    const amountInUSD = getPrice(Number(fromAmount), simulation.data.sourceAssetDenom, { format: false });
-    const amountOutUSD = getPrice(Number(toAmount), simulation.data.destAssetDenom, { format: false });
+    const amountInUSD = getPrice(Number(fromAmount), fromToken.denom, { format: false });
+    const amountOutUSD = getPrice(Number(toAmount), toToken.denom, { format: false });
     const impact = amountInUSD > 0 ? ((amountInUSD - amountOutUSD) / amountInUSD) * 100 : 0;
     return impact;
   }, [simulation, fromAmount, toAmount]);

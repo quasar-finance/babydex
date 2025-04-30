@@ -1,8 +1,9 @@
-import { Currency } from "@towerfi/types";
+import { Currency, PairType } from "@towerfi/types";
 import type React from "react";
 
 interface Props {
   assets: Currency[];
+  poolType: string,
   className?: string;
 }
 
@@ -26,13 +27,14 @@ const SATLAYER_ASSETS: Record<string, number> = {
 };
 
 
-export const CellPoints: React.FC<Props> = ({ assets, className }) => {
+export const CellPoints: React.FC<Props> = ({ assets, poolType, className }) => {
   const [token0, token1] = assets;
   
   const hasEBaby = token0.denom === EBABY_ADDRESS || token1.denom === EBABY_ADDRESS;
   const hasUnion = UNION_ASSETS[token0.denom] || UNION_ASSETS[token1.denom] || (token0.denom === EBABY_ADDRESS && token1.denom === BABY) || (token0.denom === BABY && token1.denom === EBABY_ADDRESS);
   const hasSatlayer = SATLAYER_ASSETS[token0.denom] || SATLAYER_ASSETS[token1.denom];
   
+
   // Calculate average multiplier for Union assets
   const getUnionMultiplier = () => {
     const multipliers = [];
@@ -63,6 +65,25 @@ export const CellPoints: React.FC<Props> = ({ assets, className }) => {
     return "/union/1x.svg";
   };
 
+  const getTowerMultiplier = (): number => {
+    const multiplier = poolType === 'concentrated' ? 2 : 1;
+    if (hasUnion) {
+      return multiplier + 0.5;
+    }
+    return multiplier;
+  };
+
+  const towerMultiplier = getTowerMultiplier();
+  
+  // Determine which Union logo to show based on multiplier
+  const getTowerLogo = () => {
+    if (towerMultiplier >= 2.5) return "/tower/2.5x.svg";
+    if (towerMultiplier >= 2.0) return "/tower/2x.svg";
+    if (towerMultiplier >= 1.5) return "/tower/1.5x.svg";
+    if (towerMultiplier >= 1.0) return "/tower/1x.svg";
+    return "/favicon.svg";
+  };
+
   const getSatlayerMultiplier = () => {
     // TODO add logic to differentiate between 2x and 2.5x
     return 2.0
@@ -77,13 +98,13 @@ export const CellPoints: React.FC<Props> = ({ assets, className }) => {
   
   return (
     <div className={className}>
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center gap-0">
         {/* Tower Points - Always shown */}
         <div className="flex items-center gap-1">
           <img 
-            src="/favicon.png" 
+            src={getTowerLogo()} 
             alt="TowerFi" 
-            className="w-5 h-5 overflow-x-auto"
+            className="w-auto h-7 overflow-x-auto"
           />
         </div>
         

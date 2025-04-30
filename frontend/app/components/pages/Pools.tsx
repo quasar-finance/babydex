@@ -173,7 +173,7 @@ const Pools: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col gap-8 px-4 pb-20 max-w-[100rem] mx-auto w-full min-h-[65vh] lg:pt-8">
+    <div className="flex flex-col gap-8 px-4 pb-20 max-w-[120rem] mx-auto w-full min-h-[65vh] lg:pt-8">
       <div className="flex gap-3 justify-between items-center lg:pl-3 lg:pr-2 pl-3">
         <h1 className="text-xl">Pools</h1>
         <div className="flex gap-3 h-[42px] items-center px-2">
@@ -256,7 +256,8 @@ const Pools: React.FC = () => {
               />
               <CellPoints
                 assets={pool.assets}
-                className="w-full px-4"
+                poolType={pool.poolType}
+                className="w-full px-1"
               />
               <div className="flex items-end justify-end w-full px-4">
                 <Button

@@ -146,6 +146,7 @@ export const UserPools: React.FC<Props> = ({ pools, isLoading, refreshUserPools 
                 />
                 <CellPoints
                   assets={poolInfo.assets}
+                  poolType={poolInfo.poolType}
                   className="w-full px-4"
                 />
                 <CellClaimRewards

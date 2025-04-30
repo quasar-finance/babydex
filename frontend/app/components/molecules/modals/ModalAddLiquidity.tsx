@@ -93,7 +93,7 @@ export const ModalAddLiquidity: React.FC<Props> = ({ pool, successAction }) => {
                   <AssetsStacked assets={pool.assets} />
                   <span>{name}</span>
                 </div>
-                {pool.poolType === "concentrated" && (
+                {/* {pool.poolType === "concentrated" && (
                   <div className="flex gap-2 lg:py-1 lg:px-[6px]">
                     <Tabs
                       color="orange"
@@ -107,17 +107,17 @@ export const ModalAddLiquidity: React.FC<Props> = ({ pool, successAction }) => {
                       </TabList>
                     </Tabs>
                   </div>
-                )}
+                )} */}
               </div>
 
               <div className="flex flex-col gap-2">
                 <p className="text-white/50 text-sm">Deposit Amount</p>
                 <div className="flex gap-4 flex-col">
-                  {side === "single" && pool.poolType === "concentrated" ? (
+                  {/* {side === "single" && pool.poolType === "concentrated" ? (
                     <SingleSideAddLiquidity submitRef={submitRef} pool={pool} />
-                  ) : (
+                  ) : ( */}
                     <DoubleSideAddLiquidity submitRef={submitRef} pool={pool} />
-                  )}
+                  {/* )} */}
                 </div>
               </div>
             </div>

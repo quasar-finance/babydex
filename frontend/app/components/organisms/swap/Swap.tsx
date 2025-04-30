@@ -98,7 +98,7 @@ export const Swap: React.FC = () => {
     const amountInUSD = getPrice(Number(fromAmount), fromToken.denom, { format: false });
     const amountOutUSD = getPrice(Number(toAmount), toToken.denom, { format: false });
     const impact = amountInUSD > 0 ? ((amountInUSD - amountOutUSD) / amountInUSD) * 100 : 0;
-    return impact;
+    return Math.abs(impact);
   }, [simulation, fromAmount, toAmount]);
 
   const onRotate = () => {

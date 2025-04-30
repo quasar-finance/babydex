@@ -61,6 +61,7 @@ export const blockedPoolAddresses = [
   "bbn1r4x3lvn20vpls2ammp4ch5z08nge6h77p43ktl04efptgqxgl0qsxnwehd",
   "bbn1yum4v0v5l92jkxn8xpn9mjg7wuldk784ctg424ue8gqvdp88qzlqjpr05x",
   "bbn16slnlmtu7w5hjfwyzucwm75c3kuz40jztckp2766zttdu962tndqy2zks5",
+  "bbn17a6uvlrd7xyw3t4j2nrgy4kz0v3w8pwasweleqffvptxk6wjs6pqxvpzxw",
   // old union pools
   "bbn134wsfa05dzx0xjg3raanxchg5j00hma64570yufpuw4zt6dzffusuj8ekq",
   "bbn17rrvcj20v275r5lcerxa043zmvuhzeucgrv5zlcuaewfp003nzds0kxjhd",
@@ -80,7 +81,6 @@ export const blockedPoolAddresses = [
   "bbn10l67n20j7cjxu83a6yrdyqqln6mrcq3844c3wccr7qk0vn5j0laq8j32ml",
   "bbn1x4kzffnyd7jkldual9xkp2hu22g5vs0k8kuw847mtkevs8pcec5s0rzqm0",
   "bbn1yset4m9m6lrpyz7s8nlc2r2adretctcjvfzsx9akf2dj6c95xqmq4g4z4r",
-  "bbn1qdh2egr3aneuvqf6mruxzjwxjw8splnv6shzzlm3kwsdrd0xpzksnpfqx8",
   "bbn1etp6acwkfv8kkuurskdepw8aqdwau5gnhjn88nfv5j6zgajdt7lq2dxukh",
   "bbn1hquvz7s2wm44snh4rcmqe9mx757xgacw3p5h4q23crgwg2n3pk9quhu0fg",
   "bbn1lpxsk8a8dxdpy8r6yqlz0gmjc7427wg9h25sj46c8d6jaglmzxsq6u09de",

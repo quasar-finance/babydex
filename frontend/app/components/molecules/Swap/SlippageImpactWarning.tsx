@@ -14,7 +14,7 @@ const getPriceImpactWarning = (impact: number) => {
       message: "Price Impact is very high",
       className: "bg-red-900/50 text-red-200",
     };
-  } else if (impact >= 5) {
+  } else if (impact >= 3) {
     return {
       message: "Price Impact is high",
       className: "bg-amber-900/50 text-amber-200",

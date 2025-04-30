@@ -45,7 +45,7 @@ export const SwapPriceImpactWarning: React.FC<Props> = ({ priceImpact, className
           <span>Calculating price impact...</span>
         </div>
       ) : (
-        <span>{warning.message} ({priceImpact.toFixed(2)}%)</span>
+        <span>{warning.message} (-{priceImpact.toFixed(2)}%)</span>
       )}
     </div>
   );

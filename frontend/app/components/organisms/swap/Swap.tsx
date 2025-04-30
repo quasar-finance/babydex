@@ -91,14 +91,15 @@ export const Swap: React.FC = () => {
     })();
   }, [fromAmount, toAmount, fromToken, toToken]);
 
-  // Calculate price impact only when we have fresh simulation data
+  // Calculate price impact only when we have simulation data
   const priceImpact = useMemo(() => {
-    if (!simulation?.data || !hasFreshSimulation) return 0;
+    if (!simulation?.data) return 0;
     
     const amountInUSD = getPrice(Number(fromAmount), simulation.data.sourceAssetDenom, { format: false });
     const amountOutUSD = getPrice(Number(toAmount), simulation.data.destAssetDenom, { format: false });
-    return amountInUSD > 0 ? ((amountInUSD - amountOutUSD) / amountInUSD) * 100 : 0;
-  }, [simulation, hasFreshSimulation]);
+    const impact = amountInUSD > 0 ? ((amountInUSD - amountOutUSD) / amountInUSD) * 100 : 0;
+    return Math.max(0, impact);
+  }, [simulation, fromAmount, toAmount]);
 
   const onRotate = () => {
     const fToken = { ...fromToken };
@@ -149,7 +150,7 @@ export const Swap: React.FC = () => {
       />
       <SwapPriceImpactWarning 
         priceImpact={priceImpact} 
-        isLoading={pendingSimulation || isLoading} 
+        isLoading={isLoading || isFetching} 
       />
     </div>
   );

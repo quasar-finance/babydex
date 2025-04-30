@@ -76,22 +76,6 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
         const token0Amount = convertDenomToMicroDenom(getFormValue(data, token0.symbol), token0.decimals);
         const token1Amount = convertDenomToMicroDenom(getFormValue(data, token1.symbol), token1.decimals);
 
-        if (token0.type === "cw-20") {
-          await increaseAllowance({
-            address: token0.denom,
-            spender: pool.poolAddress,
-            amount: BigInt(token0Amount),
-          });
-        }
-
-        if (token1.type === "cw-20") {
-          await increaseAllowance({
-            address: token1.denom,
-            spender: pool.poolAddress,
-            amount: BigInt(token1Amount),
-          });
-        }
-
         const sortedTokens = [
           { amount: token0Amount, info: token0 },
           { amount: token1Amount, info: token1 },

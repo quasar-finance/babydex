@@ -1,22 +1,8 @@
-import type { Account, Chain, Client, CometBftRpcSchema, Transport } from "cosmi/types";
-import type { Currency } from "@towerfi/types";
+import { executeMultiple, type ExecuteReturnType } from "cosmi/client";
+import type { Client, Chain, Account, CometBftRpcSchema, Transport } from "cosmi/types";
+import { buildAddLiquidityMsg, type AddLiquidityMsgParams } from "~/actions/utils/addLiquidityMsg";
 
-import { execute, type ExecuteReturnType } from "cosmi/client";
-import { setInnerValueToAsset } from "@towerfi/trpc";
-
-export type AddLiquidityParameters = {
-  sender: string;
-  poolAddress: string;
-  autoStake?: boolean;
-  minLpToReceive?: string;
-  receiver?: string;
-  slipageTolerance: string;
-  assets: {
-    amount: string;
-    info: Currency;
-  }[];
-};
-
+export type AddLiquidityParameters = AddLiquidityMsgParams;
 export type AddLiquidityReturnType = ExecuteReturnType;
 
 export async function addLiquidity<
@@ -26,31 +12,9 @@ export async function addLiquidity<
   client: Client<Transport, C, A, CometBftRpcSchema>,
   parameters: AddLiquidityParameters,
 ): AddLiquidityReturnType {
-  const { sender, poolAddress, slipageTolerance, autoStake, minLpToReceive, assets, receiver } =
-    parameters;
-
-  return await execute(client, {
-    execute: {
-      address: poolAddress,
-      message: {
-        provide_liquidity: {
-          receiver,
-          auto_stake: autoStake,
-          min_lp_to_receive: minLpToReceive,
-          assets: assets.map(({ info, amount }) => ({
-            info: setInnerValueToAsset(info),
-            amount,
-          })),
-          slippage_tolerance: slipageTolerance,
-        },
-      },
-      funds: assets
-        .filter((a) => a.info.type !== "cw-20")
-        .map(({ info, amount }) => ({
-          denom: info.denom,
-          amount,
-        })),
-    },
+  const { sender, execMsgs } = buildAddLiquidityMsg(parameters);
+  return await executeMultiple(client, {
+    execute: execMsgs,
     sender,
   });
 }

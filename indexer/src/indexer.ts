@@ -7,6 +7,7 @@ import type {
   PoolIncentive,
   PoolMetric,
   PoolMetricSerialized,
+  Points
 } from "@towerfi/types";
 
 import {
@@ -102,6 +103,7 @@ export type Indexer = {
     startDate?: Date | null,
     endDate?: Date | null,
   ) => Promise<AggregatedMetrics | null>;
+  getPoints: (addresses: string[], limit?: number | null) => Promise<Record<string, Points> | null>;
 };
 
 export type IndexerFilters = {
@@ -1094,6 +1096,38 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     }
   }
 
+  async function getPoints(
+    addresses: string[],
+    limit?: number | null
+  ): Promise<Record<string, Points>> {
+    limit = limit ?? 50;
+    const addressesSql = addresses.length > 0 ? sql` WHERE address = ${createPoolAddressArraySql(addresses)} ` : sql.raw(``);
+    const query = sql` SELECT * FROM v1_cosmos.materialized_points ${addressesSql} ORDER BY rank LIMIT ${limit}; `;
+
+    try {
+      const result = await client.execute(query);
+      return result.rows.reduce<Record<string, Points>>((acc, row) => {
+        const address: string = row.address as unknown as string;
+        const lping_points: number = row.lping_points as unknown as number;
+        const swapping_points: number = row.swapping_points as unknown as number;
+        const total_points: number = row.total_points as unknown as number;
+        const rank: number = row.rank as unknown as number;
+
+        acc[address] = {
+          address,
+          lping_points,
+          swapping_points,
+          total_points,
+          rank,
+        };
+        return acc;
+      }, {});
+    } catch (error) {
+      console.error("Error executing query:", error);
+      throw error;
+    }
+  }
+
   function createPoolAddressArraySql(addresses: string[]): SQL<unknown> {
     if (!addresses || addresses.length === 0) {
       return sql.raw(`ANY('{}'::text[])`);
@@ -1189,5 +1223,6 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     getPoolMetricsByPoolAddresses,
     getPoolIncentiveAprsByPoolAddresses,
     getAggregatedMetricsByPoolAddresses,
+    getPoints
   } as Indexer;
 };

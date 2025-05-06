@@ -425,7 +425,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
                  LEFT JOIN
              v1_cosmos.materialized_incentivize i ON plt.lp_token = i.lp_token
                 LEFT JOIN v1_cosmos.token t0 ON i.reward = t0.denomination
-        WHERE i.timestamp >= NOW() - (${intervalSql} || ' days')::INTERVAL
+        WHERE to_timestamp(i.end_ts) >= NOW() AT TIME ZONE 'UTC'
         GROUP BY plt.pool, plt.lp_token, i.rewards_per_second, i.reward
         ORDER BY plt.pool
         LIMIT ${limit} OFFSET ${offset};
@@ -486,7 +486,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
                  LEFT JOIN
              v1_cosmos.materialized_incentivize i ON plt.lp_token = i.lp_token
                 LEFT JOIN v1_cosmos.token t0 ON i.reward = t0.denomination
-        WHERE i.timestamp >= NOW() - (${intervalSql} || ' days')::INTERVAL
+        WHERE to_timestamp(i.end_ts) >= NOW() AT TIME ZONE 'UTC'
           AND plt.pool = ${poolAddressesSql}
         GROUP BY plt.pool, plt.lp_token, i.rewards_per_second, i.reward, t0.decimals, i.start_ts, i.end_ts
         ORDER BY plt.pool;
@@ -760,7 +760,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
                             FROM v1_cosmos.pool_lp_token plt
                                      LEFT JOIN
                                  v1_cosmos.materialized_incentivize i ON plt.lp_token = i.lp_token
-                            WHERE i.timestamp >= NOW() - (${intervalSql} || ' days')::INTERVAL
+                            WHERE to_timestamp(i.end_ts) >= NOW() AT TIME ZONE 'UTC'
                               AND plt.pool = ${poolAddressesSql}
                             GROUP BY plt.pool, plt.lp_token),
              CurrentIncentives AS (SELECT i.lp_token,

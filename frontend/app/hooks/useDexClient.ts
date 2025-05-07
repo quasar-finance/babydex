@@ -9,13 +9,14 @@ export function useDexClient() {
   // with the multisig signing methods
   // this is needed due to useSigningClient overloading the clients methods with the cosmi default signing methods
 
-  if (signingClient && signingClient.key === 'multisig') {
+  let client = signingClient;
+  if (client && client.key === 'multisig') {
     console.log("found multisig, overloading")
-    signingClient?.extend(signingActions)
+    client = client?.extend(signingActions)
   }
 
   return {
-    data: signingClient?.extend(dexActions),
+    data: client?.extend(dexActions),
     ...rest,
   };
 }

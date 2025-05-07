@@ -86,7 +86,16 @@ const ModalSelectAsset: React.FC<ModalSelectAssetProps> = ({ onSelectAsset, onCl
             })
             .map((token, index) => {
               return (
-                <Tooltip content={token.tooltip} key={index}>
+                <Tooltip
+                  content={token.tooltip}
+                  key={index}
+                  placement="left"
+                  showArrow={false}
+                  classNames={{
+                    content: "p-4 border border-white/10 bg-tw-bg",
+                  }}
+                  closeDelay={0}
+                >
                   <div
                     className={clsx(
                       "flex items-center gap-3 rounded-2xl px-3 py-3 justify-between  transition-all",

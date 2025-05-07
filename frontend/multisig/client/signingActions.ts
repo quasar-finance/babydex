@@ -16,10 +16,10 @@ import { toUtf8 } from 'cosmi/utils';
   _account extends Account | undefined = Account | undefined,
 > = {
     // TODO change these actions up to account for the multisig return type
-  execute: (args: ExecuteParameters) => void
+  execute: (args: ExecuteParameters) => ExecuteReturnType
   executeMultiple: (
     args: ExecuteMultipleParameters,
-  ) => void
+  ) => ExecuteReturnType
 }
 
 export function signingActions(client: Client): SigningActions {
@@ -29,7 +29,7 @@ export function signingActions(client: Client): SigningActions {
     };
 }
 
-export async function execute(client: Client, parameters: ExecuteParameters) {
+export async function execute(client: Client, parameters: ExecuteParameters): ExecuteReturnType {
     const { execute, sender, gasLimit, memo, timeoutHeight } = parameters;
     return await executeMultiple(client, {
         sender,
@@ -41,8 +41,10 @@ export async function execute(client: Client, parameters: ExecuteParameters) {
 }
 
 // TODO return the transaction in multisig signable format
-export async function executeMultiple(client: Client, parameters: ExecuteMultipleParameters) {
+export async function executeMultiple(client: Client, parameters: ExecuteMultipleParameters): ExecuteReturnType {
+    console.log("trying to execute something")
     const { sender, execute, gasLimit, memo, timeoutHeight } = parameters;
+    console.log("return nothing")
     // TODO format the messages in the multisig format, simulate the gas, add it to the tx and return the total format
     // const msgs = execute.map(({ address, message, funds }) => ({
     //     typeUrl: MsgExecuteContract.typeUrl,

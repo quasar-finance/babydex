@@ -165,9 +165,9 @@ export function multisig(parameters: InjectedParameters = {}) {
               address: '0x000',
               type: 'json-rpc',
               getSigner: async (chainId: string) => {
-                // const provider = await this.getProvider()
-                // if (!provider) throw new ProviderNotFoundError()
-                // return await provider.getOfflineSignerAuto(chainId)
+                const provider = await this.getProvider()
+                if (!provider) throw new ProviderNotFoundError()
+                return await provider.getOfflineSignerOnlyAmino(chainId)
               },
             },
             transport: config.transports![chainId],

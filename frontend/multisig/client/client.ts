@@ -1,20 +1,18 @@
 import { createPublicClient } from "cosmi";
 import { signingActions } from "./signingActions";
-import { Account, Chain, ClientConfig, PublicClientConfig, RpcSchema, Transport } from "viem";
-import { MultisigProvider } from "../provider";
+import type { ClientWithActions } from "./types";
 
 // export type MultiSigClientConfig {
 //     provider: MultisigProvider
 // }
 
-export function createMultisigClient(params: PublicClientConfig) {
+export function createMultisigClient(params: any): ClientWithActions {
     const { key = 'multisig', name = 'Multisig Client' } = params;
     const client = createPublicClient({
         ...params,
         key,
         name,
-        // type: 'multisigClient',
     });
-    return client.extend(signingActions);
+    return client.extend(signingActions) as unknown as ClientWithActions;
 }
 

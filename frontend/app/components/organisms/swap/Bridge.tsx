@@ -9,7 +9,7 @@ import { useModal } from "~/app/providers/ModalProvider";
 import type { Bridge as BridgeType, Currency } from "@towerfi/types";
 import { ModalTypes } from "~/types/modal";
 
-const assetsWithBridge = Object.values(Assets).map((a) => {
+const assetsWithBridgeTooltip = Object.values(Assets).map((a) => {
   return {
     ...a,
     tooltip: !a.bridge ? "No supported bridge currently available." : undefined,
@@ -81,11 +81,13 @@ export const Bridge: React.FC = () => {
   const selectAsset = async () => {
     showModal(ModalTypes.select_asset, false, {
       onSelectAsset: setAsset,
-      assets: assetsWithBridge,
+      assets: assetsWithBridgeTooltip,
     });
   };
 
-  const [asset, setAsset] = useState(assetsWithBridge[0]);
+  const [asset, setAsset] = useState(
+    assetsWithBridgeTooltip.find((a) => !!a.bridge) || assetsWithBridgeTooltip[0],
+  );
 
   const activeBridge = useMemo(() => {
     if (!asset.bridge) {

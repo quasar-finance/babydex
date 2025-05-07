@@ -1,5 +1,6 @@
 import { createConfig, http, keplrish } from "@cosmi/react";
 import { babylon } from "~/config/chains/babylon";
+import { multisig } from "~/multisig/connector";
 
 export const cosmi = createConfig({
   chains: [babylon],
@@ -29,6 +30,7 @@ export const cosmi = createConfig({
         provider: (w) => w?.cosmostation?.providers.keplr,
       },
     }),
+    multisig({shimDisconnect: true}),
   ],
   batch: { multicall: { batchSize: 10, wait: 200 } },
   transports: {

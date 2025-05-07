@@ -1,6 +1,7 @@
 export type { Cache, CacheSetOptions } from "./cache.js";
 
 export type {
+  Bridge,
   BaseCurrency,
   WithPrice,
   Currency,

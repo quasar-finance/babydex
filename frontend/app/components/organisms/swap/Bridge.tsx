@@ -1,176 +1,151 @@
 import type React from "react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Assets } from "~/config";
 import { Button } from "../../atoms/Button";
 import Link from "next/link";
-import { twMerge } from "~/utils/twMerge";
 import { motion, AnimatePresence } from "motion/react";
+import { IconChevronDown } from "@tabler/icons-react";
+import { useModal } from "~/app/providers/ModalProvider";
+import type { Bridge as BridgeType, Currency } from "@towerfi/types";
+import { ModalTypes } from "~/types/modal";
 
-const assets = Object.values(Assets);
+const assetsWithBridge = Object.values(Assets).map((a) => {
+  return {
+    ...a,
+    tooltip: !a.bridge ? "No supported bridge currently available." : undefined,
+    disabled: !a.bridge,
+  };
+});
 
-const bridgeExternalLinks = {
+function stringToHex(str: string, prefix = true): string {
+  return (
+    (prefix ? "0x" : "") +
+    Array.from(str)
+      .map((char) => char.charCodeAt(0).toString(16))
+      .join("")
+  );
+}
+
+const bridgeExternalLinks: Record<
+  BridgeType,
+  {
+    id: BridgeType;
+    label: string;
+    message: string;
+    url: string;
+    isDisabled: boolean;
+    getUrl: (asset: Currency) => string;
+  }
+> = {
   union: {
+    id: "union",
     label: "Union",
     message:
       "Union is a zero-knowledge interoperability protocol that allows fast, trustless bridging of assets and messages between chains.",
     url: "https://btc.union.build",
+    getUrl(asset: Currency) {
+      const url = new URL(this.url);
+      const params = new URLSearchParams(url.search);
+
+      params.set("source", "bbn-1");
+      params.set("destination", "1");
+      params.set("asset", stringToHex(asset.denom));
+
+      url.search = params.toString();
+      return url.toString();
+    },
     isDisabled: false,
   },
-  eureka: {
+  "ibc-eureka": {
+    id: "ibc-eureka",
     label: "IBC Eureka",
     message:
       "Eureka, by Skip, discovers the most efficient IBC routes to bridge tokens into Babylon with optimal speed and cost.",
     url: "https://go.cosmos.network/?src_asset=0x8236a87084f8B84306f72007F36F2618A5634494&src_chain=1&dest_asset=ibc%2F89EE10FCF78800B572BAAC7080AEFA301B5F3BBC51C5371E907EB129C5B900E7&dest_chain=bbn-1&amount_in=1&amount_out=0.999986",
-    isDisabled: false,
-  },
-  axelar: {
-    label: "Axelar",
-    message:
-      "Axelar is a secure cross-chain network that lets you transfer tokens and messages from any chain to Babylon via their GMP protocol.",
-    url: "https://app.squidrouter.com/",
+    getUrl(asset: Currency) {
+      const url = new URL(this.url);
+      const params = new URLSearchParams(url.search);
+
+      params.set("dest_asset", asset.denom);
+      params.set("dest_chain", "bbn-1");
+
+      url.search = params.toString();
+      return url.toString();
+    },
     isDisabled: false,
   },
 };
 
-
 export const Bridge: React.FC = () => {
-  /* const [activeInput, setActiveInput] = useState<"from" | "to">("from");
-  const [fromToken, setFromToken] = useState(assets[0]);
-  const [toToken, setToToken] = useState(assets[1]);
-  const { watch, setValue, formState } = useFormContext();
-  const { isDirty } = formState;
-  const toAmount = watch("toAmount");
-  const fromAmount = watch("fromAmount");
+  const { showModal } = useModal();
+  const selectAsset = async () => {
+    showModal(ModalTypes.select_asset, false, {
+      onSelectAsset: setAsset,
+      assets: assetsWithBridge,
+    });
+  };
 
-  const { simulation, simulate, skipClient } = useSkipClient({ cacheKey: "swap" });
-  const { isLoading } = simulation;
+  const [asset, setAsset] = useState(assetsWithBridge[0]);
 
-  useEffect(() => {
-    if (!skipClient || !isDirty || (!toAmount && !fromAmount)) return;
+  const activeBridge = useMemo(() => {
+    if (!asset.bridge) {
+      return null;
+    }
 
-    (async () => {
-      const destAssetDenom = toToken.type === "cw-20" ? `cw20:${toToken.denom}` : toToken.denom;
-      const sourceAssetDenom =
-        fromToken.type === "cw-20" ? `cw20:${fromToken.denom}` : fromToken.denom;
-
-      if (activeInput === "from") {
-        const simulation = await simulate({
-          destAssetChainID: babylonTestnet.id as unknown as string,
-          destAssetDenom,
-          sourceAssetChainID: babylonTestnet.id as unknown as string,
-          sourceAssetDenom,
-          allowSwaps: true,
-          allowUnsafe: true,
-          amountIn: convertDenomToMicroDenom(fromAmount, fromToken.decimals),
-        });
-
-        setValue("toAmount", convertMicroDenomToDenom(simulation?.amountOut, toToken.decimals), {
-          shouldValidate: true,
-        });
-      } else {
-        const simulation = await simulate({
-          destAssetChainID: babylonTestnet.id as unknown as string,
-          destAssetDenom,
-          sourceAssetChainID: babylonTestnet.id as unknown as string,
-          sourceAssetDenom,
-          allowSwaps: true,
-          allowUnsafe: true,
-          amountOut: convertDenomToMicroDenom(toAmount, toToken.decimals),
-        });
-
-        setValue("fromAmount", convertMicroDenomToDenom(simulation?.amountIn, fromToken.decimals), {
-          shouldValidate: true,
-        });
-      }
-    })();
-  }, [fromAmount, toAmount, fromToken, toToken]);
-
-  const onRotate = () => {
-    const fToken = { ...fromToken };
-    const tToken = { ...toToken };
-    setFromToken(tToken);
-    setToToken(fToken);
-    setValue("fromAmount", toAmount);
-    setValue("toAmount", fromAmount);
-    setActiveInput("from");
-  }; */
-
-  const [activeBridge, setActiveBridge] = useState("union");
+    return bridgeExternalLinks[asset.bridge];
+  }, [asset]);
 
   return (
-    <div className="flex flex-col gap-2 w-full items-center justify-center pt-2">
-      <div className="flex items-center gap-2 w-full">
-        {Object.keys(bridgeExternalLinks).map((bridge) => {
-          return (
-            <Button
-              key={bridge}
-              color="tertiary"
-              size="sm"
-              className={twMerge(
-                "bg-tw-orange-400/20 border-2 border-transparent flex-1 capitalize text-tw-orange-400",
-                {
-                  "border-tw-orange-400 bg-tw-orange-400/30": activeBridge === bridge,
-                },
-              )}
-              onClick={() => setActiveBridge(bridge)}
-            >
-              {bridgeExternalLinks[bridge as keyof typeof bridgeExternalLinks].label}
-            </Button>
-          );
-        })}
+    <div className="flex flex-col gap-2 w-full items-start justify-center pt-2">
+      <div className="pl-2 flex flex-col gap-2 w-full items-start justify-center">
+        <span>Select Asset to Bridge</span>
+
+        <motion.button
+          type="button"
+          className="flex items-center gap-2 p-2 bg-white/5 rounded-full min-w-fit w-1/2 mt-2"
+          onClick={selectAsset}
+        >
+          <img src={asset.logoURI} alt={asset.symbol} className="w-7 h-7" />
+          <p>{asset.symbol}</p>
+          <IconChevronDown className="h-4 w-4 ml-auto" />
+        </motion.button>
+      </div>
+
+      <div className="pl-2 mt-3">
+        <span>Available bridge</span>
       </div>
       <div className="bg-tw-bg rounded-2xl px-4 py-8 ">
         <AnimatePresence mode="wait">
           <motion.div
-            key={activeBridge}
+            key={activeBridge?.id || "no-bridge"}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.3 }}
             className="flex flex-col gap-6 w-full items-center justify-center text-center"
           >
-            <p className="text-sm text-white/50">
-              {bridgeExternalLinks[activeBridge as keyof typeof bridgeExternalLinks].message}
-            </p>
-            <Button
-              as={Link}
-              href={bridgeExternalLinks[activeBridge as keyof typeof bridgeExternalLinks].url}
-              target="_blank"
-              className="gap-1"
-              isDisabled={
-                bridgeExternalLinks[activeBridge as keyof typeof bridgeExternalLinks].isDisabled
-              }
-            >
-              {bridgeExternalLinks[activeBridge as keyof typeof bridgeExternalLinks].isDisabled ? (
-                "Coming soon"
-              ) : (
-                <p>
-                  Bridge your assets with{" "}
-                  <span className="capitalize font-extrabold">{activeBridge}</span>
-                </p>
-              )}
-            </Button>
+            {activeBridge ? (
+              <>
+                <p className="text-sm text-white/50">{activeBridge.message}</p>
+                <Button
+                  as={Link}
+                  href={activeBridge.getUrl(asset)}
+                  target="_blank"
+                  className="gap-1"
+                  isDisabled={activeBridge.isDisabled}
+                >
+                  <p>
+                    Bridge your assets with{" "}
+                    <span className="capitalize font-extrabold">{activeBridge.label}</span>
+                  </p>
+                </Button>
+              </>
+            ) : (
+              <></>
+            )}
           </motion.div>
         </AnimatePresence>
       </div>
-      {/*  <BridgeAssetInput
-        name="fromAmount"
-        control={control}
-        assets={[fromToken, toToken]}
-        disabled={isSubmitting || (isLoading && activeInput === "to")}
-        onSelect={setFromToken}
-        onFocus={() => setActiveInput("from")}
-      />
-      <RotateButton onClick={onRotate} />
-      <BridgeAssetInput
-        name="toAmount"
-        control={control}
-        assets={[toToken, fromToken]}
-        disabled={isSubmitting || (isLoading && activeInput === "from")}
-        onSelect={setToToken}
-        onFocus={() => setActiveInput("to")}
-        validateBalance={false}
-      /> */}
     </div>
   );
 };

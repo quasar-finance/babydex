@@ -15,6 +15,10 @@ const Tooltip: React.FC<PropsWithChildren<Props>> = ({
   isDisabled,
   className,
 }) => {
+  if (!content) {
+    return <>{children}</>;
+  }
+
   return (
     <NextTooltip
       showArrow={true}

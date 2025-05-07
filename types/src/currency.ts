@@ -8,6 +8,8 @@ export type WithGasPriceStep<T> = T & {
   };
 };
 
+export type Bridge = "union" | "ibc-eureka";
+
 export type BaseCurrency = {
   readonly name: string;
   readonly symbol: string;
@@ -15,6 +17,7 @@ export type BaseCurrency = {
   readonly decimals: number;
   readonly logoURI: string;
   readonly coingeckoId?: string;
+  readonly bridge?: Bridge;
 };
 
 export type WithPrice<T> = T & {

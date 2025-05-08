@@ -113,7 +113,6 @@ export const SkipSwap: React.FC = () => {
   // Calculate price impact only when we have simulation data
   const priceImpact = useMemo(() => {
     if (!simulation?.data) return 0;
-
     const amountInUSD = getPrice(Number(fromAmount), fromToken.denom, { format: false });
     const amountOutUSD = getPrice(Number(toAmount), toToken.denom, { format: false });
     const impact = amountInUSD > 0 ? ((amountInUSD - amountOutUSD) / amountInUSD) * 100 : 0;

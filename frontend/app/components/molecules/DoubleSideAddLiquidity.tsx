@@ -154,7 +154,7 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
               const regex = /^\d+(\.\d{0,18})?$/;
               if (target.value === "" || regex.test(target.value)) {
                 setValue(token0.symbol, target.value, { shouldValidate: true });
-                setValue(token1.symbol, formatDecimals(Number(target.value) * optimalRatio, token1.decimals), {
+                setValue(token1.symbol, formatDecimals(Number(target.value) / optimalRatio, token1.decimals), {
                   shouldValidate: true,
                 });
               }
@@ -166,7 +166,7 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
             className="flex gap-1 items-center cursor-pointer"
             onClick={() => {
               setValue(token0.symbol, formatDecimals(t0DenomBalance, token0.decimals), { shouldValidate: true });
-              setValue(token1.symbol, formatDecimals(t0DenomBalance * optimalRatio, token1.decimals), {
+              setValue(token1.symbol, formatDecimals(t0DenomBalance / optimalRatio, token1.decimals), {
                 shouldValidate: true,
               });
             }}
@@ -200,7 +200,7 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
               const regex = /^\d+(\.\d{0,18})?$/;
               if (target.value === "" || regex.test(target.value)) {
                 setValue(token1.symbol, target.value, { shouldValidate: true });
-                setValue(token0.symbol, formatDecimals(Number(target.value) / optimalRatio, token0.decimals), {
+                setValue(token0.symbol, formatDecimals(Number(target.value) * optimalRatio, token0.decimals), {
                   shouldValidate: true,
                 });
               }
@@ -212,7 +212,7 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
             className="flex gap-1 items-center cursor-pointer"
             onClick={() => {
               setValue(token1.symbol, t1DenomBalance, { shouldValidate: true });
-              setValue(token0.symbol, formatDecimals(Number(t1DenomBalance) / optimalRatio, token0.decimals), {
+              setValue(token0.symbol, formatDecimals(Number(t1DenomBalance) * optimalRatio, token0.decimals), {
                 shouldValidate: true,
               });
             }}

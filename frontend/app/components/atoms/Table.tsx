@@ -34,9 +34,10 @@ export const Table: React.FC<TableProps> = ({ columns, children, gridClass, clas
 interface TableRowProps {
   children: ReactNode[];
   gridClass?: string;
+  onClick?: () => void;
 }
 
-export const TableRow: React.FC<TableRowProps> = ({ children, gridClass }) => {
+export const TableRow: React.FC<TableRowProps> = ({ children, gridClass, onClick }) => {
   if (!Array.isArray(children)) {
     throw new Error("TableRow must have multiple children matching the column count.");
   }
@@ -47,6 +48,7 @@ export const TableRow: React.FC<TableRowProps> = ({ children, gridClass }) => {
         "rounded-2xl border lg:rounded-none lg:first:rounded-t-2xl lg:last:rounded-b-2xl lg:border-b-0 lg:last:border-b-1 border-white/10 p-4 items-center bg-tw-bg/50 backdrop-blur-md",
         gridClass,
       )}
+      onClick={onClick}
     >
       {children.map((child, index) => (
         <React.Fragment key={index}>{child}</React.Fragment>

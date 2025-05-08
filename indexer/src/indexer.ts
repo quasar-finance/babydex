@@ -1,8 +1,13 @@
-import {drizzle} from "drizzle-orm/node-postgres";
-import {Pool} from "pg";
-import {asc, desc, eq, sql, type SQL} from "drizzle-orm";
-import {StringChunk} from "drizzle-orm/sql/sql";
-import type {PoolIncentive, PoolMetric} from "@towerfi/types";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
+import { asc, desc, eq, sql, type SQL } from "drizzle-orm";
+import { StringChunk } from "drizzle-orm/sql/sql";
+import type {
+  AggregatedMetrics,
+  PoolIncentive,
+  PoolMetric,
+  PoolMetricSerialized,
+} from "@towerfi/types";
 
 import {
   materializedAddLiquidityInV1Cosmos,
@@ -16,7 +21,7 @@ import {
   materializedUnstakeLiquidityInV1Cosmos,
   materializedWithdrawLiquidityInV1Cosmos,
 } from "./drizzle/schema.js";
-import {integer, pgSchema, serial, text} from "drizzle-orm/pg-core";
+import { integer, pgSchema, serial, text } from "drizzle-orm/pg-core";
 
 const v1Cosmos = pgSchema("v1_cosmos");
 const userShares = v1Cosmos.table("pool_user_shares", {
@@ -82,8 +87,21 @@ export type Indexer = {
   ) => Promise<Record<string, PoolIncentive> | null>;
   getCurrentPoolVolumes: (page: number, limit: number) => Promise<Record<string, unknown>[] | null>;
   getPoolVolumesByPoolAddresses: (addresses: string[]) => Promise<Record<string, unknown>[] | null>;
-  getPoolMetricsByPoolAddresses: (addresses: string[], startDate?: Date | null, endDate?: Date | null) => Promise<Record<string, PoolMetric> | null>;
-  getPoolIncentiveAprsByPoolAddresses: (addresses: string[], startDate?: Date | null, endDate?: Date | null) => Promise<Record<string, unknown> | null>;
+  getPoolMetricsByPoolAddresses: (
+    addresses: string[],
+    startDate?: Date | null,
+    endDate?: Date | null,
+  ) => Promise<Record<string, PoolMetricSerialized> | null>;
+  getPoolIncentiveAprsByPoolAddresses: (
+    addresses: string[],
+    startDate?: Date | null,
+    endDate?: Date | null,
+  ) => Promise<Record<string, unknown> | null>;
+  getAggregatedMetricsByPoolAddresses: (
+    addresses: string[],
+    startDate?: Date | null,
+    endDate?: Date | null,
+  ) => Promise<AggregatedMetrics | null>;
 };
 
 export type IndexerFilters = {
@@ -112,7 +130,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
 
     if (!filters) return await query;
 
-    const {orderBy = "asc", page = 1, limit = 50, orderByColumn} = filters;
+    const { orderBy = "asc", page = 1, limit = 50, orderByColumn } = filters;
 
     const dynamicQuery = query.$dynamic();
 
@@ -134,7 +152,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
         .leftJoin(poolLpToken, eq(poolLpToken.pool, userShares.pool_address))
         .where(eq(userShares.owner, address));
 
-      return response.map(({pool_user_shares, pool_lp_token}) => ({
+      return response.map(({ pool_user_shares, pool_lp_token }) => ({
         ...pool_user_shares,
         lpToken: pool_lp_token?.lp_token,
       }));
@@ -398,7 +416,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     const query = sql`
         SELECT plt.pool     AS pool_address,
                plt.lp_token AS lp_token_address,
-               i.rewards_per_second, as rewards_per_second,
+               i.rewards_per_second as rewards_per_second,
                i.reward as reward_token,
                CASE
                    WHEN SUM(i.rewards_per_second * (
@@ -424,7 +442,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
                  LEFT JOIN
              v1_cosmos.materialized_incentivize i ON plt.lp_token = i.lp_token
                 LEFT JOIN v1_cosmos.token t0 ON i.reward = t0.denomination
-        WHERE i.timestamp >= NOW() - (${intervalSql} || ' days')::INTERVAL
+        WHERE to_timestamp(i.end_ts) >= NOW() AT TIME ZONE 'UTC'
         GROUP BY plt.pool, plt.lp_token, i.rewards_per_second, i.reward
         ORDER BY plt.pool
         LIMIT ${limit} OFFSET ${offset};
@@ -485,7 +503,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
                  LEFT JOIN
              v1_cosmos.materialized_incentivize i ON plt.lp_token = i.lp_token
                 LEFT JOIN v1_cosmos.token t0 ON i.reward = t0.denomination
-        WHERE i.timestamp >= NOW() - (${intervalSql} || ' days')::INTERVAL
+        WHERE to_timestamp(i.end_ts) >= NOW() AT TIME ZONE 'UTC'
           AND plt.pool = ${poolAddressesSql}
         GROUP BY plt.pool, plt.lp_token, i.rewards_per_second, i.reward, t0.decimals, i.start_ts, i.end_ts
         ORDER BY plt.pool;
@@ -493,18 +511,20 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
 
     try {
       const result = await client.execute(query);
-      return result.rows.reduce<Record<string, PoolIncentive>>((acc, row) => ({
-        ...acc,
-        [row.pool_address as string]: {
-          ...row as unknown as PoolIncentive
-        } as PoolIncentive,
-      }), {});    } catch (error) {
+      return result.rows.reduce<Record<string, PoolIncentive>>(
+        (acc, row) => ({
+          ...acc,
+          [row.pool_address as string]: {
+            ...(row as unknown as PoolIncentive),
+          } as PoolIncentive,
+        }),
+        {},
+      );
+    } catch (error) {
       console.error("Error executing raw query:", error);
       throw error;
     }
   }
-
-
 
   async function getPoolIncentiveAprsByPoolAddresses(
     addresses: string[],
@@ -571,7 +591,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
 
       return results.rows;
     } catch (error) {
-      console.error('Error calculating incentive APR for pools (raw query):', error);
+      console.error("Error calculating incentive APR for pools (raw query):", error);
       return [];
     }
   }
@@ -684,39 +704,55 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
                              WHERE s.pool_address = ${poolAddressesSql}
                                  ${createHeightsFilterSql("s", startHeight, endHeight)}
                              GROUP BY s.pool_address),
-              YieldPeriods AS (
-                              SELECT
-                                hpy.pool_address,
-                                hpy.timestamp,
-                                hpy.total_liquidity_usd,
-                                hpy.fees_usd + hpy.incentives_usd AS total_yield_usd,
-                                LEAD(hpy.timestamp) OVER (PARTITION BY hpy.pool_address ORDER BY hpy.timestamp) AS next_timestamp
+             YieldPeriods AS (SELECT hpy.pool_address,
+                                     hpy.timestamp,
+                                     hpy.total_liquidity_usd,
+                                     hpy.fees_usd + hpy.incentives_usd                           AS total_yield_usd,
+                                     LEAD(hpy.timestamp)
+                                     OVER (PARTITION BY hpy.pool_address ORDER BY hpy.timestamp) AS next_timestamp
                               FROM v1_cosmos.materialized_historic_pool_yield hpy
                               WHERE hpy.pool_address = ${poolAddressesSql}
-                                ${createHeightsFilterSql("hpy", startHeight, endHeight)}
-                            ),
-              AnnualizedYields AS (
-                              SELECT
-                                pool_address,
-                                total_yield_usd,
-                                total_liquidity_usd,
-                                EXTRACT(EPOCH FROM (next_timestamp - timestamp)) / ${yearInSecondsSql} AS duration_years,
+                                  ${createHeightsFilterSql("hpy", startHeight, endHeight)}),
+             AnnualizedYields AS (SELECT pool_address,
+                                         total_yield_usd,
+                                         total_liquidity_usd,
+                                         EXTRACT(EPOCH FROM (next_timestamp - timestamp)) / ${yearInSecondsSql} AS duration_years,
+                                         CASE
+                                             WHEN total_liquidity_usd > 0 AND (next_timestamp IS NOT NULL)
+                                                 THEN (total_yield_usd / total_liquidity_usd) /
+                                                      (EXTRACT(EPOCH FROM (next_timestamp - timestamp)) / ${yearInSecondsSql})
+                                             ELSE 0
+                                             END                                                                AS apr_row
+                                  FROM YieldPeriods
+                                  WHERE next_timestamp IS NOT NULL),
+             PoolAPR AS (SELECT pool_address,
                                 CASE
-                                  WHEN total_liquidity_usd > 0 AND (next_timestamp IS NOT NULL)
-                                    THEN (total_yield_usd / total_liquidity_usd) / (EXTRACT(EPOCH FROM (next_timestamp - timestamp)) / ${yearInSecondsSql})
-                                  ELSE 0
-                                END AS apr_row
-                              FROM YieldPeriods
-                              WHERE next_timestamp IS NOT NULL
-                            ),
-              PoolAPR AS (
-                              SELECT
-                                pool_address,
-                                SUM(total_yield_usd) / SUM(total_liquidity_usd * duration_years) AS average_apr
-                              FROM AnnualizedYields
-                              GROUP BY pool_address
-                            ),
-              Incentives As (SELECT plt.pool     AS pool_address,
+                                    WHEN SUM(total_liquidity_usd * duration_years) > 0
+                                        THEN SUM(total_yield_usd) / SUM(total_liquidity_usd * duration_years)
+                                    ELSE 0
+                                    END AS average_apr
+                         FROM AnnualizedYields
+                         GROUP BY pool_address),
+             AllIncentives AS (SELECT plt.pool    AS pool_address,
+                                      mi.lp_token AS lp_token_address,
+                                      JSON_AGG(
+                                              JSON_BUILD_OBJECT(
+                                                      'rewards_per_second', mi.rewards_per_second,
+                                                      'reward_token', mi.reward,
+                                                      'reward_token_decimals', t.decimals,
+                                                      'start_ts', mi.start_ts,
+                                                      'end_ts', mi.end_ts,
+                                                      'height', mi.height
+                                              )
+                                      )           AS all_incentives
+                               FROM v1_cosmos.materialized_incentivize mi
+                                        JOIN v1_cosmos.pool_lp_token plt ON mi.lp_token = plt.lp_token
+                                        LEFT JOIN v1_cosmos.token t ON mi.reward = t.denomination
+                               WHERE mi.timestamp >= ${start}::timestamp
+                                 AND mi.timestamp <= ${end}::timestamp
+                                 AND plt.pool = ${poolAddressesSql}
+                               GROUP BY mi.lp_token, plt.pool),
+             Incentives As (SELECT plt.pool     AS pool_address,
                                    plt.lp_token AS lp_token_address,
                                    CASE
                                        WHEN SUM(i.rewards_per_second * (
@@ -743,9 +779,51 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
                             FROM v1_cosmos.pool_lp_token plt
                                      LEFT JOIN
                                  v1_cosmos.materialized_incentivize i ON plt.lp_token = i.lp_token
-                            WHERE i.timestamp >= NOW() - (${intervalSql} || ' days')::INTERVAL
+                            WHERE to_timestamp(i.end_ts) >= NOW() AT TIME ZONE 'UTC'
                               AND plt.pool = ${poolAddressesSql}
                             GROUP BY plt.pool, plt.lp_token),
+             CurrentIncentives AS (SELECT i.lp_token,
+                                          i.reward AS incentive_token_denom,
+                                          i.rewards_per_second,
+                                          i.start_ts,
+                                          i.end_ts
+                                   FROM v1_cosmos.materialized_incentivize i
+                                   WHERE i.start_ts <= EXTRACT(EPOCH FROM ${end}::timestamp)
+                                     AND i.end_ts >= EXTRACT(EPOCH FROM ${start}::timestamp)),
+             IncentivesValueOverTime AS (SELECT ci.lp_token,
+                                                SUM(ci.rewards_per_second /
+                                                    power(10, t_incentive.decimals) *
+                                                    COALESCE(tp_incentive.price, 0) *
+                                                    (LEAST(ci.end_ts, EXTRACT(EPOCH FROM ${end}::timestamp)) -
+                                                     GREATEST(ci.start_ts, EXTRACT(EPOCH FROM ${start}::timestamp)))) AS total_incentive_value_usd
+                                         FROM CurrentIncentives ci
+                                                  JOIN v1_cosmos.token t_incentive
+                                                       ON ci.incentive_token_denom = t_incentive.token_name
+                                                  LEFT JOIN v1_cosmos.token_prices tp_incentive
+                                                            ON t_incentive.token_name = tp_incentive.token AND
+                                                               tp_incentive.created_at = (SELECT MAX(created_at)
+                                                                                          FROM v1_cosmos.token_prices
+                                                                                          WHERE token = t_incentive.token_name
+                                                                                            AND price IS NOT NULL
+                                                                                            AND created_at <= ${now}::timestamp)
+                                         GROUP BY ci.lp_token),
+             PoolInfo AS (SELECT DISTINCT plt.pool AS pool_address,
+                                          plt.lp_token
+                          FROM v1_cosmos.pool_lp_token plt
+                          WHERE plt.pool = ${poolAddressesSql}),
+             IncentiveAPR AS (SELECT pi.pool_address,
+                                     AVG(COALESCE(iv.total_incentive_value_usd, 0) /
+                                         NULLIF(mpl.total_liquidity_usd, 0) *
+                                         (365 * 24 * 3600) /
+                                         (EXTRACT(EPOCH FROM ${end}::timestamp) -
+                                          EXTRACT(EPOCH FROM ${start}::timestamp)) *
+                                         100) AS incentive_apr
+                              FROM PoolInfo pi
+                                       JOIN v1_cosmos.materialized_pool_liquidity mpl
+                                            ON pi.pool_address = mpl.pool_address
+                                       LEFT JOIN IncentivesValueOverTime iv ON pi.lp_token = iv.lp_token
+                              WHERE mpl.total_liquidity_usd > 0
+                              GROUP BY pi.pool_address),
              TokenInfo as (select pb.pool_address,
                                   tp0.price       as token0_price,
                                   t0.decimals     as token0_decimals,
@@ -781,35 +859,234 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
                pb.token0_balance,
                ti.token0_decimals,
                ti.token0_price,
-               sv.token0_volume                                                        AS token0_swap_volume,
+               sv.token0_volume   AS token0_swap_volume,
                pb.token1_denom,
                pb.token1_balance,
                ti.token1_decimals,
                ti.token1_price,
-               sv.token1_volume                                                        AS token1_swap_volume,
+               sv.token1_volume   AS token1_swap_volume,
                ti.tvl_usd,
-               apr.average_apr AS average_apr,
-               i.lp_token_address                                                      AS lp_token_address,
-               i.total_incentives                                                      AS total_incentives
+               apr.average_apr    AS average_apr,
+               i.lp_token_address AS lp_token_address,
+               ai.all_incentives  AS all_incentives,
+               i.total_incentives AS total_incentives,
+               iapr.incentive_apr AS incentive_apr
         FROM PoolBalances pb
                  LEFT JOIN TokenInfo ti ON pb.pool_address = ti.pool_address
                  LEFT JOIN SwapVolumes sv ON pb.pool_address = sv.pool_address
                  LEFT JOIN PoolAPR apr ON pb.pool_address = apr.pool_address
+                 LEFT JOIN AllIncentives ai ON pb.pool_address = ai.pool_address
                  LEFT JOIN Incentives i ON pb.pool_address = i.pool_address
+                 LEFT JOIN IncentiveAPR iapr ON pb.pool_address = iapr.pool_address
         ORDER BY pb.pool_address;
     `;
 
     try {
       const result = await client.execute(query);
 
-      return result.rows.reduce<Record<string, PoolMetric>>((acc, row) => ({
-        ...acc,
-        [row.pool_address as string]: {
-          ...row as Omit<PoolMetric, 'metric_start_height' | 'metric_end_height'>,
-          metric_start_height: startHeight ? startHeight.toString() : null,
-          metric_end_height: endHeight ? endHeight.toString() : null,
-        } as PoolMetric,
-      }), {});
+      return result.rows.reduce<Record<string, PoolMetric>>(
+        (acc, row) => ({
+          ...acc,
+          [row.pool_address as string]: {
+            ...(row as Omit<PoolMetric, "metric_start_height" | "metric_end_height">),
+            metric_start_height: startHeight ? startHeight.toString() : null,
+            metric_end_height: endHeight ? endHeight.toString() : null,
+          } as PoolMetric,
+        }),
+        {},
+      );
+    } catch (error) {
+      console.error("Error executing raw query:", error);
+
+      throw error;
+    }
+  }
+
+  async function getAggregatedMetricsByPoolAddresses(
+    addresses: string[],
+    startDate?: Date,
+    endDate?: Date,
+  ): Promise<AggregatedMetrics | null> {
+    const now = new Date();
+    const start = startDate ? new Date(startDate) : new Date(0);
+    const end = endDate ? new Date(endDate) : now;
+
+    if (startDate && start > now) {
+      throw new Error("Start date cannot be in the future.");
+    }
+
+    if (start > end) {
+      throw new Error("Start date cannot be after the end date.");
+    }
+
+    const heights = await findHeightsByDateRange(startDate, endDate);
+    const startHeight = heights.startHeight;
+    const endHeight = heights.endHeight;
+    const poolAddressesSql = createPoolAddressArraySql(addresses);
+    const interval = calculateIntervalInDays(startDate, endDate);
+    const intervalSql = createIntervalSql(interval);
+    const dayInSecondsSql = sql.raw("86400");
+    const yearInSecondsSql = sql.raw("31557600"); // 86400 * 365.25
+
+    const query = sql`
+        WITH LatestBalances AS (SELECT p.pool_address,
+                                       p.token0_denom,
+                                       p.token0_balance,
+                                       p.token1_denom,
+                                       p.token1_balance,
+                                       p.height,
+                                       ROW_NUMBER() OVER (PARTITION BY p.pool_address ORDER BY p.height DESC) as rn
+                                FROM v1_cosmos.materialized_pool_balance p
+                                WHERE p.pool_address = ${poolAddressesSql}
+                                    ${createHeightsFilterSql("p", startHeight, endHeight)}),
+             PoolBalances AS (SELECT lb.pool_address,
+                                     lb.token0_denom,
+                                     lb.token0_balance,
+                                     lb.token1_denom,
+                                     lb.token1_balance,
+                                     lb.height
+                              FROM LatestBalances lb
+                              WHERE lb.rn = 1),
+             LatestTokenPrices AS (SELECT tp.token,
+                                          tp.price,
+                                          tp.created_at,
+                                          ROW_NUMBER() OVER (PARTITION BY tp.token ORDER BY tp.created_at DESC) as rn
+                                   from v1_cosmos.token_prices tp),
+             TokenPrices AS (select * from LatestTokenPrices ltp where ltp.rn = 1),
+             YieldPeriods AS (SELECT hpy.pool_address,
+                                     hpy.timestamp,
+                                     hpy.total_liquidity_usd,
+                                     hpy.fees_usd + hpy.incentives_usd                           AS total_yield_usd,
+                                     LEAD(hpy.timestamp)
+                                     OVER (PARTITION BY hpy.pool_address ORDER BY hpy.timestamp) AS next_timestamp
+                              FROM v1_cosmos.materialized_historic_pool_yield hpy
+                              WHERE hpy.pool_address = ${poolAddressesSql}
+                                  ${createHeightsFilterSql("hpy", startHeight, endHeight)}),
+             AnnualizedYields AS (SELECT pool_address,
+                                         total_yield_usd,
+                                         total_liquidity_usd,
+                                         EXTRACT(EPOCH FROM (next_timestamp - timestamp)) / ${yearInSecondsSql} AS duration_years,
+                                         CASE
+                                             WHEN total_liquidity_usd > 0 AND (next_timestamp IS NOT NULL)
+                                                 THEN (total_yield_usd / total_liquidity_usd) /
+                                                      (EXTRACT(EPOCH FROM (next_timestamp - timestamp)) / ${yearInSecondsSql})
+                                             ELSE 0
+                                             END                                                                AS apr_row
+                                  FROM YieldPeriods
+                                  WHERE next_timestamp IS NOT NULL),
+             PoolYield AS (SELECT pool_address,
+                                  SUM(total_yield_usd) AS total_yield_usd
+                           FROM AnnualizedYields
+                           GROUP BY pool_address),
+             CurrentIncentives AS (SELECT i.lp_token,
+                                          i.reward AS incentive_token_denom,
+                                          i.rewards_per_second,
+                                          i.start_ts,
+                                          i.end_ts
+                                   FROM v1_cosmos.materialized_incentivize i
+                                   WHERE i.start_ts <= EXTRACT(EPOCH FROM ${end}::timestamp)
+                                     AND i.end_ts >= EXTRACT(EPOCH FROM ${start}::timestamp)),
+             TokenInfo as (select pb.pool_address,
+                                  tp0.price       as token0_price,
+                                  t0.decimals     as token0_decimals,
+                                  t0.denomination as token0_denom,
+                                  tp1.price       as token1_price,
+                                  t1.decimals     as token1_decimals,
+                                  t1.denomination as token1_denom,
+                                  COALESCE(
+                                          CASE
+                                              WHEN tp0.price IS NOT NULL AND t0.decimals IS NOT NULL
+                                                  THEN (pb.token0_balance / POWER(10, t0.decimals)) * tp0.price
+                                              ELSE 0
+                                              END,
+                                          0
+                                  ) + COALESCE(
+                                          CASE
+                                              WHEN tp1.price IS NOT NULL AND t1.decimals IS NOT NULL
+                                                  THEN (pb.token1_balance / POWER(10, t1.decimals)) * tp1.price
+                                              ELSE 0
+                                              END,
+                                          0
+                                      )           AS tvl_usd
+
+                           from PoolBalances pb
+                                    LEFT JOIN v1_cosmos.token t0 ON pb.token0_denom = t0.denomination
+                                    LEFT JOIN v1_cosmos.token t1 ON pb.token1_denom = t1.denomination
+                                    LEFT JOIN TokenPrices tp0 ON t0.token_name = tp0.token
+                                    LEFT JOIN TokenPrices tp1 ON t1.token_name = tp1.token
+                           where pb.pool_address = ${poolAddressesSql}),
+             ActiveLiquidityPositions AS (SELECT al.pool_address,
+                                                 COUNT(DISTINCT al.sender)                             as total_active_liquidity_positions,
+                                                 SUM(CASE WHEN al.token0_amount > 0 THEN 1 ELSE 0 END) AS token0_inflow_count,
+                                                 SUM(CASE WHEN al.token1_amount > 0 THEN 1 ELSE 0 END) AS token1_inflow_count,
+                                                 SUM(CASE WHEN wl.token0_amount > 0 THEN 1 ELSE 0 END) AS token0_outflow_count,
+                                                 SUM(CASE WHEN wl.token1_amount > 0 THEN 1 ELSE 0 END) AS token1_outflow_count,
+                                                 SUM(al.token0_amount) - SUM(wl.token0_amount)         AS token0_delta,
+                                                 SUM(al.token1_amount) - SUM(wl.token1_amount)         AS token1_delta
+                                          FROM v1_cosmos.add_liquidity al
+                                                   LEFT JOIN v1_cosmos.withdraw_liquidity wl ON al.sender = wl.receiver
+                                              AND wl.pool_address = al.pool_address
+                                          WHERE ((al.token0_amount - wl.token0_amount) > 0
+                                              OR (al.token1_amount - wl.token1_amount) > 0)
+                                            AND al.pool_address = ${poolAddressesSql}
+                                            AND al.timestamp >= ${start}::timestamp
+                                            AND al.timestamp <= ${end}::timestamp
+                                            AND wl.timestamp >= ${start}::timestamp
+                                            AND wl.timestamp <= ${end}::timestamp
+                                          GROUP by al.pool_address),
+             SwapsDone AS (SELECT s.pool_address,
+                                  COUNT(DISTINCT s.receiver) as total_distinct_wallet_swaps,
+                                  COUNT(s.receiver)          as swaps_done
+                           FROM v1_cosmos.materialized_swap s
+                           WHERE s.pool_address = ${poolAddressesSql}
+                             AND s.timestamp >= ${start}::timestamp
+                             AND s.timestamp <= ${end}::timestamp
+                           GROUP BY s.pool_address),
+             IncentivesDone AS (SELECT plt.pool AS pool_address, COUNT(*) AS total_incentives_done
+                                FROM CurrentIncentives ci
+                                         JOIN v1_cosmos.pool_lp_token plt ON ci.lp_token = plt.lp_token
+                                WHERE ci.end_ts <= EXTRACT(EPOCH FROM NOW())
+                                  AND ci.start_ts >= EXTRACT(EPOCH FROM NOW()) - (${intervalSql} * ${dayInSecondsSql})
+                                  AND plt.pool = ${poolAddressesSql}
+                                GROUP BY plt.pool),
+             TotalPoolAggregates AS (SELECT ti.pool_address                                   AS pool_address,
+                                            ti.tvl_usd                                        AS total_liquidity_usd,
+                                            py.total_yield_usd                                AS total_swap_fees,
+                                            py.total_yield_usd * 0.1                          AS total_tower_swap_fees,
+                                            al.total_active_liquidity_positions               AS total_active_liquidity_positions,
+                                            al.token0_inflow_count + al.token1_inflow_count   AS total_liquidity_inflow,
+                                            al.token0_outflow_count + al.token1_outflow_count AS total_liquidity_outflow,
+                                            sd.total_distinct_wallet_swaps                    AS total_distinct_wallet_swaps,
+                                            sd.swaps_done                                     AS total_swaps_done,
+                                            id.total_incentives_done                          AS total_incentives_done
+                                     FROM TokenInfo ti
+                                              LEFT JOIN PoolYield py ON ti.pool_address = py.pool_address
+                                              LEFT JOIN ActiveLiquidityPositions al ON ti.pool_address = al.pool_address
+                                              LEFT JOIN SwapsDone sd ON ti.pool_address = sd.pool_address
+                                              LEFT JOIN IncentivesDone id ON ti.pool_address = id.pool_address
+                                     WHERE ti.pool_address = ${poolAddressesSql})
+        SELECT SUM(tpa.total_liquidity_usd)              AS total_liquidity_usd,
+               SUM(tpa.total_swap_fees)                  AS total_swap_fees,
+               SUM(tpa.total_tower_swap_fees)            AS total_tower_swap_fees,
+               SUM(tpa.total_active_liquidity_positions) AS total_active_liquidity_positions,
+               SUM(tpa.total_liquidity_inflow)           AS total_liquidity_inflow,
+               SUM(tpa.total_liquidity_outflow)          AS total_liquidity_outflow,
+               SUM(tpa.total_distinct_wallet_swaps)      AS total_distinct_wallet_swaps,
+               SUM(tpa.total_swaps_done)                 AS total_swaps_done,
+               SUM(tpa.total_incentives_done)            AS total_incentives_done,
+               ${startHeight}                            AS start_height,
+               ${endHeight}                              AS end_height
+        FROM TotalPoolAggregates tpa;
+    `;
+
+    try {
+      const result = await client.execute(query);
+
+      if (result.rows.length === 0) {
+        throw new Error("No data found for the given date range.");
+      }
+
+      return result.rows[0] as AggregatedMetrics;
     } catch (error) {
       console.error("Error executing raw query:", error);
 
@@ -831,9 +1108,12 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     return sql.raw(Math.min(Math.max(1, interval), 365).toString());
   }
 
-  async function findHeightsByDateRange(startDate?: Date, endDate?: Date): Promise<{
-    startHeight: bigint | null,
-    endHeight: bigint | null
+  async function findHeightsByDateRange(
+    startDate?: Date,
+    endDate?: Date,
+  ): Promise<{
+    startHeight: bigint | null;
+    endHeight: bigint | null;
   }> {
     let startHeight: bigint | null;
     let endHeight: bigint | null;
@@ -850,27 +1130,32 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
       try {
         const heightsResult = await client.execute(minMaxHeightsQuery);
         if (heightsResult.rows.length > 0) {
-          startHeight = heightsResult.rows[0]?.min_height as bigint ?? null;
-          endHeight = heightsResult.rows[0]?.max_height as bigint ?? null;
+          startHeight = (heightsResult.rows[0]?.min_height as bigint) ?? null;
+          endHeight = (heightsResult.rows[0]?.max_height as bigint) ?? null;
 
-          return {startHeight: startHeight, endHeight: endHeight}
+          return { startHeight: startHeight, endHeight: endHeight };
         }
-
       } catch (error) {
         console.error("Error fetching min/max heights:", error);
         throw error;
       }
     }
 
-    return {startHeight: null, endHeight: null}
+    return { startHeight: null, endHeight: null };
   }
 
-  function createHeightsFilterSql(table: string, startHeight?: bigint | null, endHeight?: bigint | null) {
+  function createHeightsFilterSql(
+    table: string,
+    startHeight?: bigint | null,
+    endHeight?: bigint | null,
+  ) {
     let heightFilter = sql``;
 
     if (startHeight || endHeight) {
       if (startHeight !== null && endHeight !== null) {
-        heightFilter = sql.raw(`AND ${table}.height >= ${startHeight} AND ${table}.height <= ${endHeight}`);
+        heightFilter = sql.raw(
+          `AND ${table}.height >= ${startHeight} AND ${table}.height <= ${endHeight}`,
+        );
       } else if (startHeight !== null) {
         heightFilter = sql.raw(`AND ${table}.height >= ${startHeight}`);
       } else if (endHeight !== null) {
@@ -902,6 +1187,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     getCurrentPoolIncentives,
     getPoolIncentivesByPoolAddresses,
     getPoolMetricsByPoolAddresses,
-    getPoolIncentiveAprsByPoolAddresses
+    getPoolIncentiveAprsByPoolAddresses,
+    getAggregatedMetricsByPoolAddresses,
   } as Indexer;
 };

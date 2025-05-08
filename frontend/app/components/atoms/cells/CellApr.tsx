@@ -1,38 +1,23 @@
 import type React from "react";
 import { CellData } from "./CellData";
 import Tooltip from "../Tooltip";
-import type { PoolIncentive, PoolMetric } from "@towerfi/types";
-import { usePrices } from "~/app/hooks/usePrices";
-import { convertMicroDenomToDenom } from "~/utils/intl";
+import type { PoolIncentive, PoolMetricSerialized } from "@towerfi/types";
+import { useAPR } from "~/app/hooks/useAPR";
 
 interface Props {
   title: string;
-  metrics?: PoolMetric | null;
+  metrics?: PoolMetricSerialized | null;
   incentives?: PoolIncentive | null;
   isLoading?: boolean;
   className?: string;
 }
 
-const CellApr: React.FC<Props> = ({ title, metrics, incentives, isLoading, className }) => {
-
-  const { getPrice } = usePrices();
-
-  const apr = (metrics?.average_apr ?? 0) * 100;
-  const formattedApr = isLoading || !metrics ? "..." : `${apr.toFixed(2)}%`;
-
-  const yearInSeconds = 31557600;
-  const total_incentives = !isLoading && incentives?.rewards_per_second ? incentives.rewards_per_second * yearInSeconds : 0;
-  const incentives_apr = !isLoading && incentives?.rewards_per_second && metrics?.tvl_usd ? 
-    getPrice(
-      convertMicroDenomToDenom(total_incentives || 0, incentives?.token_decimals || 0, incentives?.token_decimals || 0, false),
-      incentives?.reward_token || '',
-      { format: false }
-    ) / metrics.tvl_usd * 100 : 0;
-  const formattedIncentives = isLoading ? "..." : `${incentives_apr.toFixed(2)}%`;
-  const total_apr = apr + incentives_apr;
-  const formatted_total_apr = isLoading ? "..." : `${total_apr.toFixed(2)}%`;
-
-  const tooltipContent = (
+export const CellAprBreakDown: React.FC<{
+  formattedApr: string;
+  formattedIncentives: string;
+  formatted_total_apr: string;
+}> = ({ formattedApr, formattedIncentives, formatted_total_apr }) => {
+  return (
     <div className="flex flex-col gap-2 p-1">
       <div className="text-tw-orange-400">APR Breakdown</div>
       <div className="flex justify-between gap-4">
@@ -50,16 +35,27 @@ const CellApr: React.FC<Props> = ({ title, metrics, incentives, isLoading, class
       </div>
     </div>
   );
+};
+
+const CellApr: React.FC<Props> = ({ title, metrics, incentives, isLoading, className }) => {
+  const apr = useAPR(metrics, incentives);
+  const formattedApr = isLoading || !metrics ? "..." : `${apr.fee_apr.toFixed(2)}%`;
+  const formattedIncentives = isLoading ? "..." : `${apr.incentives_apr.toFixed(2)}%`;
+  const formatted_total_apr = isLoading ? "..." : `${apr.total_apr.toFixed(2)}%`;
+
+  const tooltipContent = (
+    <CellAprBreakDown
+      formattedApr={formattedApr}
+      formattedIncentives={formattedIncentives}
+      formatted_total_apr={formatted_total_apr}
+    />
+  );
 
   return (
-    <CellData 
-      title={title} 
-      data={
-        <Tooltip content={tooltipContent}>
-          {formatted_total_apr}
-        </Tooltip>
-      } 
-      className={className} 
+    <CellData
+      title={title}
+      data={<Tooltip content={tooltipContent}>{formatted_total_apr}</Tooltip>}
+      className={className}
     />
   );
 };

@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import _toast, { type ToastOptions } from "react-hot-toast";
 import { ToastCustom } from "~/app/components/atoms/ToastCustom";
 
@@ -67,7 +66,7 @@ const error = (toastMsg: ToastMsg = {}, options?: ToastOptions) =>
 
 const warning = (toastMsg: ToastMsg = {}, options?: ToastOptions) =>
   _toast.custom((t) => {
-    const msg = { ...defaultMsgs.error, ...toastMsg };
+    const msg = { ...defaultMsgs.warning, ...toastMsg };
     return (
       <ToastCustom
         close={() => _toast.dismiss(t.id)}
@@ -80,7 +79,7 @@ const warning = (toastMsg: ToastMsg = {}, options?: ToastOptions) =>
 
 const info = (toastMsg: ToastMsg = {}, options?: ToastOptions) =>
   _toast.custom((t) => {
-    const msg = { ...defaultMsgs.error, ...toastMsg };
+    const msg = { ...defaultMsgs.info, ...toastMsg };
     return (
       <ToastCustom
         close={() => _toast.dismiss(t.id)}

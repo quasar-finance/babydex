@@ -121,3 +121,14 @@ export function toFullNumberString(value: number | string): string {
   }
   return value;
 }
+
+export function maxSlippageToBps(maxSlippage: string): number {
+  // default to 1% if maxSlippage is not set
+  if (maxSlippage === "auto") return 100;
+
+  return Math.floor(Number(maxSlippage) * 100);
+}
+
+export function bpsToFloat(bps: number, decimals = 4): string {
+  return (bps / 10 ** decimals).toFixed(decimals);
+}

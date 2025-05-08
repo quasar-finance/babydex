@@ -46,6 +46,7 @@ import {
   type IncreaseAllowanceParameters,
   type IncreaseAllowanceReturnType,
 } from "./increaseAllowance";
+import { poolSwap, type PoolSwapParameters, type PoolSwapReturnType } from "./poolSwap";
 
 export type DexActions<
   _transport extends Transport = Transport,
@@ -60,6 +61,7 @@ export type DexActions<
   getCw20Allowance: (args: GetCw20AllowanceParameters) => GetCw20AllowanceReturnType;
   getCw20Balance: (args: GetCw20BalanceParameters) => GetCw20BalanceReturnType;
   increaseAllowance: (args: IncreaseAllowanceParameters) => IncreaseAllowanceReturnType;
+  poolSwap: (args: PoolSwapParameters) => PoolSwapReturnType;
 };
 
 export function dexActions<
@@ -76,5 +78,6 @@ export function dexActions<
     getCw20Allowance: (args) => getCw20Allowance(client, args),
     getCw20Balance: (args) => getCw20Balance(client, args),
     increaseAllowance: (args) => increaseAllowance(client, args),
+    poolSwap: (args) => poolSwap(client, args),
   };
 }

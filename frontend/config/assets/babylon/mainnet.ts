@@ -58,7 +58,7 @@ export const BabylonMainnetAssets = {
     name: "SolvBTC",
     decimals: 18,
     logoURI:
-      "https://raw.githubusercontent.com/cosmos/chain-registry/refs/heads/master/_non-cosmos/ethereum/images/solvBTC.svg",
+      "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/solvBTC.svg",
     coingeckoId: "solv-btc",
   },
   bbn1fkz8dcvsqyfy3apfh8ufexdn4ag00w5jts99zjw9nkjue0zhs4ts6hfdz2: {
@@ -72,7 +72,7 @@ export const BabylonMainnetAssets = {
     coingeckoId: "universal-btc",
   },
   bbn1z5gne4pe84tqerdrjta5sp966m98zgg5czqe4xu2yzxqfqv5tfkqed0jyy: {
-    symbol: "uno.LBTC",
+    symbol: "LBTC.union",
     type: "cw-20",
     denom: "bbn1z5gne4pe84tqerdrjta5sp966m98zgg5czqe4xu2yzxqfqv5tfkqed0jyy",
     name: "Lombard BTC",
@@ -82,13 +82,13 @@ export const BabylonMainnetAssets = {
     coingeckoId: "lombard-staked-btc",
   },
   bbn1tyvxlr8qjt7yx48lhhle7xzxfxkyqwzkaxey3jekrl0gql260jlqlxgfst: {
-    symbol: "uno.solvBTC",
+    symbol: "solvBTC.union",
     type: "cw-20",
     denom: "bbn1tyvxlr8qjt7yx48lhhle7xzxfxkyqwzkaxey3jekrl0gql260jlqlxgfst",
     name: "SolvBTC",
     decimals: 18,
     logoURI:
-      "https://raw.githubusercontent.com/cosmos/chain-registry/refs/heads/master/_non-cosmos/ethereum/images/solvBTC.svg",
+      "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/solvBTC.svg",
     coingeckoId: "solv-btc",
   },
   bbn1jr0xpgy90hqmaafdq3jtapr2p63tv59s9hcced5j4qqgs5ed9x7sr3sv0d: {
@@ -106,13 +106,13 @@ export const BabylonMainnetAssets = {
     type: "cw-20",
     denom: "bbn1ccylwef8yfhafxpmtzq4ps24kxce9cfnz0wnkucsvf2rylfh0jzswhk5ks",
     name: "Lorenzo BTC",
-    decimals: 8,
+    decimals: 18,
     logoURI:
       "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/stbtc.svg",
     coingeckoId: "bitcoin",
   },
   bbn1j2nchmpuhkq0yj93g84txe33j5lhw2y7p3anhqjhvamqxsev6rmsneu85x: {
-    symbol: "satUniBTC",
+    symbol: "satUniBTC.e",
     type: "cw-20",
     denom: "bbn1j2nchmpuhkq0yj93g84txe33j5lhw2y7p3anhqjhvamqxsev6rmsneu85x",
     name: "Satlayer uniBTC",

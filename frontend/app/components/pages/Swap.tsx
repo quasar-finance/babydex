@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  IconArrowsLeftRight,
-  IconPlugConnected,
-  IconRepeat,
-  IconSettingsFilled,
-  IconWallet,
-} from "@tabler/icons-react";
+import { IconArrowsLeftRight, IconRepeat, IconSettingsFilled } from "@tabler/icons-react";
 import { Button } from "../atoms/Button";
 import { ModalTypes } from "~/types/modal";
 import { useModal } from "~/app/providers/ModalProvider";
@@ -14,7 +8,7 @@ import { motion } from "motion/react";
 import SwapInfoAccordion from "../molecules/Swap/SwapInfoAccordion";
 import { useAccount, useBalances } from "@cosmi/react";
 import { Tab, TabList, TabContent, Tabs } from "../atoms/Tabs";
-import { Swap } from "../organisms/swap/Swap";
+import { SkipSwap } from "../organisms/swap/Swap";
 import { Bridge } from "../organisms/swap/Bridge";
 import { useSkipClient } from "~/app/hooks/useSkipClient";
 import { FormProvider, useForm } from "react-hook-form";
@@ -155,7 +149,7 @@ const SwapComponent: React.FC = () => {
                 </TabList>
 
                 <TabContent tabKey="swap">
-                  <Swap />
+                  <SkipSwap />
                 </TabContent>
                 <TabContent tabKey="bridge">
                   <Bridge />

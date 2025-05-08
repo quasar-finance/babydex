@@ -7,15 +7,16 @@ import { IconChevronDown, IconWallet } from "@tabler/icons-react";
 import { ModalTypes } from "~/types/modal";
 import { useModal } from "~/app/providers/ModalProvider";
 import { Assets } from "~/config";
-import { useBalances } from "@cosmi/react";
 import { assetNumberMask } from "~/utils/masks";
 import { useUserBalances } from "~/app/hooks/useUserBalances";
 import { usePrices } from "~/app/hooks/usePrices";
+import clsx from "clsx";
 
 type AssetInputProps = {
   assets: Currency[];
   name: string;
   disabled?: boolean;
+  selectDisabled?: boolean;
   onSelect: (asset: Currency) => void;
   control: Control;
   mask?: (v: string) => string | null;
@@ -31,6 +32,7 @@ export const AssetInput: React.FC<AssetInputProps> = ({
   onSelect,
   onFocus,
   disabled,
+  selectDisabled,
   control,
   validateBalance = true,
   mask = assetNumberMask,
@@ -91,13 +93,15 @@ export const AssetInput: React.FC<AssetInputProps> = ({
       <div className="flex items-center justify-between gap-2">
         <motion.button
           type="button"
-          disabled={disabled}
+          disabled={disabled || selectDisabled}
           className="flex items-center gap-2 p-2 bg-white/5 rounded-full min-w-fit"
           onClick={selectAsset}
         >
           <img src={asset.logoURI} alt={asset.symbol} className="w-7 h-7" />
           <p>{asset.symbol}</p>
-          <IconChevronDown className="h-4 w-4" />
+          <IconChevronDown
+            className={clsx("h-4 w-4", (disabled || selectDisabled) && "opacity-0")}
+          />
         </motion.button>
 
         <input

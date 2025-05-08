@@ -130,12 +130,11 @@ export const poolsRouter = createTRPCRouter({
 
         const poolAmount0 = Number(token0Amount) / 10 ** assetInfo0.decimals;
         const poolAmount1 = Number(token1Amount) / 10 ** assetInfo1.decimals;
-        const optimalRatio: number = poolAmount1 / poolAmount0;
+        const optimalRatio: number = poolAmount0 / poolAmount1;
 
         return Number.isNaN(optimalRatio) ? 1 : optimalRatio;
       } else {
         const { params } = config;
-        console.log(params)
         const priceScale: number = Number(params.price_scale);
 
         return priceScale;
@@ -198,17 +197,16 @@ export const poolsRouter = createTRPCRouter({
         rewards: [],
       } as PoolInfo;
     }),
-    
+
   getPools: createTRPCPublicProcedure
     .input(z.object({ limit: z.number().optional(), start_after: z.string().optional() }))
     .query<PoolInfo[]>(async ({ ctx, input }) => {
       const { publicClient, contracts } = ctx;
       const { limit, start_after } = input as { limit?: number; start_after?: string };
 
-
       const pools: PairInfo[] = await publicClient.queryContractSmart<PairInfo[]>({
         address: contracts.factory,
-        msg: { pairs: { limit: limit || 100,  start_after } },
+        msg: { pairs: { limit: limit || 100, start_after } },
       });
 
       const caller = createCallerFactory(appRouter)(ctx);
@@ -218,5 +216,5 @@ export const poolsRouter = createTRPCRouter({
       );
 
       return poolInfo;
-  }),
+    }),
 });

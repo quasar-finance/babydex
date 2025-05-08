@@ -14,6 +14,7 @@ import { useToast } from "~/app/hooks";
 import { usePrices } from "~/app/hooks/usePrices";
 
 interface Props {
+  title?: string;
   rewards: Asset[];
   poolToken: string;
   className?: string;
@@ -21,6 +22,7 @@ interface Props {
 }
 
 export const CellClaimRewards: React.FC<Props> = ({
+  title = "Claimable Rewards",
   rewards,
   poolToken,
   className,
@@ -73,24 +75,30 @@ export const CellClaimRewards: React.FC<Props> = ({
       return denom;
     }),
   });
-  
-  const totalValue = assets?.reduce((sum, asset, i) => {
-    const amount = convertMicroDenomToDenom(rewards[i].amount, asset.decimals, asset.decimals, false);
-    const price = getPrice(amount, asset.denom, { format: false });
-    return sum + price;
-  }, 0) || 0;
+
+  const totalValue =
+    assets?.reduce((sum, asset, i) => {
+      const amount = convertMicroDenomToDenom(
+        rewards[i].amount,
+        asset.decimals,
+        asset.decimals,
+        false,
+      );
+      const price = getPrice(amount, asset.denom, { format: false });
+      return sum + price;
+    }, 0) || 0;
 
   const totalValueformatted = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
   }).format(totalValue);
 
-  const hasRewards = totalValue > 0 || rewards.some(r => Number(r.amount) > 0);
+  const hasRewards = totalValue > 0 || rewards.some((r) => Number(r.amount) > 0);
 
   if (!stakedAmount) {
     return (
       <div className={twMerge("flex flex-col gap-2", className)}>
-        <p className="text-xs text-white/50 lg:hidden">Claimable Rewards</p>
+        <p className="text-xs text-white/50 lg:hidden">{title}</p>
         <div className="flex gap-2 items-center">
           <Button
             color="secondary"
@@ -108,7 +116,7 @@ export const CellClaimRewards: React.FC<Props> = ({
 
   return (
     <div className={twMerge("flex flex-col gap-2", className)}>
-      <p className="text-xs text-white/50 lg:hidden">Claimable Rewards</p>
+      <p className="text-xs text-white/50 lg:hidden">{title}</p>
       <div className="flex gap-2 items-center">
         {hasRewards ? (
           <Tooltip
@@ -135,13 +143,17 @@ export const CellClaimRewards: React.FC<Props> = ({
           >
             {totalValueformatted}
           </Tooltip>
-        ) : "$0.00"}
+        ) : (
+          "$0.00"
+        )}
         <Button
           color="secondary"
           size="sm"
           onClick={() => claimReward()}
           isLoading={isLoading}
-          isDisabled={isLoading || rewards.length === 0 || rewards.every(r => Number(r.amount) === 0)}
+          isDisabled={
+            isLoading || rewards.length === 0 || rewards.every((r) => Number(r.amount) === 0)
+          }
         >
           Claim
         </Button>

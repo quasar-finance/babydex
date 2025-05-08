@@ -139,4 +139,21 @@ export const indexerRouter = createTRPCRouter({
         input.endDate,
       );
     }),
+  getAggregatedMetricsByAddresses: createTRPCPublicProcedure
+    .input(z.object({
+      addresses: z.string().array(),
+      startDate: z.string().refine(str => !isNaN(Date.parse(str)), {
+        message: "Invalid date string"
+      }).transform(str => new Date(str)).nullish(),
+      endDate: z.string().refine(str => !isNaN(Date.parse(str)), {
+        message: "Invalid date string"
+      }).transform(str => new Date(str)).nullish()
+    }))
+    .query(async ({ ctx, input }) => {
+      return await ctx.indexerService.getAggregatedMetricsByPoolAddresses(
+        input.addresses,
+        input.startDate,
+        input.endDate,
+      );
+    }),
 });

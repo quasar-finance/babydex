@@ -17,11 +17,15 @@ import AssetsStacked from "../../atoms/AssetsStacked";
 import { Popover, PopoverContent, PopoverTrigger } from "../../atoms/Popover";
 import MaxSlippageSwitcher from "../MaxSlippageSwitcher";
 import { IconSettingsFilled } from "@tabler/icons-react";
-import { usePrices } from "~/app/hooks/usePrices";
+import { twMerge } from "~/utils/twMerge";
 
 interface Props {
   pool: PoolInfo;
   successAction?: () => void;
+  className?: string;
+  classNameContainer?: string;
+  WrapperComponent?: React.ElementType<{ classNames?: string; title?: string }>;
+  wrapperProps?: Record<string, any>;
 }
 
 export interface DepositFormData {
@@ -29,7 +33,23 @@ export interface DepositFormData {
   slipageTolerance: string;
 }
 
-export const ModalAddLiquidity: React.FC<Props> = ({ pool, successAction }) => {
+const DefaultWrapperComponent = BasicModal;
+const defaultWrapperProps = {
+  title: "Add Liquidity",
+  classNames: {
+    wrapper: "max-w-xl",
+    container: "p-0",
+  },
+};
+
+export const ModalAddLiquidity: React.FC<Props> = ({
+  pool,
+  successAction,
+  className,
+  classNameContainer,
+  WrapperComponent = DefaultWrapperComponent,
+  wrapperProps = {},
+}) => {
   const { name } = pool;
 
   const { showModal } = useModal();
@@ -61,10 +81,17 @@ export const ModalAddLiquidity: React.FC<Props> = ({ pool, successAction }) => {
     if (successAction) successAction();
   });
 
+  if (WrapperComponent === BasicModal) {
+    wrapperProps = {
+      ...defaultWrapperProps,
+      ...wrapperProps,
+    };
+  }
+
   return (
-    <BasicModal title="Add Liquidity" classNames={{ wrapper: "max-w-xl", container: "p-0" }}>
+    <WrapperComponent {...wrapperProps}>
       <FormProvider {...methods}>
-        <form className="flex flex-col max-w-xl" onSubmit={onSubmit}>
+        <form className={twMerge("flex flex-col max-w-xl", className)} onSubmit={onSubmit}>
           <Popover>
             <PopoverTrigger>
               <Button
@@ -86,14 +113,14 @@ export const ModalAddLiquidity: React.FC<Props> = ({ pool, successAction }) => {
               </div>
             </PopoverContent>
           </Popover>
-          <div className="flex flex-col gap-5 px-4 py-5">
+          <div className={twMerge("flex flex-col gap-5 px-4 py-5", classNameContainer)}>
             <div className="flex flex-col gap-4">
               <div className="bg-white/5 w-full rounded-xl p-4 flex lg:items-center justify-between gap-4 lg:gap-1 flex-col lg:flex-row">
                 <div className="flex items-center gap-3">
                   <AssetsStacked assets={pool.assets} />
                   <span>{name}</span>
                 </div>
-                {pool.poolType === "concentrated" && (
+                {/* {pool.poolType === "concentrated" && (
                   <div className="flex gap-2 lg:py-1 lg:px-[6px]">
                     <Tabs
                       color="orange"
@@ -107,17 +134,17 @@ export const ModalAddLiquidity: React.FC<Props> = ({ pool, successAction }) => {
                       </TabList>
                     </Tabs>
                   </div>
-                )}
+                )} */}
               </div>
 
               <div className="flex flex-col gap-2">
                 <p className="text-white/50 text-sm">Deposit Amount</p>
                 <div className="flex gap-4 flex-col">
-                  {side === "single" && pool.poolType === "concentrated" ? (
+                  {/* {side === "single" && pool.poolType === "concentrated" ? (
                     <SingleSideAddLiquidity submitRef={submitRef} pool={pool} />
-                  ) : (
-                    <DoubleSideAddLiquidity submitRef={submitRef} pool={pool} />
-                  )}
+                  ) : ( */}
+                  <DoubleSideAddLiquidity submitRef={submitRef} pool={pool} />
+                  {/* )} */}
                 </div>
               </div>
             </div>
@@ -154,6 +181,6 @@ export const ModalAddLiquidity: React.FC<Props> = ({ pool, successAction }) => {
           </div>
         </form>
       </FormProvider>
-    </BasicModal>
+    </WrapperComponent>
   );
 };

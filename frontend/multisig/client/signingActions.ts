@@ -7,7 +7,6 @@ import type {
     CometBftRpcSchema,
     Transport,
     TxMessage,
-    MsgExecuteContract
 } from 'cosmi/types'
 import { toUtf8 } from 'cosmi/utils';
 
@@ -44,20 +43,20 @@ export async function execute(client: Client, parameters: ExecuteParameters): Ex
 export async function executeMultiple(client: Client, parameters: ExecuteMultipleParameters): ExecuteReturnType {
     const { sender, execute, gasLimit, memo, timeoutHeight } = parameters;
     
-    // Format the messages
-    const msgs = execute.map(({ address, message, funds }) => ({
-        typeUrl: MsgExecuteContract.typeUrl,
-        value: MsgExecuteContract.encode({
-            sender,
-            contract: address,
-            msg: toUtf8(JSON.stringify(message)),
-            funds: funds || [],
-        }).finish(),
-    }));
+    // // Format the messages
+    // const msgs = execute.map(({ address, message, funds }) => ({
+    //     typeUrl: MsgExecuteContract.typeUrl,
+    //     value: MsgExecuteContract.encode({
+    //         sender,
+    //         contract: address,
+    //         msg: toUtf8(JSON.stringify(message)),
+    //         funds: funds || [],
+    //     }).finish(),
+    // }));
 
     // Create the transaction object
     const transaction = {
-        messages: msgs,
+        messages: execute,
         signer: sender,
         gasLimit,
         memo,
@@ -72,5 +71,5 @@ export async function executeMultiple(client: Client, parameters: ExecuteMultipl
     });
     window.dispatchEvent(event);
 
-    return transaction;
+    return {};
 }

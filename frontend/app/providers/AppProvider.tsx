@@ -8,6 +8,7 @@ import { createClient, trpc } from "~/trpc/client";
 import type { PropsWithChildren } from "react";
 import { CosmiProvider } from "@cosmi/react";
 import { cosmi } from "~/config/cosmi";
+import { TransactionDisplayProvider } from './TransactionDisplayProvider';
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: false, refetchOnWindowFocus: false } },
@@ -21,7 +22,11 @@ const AppProvider: React.FC<PropsWithChildren> = ({ children }) => {
       <trpc.Provider client={trpcClient} queryClient={queryClient}>
         <CosmiProvider config={cosmi}>
           <ThemeProvider>
-            <ModalProvider>{children}</ModalProvider>
+            <ModalProvider>
+              <TransactionDisplayProvider>
+                {children}
+              </TransactionDisplayProvider>
+            </ModalProvider>
             <Toaster
               containerStyle={{
                 zIndex: 99999999,

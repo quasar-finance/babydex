@@ -47,6 +47,7 @@ import {
   type IncreaseAllowanceReturnType,
 } from "./increaseAllowance";
 import { poolSwap, type PoolSwapParameters, type PoolSwapReturnType } from "./poolSwap";
+import { ClientWithActions } from "~/multisig/client/types";
 
 export type DexActions<
   _transport extends Transport = Transport,
@@ -68,7 +69,7 @@ export function dexActions<
   transport extends Transport = Transport,
   chain extends Chain | undefined = Chain | undefined,
   account extends Account | undefined = Account | undefined,
->(client: Client<transport, chain, account>): DexActions<transport, chain, account> {
+>(client: ClientWithActions<transport, chain, account>): DexActions<transport, chain, account> {
   return {
     addLiquidity: (args) => addLiquidity(client, args),
     withdrawLiquidity: (args) => withdrawLiquidity(client, args),

@@ -10,7 +10,9 @@ import { babylon } from "~/config/chains/babylon";
 import { useEffect } from "react";
 
 function ConnectorButton({ connector, onClick }: { connector: any; onClick: () => void }) {
-  const { name, id, isInstalled } = connector;
+  const { name, id, isInstalled, icon } = connector;
+
+  const walletIcon = connector.icon ?? `https://raw.githubusercontent.com/quasar-finance/quasar-resources/main/assets/wallet/${id}.webp`;
 
   return (
     <Button
@@ -24,7 +26,7 @@ function ConnectorButton({ connector, onClick }: { connector: any; onClick: () =
       <div className="h-12 w-12 p-1 relative">
         <Image
           className="w-full h-full rounded-full object-contain relative z-10"
-          src={`https://raw.githubusercontent.com/quasar-finance/quasar-resources/main/assets/wallet/${id}.webp`}
+          src={walletIcon}
           width={40}
           height={40}
           alt={`chain-${name}-${id}`}

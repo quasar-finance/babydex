@@ -3,6 +3,7 @@ import type { Currency } from "@towerfi/types";
 
 import { execute, type ExecuteReturnType } from "cosmi/client";
 import { setInnerValueToAsset } from "@towerfi/trpc";
+import { ClientWithActions } from "~/multisig/client/types";
 
 export type PoolSwapParameters = {
   sender: string;
@@ -23,7 +24,7 @@ export async function poolSwap<
   C extends Chain | undefined,
   A extends Account | undefined = Account | undefined,
 >(
-  client: Client<Transport, C, A, CometBftRpcSchema>,
+  client: ClientWithActions<Transport, C, A, CometBftRpcSchema>,
   parameters: PoolSwapParameters,
 ): PoolSwapReturnType {
   const { sender, poolAddress, askAssetInfo, beliefPrice, maxSpread, offerAsset, to } = parameters;
@@ -42,7 +43,7 @@ export async function poolSwap<
   };
 
   if (offerAsset.info.type === "cw-20") {
-    return execute(client, {
+    return client.execute({
       execute: {
         address: offerAsset.info.denom,
         message: {
@@ -58,7 +59,7 @@ export async function poolSwap<
     });
   }
 
-  return execute(client, {
+  return client.execute({
     execute: {
       address: poolAddress,
       message: swapMsg,

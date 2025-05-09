@@ -21,17 +21,17 @@ export const CellAprBreakDown: React.FC<{
     <div className="flex flex-col gap-2 p-1">
       <div className="text-tw-orange-400">APR Breakdown</div>
       <div className="flex justify-between gap-4">
-        <span className="text-white/50">Swap Fees</span>
-        <span>{formattedApr}</span>
+        <div className="text-white/50">Swap Fees</div>
+        <div>{formattedApr}</div>
       </div>
       <div className="flex justify-between gap-4">
-        <span className="text-white/50">Incentives</span>
-        <span>{formattedIncentives}</span>
+        <div className="text-white/50">Incentives</div>
+        <div>{formattedIncentives}</div>
       </div>
       <div className="h-[1px] bg-white/10" />
       <div className="flex justify-between gap-4">
-        <span className="text-white/50">Net</span>
-        <span>{formatted_total_apr}</span>
+        <div className="text-white/50">Net</div>
+        <div>{formatted_total_apr}</div>
       </div>
     </div>
   );

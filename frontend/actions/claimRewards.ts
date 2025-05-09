@@ -1,5 +1,6 @@
 import type { Account, Chain, Client, CometBftRpcSchema, Transport } from "cosmi/types";
 import { execute, type ExecuteReturnType } from "cosmi/client";
+import { ClientWithActions } from "~/multisig/client/types";
 
 export type ClaimRewardsParameters = {
   incentiveAddress: string;
@@ -13,20 +14,22 @@ export async function claimRewards<
   C extends Chain | undefined,
   A extends Account | undefined = Account | undefined,
 >(
-  client: Client<Transport, C, A, CometBftRpcSchema>,
+  client: ClientWithActions<Transport, C, A, CometBftRpcSchema>,
   parameters: ClaimRewardsParameters,
 ): ClaimRewardsReturnType {
   const { sender, incentiveAddress, lpTokens } = parameters;
 
-  return await execute(client, {
-    sender,
-    execute: {
-      address: incentiveAddress,
-      message: {
-        claim_rewards: {
-          lp_tokens: lpTokens,
-        },
+  const execMsg = {
+    address: incentiveAddress,
+    message: {
+      claim_rewards: {
+        lp_tokens: lpTokens,
       },
     },
+  };
+
+  return await client.execute({
+    execute: execMsg,
+    sender,
   });
 }

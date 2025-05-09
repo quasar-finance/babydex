@@ -19,7 +19,6 @@ _transport extends Transport = Transport,
 _chain extends Chain | undefined = Chain | undefined,
 _account extends Account | undefined = Account | undefined,
 > = {
-    // TODO change these actions up to account for the multisig return type
     execute: (args: ExecuteParameters) => ExecuteReturnType
     executeMultiple: (
         args: ExecuteMultipleParameters,

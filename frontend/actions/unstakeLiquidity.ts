@@ -1,5 +1,6 @@
 import type { Account, Chain, Client, CometBftRpcSchema, Transport } from "cosmi/types";
 import { execute, type ExecuteReturnType } from "cosmi/client";
+import { ClientWithActions } from "~/multisig/client/types";
 
 export type UnstakeLiquidityParameters = {
   sender: string;
@@ -14,12 +15,12 @@ export async function unstakeLiquidity<
   C extends Chain | undefined,
   A extends Account | undefined = Account | undefined,
 >(
-  client: Client<Transport, C, A, CometBftRpcSchema>,
+  client: ClientWithActions<Transport, C, A, CometBftRpcSchema>,
   parameters: UnstakeLiquidityParameters,
 ): UnstakeLiquidityReturnType {
   const { sender, incentiveAddress, lpTokenAddress, amount } = parameters;
 
-  return await execute(client, {
+  return await client.execute({
     sender,
     execute: {
       address: incentiveAddress,

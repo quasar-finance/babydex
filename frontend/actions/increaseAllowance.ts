@@ -1,5 +1,6 @@
-import type { Account, Chain, Client, CometBftRpcSchema, Transport } from "cosmi/types";
-import { execute, type ExecuteReturnType } from "cosmi/client";
+import type { Account, Chain, CometBftRpcSchema, Transport } from "cosmi/types";
+import { type ExecuteReturnType } from "cosmi/client";
+import { ClientWithActions } from "~/multisig/client/types";
 
 export type IncreaseAllowanceParameters = {
   sender: string;
@@ -14,23 +15,14 @@ export async function increaseAllowance<
   C extends Chain | undefined,
   A extends Account | undefined = Account | undefined,
 >(
-  client: Client<Transport, C, A, CometBftRpcSchema>,
+  client: ClientWithActions<Transport, C, A, CometBftRpcSchema>,
   parameters: IncreaseAllowanceParameters,
 ): IncreaseAllowanceReturnType {
   const { address, sender, spender, amount } = parameters;
 
-  return await execute(client, {
-    sender,
-    execute: {
-      address,
-      message: {
-        increase_allowance: {
-          spender,
-          amount,
-        },
-      },
-    },
-  });
+  const execMsg = buildIncreaseAllowanceMsg({tokenAddress: address, ...parameters})
+
+  return await client.execute(execMsg);
 }
 
 export type IncreaseAllowanceMsgParams = {
@@ -56,11 +48,11 @@ export function buildIncreaseAllowanceMsg({
     },
   };
 
-  const execMsg = {
+  const execute = {
     address: tokenAddress,
     message: msg,
     funds: [],
   };
 
-  return { sender, execMsg };
+  return { sender, execute };
 }

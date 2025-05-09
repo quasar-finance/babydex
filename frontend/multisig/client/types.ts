@@ -57,6 +57,4 @@ export type ClientWithActions<
   TChain extends Chain | undefined = Chain | undefined,
   TAccount extends Account | undefined = Account | undefined,
   TRpcSchema extends CometBftRpcSchema = CometBftRpcSchema
-> = Client<TTransport, TChain, TAccount, TRpcSchema> & {
-  actions: SigningActions<TTransport, TChain, TAccount>;
-}; 
+> = Client<TTransport, TChain, TAccount, TRpcSchema> & SigningActions<TTransport, TChain, TAccount>; 

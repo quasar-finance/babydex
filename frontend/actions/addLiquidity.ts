@@ -13,10 +13,7 @@ export async function addLiquidity<
   client: ClientWithActions<Transport, C, A>,
   parameters: AddLiquidityParameters,
 ): AddLiquidityReturnType {
-  console.log(client.name)
   const { sender, execMsgs } = buildAddLiquidityMsg(parameters);
-  console.log("building")
-  console.log(client)
   // TODO, make this call differentiate between cosmi base signing call and our multisig signing call
   return await client.executeMultiple({
     execute: execMsgs,

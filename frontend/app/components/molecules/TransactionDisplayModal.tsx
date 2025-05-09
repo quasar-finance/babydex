@@ -1,4 +1,4 @@
-import { Modal } from "../atoms/Modal";
+import { Modal } from "@heroui/react";
 import { Button } from "../atoms/Button";
 import { IconCopy } from "@tabler/icons-react";
 import { useState } from "react";

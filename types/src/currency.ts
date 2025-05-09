@@ -17,7 +17,7 @@ export type BaseCurrency = {
   readonly decimals: number;
   readonly logoURI: string;
   readonly coingeckoId?: string;
-  readonly bridge?: Bridge;
+  readonly bridge?: Bridge[];
   readonly ethereumAddress?: string;
 };
 

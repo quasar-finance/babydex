@@ -12,6 +12,7 @@ export const BabylonMainnetAssets = {
       "https://raw.githubusercontent.com/cosmos/chain-registry/master/babylon/images/logo.svg",
     coingeckoId: "babylon",
     ethereumAddress: "0xe53dcec07d16d88e386ae0710e86d9a400f83c31",
+    bridge: ["ibc-eureka", "union"],
   },
   "ibc/65D0BEC6DAD96C7F5043D1E54E54B6BB5D5B3AEC3FF6CEBB75B9E059F3580EA3": {
     symbol: "USDC",
@@ -22,7 +23,7 @@ export const BabylonMainnetAssets = {
     logoURI:
       "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/usdc.png",
     coingeckoId: "usd-coin",
-    bridge: "ibc-eureka",
+    bridge: ["ibc-eureka"],
   },
   "ibc/89EE10FCF78800B572BAAC7080AEFA301B5F3BBC51C5371E907EB129C5B900E7": {
     symbol: "LBTC",
@@ -33,7 +34,7 @@ export const BabylonMainnetAssets = {
     logoURI:
       "https://raw.githubusercontent.com/quasar-finance/quasar-resources/main/assets/coins/lbtc.svg",
     coingeckoId: "lombard-staked-btc",
-    bridge: "ibc-eureka",
+    bridge: ["ibc-eureka"],
   },
   bbn1s7jzz7cyuqmy5xpr07yepka5ngktexsferu2cr4xeww897ftj77sv30f5s: {
     symbol: "eBABY",
@@ -64,7 +65,7 @@ export const BabylonMainnetAssets = {
     logoURI:
       "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/solvBTC.svg",
     coingeckoId: "solv-btc",
-    bridge: "ibc-eureka",
+    bridge: ["ibc-eureka"],
   },
   bbn1fkz8dcvsqyfy3apfh8ufexdn4ag00w5jts99zjw9nkjue0zhs4ts6hfdz2: {
     symbol: "uniBTC",
@@ -75,7 +76,7 @@ export const BabylonMainnetAssets = {
     logoURI:
       "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/uniBTC.svg",
     coingeckoId: "universal-btc",
-    bridge: "union",
+    bridge: ["union"],
     ethereumAddress: "0x004e9c3ef86bc1ca1f0bb5c7662861ee93350568",
   },
   bbn1z5gne4pe84tqerdrjta5sp966m98zgg5czqe4xu2yzxqfqv5tfkqed0jyy: {
@@ -87,7 +88,7 @@ export const BabylonMainnetAssets = {
     logoURI:
       "https://raw.githubusercontent.com/quasar-finance/quasar-resources/main/assets/coins/lbtc.svg",
     coingeckoId: "lombard-staked-btc",
-    bridge: "union",
+    bridge: ["union"],
     ethereumAddress: "0x8236a87084f8B84306f72007F36F2618A5634494",
   },
   bbn1tyvxlr8qjt7yx48lhhle7xzxfxkyqwzkaxey3jekrl0gql260jlqlxgfst: {
@@ -99,7 +100,7 @@ export const BabylonMainnetAssets = {
     logoURI:
       "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/solvBTC.svg",
     coingeckoId: "solv-btc",
-    bridge: "union",
+    bridge: ["union"],
     ethereumAddress: "0x7a56e1c57c7475ccf742a1832b028f0456652f97",
   },
   bbn1jr0xpgy90hqmaafdq3jtapr2p63tv59s9hcced5j4qqgs5ed9x7sr3sv0d: {
@@ -111,7 +112,7 @@ export const BabylonMainnetAssets = {
     logoURI:
       "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/pumpBTC.svg",
     coingeckoId: "pumpbtc",
-    bridge: "union",
+    bridge: ["union"],
     ethereumAddress: "0xf469fbd2abcd6b9de8e169d128226c0fc90a012e",
   },
   bbn1ccylwef8yfhafxpmtzq4ps24kxce9cfnz0wnkucsvf2rylfh0jzswhk5ks: {
@@ -123,7 +124,7 @@ export const BabylonMainnetAssets = {
     logoURI:
       "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/stbtc.svg",
     coingeckoId: "bitcoin",
-    bridge: "union",
+    bridge: ["union"],
     ethereumAddress: "0xf6718b2701d4a6498ef77d7c152b2137ab28b8a3",
   },
   bbn1j2nchmpuhkq0yj93g84txe33j5lhw2y7p3anhqjhvamqxsev6rmsneu85x: {
@@ -135,7 +136,7 @@ export const BabylonMainnetAssets = {
     logoURI:
       "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/uniBTC.svg",
     coingeckoId: "universal-btc",
-    bridge: "union",
+    bridge: ["union"],
     ethereumAddress: "0xF7De2B7afdb07AA5dD143180Ed758165821E076e",
   },
 } as unknown as Record<string, Currency>;

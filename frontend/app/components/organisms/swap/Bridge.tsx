@@ -1,5 +1,5 @@
 import type React from "react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Assets } from "~/config";
 import { Button } from "../../atoms/Button";
 import Link from "next/link";
@@ -8,6 +8,7 @@ import { IconChevronDown } from "@tabler/icons-react";
 import { useModal } from "~/app/providers/ModalProvider";
 import type { Bridge as BridgeType, Currency } from "@towerfi/types";
 import { ModalTypes } from "~/types/modal";
+import { twMerge } from "~/utils/twMerge";
 
 const assetsWithBridgeTooltip = Object.values(Assets).map((a) => {
   return {
@@ -17,39 +18,28 @@ const assetsWithBridgeTooltip = Object.values(Assets).map((a) => {
   };
 });
 
-function stringToHex(str: string, prefix = true): string {
-  return (
-    (prefix ? "0x" : "") +
-    Array.from(str)
-      .map((char) => char.charCodeAt(0).toString(16))
-      .join("")
-  );
-}
+type Bridge = {
+  id: BridgeType;
+  label: string;
+  message: string;
+  url: string;
+  isDisabled: boolean;
+  getUrl: (asset: Currency) => string;
+};
 
-const bridgeExternalLinks: Record<
-  BridgeType,
-  {
-    id: BridgeType;
-    label: string;
-    message: string;
-    url: string;
-    isDisabled: boolean;
-    getUrl: (asset: Currency) => string;
-  }
-> = {
+const bridgeExternalLinks: Record<BridgeType, Bridge> = {
   union: {
     id: "union",
     label: "Union",
-    message:
-      "Union is a zero-knowledge interoperability protocol that allows fast, trustless bridging of assets and messages between chains.",
+    message: "Union provide bridging from Ethereum, Corn, BoB to Babylon.",
     url: "https://btc.union.build",
     getUrl(asset: Currency) {
       const url = new URL(this.url);
       const params = new URLSearchParams(url.search);
 
-      params.set("source", "bbn-1");
-      params.set("destination", "1");
-      params.set("asset", stringToHex(asset.denom));
+      params.set("source", "1");
+      params.set("destination", "bbn-1");
+      params.set("asset", asset.ethereumAddress || "");
 
       url.search = params.toString();
       return url.toString();
@@ -60,7 +50,7 @@ const bridgeExternalLinks: Record<
     id: "ibc-eureka",
     label: "IBC Eureka",
     message:
-      "Eureka, by Skip, discovers the most efficient IBC routes to bridge tokens into Babylon with optimal speed and cost.",
+      "IBC Eureka provide bridging from Ethereum, Osmosis and other IBC related chains to Babylon.",
     url: "https://go.cosmos.network/?src_asset=0x8236a87084f8B84306f72007F36F2618A5634494&src_chain=1&dest_asset=ibc%2F89EE10FCF78800B572BAAC7080AEFA301B5F3BBC51C5371E907EB129C5B900E7&dest_chain=bbn-1&amount_in=1&amount_out=0.999986",
     getUrl(asset: Currency) {
       const url = new URL(this.url);
@@ -89,12 +79,25 @@ export const Bridge: React.FC = () => {
     assetsWithBridgeTooltip.find((a) => !!a.bridge) || assetsWithBridgeTooltip[0],
   );
 
-  const activeBridge = useMemo(() => {
+  const hasMultipleBridges = useMemo(() => {
     if (!asset.bridge) {
-      return null;
+      return false;
     }
 
-    return bridgeExternalLinks[asset.bridge];
+    return asset.bridge.length > 1;
+  }, [asset]);
+
+  const [activeBridge, setActiveBridge] = useState<Bridge | null>(null);
+  const handleBridgeSelect = (bridge: BridgeType) => {
+    const selectedBridge = bridgeExternalLinks[bridge];
+    setActiveBridge(selectedBridge);
+  };
+
+  useEffect(() => {
+    if (asset.bridge && asset.bridge.length > 0) {
+      const defaultBridge = bridgeExternalLinks[asset.bridge[0]];
+      setActiveBridge(defaultBridge);
+    }
   }, [asset]);
 
   return (
@@ -114,9 +117,31 @@ export const Bridge: React.FC = () => {
       </div>
 
       <div className="pl-2 mt-3">
-        <span>Available Bridge</span>
+        <span>Available Bridge{hasMultipleBridges ? "s" : ""}</span>
       </div>
-      <div className="bg-tw-bg rounded-2xl px-4 py-8 ">
+      {asset.bridge && hasMultipleBridges && (
+        <div className="flex items-center gap-2 w-full">
+          {asset.bridge.map((bridge) => {
+            return (
+              <Button
+                key={bridge}
+                color="tertiary"
+                size="sm"
+                className={twMerge(
+                  "bg-tw-orange-400/20 border-2 border-transparent flex-1 capitalize text-tw-orange-400",
+                  {
+                    "border-tw-orange-400 bg-tw-orange-400/30": activeBridge?.id === bridge,
+                  },
+                )}
+                onClick={() => handleBridgeSelect(bridge)}
+              >
+                {bridgeExternalLinks[bridge].label}
+              </Button>
+            );
+          })}
+        </div>
+      )}
+      <div className="bg-tw-bg rounded-2xl px-4 py-8 min-w-full min-h-40">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeBridge?.id || "no-bridge"}

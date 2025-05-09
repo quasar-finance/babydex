@@ -89,7 +89,7 @@ const ModalSelectAsset: React.FC<ModalSelectAssetProps> = ({ onSelectAsset, onCl
                 <Tooltip
                   content={token.tooltip}
                   key={index}
-                  placement="left"
+                  placement="right"
                   showArrow={false}
                   classNames={{
                     content: "p-4 border border-white/10 bg-tw-bg",

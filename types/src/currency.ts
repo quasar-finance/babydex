@@ -18,6 +18,7 @@ export type BaseCurrency = {
   readonly logoURI: string;
   readonly coingeckoId?: string;
   readonly bridge?: Bridge;
+  readonly ethereumAddress?: string;
 };
 
 export type WithPrice<T> = T & {

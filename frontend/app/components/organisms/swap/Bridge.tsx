@@ -114,7 +114,7 @@ export const Bridge: React.FC = () => {
       </div>
 
       <div className="pl-2 mt-3">
-        <span>Available bridge</span>
+        <span>Available Bridge</span>
       </div>
       <div className="bg-tw-bg rounded-2xl px-4 py-8 ">
         <AnimatePresence mode="wait">
@@ -137,8 +137,8 @@ export const Bridge: React.FC = () => {
                   isDisabled={activeBridge.isDisabled}
                 >
                   <p>
-                    Bridge your assets with{" "}
-                    <span className="capitalize font-extrabold">{activeBridge.label}</span>
+                    Open <span className="capitalize font-extrabold">{activeBridge.label}</span>
+                    {" Bridge"}
                   </p>
                 </Button>
               </>

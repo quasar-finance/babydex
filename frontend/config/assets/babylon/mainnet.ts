@@ -1,4 +1,5 @@
 import type { Currency } from "@towerfi/types";
+import { etherUnits } from "viem";
 
 export const BabylonMainnetAssets = {
   ubbn: {
@@ -10,6 +11,7 @@ export const BabylonMainnetAssets = {
     logoURI:
       "https://raw.githubusercontent.com/cosmos/chain-registry/master/babylon/images/logo.svg",
     coingeckoId: "babylon",
+    ethereumAddress: "0xe53dcec07d16d88e386ae0710e86d9a400f83c31",
   },
   "ibc/65D0BEC6DAD96C7F5043D1E54E54B6BB5D5B3AEC3FF6CEBB75B9E059F3580EA3": {
     symbol: "USDC",
@@ -74,6 +76,7 @@ export const BabylonMainnetAssets = {
       "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/uniBTC.svg",
     coingeckoId: "universal-btc",
     bridge: "union",
+    ethereumAddress: "0x004e9c3ef86bc1ca1f0bb5c7662861ee93350568",
   },
   bbn1z5gne4pe84tqerdrjta5sp966m98zgg5czqe4xu2yzxqfqv5tfkqed0jyy: {
     symbol: "LBTC.union",
@@ -85,6 +88,7 @@ export const BabylonMainnetAssets = {
       "https://raw.githubusercontent.com/quasar-finance/quasar-resources/main/assets/coins/lbtc.svg",
     coingeckoId: "lombard-staked-btc",
     bridge: "union",
+    ethereumAddress: "0x8236a87084f8B84306f72007F36F2618A5634494",
   },
   bbn1tyvxlr8qjt7yx48lhhle7xzxfxkyqwzkaxey3jekrl0gql260jlqlxgfst: {
     symbol: "solvBTC.union",
@@ -96,6 +100,7 @@ export const BabylonMainnetAssets = {
       "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/solvBTC.svg",
     coingeckoId: "solv-btc",
     bridge: "union",
+    ethereumAddress: "0x7a56e1c57c7475ccf742a1832b028f0456652f97",
   },
   bbn1jr0xpgy90hqmaafdq3jtapr2p63tv59s9hcced5j4qqgs5ed9x7sr3sv0d: {
     symbol: "PumpBTC",
@@ -107,6 +112,7 @@ export const BabylonMainnetAssets = {
       "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/pumpBTC.svg",
     coingeckoId: "pumpbtc",
     bridge: "union",
+    ethereumAddress: "0xf469fbd2abcd6b9de8e169d128226c0fc90a012e",
   },
   bbn1ccylwef8yfhafxpmtzq4ps24kxce9cfnz0wnkucsvf2rylfh0jzswhk5ks: {
     symbol: "stBTC",
@@ -118,6 +124,7 @@ export const BabylonMainnetAssets = {
       "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/stbtc.svg",
     coingeckoId: "bitcoin",
     bridge: "union",
+    ethereumAddress: "0xf6718b2701d4a6498ef77d7c152b2137ab28b8a3",
   },
   bbn1j2nchmpuhkq0yj93g84txe33j5lhw2y7p3anhqjhvamqxsev6rmsneu85x: {
     symbol: "satUniBTC.e",
@@ -129,5 +136,6 @@ export const BabylonMainnetAssets = {
       "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/uniBTC.svg",
     coingeckoId: "universal-btc",
     bridge: "union",
+    ethereumAddress: "0xF7De2B7afdb07AA5dD143180Ed758165821E076e",
   },
 } as unknown as Record<string, Currency>;

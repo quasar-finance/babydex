@@ -48,6 +48,7 @@ export function multisig(parameters: InjectedParameters = {}) {
       return {
         id: 'multisig',
         name: 'Multisig',
+        icon: '/favicon.png',
         provider() {
           return providerInstance;
         },
@@ -67,7 +68,8 @@ export function multisig(parameters: InjectedParameters = {}) {
     return createConnector<Provider | undefined, Properties, StorageItem>(
       (config: any) => ({
         get icon() {
-          return getTarget().icon
+          const iconPath = getTarget().icon;
+          return iconPath;
         },
         get id() {
           return getTarget().id
@@ -76,7 +78,6 @@ export function multisig(parameters: InjectedParameters = {}) {
           return getTarget().name
         },
         type: getTarget().name,
-        // How does this multisig "connect??"
         async connect({ chainId: chain }: { chainId?: number }) {
           const provider = await this.getProvider()
           if (!provider) throw new ProviderNotFoundError()
@@ -153,7 +154,7 @@ export function multisig(parameters: InjectedParameters = {}) {
           let provider: Provider
           const target = getTarget()
           if (typeof target.provider === 'function')
-            provider = target.provider() // provider = target.provider(window as Window | undefined)
+            provider = target.provider() 
           else provider = target.provider
   
           return provider

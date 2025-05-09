@@ -81,7 +81,7 @@ export function buildAddLiquidityMsg({
 
   return {
     sender,
-    execMsgs: [...increaseAllowanceMsgs.map(msg => msg.execMsg), provideLiquidityMsg],
+    execMsgs: [...increaseAllowanceMsgs.map(msg => msg.execute), provideLiquidityMsg],
   };
 }
 

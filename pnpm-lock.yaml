@@ -101,6 +101,9 @@ importers:
       cosmi:
         specifier: ^0.2.7
         version: 0.2.7(@tanstack/query-core@5.67.2)(@tanstack/react-query@4.36.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@18.3.18)(bufferutil@4.0.9)(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2)
+      cosmjs-types:
+        specifier: ^0.9.0
+        version: 0.9.0
       ky:
         specifier: ^1.7.5
         version: 1.7.5

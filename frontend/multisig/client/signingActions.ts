@@ -10,6 +10,10 @@ import type {
 } from 'cosmi/types'
 import { toUtf8 } from 'cosmi/utils';
 
+import { MsgExecuteContract } from 'cosmjs-types/cosmwasm/wasm/v1/tx.js';
+import { AuthInfo, TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx.js';
+import { TxBody, Transaction } from './types';
+
 export type SigningActions<
 _transport extends Transport = Transport,
 _chain extends Chain | undefined = Chain | undefined,
@@ -43,33 +47,39 @@ export async function execute(client: Client, parameters: ExecuteParameters): Ex
 export async function executeMultiple(client: Client, parameters: ExecuteMultipleParameters): ExecuteReturnType {
     const { sender, execute, gasLimit, memo, timeoutHeight } = parameters;
     
-    // // Format the messages
-    // const msgs = execute.map(({ address, message, funds }) => ({
-    //     typeUrl: MsgExecuteContract.typeUrl,
-    //     value: MsgExecuteContract.encode({
-    //         sender,
-    //         contract: address,
-    //         msg: toUtf8(JSON.stringify(message)),
-    //         funds: funds || [],
-    //     }).finish(),
-    // }));
+    const msgs = execute.map(({ address, message, funds }) => ({
+      "@type": "/cosmwasm.wasm.v1.MsgExecuteContract" as const,
+      sender,
+      contract: address,
+      msg: message,
+      funds: funds || [],
+    }))
 
-    // Create the transaction object
-    const transaction = {
-        messages: execute,
-        signer: sender,
-        gasLimit,
+      const txBody = TxBody.fromPartial({
+        timeoutHeight: timeoutHeight ?? BigInt(0),
+        messages: msgs,
         memo,
-        timeoutHeight,
-    };
+      })
 
-    // Show the transaction in a modal
-    // We'll need to use a state management solution to show the modal
-    // For now, let's use a custom event
-    const event = new CustomEvent('showTransaction', { 
-        detail: { transaction } 
-    });
-    window.dispatchEvent(event);
+      const transaction: Transaction = {
+        body: txBody,
+        auth_info: {
+          signer_infos: [],
+          fee: {
+            amount: [],
+            gas_limit: gasLimit?.toString() ?? "0",
+            payer: "",
+            granter: ""
+          }
+        },
+        signatures: []
+      };
 
-    return {};
+      // Show the transaction in a modal
+      const event = new CustomEvent('showTransaction', { 
+          detail: { transaction } 
+      });
+      window.dispatchEvent(event);
+
+      return {};
 }

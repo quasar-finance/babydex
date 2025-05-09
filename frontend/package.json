@@ -30,6 +30,7 @@
     "bignumber.js": "^9.1.2",
     "clsx": "^2.1.1",
     "cosmi": "^0.2.7",
+    "cosmjs-types": "^0.9.0",
     "ky": "^1.7.5",
     "lru-cache": "^11.0.2",
     "mipd": "^0.0.7",

@@ -122,15 +122,17 @@ const SwapComponent: React.FC = () => {
                 <IconWallet className="w-5 h-5" />
               </motion.button>
             )} */}
-              <motion.button
-                type="button"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={() => showModal(ModalTypes.swap_settings, true)}
-                className="absolute top-[10px] right-2 p-2 bg-tw-bg rounded-full z-10"
-              >
-                <IconSettingsFilled className="w-5 h-5" />
-              </motion.button>
+              {action === "swap" && (
+                <motion.button
+                  type="button"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => showModal(ModalTypes.swap_settings, true)}
+                  className="absolute top-[10px] right-2 p-2 bg-tw-bg rounded-full z-10"
+                >
+                  <IconSettingsFilled className="w-5 h-5" />
+                </motion.button>
+              )}
 
               <Tabs
                 defaultKey="swap"

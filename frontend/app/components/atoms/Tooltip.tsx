@@ -1,23 +1,28 @@
-import { Tooltip as NextTooltip } from "@heroui/react";
+import { Tooltip as NextTooltip, type TooltipProps } from "@heroui/react";
 import type React from "react";
 import type { PropsWithChildren } from "react";
 import { twMerge } from "~/utils/twMerge";
 
-interface Props {
+type Props = {
   content: string | React.ReactNode;
   isDisabled?: boolean;
   className?: string;
-}
+} & TooltipProps;
 
 const Tooltip: React.FC<PropsWithChildren<Props>> = ({
   children,
   content,
   isDisabled,
   className,
+  ...rest
 }) => {
+  if (!content) {
+    return <>{children}</>;
+  }
+
   return (
     <NextTooltip
-      showArrow={true}
+      showArrow={false}
       content={content}
       isDisabled={isDisabled}
       classNames={{
@@ -31,6 +36,7 @@ const Tooltip: React.FC<PropsWithChildren<Props>> = ({
       }}
       radius="lg"
       placement="bottom"
+      {...rest}
     >
       {children}
     </NextTooltip>

@@ -12,7 +12,7 @@ export const BabylonMainnetAssets = {
       "https://raw.githubusercontent.com/cosmos/chain-registry/master/babylon/images/logo.svg",
     coingeckoId: "babylon",
     ethereumAddress: "0xe53dcec07d16d88e386ae0710e86d9a400f83c31",
-    bridge: ["ibc-eureka", "union"],
+    bridge: ["union", "ibc-eureka"],
   },
   "ibc/65D0BEC6DAD96C7F5043D1E54E54B6BB5D5B3AEC3FF6CEBB75B9E059F3580EA3": {
     symbol: "USDC",

@@ -137,6 +137,6 @@ export const BabylonMainnetAssets = {
       "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/uniBTC.svg",
     coingeckoId: "universal-btc",
     bridge: ["union"],
-    ethereumAddress: "0xF7De2B7afdb07AA5dD143180Ed758165821E076e",
+    ethereumAddress: "0xf7de2b7afdb07aa5dd143180ed758165821e076e",
   },
 } as unknown as Record<string, Currency>;

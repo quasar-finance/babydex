@@ -4,11 +4,6 @@ export class MultisigProvider {
   private readonly POPUP_KEY = 'multisig_popup_open';
 
   async enable(chainId: string): Promise<void> {
-    // Check if popup is already open from a previous session
-    if (localStorage.getItem(this.POPUP_KEY)) {
-      localStorage.removeItem(this.POPUP_KEY);
-    }
-
     // Try to close any existing popup windows
     try {
       const existingPopup = window.open('', 'Multisig Address Input');
@@ -22,9 +17,6 @@ export class MultisigProvider {
     // Create a popup window for address input
     this.popup = window.open('', 'Multisig Address Input', 'width=400,height=300');
     if (!this.popup) throw new Error('Popup blocked');
-
-    // Mark popup as open
-    localStorage.setItem(this.POPUP_KEY, 'true');
 
     // Create the popup content
     this.popup.document.write(`

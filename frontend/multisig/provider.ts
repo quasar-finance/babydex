@@ -1,13 +1,33 @@
 export class MultisigProvider {
   private address: string | null = null;
+  private popup: Window | null = null;
+  private readonly POPUP_KEY = 'multisig_popup_open';
 
   async enable(chainId: string): Promise<void> {
+    // Check if popup is already open from a previous session
+    if (localStorage.getItem(this.POPUP_KEY)) {
+      localStorage.removeItem(this.POPUP_KEY);
+    }
+
+    // Try to close any existing popup windows
+    try {
+      const existingPopup = window.open('', 'Multisig Address Input');
+      if (existingPopup) {
+        existingPopup.close();
+      }
+    } catch (e) {
+      // Ignore errors from trying to access closed windows
+    }
+
     // Create a popup window for address input
-    const popup = window.open('', 'Multisig Address Input', 'width=400,height=300');
-    if (!popup) throw new Error('Popup blocked');
+    this.popup = window.open('', 'Multisig Address Input', 'width=400,height=300');
+    if (!this.popup) throw new Error('Popup blocked');
+
+    // Mark popup as open
+    localStorage.setItem(this.POPUP_KEY, 'true');
 
     // Create the popup content
-    popup.document.write(`
+    this.popup.document.write(`
       <html>
         <head>
           <style>
@@ -48,8 +68,13 @@ export class MultisigProvider {
             function submitAddress() {
               const address = document.getElementById('address').value;
               window.opener.postMessage({ type: 'MULTISIG_ADDRESS', address }, '*');
+              window.opener.localStorage.removeItem('multisig_popup_open');
               window.close();
             }
+            // Clean up if popup is closed without submitting
+            window.onbeforeunload = function() {
+              window.opener.localStorage.removeItem('multisig_popup_open');
+            };
           </script>
         </body>
       </html>

@@ -11,6 +11,8 @@ export const WalletDetails: React.FC = () => {
 
   if (!isConnected) return null;
 
+  const walletIcon = connector?.icon ?? `https://raw.githubusercontent.com/quasar-finance/quasar-resources/main/assets/wallet/${connector?.id}.webp`;
+
   return (
     <>
       <h3 className="text-sm text-tw-gray-200">
@@ -19,7 +21,7 @@ export const WalletDetails: React.FC = () => {
       <div className="w-full rounded-xl bg-tw-orange-400/20 p-2 flex items-center justify-between">
         <div className="flex gap-2 items-center">
           <img
-            src={`https://raw.githubusercontent.com/quasar-finance/quasar-resources/main/assets/wallet/${connector?.id}.webp`}
+            src={walletIcon}
             alt="wallet"
             className="w-10 h-10"
           />

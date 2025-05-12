@@ -12,7 +12,7 @@ import { useEffect } from "react";
 function ConnectorButton({ connector, onClick }: { connector: any; onClick: () => void }) {
   const { name, id, isInstalled, icon } = connector;
 
-  const walletIcon = connector.icon ?? `https://raw.githubusercontent.com/quasar-finance/quasar-resources/main/assets/wallet/${id}.webp`;
+  const walletIcon = icon ?? `https://raw.githubusercontent.com/quasar-finance/quasar-resources/main/assets/wallet/${id}.webp`;
 
   return (
     <Button

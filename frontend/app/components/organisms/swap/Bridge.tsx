@@ -39,7 +39,7 @@ const bridgeExternalLinks: Record<BridgeType, Bridge> = {
 
       params.set("source", "1");
       params.set("destination", "bbn-1");
-      params.set("asset", (asset.ethereumAddress || "").toLowerCase());
+      params.set("asset", (asset.ethereumAddresses?.union || "").toLowerCase());
 
       url.search = params.toString();
       return url.toString();
@@ -56,7 +56,7 @@ const bridgeExternalLinks: Record<BridgeType, Bridge> = {
       const url = new URL(this.url);
       const params = new URLSearchParams(url.search);
 
-      params.set("src_asset", (asset.ethereumAddress || "").toLowerCase());
+      params.set("src_asset", (asset.ethereumAddresses?.["ibc-eureka"] || "").toLowerCase());
       params.set("src_chain", "1");
       params.set("dest_asset", asset.denom);
       params.set("dest_chain", "bbn-1");

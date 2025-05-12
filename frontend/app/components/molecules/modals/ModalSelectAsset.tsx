@@ -62,7 +62,7 @@ const ModalSelectAsset: React.FC<ModalSelectAssetProps> = ({ onSelectAsset, onCl
   return (
     <BasicModal title="Select Asset" classNames={{ wrapper: "overflow-hidden" }} onClose={onClose}>
       <div className="w-full overflow-scroll scrollbar-none h-[25rem] relative">
-        <div className="w-full sticky top-0 bg-gradient-to-b from-70% from-transparent to-tw-gray-950/80 pb-4 backdrop-blur-sm ">
+        <div className="w-full sticky top-0 bg-gradient-to-b from-70% from-transparent to-tw-gray-950/80 pb-4 backdrop-blur-sm z-10">
           <Input
             placeholder="Search by Name, Symbol or Address"
             isSearch
@@ -98,7 +98,7 @@ const ModalSelectAsset: React.FC<ModalSelectAssetProps> = ({ onSelectAsset, onCl
                 >
                   <div
                     className={clsx(
-                      "flex items-center gap-3 rounded-2xl px-3 py-3 justify-between  transition-all",
+                      "flex items-center gap-3 rounded-2xl px-3 py-3 justify-between transition-all",
                       {
                         grayscale: token.disabled,
                         "cursor-not-allowed": token.disabled,

@@ -1,5 +1,4 @@
 import type { Currency } from "@towerfi/types";
-import { etherUnits } from "viem";
 
 export const BabylonMainnetAssets = {
   ubbn: {
@@ -24,6 +23,7 @@ export const BabylonMainnetAssets = {
       "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/usdc.png",
     coingeckoId: "usd-coin",
     bridge: ["ibc-eureka"],
+    ethereumAddress: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
   },
   "ibc/89EE10FCF78800B572BAAC7080AEFA301B5F3BBC51C5371E907EB129C5B900E7": {
     symbol: "LBTC",
@@ -35,6 +35,7 @@ export const BabylonMainnetAssets = {
       "https://raw.githubusercontent.com/quasar-finance/quasar-resources/main/assets/coins/lbtc.svg",
     coingeckoId: "lombard-staked-btc",
     bridge: ["ibc-eureka"],
+    ethereumAddress: "0x8236a87084f8B84306f72007F36F2618A5634494",
   },
   bbn1s7jzz7cyuqmy5xpr07yepka5ngktexsferu2cr4xeww897ftj77sv30f5s: {
     symbol: "eBABY",
@@ -66,6 +67,7 @@ export const BabylonMainnetAssets = {
       "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/solvBTC.svg",
     coingeckoId: "solv-btc",
     bridge: ["ibc-eureka"],
+    ethereumAddress: "0x7a56e1c57c7475ccf742a1832b028f0456652f97",
   },
   bbn1fkz8dcvsqyfy3apfh8ufexdn4ag00w5jts99zjw9nkjue0zhs4ts6hfdz2: {
     symbol: "uniBTC",

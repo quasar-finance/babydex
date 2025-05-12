@@ -23,7 +23,7 @@ import { Chain } from "cosmi/types";
     /**
      * Some injected providers do not support programmatic disconnect.
      * This flag simulates the disconnect behavior by keeping track of connection status in storage.
-     * @default true
+     * @default false
      */
     shimDisconnect?: boolean | undefined
   
@@ -78,16 +78,18 @@ export function multisig(parameters: InjectedParameters = {}) {
           return getTarget().name
         },
         type: getTarget().name,
-        async connect({ chainId: chain }: { chainId?: number }) {
+        async connect({ chainId: chain, isReconnecting } = {}) {
           const provider = await this.getProvider()
           if (!provider) throw new ProviderNotFoundError()
   
           const chainId = chain ?? (await this.getChainId())
           let accounts: readonly Address[] = []
-          config.storage?.setItem('injected.chainId', chainId.toString())
+          if (isReconnecting) accounts = await this.getAccounts().catch(() => [])
+          if (!isReconnecting)
+            config.storage?.setItem('injected.chainId', chainId.toString())
   
           try {
-            if (!accounts?.length) {
+            if (!accounts?.length && !isReconnecting) {
               await provider
                 .enable(chainId.toString())
                 .catch(async (err: Error) => {
@@ -137,6 +139,13 @@ export function multisig(parameters: InjectedParameters = {}) {
   
           if (!parameters.target)
             await config.storage?.removeItem('injected.connected')
+          
+          // Clean up provider state
+          const provider = await this.getProvider()
+          if (provider) {
+            provider.cleanup()
+          }
+  
           this.onDisconnect()
         },
         async getAccounts() {
@@ -149,7 +158,6 @@ export function multisig(parameters: InjectedParameters = {}) {
           return accounts.map((account) => account.address) as readonly Address[]
         },
   
-        // TODO what is the provider for the multisig??
         async getProvider() {
           let provider: Provider
           const target = getTarget()

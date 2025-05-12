@@ -1,7 +1,27 @@
 export class MultisigProvider {
-  private address: string | null = null;
   private popup: Window | null = null;
-  private readonly POPUP_KEY = 'multisig_popup_open';
+  private readonly ADDRESS_KEY = 'multisig_address';
+
+  get address(): string | null {
+    return localStorage.getItem(this.ADDRESS_KEY);
+  }
+
+  set address(value: string | null) {
+    if (value) {
+      localStorage.setItem(this.ADDRESS_KEY, value);
+    } else {
+      localStorage.removeItem(this.ADDRESS_KEY);
+    }
+  }
+
+  cleanup() {
+    this.address = null;
+    if (this.popup && !this.popup.closed) {
+      this.popup.close();
+    }
+    this.popup = null;
+    localStorage.removeItem(this.ADDRESS_KEY)
+  }
 
   async enable(chainId: string): Promise<void> {
     // Try to close any existing popup windows
@@ -60,13 +80,8 @@ export class MultisigProvider {
             function submitAddress() {
               const address = document.getElementById('address').value;
               window.opener.postMessage({ type: 'MULTISIG_ADDRESS', address }, '*');
-              window.opener.localStorage.removeItem('multisig_popup_open');
               window.close();
             }
-            // Clean up if popup is closed without submitting
-            window.onbeforeunload = function() {
-              window.opener.localStorage.removeItem('multisig_popup_open');
-            };
           </script>
         </body>
       </html>

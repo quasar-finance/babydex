@@ -11,6 +11,7 @@ export const navLinks: { label: string; to: string; isDisabled?: boolean; isExte
     { label: "Swap", to: "/swap" },
     { label: "Pools", to: "/pools" },
     { label: "Dashboard", to: "/dashboard" },
+    { label: "Points", to: "/points" },
     ...(isTestnet ? [{ label: "Faucet", to: "/faucet" }] : []),
   ];
 

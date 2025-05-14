@@ -148,3 +148,6 @@ export function DefaultCW20Currency(): CW20Currency {
     contractAddress: "",
   };
 }
+
+export const pointsShareBps = 2000;
+export const inviteBoostBps = 1000;

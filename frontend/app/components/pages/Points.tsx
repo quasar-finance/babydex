@@ -2,6 +2,8 @@ import { bpsToFloat } from "~/utils/intl";
 import { Button } from "../atoms/Button";
 import { inviteBoostBps, pointsShareBps } from "~/utils/consts";
 import { Overview } from "../organisms/points/Overview";
+import { Leaderboard } from "../organisms/points/Leaderboard";
+import Pill from "../atoms/Pill";
 
 const Points: React.FC = () => {
   return (
@@ -38,6 +40,26 @@ const Points: React.FC = () => {
           </p>
           <Button size="sm">Create referral link</Button>
         </div>
+      </div>
+      <div className="flex flex-col my-4 gap-4 lg:px-4">
+        <div className="flex flex-col-reverse lg:flex-row gap-6">
+          <h1 className="text-2xl">BabyDex Points Leaderboard</h1>
+          <div
+            className="flex items-center gap-2 text-yellow-500"
+            style={{ textShadow: "rgba(238, 173, 33, 0.8) 0 0 20px" }}
+          >
+            <Pill color="yellow" className="border border-yellow-500 text-md">
+              #57
+            </Pill>
+            <span>On the leaderboard</span>
+          </div>
+        </div>
+        <p className="text-white/70">
+          Earn BabyDex points through Referrals, Providing Liquidity and Swapping on Tower
+        </p>
+      </div>
+      <div>
+        <Leaderboard />
       </div>
     </div>
   );

@@ -20,8 +20,8 @@ const main = async () => {
     await factoryClient.createPair(
         {
             assetInfos: [
-                {native_token: {denom: xSolvBTC}},
-                {native_token: {denom: satXSolvBTC}}
+                {token: {contract_addr: xSolvBTC}},
+                {token: {contract_addr: satXSolvBTC}}
             ],
             pairType: {concentrated: {}},
             initParams: toBase64(pclLSDParams("1.0"))

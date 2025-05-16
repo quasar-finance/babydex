@@ -10,7 +10,7 @@ import type React from "react";
 import PoolsSkeleton from "../molecules/skeletons/PoolsSkeleton";
 import { CellPoolName } from "../atoms/cells/CellPoolName";
 import { CellTVL } from "../atoms/cells/CellTVL";
-import { Table, TableRow } from "../atoms/Table";
+import { type Column, SortableTable, type SortDirection, Table, TableRow } from "../atoms/Table";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { Pagination } from "../atoms/Pagination";
 import { blockedPoolAddresses } from "~/utils/consts";
@@ -22,6 +22,8 @@ import { convertMicroDenomToDenom } from "~/utils/intl";
 import CellApr from "../atoms/cells/CellApr";
 import { useRouter } from "next/navigation";
 import { PeriodToggle, type Period } from "../atoms/PeriodToggle";
+
+type SortableField = "poolLiquidity" | "apr" | "volume";
 
 const Pools: React.FC = () => {
   const { showModal } = useModal();
@@ -40,8 +42,8 @@ const Pools: React.FC = () => {
     },
     [setAprTimeframe],
   );
-  const [sortField, setSortField] = useState<"poolLiquidity" | "apr" | "volume">("poolLiquidity");
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+  const [sortField, setSortField] = useState<SortableField>("poolLiquidity");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
   const poolAddresses = useMemo(() => [...pools.map((pool) => pool.poolAddress)].sort(), [pools]);
 
@@ -101,7 +103,7 @@ const Pools: React.FC = () => {
     return swapApr + incentives_apr;
   };
 
-  const columns = [
+  const columns: Column[] = [
     { key: "name", title: "Pool", className: "col-span-2 lg:col-span-1" },
     { key: "poolLiquidity", title: "TVL", sortable: true },
     { key: "apr", title: "APR", sortable: true },
@@ -204,7 +206,9 @@ const Pools: React.FC = () => {
     return sortDirection === "desc" ? valueB - valueA : valueA - valueB;
   });
 
-  const handleSort = (field: "poolLiquidity" | "apr" | "volume") => {
+  const handleSort = (col: Column) => {
+    const field = col.key as SortableField;
+
     if (field === sortField) {
       setSortDirection(sortDirection === "desc" ? "asc" : "desc");
     } else {
@@ -228,23 +232,11 @@ const Pools: React.FC = () => {
         </div>
       </div>
 
-      <Table
-        columns={columns.map((col) => ({
-          ...col,
-          title: col.sortable ? (
-            <div
-              className="flex items-center gap-2 cursor-pointer hover:text-white"
-              onClick={() => handleSort(col.key as "poolLiquidity" | "apr" | "volume")}
-            >
-              {col.title}
-              {col.sortable && sortField === col.key && (
-                <span>{sortDirection === "desc" ? "↓" : "↑"}</span>
-              )}
-            </div>
-          ) : (
-            col.title
-          ),
-        }))}
+      <SortableTable
+        columns={columns}
+        sortField={sortField}
+        sortDirection={sortDirection}
+        handleSort={handleSort}
         gridClass={gridClass}
       >
         {isLoading && <PoolsSkeleton className={twMerge("grid", gridClass)} />}
@@ -295,7 +287,7 @@ const Pools: React.FC = () => {
               </div>
             </TableRow>
           ))}
-      </Table>
+      </SortableTable>
       {filteredPools.length > numberPerPage && (
         <Pagination
           total={totalPools}

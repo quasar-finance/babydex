@@ -11,6 +11,7 @@ export const navLinks: { label: string; to: string; isDisabled?: boolean; isExte
     { label: "Swap", to: "/swap" },
     { label: "Pools", to: "/pools" },
     { label: "Dashboard", to: "/dashboard" },
+    { label: "Points", to: "/points" },
     ...(isTestnet ? [{ label: "Faucet", to: "/faucet" }] : []),
   ];
 
@@ -147,3 +148,6 @@ export function DefaultCW20Currency(): CW20Currency {
     contractAddress: "",
   };
 }
+
+export const pointsShareBps = 2000;
+export const inviteBoostBps = 1000;

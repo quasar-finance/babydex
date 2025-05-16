@@ -146,4 +146,28 @@ export const BabylonMainnetAssets = {
     bridge: ["union"],
     ethereumAddresses: { union: "0xf7de2b7afdb07aa5dd143180ed758165821e076e" },
   },
+  bbn1ztf5dlsljzmxn800yeydplwyvpp828fjkyy29gtjzerd4mu4kxsscmzc0a: {
+    symbol: "XSolvBTC.union",
+    type: "cw-20",
+    denom: "bbn1ztf5dlsljzmxn800yeydplwyvpp828fjkyy29gtjzerd4mu4kxsscmzc0a",
+    name: "xSolvBTC",
+    decimals: 18,
+    logoURI:
+      "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/solvBTC.svg",
+    coingeckoId: "solv-protocol-solvbtc-bbn",
+    bridge: ["union"],
+    ethereumAddresses: { union: "0xd9d920aa40f578ab794426f5c90f6c731d159def" },
+  },
+  bbn1rl75n93kk075clrt72hqa7md6mwl78u28sghs380xuvlmksw6x3q07n2tc: {
+    symbol: "satXSolvBTC.e.union",
+    type: "cw-20",
+    denom: "bbn1rl75n93kk075clrt72hqa7md6mwl78u28sghs380xuvlmksw6x3q07n2tc",
+    name: "satXSolvBTC.e",
+    decimals: 18,
+    logoURI:
+      "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/solvBTC.svg",
+    coingeckoId: "solv-protocol-solvbtc-bbn",
+    bridge: ["union"],
+    ethereumAddresses: { union: "0x17140b69FfaDfF9e87BF1D86D99119ee10AD24ff" },
+  }
 } as unknown as Record<string, Currency>;

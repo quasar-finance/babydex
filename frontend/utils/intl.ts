@@ -7,7 +7,7 @@ export function IntlAddress(address: string): string {
 export function convertMicroDenomToDenom(
   amount?: number | string,
   decimals = 6,
-  fixed = 2,
+  fixed = 6,
   rounded = true,
 ) {
   if (!amount) return 0;

@@ -33,4 +33,5 @@ export type {
   PoolMetricSerialized,
   PoolIncentive,
   AggregatedMetrics,
+  Points
 } from "./indexer.js";

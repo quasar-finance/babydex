@@ -27,7 +27,7 @@ const GetPointsButton: React.FC<{ className: string }> = ({ className }) => (
 
 const Points: React.FC = () => {
   const { address: userAddress } = useAccount();
-  const { data: userPoints, isLoading: userPointsLoading } = trpc.edge.indexer.getPoints.useQuery(
+  const { data: userPoints, isLoading: _userPointsLoading } = trpc.edge.indexer.getPoints.useQuery(
     {
       addresses: [userAddress || ""],
       limit: 1,

@@ -105,7 +105,9 @@ export const Leaderboard: React.FC<{ userPoints: Points }> = ({ userPoints }) =>
             </span>
           </div>
           <div className="col-span-1 flex flex-col gap-2">
-            {points.total_points.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+            {points.total_points.toLocaleString(undefined, {
+              maximumFractionDigits: points.total_points > 1 ? 0 : 3,
+            })}
           </div>
         </div>
       ))}

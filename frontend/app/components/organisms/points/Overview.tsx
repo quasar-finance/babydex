@@ -24,7 +24,9 @@ export const Overview: React.FC<{ points: Points }> = ({ points }) => {
             )}
           >
             <span className={twMerge("text-2xl text-white/50", cell.highlight && "text-white/100")}>
-              {cell.points?.toLocaleString(undefined, { maximumFractionDigits: 0 }) || "-"}
+              {cell.points?.toLocaleString(undefined, {
+                maximumFractionDigits: cell.points > 1 ? 0 : 3,
+              }) || "-"}
             </span>
             <span className="text-sm text-white/50">{cell.title}</span>
           </div>

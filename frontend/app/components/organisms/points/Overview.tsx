@@ -1,11 +1,12 @@
-import clsx from "clsx";
+import type { Points } from "@towerfi/types";
+import { twMerge } from "~/utils/twMerge";
 
-export const Overview: React.FC = () => {
+export const Overview: React.FC<{ points: Points }> = ({ points }) => {
   const cells = [
-    { points: 65867, title: "Total", highlight: true },
-    { points: 58987, title: "LPing" },
-    { points: 7896, title: "Swapping" },
-    { points: 16876, title: "Referral Link" },
+    { points: points.total_points, title: "Total", highlight: true },
+    { points: points.lping_points, title: "LPing" },
+    { points: points.swapping_points, title: "Swapping" },
+    { points: null, title: "Referral Link" },
     { points: null, title: "Invite Boost" },
   ];
 
@@ -15,15 +16,15 @@ export const Overview: React.FC = () => {
         {Array.from(cells).map((cell, index, a) => (
           <div
             key={index}
-            className={clsx(
-              "w-1/2 lg:w-1/5 pl-4 p-1 box-border mb-6 lg:mb-0 flex flex-col justify-center space-y-1",
+            className={twMerge(
+              "w-1/2 lg:w-1/5 p-1 pl-4 box-border mb-6 lg:mb-0 flex flex-col justify-center space-y-1",
               "lg:border-r-3 border-white/10",
               index % 2 === 0 && "border-r-3",
               index === a.length - 1 && "border-none",
             )}
           >
-            <span className={clsx("text-2xl text-white/50", cell.highlight && "text-white/100")}>
-              {cell.points?.toLocaleString() || "-"}
+            <span className={twMerge("text-2xl text-white/50", cell.highlight && "text-white/100")}>
+              {cell.points?.toLocaleString(undefined, { maximumFractionDigits: 0 }) || "-"}
             </span>
             <span className="text-sm text-white/50">{cell.title}</span>
           </div>

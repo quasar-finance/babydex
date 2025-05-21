@@ -1,6 +1,7 @@
 import type {
   BaseCurrency,
   CW20Currency,
+  Points,
   PoolIncentive,
   PoolMetricSerialized,
 } from "@towerfi/types";
@@ -146,6 +147,16 @@ export function DefaultCW20Currency(): CW20Currency {
     ...DefaultBaseCurrency(),
     type: "cw-20",
     contractAddress: "",
+  };
+}
+
+export function DefaultPoints(): Points {
+  return {
+    address: "",
+    total_points: 0,
+    lping_points: 0,
+    swapping_points: 0,
+    rank: 0,
   };
 }
 

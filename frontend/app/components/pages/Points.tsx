@@ -9,8 +9,21 @@ import Pill from "../atoms/Pill";
 import { trpc } from "~/trpc/client";
 import { useAccount } from "@cosmi/react";
 import WithConnectedWallet from "../atoms/WithConnectedWallet";
+import type React from "react";
 import { useMemo } from "react";
 import Link from "next/link";
+
+const GetPointsButton: React.FC<{ className: string }> = ({ className }) => (
+  <Button
+    as={Link}
+    color="tertiary"
+    className={className}
+    target="_blank"
+    href="https://docs.tower.fi/user-guides/points-campaigns"
+  >
+    Get Points Now
+  </Button>
+);
 
 const Points: React.FC = () => {
   const { address: userAddress } = useAccount();
@@ -33,15 +46,7 @@ const Points: React.FC = () => {
     <div className="flex flex-col gap-8 px-4 pb-20 max-w-[84.5rem] mx-auto w-full min-h-[65vh] lg:pt-8">
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl">My Points</h1>
-        <Button
-          as={Link}
-          color="tertiary"
-          className="lg:hidden"
-          target="_blank"
-          href="https://docs.tower.fi/user-guides/points-campaigns"
-        >
-          Learn How it Works
-        </Button>
+        <GetPointsButton className="lg:hidden" />
       </div>
       <div className="flex flex-col lg:flex-row gap-6">
         <div className="w-full lg:w-[65%] p-4 border border-white/10 rounded-2xl overflow-hidden">
@@ -50,15 +55,7 @@ const Points: React.FC = () => {
               <img src={"/tower/points.png"} alt="Tower Points" className="w-auto h-[24px]" />
               <h2 className="text-lg">BabyDex Points</h2>
             </div>
-            <Button
-              as={Link}
-              color="tertiary"
-              className="hidden lg:inline-flex"
-              target="_blank"
-              href="https://docs.tower.fi/user-guides/points-campaigns"
-            >
-              Learn How it Works
-            </Button>
+            <GetPointsButton className="hidden lg:inline-flex" />
           </div>
           <div className="mt-4 lg:mt-8">
             <WithConnectedWallet>
@@ -100,7 +97,7 @@ const Points: React.FC = () => {
         </p>
       </div>
       <div>
-        <Leaderboard />
+        <Leaderboard userPoints={userPointsData} />
       </div>
     </div>
   );

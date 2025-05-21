@@ -4,13 +4,35 @@ import { twMerge } from "~/utils/twMerge";
 import { trpc } from "~/trpc/client";
 import Skeleton from "../../atoms/Skeleton";
 import { useAccount } from "@cosmi/react";
+import type { Points } from "@towerfi/types";
+import { useMemo } from "react";
 
-export const Leaderboard: React.FC = () => {
+export const Leaderboard: React.FC<{ userPoints: Points }> = ({ userPoints }) => {
   const { data: allPoints, isLoading: allPointsLoading } = trpc.edge.indexer.getPoints.useQuery({
     addresses: [],
     limit: 50,
   });
   const { address: userAddress } = useAccount();
+
+  const allPointsWithUser = useMemo(() => {
+    if (!allPoints) {
+      return null;
+    }
+
+    if (!userPoints.address) {
+      return allPoints;
+    }
+
+    const currentUserPoints = allPoints[userPoints.address];
+    // if userPoints is not in allPoints, add it
+    if (!currentUserPoints) {
+      allPoints[userPoints.address] = {
+        ...userPoints,
+      };
+    }
+
+    return allPoints;
+  }, [allPoints, userAddress, userPoints]);
 
   const columns: Column[] = [
     { key: "position", title: "Position" },
@@ -43,7 +65,7 @@ export const Leaderboard: React.FC = () => {
     );
   }
 
-  if (!allPoints) {
+  if (!allPointsWithUser) {
     return (
       <Table columns={columns} gridClass={gridClass} bodyClass="gap-0">
         <div className="grid rounded-2xl p-4 items-center bg-[#1b1b1b] my-1">
@@ -55,7 +77,7 @@ export const Leaderboard: React.FC = () => {
 
   return (
     <Table columns={columns} gridClass={gridClass} bodyClass="gap-0">
-      {Object.entries(allPoints).map(([address, points], index) => (
+      {Object.entries(allPointsWithUser).map(([address, points], index) => (
         <div
           key={index}
           className={twMerge(

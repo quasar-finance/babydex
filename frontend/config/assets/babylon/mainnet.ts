@@ -7,8 +7,7 @@ export const BabylonMainnetAssets = {
     type: "native",
     decimals: 6,
     symbol: "BABY",
-    logoURI:
-      "https://raw.githubusercontent.com/cosmos/chain-registry/master/babylon/images/logo.svg",
+    logoURI: "/assets/baby-mint.svg",
     coingeckoId: "babylon",
     ethereumAddresses: {
       union: "0xe53dcec07d16d88e386ae0710e86d9a400f83c31",
@@ -169,5 +168,5 @@ export const BabylonMainnetAssets = {
     coingeckoId: "solv-protocol-solvbtc-bbn",
     bridge: ["union"],
     ethereumAddresses: { union: "0x17140b69FfaDfF9e87BF1D86D99119ee10AD24ff" },
-  }
+  },
 } as unknown as Record<string, Currency>;

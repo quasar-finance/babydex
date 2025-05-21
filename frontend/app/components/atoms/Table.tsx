@@ -2,21 +2,28 @@ import type { ReactNode } from "react";
 import React from "react";
 import { twMerge } from "~/utils/twMerge";
 
-interface Column {
+export interface Column {
   key: string;
   title: ReactNode;
   className?: string;
   sortable?: boolean;
 }
 
-interface TableProps {
+export interface TableProps {
   columns: Column[];
   children: ReactNode;
   gridClass?: string;
   className?: string;
+  bodyClass?: string;
 }
 
-export const Table: React.FC<TableProps> = ({ columns, children, gridClass, className }) => {
+export const Table: React.FC<TableProps> = ({
+  columns,
+  children,
+  gridClass,
+  className,
+  bodyClass,
+}) => {
   return (
     <div className={twMerge("flex flex-col gap-3", className)}>
       <div className={twMerge("hidden lg:grid px-4 text-xs text-white/50", gridClass)}>
@@ -26,8 +33,43 @@ export const Table: React.FC<TableProps> = ({ columns, children, gridClass, clas
           </div>
         ))}
       </div>
-      <div className="flex flex-col gap-4 lg:gap-0">{children}</div>
+      <div className={twMerge("flex flex-col gap-4 lg:gap-0", bodyClass)}>{children}</div>
     </div>
+  );
+};
+
+export type SortDirection = "asc" | "desc";
+
+export const SortableTable: React.FC<
+  TableProps & {
+    sortField: string;
+    sortDirection: SortDirection;
+    handleSort: (col: Column) => void;
+  }
+> = ({ columns, gridClass, className, sortField, sortDirection, children, handleSort }) => {
+  return (
+    <Table
+      columns={columns.map((col) => ({
+        ...col,
+        title: col.sortable ? (
+          <div
+            className="flex items-center gap-2 cursor-pointer hover:text-white"
+            onClick={() => handleSort(col)}
+          >
+            {col.title}
+            {col.sortable && sortField === col.key && (
+              <span>{sortDirection === "desc" ? "↓" : "↑"}</span>
+            )}
+          </div>
+        ) : (
+          col.title
+        ),
+      }))}
+      className={className}
+      gridClass={gridClass}
+    >
+      {children}
+    </Table>
   );
 };
 

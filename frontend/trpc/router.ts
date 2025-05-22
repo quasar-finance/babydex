@@ -1,20 +1,9 @@
-import {
-  DataTransformerOptions, DefaultDataTransformer,
-  DefaultErrorShape,
-  initTRPC,
-  RootConfig,
-  Unwrap,
-  WithoutIndexSignature
-} from "@trpc/server";
+import { initTRPC } from "@trpc/server";
 import { observable } from "@trpc/server/observable";
 import { TRPCClientError, type TRPCLink } from "@trpc/client";
 
 import type { AnyRouter } from "@trpc/server";
 import type { ContextOptions } from "@towerfi/trpc";
-import {RouterDef} from "@trpc/server/dist/core/router";
-import {ErrorFormatterShape} from "@trpc/server/dist/error/formatter";
-import {PickFirstDefined} from "@trpc/server/dist/core/internals/utils";
-import {RuntimeConfig} from "@trpc/server/dist/core/internals/config";
 
 export const createInnerTRPCContext = (opts: ContextOptions) => {
   return opts;

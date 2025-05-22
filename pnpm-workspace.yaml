@@ -3,6 +3,7 @@ packages:
   - "frontend"
   - "types"
   - "indexer"
+  - "referral"
 packageOptions:
   overrides:
     '@tanstack/react-query': ^4.0.0

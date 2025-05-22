@@ -18,7 +18,7 @@ export const createCallerFactory = t.createCallerFactory;
 export const createTRPCPublicProcedure = t.procedure;
 
 export function createLocalTRPCLink<TRouter extends AnyRouter>(
-  opts: { router: TRouter } & Omit<ContextOptions, "indexerService,referralService">,
+  opts: { router: TRouter } & Omit<ContextOptions, "indexerService">,
 ): TRPCLink<TRouter> {
   const { router, ...ctx } = opts;
   const createCaller = createCallerFactory(router);

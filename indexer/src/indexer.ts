@@ -1107,11 +1107,11 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     try {
       const result = await client.execute(query);
       return result.rows.reduce<Record<string, Points>>((acc, row) => {
-        const address: string = row.address as unknown as string;
-        const lping_points: number = row.lping_points as unknown as number;
-        const swapping_points: number = row.swapping_points as unknown as number;
-        const total_points: number = row.total_points as unknown as number;
-        const rank: number = row.rank as unknown as number;
+        const address: string = row.address as string;
+        const lping_points: number = parseFloat(row.lping_points as string);
+        const swapping_points: number = parseFloat(row.swapping_points as string);
+        const total_points: number = parseFloat(row.total_points as string);
+        const rank: number = parseInt(row.rank as string);
 
         acc[address] = {
           address,
@@ -1119,7 +1119,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
           swapping_points,
           total_points,
           rank,
-        };
+        } as Points;
         return acc;
       }, {});
     } catch (error) {

@@ -3,10 +3,12 @@ import { userRouter } from "./routers/user.js";
 import { poolsRouter } from "./routers/pools.js";
 import { assetsRouter } from "./routers/assets.js";
 import { indexerRouter } from "./routers/indexer.js";
+import { referralRouter } from "./routers/referral.js";
 
 export const edgeRouter = createTRPCRouter({
   user: userRouter,
   indexer: indexerRouter,
+  referral: referralRouter,
   health: createTRPCPublicProcedure.query(async () => {
     return { status: "up" };
   }),

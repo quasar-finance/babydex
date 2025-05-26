@@ -35,3 +35,7 @@ export type {
   AggregatedMetrics,
   Points
 } from "./indexer.js";
+
+export type {
+  CosmosSignedMessage
+} from "./referral.js";

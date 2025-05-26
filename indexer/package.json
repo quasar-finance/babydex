@@ -37,6 +37,10 @@
   "dependencies": {
     "drizzle-orm": "^0.40.0",
     "pg": "^8.13.3",
-    "@supabase/supabase-js": "^2.49.5"
+    "@supabase/supabase-js": "^2.49.5",
+    "@cosmjs/amino": "^0.33.1",
+    "@cosmjs/proto-signing": "^0.33.1",
+    "@cosmjs/encoding": "^0.33.1",
+    "@cosmjs/crypto": "^0.33.1"
   }
 }

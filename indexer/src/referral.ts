@@ -1,4 +1,9 @@
-import {createClient} from '@supabase/supabase-js';
+import {createClient} from "@supabase/supabase-js";
+import {pubkeyToAddress} from "@cosmjs/amino";
+import {decodePubkey} from "@cosmjs/proto-signing";
+import {fromBase64} from "@cosmjs/encoding";
+import {Secp256k1, Secp256k1Signature} from "@cosmjs/crypto";
+import type {CosmosSignedMessage} from "@towerfi/types";
 
 export type Referral = {
   fetchReferralCode: (
@@ -6,10 +11,12 @@ export type Referral = {
   ) => Promise<{ code: string; success: boolean; error?: any }>;
   storeReferralCode: (
     userWalletAddress: string,
+    signedMessage: CosmosSignedMessage,
   ) => Promise<{ code: string; success: boolean; error?: any }>;
   handleReferral: (
     referredUserWalletAddress: string,
     referralCode: string,
+    signedMessage: CosmosSignedMessage,
   ) => Promise<{ success: boolean; error?: any; }>;
 };
 
@@ -54,7 +61,10 @@ export const createReferralService = (supabaseUrl: string, supabaseKey: string) 
     }
   }
 
-  async function storeReferralCode(userWalletAddress: string): Promise<{
+  async function storeReferralCode(
+    userWalletAddress: string,
+    signedMessage: CosmosSignedMessage
+  ): Promise<{
     code: string;
     success: boolean;
     error?: any
@@ -71,6 +81,17 @@ export const createReferralService = (supabaseUrl: string, supabaseKey: string) 
     }
 
     try {
+      const verifiedAddress = await verifyCosmosSignature(signedMessage, userWalletAddress);
+
+      if (!verifiedAddress) {
+        return { code: '', success: false, error: 'Account ownership verification failed.' };
+      }
+
+      // Ensure the verified address matches the one provided
+      if (verifiedAddress !== userWalletAddress) {
+        return { code: '', success: false, error: 'Provided wallet address does not match signed address.' };
+      }
+
       const referralCodeAlreadyExists = await fetchReferralCode(userWalletAddress);
 
       if (referralCodeAlreadyExists.success) {
@@ -136,7 +157,7 @@ export const createReferralService = (supabaseUrl: string, supabaseKey: string) 
         .single(); // Expect only one result
 
       if (error) {
-        if (error.code === 'PGRST116') {
+        if (error.code === SUPABASE_SELECT_SINGLE_ROW_ERROR_CODE) {
           return null; // No data found
         }
         console.error("Error fetching user wallet address", error);
@@ -150,7 +171,35 @@ export const createReferralService = (supabaseUrl: string, supabaseKey: string) 
     }
   }
 
-  async function handleReferral(referredUserWalletAddress: string, referralCode: string): Promise<{
+  async function fetchReferredUserWalletAddress(referredUserWalletAddress: string): Promise<string | null> {
+    try {
+      const { data, error } = await supabase
+        .from('referrals')
+        .select('referred_user_wallet_address')
+        .eq('referred_user_wallet_address', referredUserWalletAddress)
+        .single();
+
+      if (error) {
+        if (error.code === SUPABASE_SELECT_SINGLE_ROW_ERROR_CODE) {
+          return null;
+        }
+
+        throw error;
+      }
+
+      return data ? data.referred_user_wallet_address : null;
+    } catch (error: any) {
+      console.error("Error fetching referred user wallet address", error);
+
+      throw error;
+    }
+  }
+
+  async function handleReferral(
+    referredUserWalletAddress: string,
+    referralCode: string,
+    signedMessage: CosmosSignedMessage
+  ): Promise<{
     success: boolean;
     error?: any;
   }> {
@@ -163,9 +212,27 @@ export const createReferralService = (supabaseUrl: string, supabaseKey: string) 
     }
 
     try {
+      const verifiedAddress = await verifyCosmosSignature(signedMessage, referredUserWalletAddress);
+
+      if (!verifiedAddress) {
+        return { success: false, error: 'Account ownership verification of referred user failed.' };
+      }
+
+      if (verifiedAddress !== referredUserWalletAddress) {
+        return { success: false, error: 'Provided wallet address of referred user does not match signed address.' };
+      }
+
+      if (await fetchReferredUserWalletAddress(referredUserWalletAddress)) {
+        return { success: false, error: 'User has already been referred.' };
+      }
+
       const referredByUserWalletAddress = await fetchUserWalletAddress(referralCode);
       if (!referredByUserWalletAddress) {
         return { success: false, error: 'User wallet for referral code not found.' };
+      }
+
+      if (referredByUserWalletAddress === referredUserWalletAddress) {
+        return { success: false, error: 'User cannot refer to themselves.' };
       }
 
       const recordResult = await recordReferral(referredUserWalletAddress, referredByUserWalletAddress);
@@ -195,4 +262,48 @@ export function generateReferralCode(): string {
     code += characters.charAt(Math.floor(Math.random() * characters.length));
   }
   return code;
+}
+
+
+/**
+ * Verifies a Cosmos ADR-036 arbitrary data signature using @cosmjs libraries.
+ *
+ * @param signedMessage The object containing the signature, pubkey, and original data.
+ * @param expectedWalletAddress The wallet address that is expected to be the signer.
+ * @param prefix The bech32 prefix for the Cosmos chain (e.g., 'cosmos', 'juno', 'osmo', 'bbn').
+ * @returns The verified wallet address if successful, otherwise null.
+ */
+export async function verifyCosmosSignature(
+  signedMessage: CosmosSignedMessage,
+  expectedWalletAddress: string,
+  prefix: string = 'bbn',
+): Promise<string | null> {
+  try {
+    // Decode the public key from its type and base64 value
+    const decodedPubkey = decodePubkey(signedMessage.pubkey as any);
+
+    // Derive the address from the decoded public key
+    const derivedAddress = pubkeyToAddress(decodedPubkey, prefix);
+
+    // Decode the signature and the original signed data from base64
+    const decodedSignature = fromBase64(signedMessage.signature);
+    const signedDataBytes = fromBase64(signedMessage.data); // ADR-036 data is base64 encoded bytes of the UTF-8 string
+
+    // Convert Uint8Array signature to Secp256k1Signature object
+    const secp256k1Signature = Secp256k1Signature.fromFixedLength(decodedSignature);
+
+    // Perform the cryptographic verification using Secp256k1
+    const isValid = await Secp256k1.verifySignature(secp256k1Signature, signedDataBytes, decodedPubkey.value);
+
+    if (isValid && derivedAddress === expectedWalletAddress) {
+      console.log(`Signature verified successfully for address: ${ derivedAddress }`);
+      return derivedAddress;
+    } else {
+      console.warn(`Signature verification failed or address mismatch. Derived: ${ derivedAddress }, Expected: ${ expectedWalletAddress }`);
+      return null;
+    }
+  } catch (error) {
+    console.error('Error during Cosmos signature verification:', error);
+    return null;
+  }
 }

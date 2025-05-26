@@ -1,8 +1,9 @@
-import {expect, test, afterAll} from 'vitest';
+import {afterAll, expect, test} from 'vitest';
 import {createReferralService} from '../src/';
 import sanitizedConfig from "./config";
 import {generateReferralCode} from "../src/referral";
 import {createClient} from "@supabase/supabase-js";
+import {CosmosSignedMessage} from "@towerfi/types";
 
 const options = {
   db: { schema: 'v1_cosmos' }
@@ -37,6 +38,15 @@ async function deleteReferrals() {
   expect(error).toBeNull;
 }
 
+const mockSignedMessage: CosmosSignedMessage = {
+  signature: "",
+  pubkey: {
+    type: "",
+    value: "",
+  },
+  data: ""
+}
+
 // Test suite for referral system functions
 test('generateReferralCode generates an 8-character code', () => {
   const code = generateReferralCode();
@@ -48,7 +58,7 @@ test('generateReferralCode generates an 8-character code', () => {
 
 test('storeReferralCode generates referral code and stores it with the user wallet', async () => {
   const userWallet = TEST_USER_WALLET_ADDRESS;
-  const result = await referralService.storeReferralCode(userWallet);
+  const result = await referralService.storeReferralCode(userWallet, mockSignedMessage);
 
   console.log(result);
 
@@ -62,7 +72,7 @@ test('storeReferralCode generates referral code and stores it with the user wall
 
 test('storeReferralCode fails with invalid user wallet', async () => {
   const userWallet = '';
-  const result = await referralService.storeReferralCode(userWallet);
+  const result = await referralService.storeReferralCode(userWallet, mockSignedMessage);
 
   console.log(result);
 
@@ -81,11 +91,11 @@ test('fetchReferralCode returns error code PGRST116 when no referral code exists
 
 test('storing existing user wallet referral code fails and returns existing code', async () => {
   const userWallet = TEST_USER_WALLET_ADDRESS;
-  const firstResult = await referralService.storeReferralCode(userWallet);
+  const firstResult = await referralService.storeReferralCode(userWallet, mockSignedMessage);
 
   expect(firstResult.success).true;
 
-  const result = await referralService.storeReferralCode(userWallet);
+  const result = await referralService.storeReferralCode(userWallet, mockSignedMessage);
 
   console.log(result);
 
@@ -97,11 +107,11 @@ test('handleReferral records the referral if a valid code is provided', async ()
   const referredUserWallet = TEST_REFERRED_USER_WALLET_ADDRESS;
   const referredByUserWallet = TEST_USER_WALLET_ADDRESS;
 
-  const store_result = await referralService.storeReferralCode(referredByUserWallet);
+  const store_result = await referralService.storeReferralCode(referredByUserWallet, mockSignedMessage);
 
   expect(store_result.success).toBe(true);
 
-  const result = await referralService.handleReferral(referredUserWallet, store_result.code);
+  const result = await referralService.handleReferral(referredUserWallet, store_result.code, mockSignedMessage);
 
   console.log(result);
 
@@ -123,14 +133,38 @@ test('handleReferral records the referral if a valid code is provided', async ()
 test('handleReferral returns an error if the referral code is invalid', async () => {
   const referredUserWallet = TEST_REFERRED_USER_WALLET_ADDRESS;
   const invalidCode = 'INVALID_CODE';
-  const result = await referralService.handleReferral(referredUserWallet, invalidCode);
+  const result = await referralService.handleReferral(referredUserWallet, invalidCode, mockSignedMessage);
   expect(result.success).toBe(false);
   expect(result.error).toBe('Referral code is required and must be 8 characters long.');
 });
 
-test('handleReferral returns an error if the new user wallet address is missing', async () => {
-  const result = await referralService.handleReferral('', generateReferralCode());
+test('handleReferral returns an error if the referred user wallet address is missing', async () => {
+  const result = await referralService.handleReferral('', generateReferralCode(), mockSignedMessage);
   expect(result.success).toBe(false);
   expect(result.error).toBe('Referred user wallet address is required and cannot be empty.');
+});
+
+test('handleReferral returns an error if the referred user wallet address already exists', async () => {
+  const referredUserWallet = TEST_REFERRED_USER_WALLET_ADDRESS;
+  const store_result = await referralService.storeReferralCode(TEST_USER_WALLET_ADDRESS, mockSignedMessage);
+
+  expect(store_result.success).toBe(true);
+
+  const result = await referralService.handleReferral(referredUserWallet, store_result.code, mockSignedMessage);
+  expect(result.success).toBe(true);
+
+  const duplicate_result = await referralService.handleReferral(referredUserWallet, store_result.code, mockSignedMessage);
+  expect(duplicate_result.success).toBe(false);
+  expect(duplicate_result.error).toBe('User has already been referred.');
+});
+
+test('handleReferral returns an error if users try to refer themselves', async () => {
+  const store_result = await referralService.storeReferralCode(TEST_USER_WALLET_ADDRESS, mockSignedMessage);
+
+  expect(store_result.success).toBe(true);
+
+  const result = await referralService.handleReferral(TEST_USER_WALLET_ADDRESS, store_result.code, mockSignedMessage);
+  expect(result.success).toBe(false);
+  expect(result.error).toBe('User cannot refer to themselves.');
 });
 

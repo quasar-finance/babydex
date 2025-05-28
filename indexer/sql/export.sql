@@ -137,24 +137,10 @@ CREATE SCHEMA supabase_migrations;
 
 
 --
--- Name: v1_aptos; Type: SCHEMA; Schema: -; Owner: -
---
-
-CREATE SCHEMA v1_aptos;
-
-
---
 -- Name: v1_cosmos; Type: SCHEMA; Schema: -; Owner: -
 --
 
 CREATE SCHEMA v1_cosmos;
-
-
---
--- Name: v1_evm; Type: SCHEMA; Schema: -; Owner: -
---
-
-CREATE SCHEMA v1_evm;
 
 
 --
@@ -784,15 +770,21 @@ $$;
 
 CREATE FUNCTION pgbouncer.get_auth(p_usename text) RETURNS TABLE(username text, password text)
     LANGUAGE plpgsql SECURITY DEFINER
-    AS $$
-BEGIN
-    RAISE WARNING 'PgBouncer auth request: %', p_usename;
+    AS $_$
+  BEGIN
+      RAISE DEBUG 'PgBouncer auth request: %', p_usename;
 
-    RETURN QUERY
-    SELECT usename::TEXT, passwd::TEXT FROM pg_catalog.pg_shadow
-    WHERE usename = p_usename;
-END;
-$$;
+      RETURN QUERY
+      SELECT
+          rolname::text,
+          CASE WHEN rolvaliduntil < now()
+              THEN null
+              ELSE rolpassword::text
+          END
+      FROM pg_authid
+      WHERE rolname=$1 and rolcanlogin;
+  END;
+  $_$;
 
 
 SET default_tablespace = '';
@@ -839,72 +831,52 @@ $_$;
 
 
 --
--- Name: insert_pool_and_blockfix(text, text, bigint); Type: FUNCTION; Schema: public; Owner: -
+-- Name: insert_pool_and_blockfix(text, integer, bigint); Type: FUNCTION; Schema: public; Owner: -
 --
 
-CREATE FUNCTION public.insert_pool_and_blockfix(p_address text, p_internal_chain_id text, p_height bigint) RETURNS jsonb
-    LANGUAGE plpgsql
+CREATE FUNCTION public.insert_pool_and_blockfix(p_address text, p_internal_chain_id integer, p_height bigint) RETURNS jsonb
+    LANGUAGE plpgsql SECURITY DEFINER
     AS $$
 DECLARE
-  result JSONB;
-  v_indexer_id TEXT;
-  v_end_height BIGINT;
+    result       JSONB;
+    v_indexer_id TEXT;
+    v_end_height BIGINT;
 BEGIN
-  -- Start transaction
-  BEGIN
-    -- First, get the indexer_id from hubble.chains
-    SELECT indexer_id INTO v_indexer_id
+    SELECT indexer_id
+    INTO v_indexer_id
     FROM hubble.chains
-    WHERE internal_chain_id = p_internal_chain_id;
-    
-    -- Check if we found an indexer_id
+    WHERE id = p_internal_chain_id;
+
     IF v_indexer_id IS NULL THEN
-      RAISE EXCEPTION 'No indexer_id found for internal_chain_id: %', p_internal_chain_id;
+        RAISE EXCEPTION 'No indexer_id found for internal_chain_id: %', p_internal_chain_id;
     END IF;
-    
-    -- Get the max height from hubble.block_status
-    SELECT MAX(height) INTO v_end_height
+
+    SELECT MAX(height)
+    INTO v_end_height
     FROM hubble.block_status
     WHERE indexer_id = v_indexer_id;
-    
+
     IF v_end_height IS NULL THEN
-      RAISE EXCEPTION 'No blocks found in block_status for indexer_id: %', v_indexer_id;
+        RAISE EXCEPTION 'No blocks found in block_status for indexer_id: %', v_indexer_id;
     END IF;
-    
-    INSERT INTO contracts (
-      address, 
-      internal_chain_id, 
-      height
-    ) VALUES (
-      p_address,
-      p_internal_chain_id,
-      p_height
-    );
 
-    INSERT INTO hubble.blockfix (
-      indexer_id,
-      start_height,
-      end_height,
-      status
-    ) VALUES (
-      v_indexer_id,
-      p_height,
-      v_end_height
-    );
+    INSERT INTO v1_cosmos.contracts (address,
+                                     internal_chain_id,
+                                     start_height)
+    VALUES (p_address,
+            p_internal_chain_id,
+            p_height);
 
-    -- Commit transaction implicitly
+    INSERT INTO hubble.block_fix (indexer_id,
+                                  start_height,
+                                  end_height)
+    VALUES (v_indexer_id,
+            p_height,
+            v_end_height);
+
     result := jsonb_build_object('success', true);
-  EXCEPTION
-    WHEN OTHERS THEN
-      -- Rollback transaction
-      ROLLBACK;
-      result := jsonb_build_object(
-        'success', false,
-        'error', SQLERRM
-      );
-  END;
 
-  RETURN result;
+    RETURN result;
 END;
 $$;
 
@@ -1962,6 +1934,62 @@ CREATE FUNCTION supabase_functions.http_request() RETURNS trigger
 
 
 --
+-- Name: insert_missing_token_prices_by_block(); Type: PROCEDURE; Schema: v1_cosmos; Owner: -
+--
+
+CREATE PROCEDURE v1_cosmos.insert_missing_token_prices_by_block()
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    -- Insert new rows for heights missing in token_prices_by_block
+    INSERT INTO v1_cosmos.token_prices_by_block (
+        height,
+        "timestamp",
+        next_timestamp,
+        next_height,
+        seconds_between_blocks,
+        denomination,
+        price,
+        decimals,
+        token_name
+    )
+    SELECT
+        bd.height,
+        bd."timestamp",
+        bd.next_timestamp,
+        bd.next_height,
+        EXTRACT(epoch FROM bd.next_timestamp - bd."timestamp") AS seconds_between_blocks,
+        t.denomination,
+        closest_tp.price,
+        t.decimals,
+        t.token_name
+    FROM v1_cosmos.materialized_block_data bd
+    JOIN v1_cosmos.token t ON true
+    CROSS JOIN LATERAL (
+        SELECT DISTINCT token.token_name
+        FROM v1_cosmos.token
+    ) all_tokens
+    LEFT JOIN LATERAL (
+        SELECT
+            tp.token,
+            tp.price,
+            ROW_NUMBER() OVER (PARTITION BY tp.token ORDER BY (abs(EXTRACT(epoch FROM bd."timestamp" - tp.created_at)))) AS rn
+        FROM v1_cosmos.token_prices tp
+        WHERE tp.token = all_tokens.token_name
+        AND tp.price IS NOT NULL
+    ) closest_tp ON closest_tp.token = all_tokens.token_name AND closest_tp.rn = 1
+    WHERE bd.next_height IS NOT NULL
+    AND t.token_name = all_tokens.token_name
+    AND NOT EXISTS (  -- Add this condition to check for missing heights
+        SELECT 1
+        FROM v1_cosmos.token_prices_by_block tpb
+        WHERE tpb.height = bd.height
+    );
+END;
+$$;
+
+
+--
 -- Name: insert_pool_and_blockfix(text, integer, bigint); Type: FUNCTION; Schema: v1_cosmos; Owner: -
 --
 
@@ -1977,26 +2005,26 @@ BEGIN
   SELECT indexer_id INTO v_indexer_id
   FROM hubble.chains
   WHERE id = p_internal_chain_id;
-  
+
   -- Check if we found an indexer_id
   IF v_indexer_id IS NULL THEN
     RAISE EXCEPTION 'No indexer_id found for internal_chain_id: %', p_internal_chain_id;
   END IF;
-  
+
   -- Get the max height from hubble.block_status
   SELECT MAX(height) INTO v_end_height
   FROM hubble.block_status
   WHERE indexer_id = v_indexer_id;
-  
+
   -- Check if we found a max height
   IF v_end_height IS NULL THEN
     RAISE EXCEPTION 'No blocks found in block_status for indexer_id: %', v_indexer_id;
   END IF;
-  
+
   -- Insert into contracts table
   INSERT INTO v1_cosmos.contracts (
-    address, 
-    internal_chain_id, 
+    address,
+    internal_chain_id,
     start_height
   ) VALUES (
     p_address,
@@ -2023,6 +2051,21 @@ EXCEPTION
       'success', false,
       'error', SQLERRM
     );
+END;
+$$;
+
+
+--
+-- Name: on_materialized_block_data_refresh(); Type: FUNCTION; Schema: v1_cosmos; Owner: -
+--
+
+CREATE FUNCTION v1_cosmos.on_materialized_block_data_refresh() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  -- Call the procedure to insert missing token prices.
+  CALL v1_cosmos.insert_missing_token_prices_by_block();
+  RETURN NULL; -- Important:  Trigger functions must return NULL for AFTER triggers.
 END;
 $$;
 
@@ -2674,379 +2717,6 @@ ALTER SEQUENCE hubble.token_sources_id_seq OWNED BY hubble.token_sources.id;
 
 
 --
--- Name: add_liquidity; Type: VIEW; Schema: v1_cosmos; Owner: -
---
-
-CREATE VIEW v1_cosmos.add_liquidity AS
- SELECT (public.attributes(events.*) ->> 'sender'::text) AS sender,
-    (public.attributes(events.*) ->> 'receiver'::text) AS receiver,
-    regexp_replace(split_part((public.attributes(events.*) ->> 'assets'::text), ', '::text, 1), '^\d+'::text, ''::text) AS token0_denom,
-    ((regexp_matches((public.attributes(events.*) ->> 'assets'::text), '^\d+'::text))[1])::numeric AS token0_amount,
-    regexp_replace(split_part((public.attributes(events.*) ->> 'assets'::text), ', '::text, 2), '^\d+'::text, ''::text) AS token1_denom,
-    ((regexp_matches(split_part((public.attributes(events.*) ->> 'assets'::text), ', '::text, 2), '^\d+'::text))[1])::numeric AS token1_amount,
-    ((public.attributes(events.*) ->> 'share'::text))::numeric AS share,
-    (public.attributes(events.*) ->> '_contract_address'::text) AS pool_address,
-    ((public.attributes(events.*) ->> 'msg_index'::text))::integer AS msg_index,
-    events.chain_id AS internal_chain_id,
-    events.block_hash,
-    events.height,
-    events.index,
-    events."time" AS "timestamp",
-    events.transaction_hash,
-    events.transaction_index,
-    events.data
-   FROM v1_cosmos.events
-  WHERE ((events.data ->> 'type'::text) = 'wasm-provide_liquidity'::text);
-
-
---
--- Name: blocks; Type: TABLE; Schema: v1_cosmos; Owner: -
---
-
-CREATE TABLE v1_cosmos.blocks (
-    chain_id integer NOT NULL,
-    hash text NOT NULL,
-    height bigint NOT NULL,
-    "time" timestamp with time zone NOT NULL,
-    data jsonb NOT NULL
-);
-
-
---
--- Name: TABLE blocks; Type: COMMENT; Schema: v1_cosmos; Owner: -
---
-
-COMMENT ON TABLE v1_cosmos.blocks IS 'DEPRECATED: use V1';
-
-
---
--- Name: incentivize; Type: VIEW; Schema: v1_cosmos; Owner: -
---
-
-CREATE VIEW v1_cosmos.incentivize WITH (security_invoker='on') AS
- SELECT (public.attributes(events.*) ->> 'lp_token'::text) AS lp_token,
-    ((public.attributes(events.*) ->> 'start_ts'::text))::bigint AS start_ts,
-    ((public.attributes(events.*) ->> 'end_ts'::text))::bigint AS end_ts,
-    (public.attributes(events.*) ->> 'reward'::text) AS reward,
-    ((public.attributes(events.*) ->> 'rps'::text))::numeric AS rewards_per_second,
-    ((public.attributes(events.*) ->> 'msg_index'::text))::integer AS msg_index,
-    events.chain_id AS internal_chain_id,
-    events.block_hash,
-    events.height,
-    events.index,
-    events."time" AS "timestamp",
-    events.transaction_hash,
-    events.transaction_index,
-    NULL::integer AS transaction_event_index,
-    events.data
-   FROM v1_cosmos.events
-  WHERE ((events.data ->> 'type'::text) = 'wasm-incentivize'::text);
-
-
---
--- Name: pool_lp_token; Type: TABLE; Schema: v1_cosmos; Owner: -
---
-
-CREATE TABLE v1_cosmos.pool_lp_token (
-    id bigint NOT NULL,
-    pool text NOT NULL,
-    lp_token text NOT NULL,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL
-);
-
-
---
--- Name: TABLE pool_lp_token; Type: COMMENT; Schema: v1_cosmos; Owner: -
---
-
-COMMENT ON TABLE v1_cosmos.pool_lp_token IS 'indexes the relation between the pool and lp tokens';
-
-
---
--- Name: swap; Type: VIEW; Schema: v1_cosmos; Owner: -
---
-
-CREATE VIEW v1_cosmos.swap WITH (security_invoker='on') AS
- SELECT (public.attributes(events.*) ->> 'sender'::text) AS sender,
-    (public.attributes(events.*) ->> 'receiver'::text) AS receiver,
-    (public.attributes(events.*) ->> 'ask_asset'::text) AS ask_asset,
-    ((public.attributes(events.*) ->> 'commission_amount'::text))::numeric AS commission_amount,
-    ((public.attributes(events.*) ->> 'fee_share_amount'::text))::numeric AS fee_share_amount,
-    ((public.attributes(events.*) ->> 'maker_fee_amount'::text))::numeric AS maker_fee_amount,
-    ((public.attributes(events.*) ->> 'offer_amount'::text))::numeric AS offer_amount,
-    (public.attributes(events.*) ->> 'offer_asset'::text) AS offer_asset,
-    ((public.attributes(events.*) ->> 'return_amount'::text))::numeric AS return_amount,
-    ((public.attributes(events.*) ->> 'spread_amount'::text))::numeric AS spread_amount,
-    (public.attributes(events.*) ->> '_contract_address'::text) AS pool_address,
-    ((public.attributes(events.*) ->> 'msg_index'::text))::integer AS msg_index,
-    events.chain_id AS internal_chain_id,
-    events.block_hash,
-    events.height,
-    events.index,
-    events."time" AS "timestamp",
-    events.transaction_hash,
-    events.transaction_index,
-    NULL::integer AS transaction_event_index,
-    events.data
-   FROM v1_cosmos.events
-  WHERE ((events.data ->> 'type'::text) = 'wasm-swap'::text);
-
-
---
--- Name: withdraw_liquidity; Type: VIEW; Schema: v1_cosmos; Owner: -
---
-
-CREATE VIEW v1_cosmos.withdraw_liquidity AS
- SELECT (public.attributes(events.*) ->> 'sender'::text) AS sender,
-    COALESCE((public.attributes(events.*) ->> 'receiver'::text), (public.attributes(events.*) ->> 'sender'::text)) AS receiver,
-    regexp_replace(split_part((public.attributes(events.*) ->> 'refund_assets'::text), ', '::text, 1), '^\d+'::text, ''::text) AS token0_denom,
-    ((regexp_matches((public.attributes(events.*) ->> 'refund_assets'::text), '^\d+'::text))[1])::numeric AS token0_amount,
-    regexp_replace(split_part((public.attributes(events.*) ->> 'refund_assets'::text), ', '::text, 2), '^\d+'::text, ''::text) AS token1_denom,
-    ((regexp_matches(split_part((public.attributes(events.*) ->> 'refund_assets'::text), ', '::text, 2), '^\d+'::text))[1])::numeric AS token1_amount,
-    ((public.attributes(events.*) ->> 'withdrawn_share'::text))::numeric AS share,
-    ( SELECT plt.pool
-           FROM v1_cosmos.pool_lp_token plt
-          WHERE ((plt.pool = (public.attributes(events.*) ->> '_contract_address'::text)) OR (plt.lp_token = (public.attributes(events.*) ->> '_contract_address'::text)))
-         LIMIT 1) AS pool_address,
-    ((public.attributes(events.*) ->> 'msg_index'::text))::integer AS msg_index,
-    events.chain_id AS internal_chain_id,
-    events.block_hash,
-    events.height,
-    events.index,
-    events."time" AS "timestamp",
-    events.transaction_hash,
-    events.transaction_index,
-    events.data
-   FROM v1_cosmos.events
-  WHERE ((events.data ->> 'type'::text) = 'wasm-withdraw_liquidity'::text);
-
-
---
--- Name: pool_balance; Type: VIEW; Schema: v1_cosmos; Owner: -
---
-
-CREATE VIEW v1_cosmos.pool_balance WITH (security_invoker='on') AS
- WITH all_heights AS (
-         SELECT DISTINCT all_events.pool_address,
-            all_events.height
-           FROM ( SELECT add_liquidity.pool_address,
-                    add_liquidity.height
-                   FROM v1_cosmos.add_liquidity
-                UNION ALL
-                 SELECT withdraw_liquidity.pool_address,
-                    withdraw_liquidity.height
-                   FROM v1_cosmos.withdraw_liquidity
-                UNION ALL
-                 SELECT swap.pool_address,
-                    swap.height
-                   FROM v1_cosmos.swap) all_events
-        ), add_liquidity AS (
-         SELECT add_liquidity.pool_address,
-            add_liquidity.token0_denom,
-            sum(add_liquidity.token0_amount) OVER (PARTITION BY add_liquidity.pool_address, add_liquidity.token0_denom ORDER BY add_liquidity.height) AS total_token0_added,
-            add_liquidity.token1_denom,
-            sum(add_liquidity.token1_amount) OVER (PARTITION BY add_liquidity.pool_address, add_liquidity.token1_denom ORDER BY add_liquidity.height) AS total_token1_added,
-            sum(add_liquidity.share) OVER (PARTITION BY add_liquidity.pool_address ORDER BY add_liquidity.height) AS total_share_added,
-            add_liquidity.height
-           FROM v1_cosmos.add_liquidity
-        ), withdraw_liquidity AS (
-         SELECT withdraw_liquidity.pool_address,
-            withdraw_liquidity.token0_denom,
-            sum(withdraw_liquidity.token0_amount) OVER (PARTITION BY withdraw_liquidity.pool_address, withdraw_liquidity.token0_denom ORDER BY withdraw_liquidity.height) AS total_token0_withdrawn,
-            withdraw_liquidity.token1_denom,
-            sum(withdraw_liquidity.token1_amount) OVER (PARTITION BY withdraw_liquidity.pool_address, withdraw_liquidity.token1_denom ORDER BY withdraw_liquidity.height) AS total_token1_withdrawn,
-            sum(withdraw_liquidity.share) OVER (PARTITION BY withdraw_liquidity.pool_address ORDER BY withdraw_liquidity.height) AS total_share_withdrawn,
-            withdraw_liquidity.height
-           FROM v1_cosmos.withdraw_liquidity
-        ), swap_impact AS (
-         SELECT s_1.pool_address,
-            s_1.height,
-                CASE
-                    WHEN (s_1.offer_asset = p.token0_denom) THEN s_1.offer_amount
-                    WHEN (s_1.ask_asset = p.token0_denom) THEN ((s_1.return_amount * ('-1'::integer)::numeric) - COALESCE(s_1.fee_share_amount, (0)::numeric))
-                    ELSE (0)::numeric
-                END AS token0_swap_impact,
-                CASE
-                    WHEN (s_1.offer_asset = p.token1_denom) THEN s_1.offer_amount
-                    WHEN (s_1.ask_asset = p.token1_denom) THEN ((s_1.return_amount * ('-1'::integer)::numeric) - COALESCE(s_1.fee_share_amount, (0)::numeric))
-                    ELSE (0)::numeric
-                END AS token1_swap_impact
-           FROM (v1_cosmos.swap s_1
-             JOIN ( SELECT DISTINCT add_liquidity.pool_address,
-                    add_liquidity.token0_denom,
-                    add_liquidity.token1_denom
-                   FROM v1_cosmos.add_liquidity) p ON ((s_1.pool_address = p.pool_address)))
-        ), swap_totals AS (
-         SELECT swap_impact.pool_address,
-            sum(swap_impact.token0_swap_impact) OVER (PARTITION BY swap_impact.pool_address ORDER BY swap_impact.height) AS total_token0_swap_impact,
-            sum(swap_impact.token1_swap_impact) OVER (PARTITION BY swap_impact.pool_address ORDER BY swap_impact.height) AS total_token1_swap_impact,
-            swap_impact.height
-           FROM swap_impact
-        )
- SELECT h.pool_address,
-    a.token0_denom,
-    ((COALESCE(a.total_token0_added, (0)::numeric) - COALESCE(w.total_token0_withdrawn, (0)::numeric)) + COALESCE(s.total_token0_swap_impact, (0)::numeric)) AS token0_balance,
-    a.token1_denom,
-    ((COALESCE(a.total_token1_added, (0)::numeric) - COALESCE(w.total_token1_withdrawn, (0)::numeric)) + COALESCE(s.total_token1_swap_impact, (0)::numeric)) AS token1_balance,
-    (COALESCE(a.total_share_added, (0)::numeric) - COALESCE(w.total_share_withdrawn, (0)::numeric)) AS share,
-    h.height
-   FROM (((all_heights h
-     LEFT JOIN add_liquidity a ON (((h.pool_address = a.pool_address) AND (h.height >= a.height) AND (a.height = ( SELECT max(add_liquidity.height) AS max
-           FROM add_liquidity
-          WHERE ((add_liquidity.pool_address = h.pool_address) AND (add_liquidity.height <= h.height)))))))
-     LEFT JOIN withdraw_liquidity w ON (((h.pool_address = w.pool_address) AND (h.height >= w.height) AND (w.height = ( SELECT max(withdraw_liquidity.height) AS max
-           FROM withdraw_liquidity
-          WHERE ((withdraw_liquidity.pool_address = h.pool_address) AND (withdraw_liquidity.height <= h.height)))))))
-     LEFT JOIN swap_totals s ON (((h.pool_address = s.pool_address) AND (h.height >= s.height) AND (s.height = ( SELECT max(swap_totals.height) AS max
-           FROM swap_totals
-          WHERE ((swap_totals.pool_address = h.pool_address) AND (swap_totals.height <= h.height)))))));
-
-
---
--- Name: token; Type: TABLE; Schema: v1_cosmos; Owner: -
---
-
-CREATE TABLE v1_cosmos.token (
-    id bigint NOT NULL,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    coingecko_id text NOT NULL,
-    denomination text,
-    token_name text,
-    chain_id integer,
-    decimals smallint
-);
-
-
---
--- Name: TABLE token; Type: COMMENT; Schema: v1_cosmos; Owner: -
---
-
-COMMENT ON TABLE v1_cosmos.token IS 'contains the onchain representation of a token on babylon, aswell as the full token name and the coingecko id';
-
-
---
--- Name: token_prices; Type: TABLE; Schema: v1_cosmos; Owner: -
---
-
-CREATE TABLE v1_cosmos.token_prices (
-    id bigint NOT NULL,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    price numeric,
-    last_updated_at numeric,
-    token text
-);
-
-
---
--- Name: historic_pool_yield; Type: VIEW; Schema: public; Owner: -
---
-
-CREATE VIEW public.historic_pool_yield AS
- WITH block_data AS (
-         SELECT b.height,
-            b."time" AS "timestamp",
-            lead(b."time") OVER (ORDER BY b.height) AS next_timestamp,
-            lead(b.height) OVER (ORDER BY b.height) AS next_height
-           FROM v1_cosmos.blocks b
-        ), token_prices_by_block AS (
-         SELECT bd_1.height,
-            bd_1."timestamp",
-            bd_1.next_timestamp,
-            bd_1.next_height,
-            EXTRACT(epoch FROM (bd_1.next_timestamp - bd_1."timestamp")) AS seconds_between_blocks,
-            t.denomination,
-            tp.price,
-            t.decimals,
-            t.token_name
-           FROM (((block_data bd_1
-             CROSS JOIN LATERAL ( SELECT DISTINCT token_prices.token
-                   FROM v1_cosmos.token_prices) d)
-             LEFT JOIN LATERAL ( SELECT token_prices.token,
-                    token_prices.price
-                   FROM v1_cosmos.token_prices
-                  WHERE (token_prices.token = d.token)
-                  ORDER BY (abs(EXTRACT(epoch FROM (bd_1."timestamp" - token_prices.created_at))))
-                 LIMIT 1) tp ON (true))
-             LEFT JOIN v1_cosmos.token t ON ((tp.token = t.token_name)))
-          WHERE (bd_1.next_height IS NOT NULL)
-        ), block_fees AS (
-         SELECT s.height,
-            s.pool_address,
-            s.ask_asset AS fee_token_denom,
-            sum(s.commission_amount) AS fee_amount,
-            (sum(((s.commission_amount)::double precision / power((10)::double precision, (COALESCE((tp.decimals)::integer, 6))::double precision))) * (COALESCE(tp.price, (0)::numeric))::double precision) AS fees_usd
-           FROM (v1_cosmos.swap s
-             LEFT JOIN token_prices_by_block tp ON (((s.height = tp.height) AND (s.ask_asset = tp.denomination))))
-          GROUP BY s.height, s.pool_address, s.ask_asset, tp.price, tp.decimals
-        ), block_incentives AS (
-         SELECT bp.height,
-            i.lp_token,
-            i.reward AS incentive_token_denom,
-            sum((i.rewards_per_second * tp.seconds_between_blocks)) AS incentive_amount,
-            (sum((((i.rewards_per_second * tp.seconds_between_blocks))::double precision / power((10)::double precision, (COALESCE((tp.decimals)::integer, 6))::double precision))) * (COALESCE(tp.price, (0)::numeric))::double precision) AS incentives_usd
-           FROM ((block_data bp
-             JOIN v1_cosmos.incentivize i ON ((((i.start_ts)::numeric <= EXTRACT(epoch FROM bp."timestamp")) AND ((i.end_ts)::numeric >= EXTRACT(epoch FROM bp."timestamp")))))
-             LEFT JOIN token_prices_by_block tp ON (((bp.height = tp.height) AND (i.reward = tp.denomination))))
-          GROUP BY bp.height, i.lp_token, i.reward, tp.seconds_between_blocks, tp.price, tp.decimals
-        ), pool_info AS (
-         SELECT DISTINCT pool_balance.pool_address,
-            ((pool_balance.token0_denom || ':'::text) || pool_balance.token1_denom) AS lp_token
-           FROM v1_cosmos.pool_balance
-        ), pool_liquidity AS (
-         SELECT h.height,
-            a.pool_address,
-            a.token0_denom,
-            a.token1_denom,
-            a.token0_balance,
-            a.token1_balance,
-            (((a.token0_balance)::double precision / power((10)::double precision, (COALESCE((tp0.decimals)::integer, 6))::double precision)) * (COALESCE(tp0.price, (0)::numeric))::double precision) AS token0_value_usd,
-            (((a.token1_balance)::double precision / power((10)::double precision, (COALESCE((tp1.decimals)::integer, 6))::double precision)) * (COALESCE(tp1.price, (0)::numeric))::double precision) AS token1_value_usd,
-            ((((a.token0_balance)::double precision / power((10)::double precision, (COALESCE((tp0.decimals)::integer, 6))::double precision)) * (COALESCE(tp0.price, (0)::numeric))::double precision) + (((a.token1_balance)::double precision / power((10)::double precision, (COALESCE((tp1.decimals)::integer, 6))::double precision)) * (COALESCE(tp1.price, (0)::numeric))::double precision)) AS total_liquidity_usd
-           FROM (((v1_cosmos.blocks h
-             JOIN v1_cosmos.pool_balance a ON ((h.height = a.height)))
-             LEFT JOIN token_prices_by_block tp0 ON (((h.height = tp0.height) AND (a.token0_denom = tp0.denomination))))
-             LEFT JOIN token_prices_by_block tp1 ON (((h.height = tp1.height) AND (a.token1_denom = tp1.denomination))))
-        ), total_fees_by_pool AS (
-         SELECT block_fees.height,
-            block_fees.pool_address,
-            json_agg(json_build_object('denom', block_fees.fee_token_denom, 'amount', block_fees.fee_amount, 'usd_value', block_fees.fees_usd)) AS fee_tokens,
-            sum(block_fees.fees_usd) AS total_fees_usd
-           FROM block_fees
-          GROUP BY block_fees.height, block_fees.pool_address
-        ), total_incentives_by_pool AS (
-         SELECT bi.height,
-            pi.pool_address,
-            json_agg(json_build_object('denom', bi.incentive_token_denom, 'amount', bi.incentive_amount, 'usd_value', bi.incentives_usd)) AS incentive_tokens,
-            sum(bi.incentives_usd) AS total_incentives_usd
-           FROM (block_incentives bi
-             LEFT JOIN pool_info pi ON ((bi.lp_token = pi.lp_token)))
-          GROUP BY bi.height, pi.pool_address
-        )
- SELECT bd.height,
-    bd."timestamp",
-    pl.pool_address,
-    pl.token0_denom,
-    pl.token1_denom,
-    pl.token0_balance,
-    pl.token1_balance,
-    pl.token0_value_usd,
-    pl.token1_value_usd,
-    pl.total_liquidity_usd,
-    tf.fee_tokens,
-    COALESCE(tf.total_fees_usd, (0)::double precision) AS fees_usd,
-    ti.incentive_tokens,
-    COALESCE(ti.total_incentives_usd, (0)::double precision) AS incentives_usd,
-    (COALESCE(tf.total_fees_usd, (0)::double precision) + COALESCE(ti.total_incentives_usd, (0)::double precision)) AS total_earnings_usd
-   FROM (((block_data bd
-     JOIN pool_liquidity pl ON ((bd.height = pl.height)))
-     LEFT JOIN total_fees_by_pool tf ON (((bd.height = tf.height) AND (pl.pool_address = tf.pool_address))))
-     LEFT JOIN total_incentives_by_pool ti ON (((bd.height = ti.height) AND (pl.pool_address = ti.pool_address))))
-  WHERE (bd.next_height IS NOT NULL)
-  ORDER BY bd.height, pl.pool_address;
-
-
---
 -- Name: messages; Type: TABLE; Schema: realtime; Owner: -
 --
 
@@ -3272,238 +2942,113 @@ CREATE TABLE supabase_migrations.seed_files (
 
 
 --
--- Name: blocks; Type: TABLE; Schema: v1_aptos; Owner: -
+-- Name: pools; Type: VIEW; Schema: v1_cosmos; Owner: -
 --
 
-CREATE TABLE v1_aptos.blocks (
-    internal_chain_id integer NOT NULL,
-    block_hash text NOT NULL,
+CREATE VIEW v1_cosmos.pools AS
+ WITH create_pair AS (
+         SELECT (public.attributes(events.*) ->> 'action'::text) AS action,
+            (public.attributes(events.*) ->> 'pair'::text) AS pair,
+            (public.attributes(events.*) ->> '_contract_address'::text) AS factory_address,
+            (public.attributes(events.*) ->> 'msg_index'::text) AS msg_index,
+            events.chain_id AS internal_chain_id,
+            events.block_hash,
+            events.height,
+            events.index,
+            events."time" AS "timestamp",
+            events.transaction_hash,
+            events.transaction_index,
+            NULL::integer AS transaction_event_index,
+            events.data
+           FROM v1_cosmos.events
+          WHERE ((events.data ->> 'type'::text) = 'wasm-create_pair'::text)
+        ), register AS (
+         SELECT (public.attributes(events.*) ->> 'action'::text) AS action,
+            (public.attributes(events.*) ->> 'pair_contract_addr'::text) AS pair_contract_addr,
+            (public.attributes(events.*) ->> '_contract_address'::text) AS factory_address,
+            (public.attributes(events.*) ->> 'msg_index'::text) AS msg_index,
+            events.chain_id AS internal_chain_id,
+            events.block_hash,
+            events.height,
+            events.index,
+            events."time" AS "timestamp",
+            events.transaction_hash,
+            events.transaction_index,
+            NULL::integer AS transaction_event_index,
+            events.data
+           FROM v1_cosmos.events
+          WHERE ((events.data ->> 'type'::text) = 'wasm-register'::text)
+        )
+ SELECT split_part(cp.pair, '-'::text, 1) AS token0,
+    split_part(cp.pair, '-'::text, 2) AS token1,
+    r.pair_contract_addr AS pool_address,
+    (cp.msg_index)::integer AS msg_index,
+    cp.internal_chain_id,
+    cp.block_hash,
+    cp.height,
+    cp.index AS create_index,
+    r.index AS register_index,
+    cp."timestamp",
+    cp.transaction_hash,
+    cp.transaction_index AS create_transaction_index,
+    r.transaction_index AS register_transaction_index
+   FROM (create_pair cp
+     JOIN register r ON ((cp.transaction_hash = r.transaction_hash)));
+
+
+--
+-- Name: add_liquidity; Type: VIEW; Schema: v1_cosmos; Owner: -
+--
+
+CREATE VIEW v1_cosmos.add_liquidity AS
+ SELECT (public.attributes(events.*) ->> 'sender'::text) AS sender,
+    (public.attributes(events.*) ->> 'receiver'::text) AS receiver,
+    pools.token0 AS token0_denom,
+        CASE
+            WHEN (regexp_replace(split_part((public.attributes(events.*) ->> 'assets'::text), ', '::text, 1), '^\d+'::text, ''::text) = pools.token0) THEN ("substring"(split_part((public.attributes(events.*) ->> 'assets'::text), ', '::text, 1), '^\d+'::text))::numeric
+            WHEN (regexp_replace(split_part((public.attributes(events.*) ->> 'assets'::text), ', '::text, 2), '^\d+'::text, ''::text) = pools.token0) THEN ("substring"(split_part((public.attributes(events.*) ->> 'assets'::text), ', '::text, 2), '^\d+'::text))::numeric
+            ELSE NULL::numeric
+        END AS token0_amount,
+    pools.token1 AS token1_denom,
+        CASE
+            WHEN (regexp_replace(split_part((public.attributes(events.*) ->> 'assets'::text), ', '::text, 1), '^\d+'::text, ''::text) = pools.token1) THEN ("substring"(split_part((public.attributes(events.*) ->> 'assets'::text), ', '::text, 1), '^\d+'::text))::numeric
+            WHEN (regexp_replace(split_part((public.attributes(events.*) ->> 'assets'::text), ', '::text, 2), '^\d+'::text, ''::text) = pools.token1) THEN ("substring"(split_part((public.attributes(events.*) ->> 'assets'::text), ', '::text, 2), '^\d+'::text))::numeric
+            ELSE NULL::numeric
+        END AS token1_amount,
+    ((public.attributes(events.*) ->> 'share'::text))::numeric AS share,
+    (public.attributes(events.*) ->> '_contract_address'::text) AS pool_address,
+    ((public.attributes(events.*) ->> 'msg_index'::text))::integer AS msg_index,
+    events.chain_id AS internal_chain_id,
+    events.block_hash,
+    events.height,
+    events.index,
+    events."time" AS "timestamp",
+    events.transaction_hash,
+    events.transaction_index,
+    events.data
+   FROM (v1_cosmos.events
+     JOIN v1_cosmos.pools ON ((pools.pool_address = (public.attributes(events.*) ->> '_contract_address'::text))))
+  WHERE ((events.data ->> 'type'::text) = 'wasm-provide_liquidity'::text);
+
+
+--
+-- Name: blocks; Type: TABLE; Schema: v1_cosmos; Owner: -
+--
+
+CREATE TABLE v1_cosmos.blocks (
+    chain_id integer NOT NULL,
+    hash text NOT NULL,
     height bigint NOT NULL,
-    "timestamp" timestamp with time zone NOT NULL,
-    first_version bigint NOT NULL,
-    last_version bigint NOT NULL,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp with time zone DEFAULT now() NOT NULL
+    "time" timestamp with time zone NOT NULL,
+    data jsonb NOT NULL
 );
 
 
 --
--- Name: events; Type: TABLE; Schema: v1_aptos; Owner: -
+-- Name: TABLE blocks; Type: COMMENT; Schema: v1_cosmos; Owner: -
 --
 
-CREATE TABLE v1_aptos.events (
-    internal_chain_id integer NOT NULL,
-    height bigint NOT NULL,
-    version bigint NOT NULL,
-    sequence_number bigint NOT NULL,
-    creation_number bigint NOT NULL,
-    index bigint NOT NULL,
-    transaction_event_index bigint NOT NULL,
-    account_address text NOT NULL,
-    type text NOT NULL,
-    data jsonb NOT NULL,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp with time zone DEFAULT now() NOT NULL
-);
-
-
---
--- Name: transactions; Type: TABLE; Schema: v1_aptos; Owner: -
---
-
-CREATE TABLE v1_aptos.transactions (
-    internal_chain_id integer NOT NULL,
-    height bigint NOT NULL,
-    version bigint NOT NULL,
-    transaction_hash text NOT NULL,
-    transaction_index bigint NOT NULL,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp with time zone DEFAULT now() NOT NULL
-);
-
-
---
--- Name: channel_open_ack; Type: VIEW; Schema: v1_aptos; Owner: -
---
-
-CREATE VIEW v1_aptos.channel_open_ack AS
- SELECT (event.data ->> 'port_id'::text) AS port_id,
-    (event.data ->> 'channel_id'::text) AS channel_id,
-    (event.data ->> 'connection_id'::text) AS connection_id,
-    (event.data ->> 'counterparty_port_id'::text) AS counterparty_port_id,
-    (event.data ->> 'counterparty_channel_id'::text) AS counterparty_channel_id,
-    event.internal_chain_id,
-    block.block_hash,
-    event.height,
-    event.version AS transaction_version,
-    transaction.transaction_hash,
-    transaction.transaction_index,
-    event.transaction_event_index,
-    event.sequence_number,
-    event.creation_number,
-    event.index,
-    event.account_address,
-    event.type,
-    event.data
-   FROM ((v1_aptos.events event
-     JOIN v1_aptos.transactions transaction ON (((event.internal_chain_id = transaction.internal_chain_id) AND (event.version = transaction.version))))
-     JOIN v1_aptos.blocks block ON (((transaction.internal_chain_id = block.internal_chain_id) AND (transaction.version >= block.first_version) AND (transaction.version <= block.last_version))))
-  WHERE (SUBSTRING(event.type FROM (POSITION(('::'::text) IN (event.type)) + 2)) = 'ibc::ChannelOpenAck'::text);
-
-
---
--- Name: channel_open_init; Type: VIEW; Schema: v1_aptos; Owner: -
---
-
-CREATE VIEW v1_aptos.channel_open_init AS
- SELECT (event.data ->> 'port_id'::text) AS port_id,
-    (event.data ->> 'version'::text) AS version,
-    (event.data ->> 'channel_id'::text) AS channel_id,
-    (event.data ->> 'connection_id'::text) AS connection_id,
-    (event.data ->> 'counterparty_port_id'::text) AS counterparty_port_id,
-    event.internal_chain_id,
-    block.block_hash,
-    event.height,
-    event.version AS transaction_version,
-    transaction.transaction_hash,
-    transaction.transaction_index,
-    event.transaction_event_index,
-    event.sequence_number,
-    event.creation_number,
-    event.index,
-    event.account_address,
-    event.type,
-    event.data
-   FROM ((v1_aptos.events event
-     JOIN v1_aptos.transactions transaction ON (((event.internal_chain_id = transaction.internal_chain_id) AND (event.version = transaction.version))))
-     JOIN v1_aptos.blocks block ON (((transaction.internal_chain_id = block.internal_chain_id) AND (transaction.version >= block.first_version) AND (transaction.version <= block.last_version))))
-  WHERE (SUBSTRING(event.type FROM (POSITION(('::'::text) IN (event.type)) + 2)) = 'ibc::ChannelOpenInit'::text);
-
-
---
--- Name: client_created_event; Type: VIEW; Schema: v1_aptos; Owner: -
---
-
-CREATE VIEW v1_aptos.client_created_event AS
- SELECT (event.data ->> 'client_id'::text) AS client_id,
-    (event.data ->> 'client_type'::text) AS client_type,
-    (((event.data -> 'consensus_height'::text) ->> 'revision_height'::text))::bigint AS consensus_revision_height,
-    (((event.data -> 'consensus_height'::text) ->> 'revision_number'::text))::bigint AS consensus_revision_number,
-    event.internal_chain_id,
-    block.block_hash,
-    event.height,
-    event.version AS transaction_version,
-    transaction.transaction_hash,
-    transaction.transaction_index,
-    event.transaction_event_index,
-    event.sequence_number,
-    event.creation_number,
-    event.index,
-    event.account_address,
-    event.type,
-    event.data
-   FROM ((v1_aptos.events event
-     JOIN v1_aptos.transactions transaction ON (((event.internal_chain_id = transaction.internal_chain_id) AND (event.version = transaction.version))))
-     JOIN v1_aptos.blocks block ON (((transaction.internal_chain_id = block.internal_chain_id) AND (transaction.version >= block.first_version) AND (transaction.version <= block.last_version))))
-  WHERE (SUBSTRING(event.type FROM (POSITION(('::'::text) IN (event.type)) + 2)) = 'ibc::ClientCreatedEvent'::text);
-
-
---
--- Name: client_updated; Type: VIEW; Schema: v1_aptos; Owner: -
---
-
-CREATE VIEW v1_aptos.client_updated AS
- SELECT (event.data ->> 'client_id'::text) AS client_id,
-    (event.data ->> 'client_type'::text) AS client_type,
-    (((event.data -> 'consensus_height'::text) ->> 'revision_height'::text))::bigint AS consensus_revision_height,
-    (((event.data -> 'consensus_height'::text) ->> 'revision_number'::text))::bigint AS consensus_revision_number,
-    event.internal_chain_id,
-    block.block_hash,
-    event.height,
-    event.version AS transaction_version,
-    transaction.transaction_hash,
-    transaction.transaction_index,
-    event.transaction_event_index,
-    event.sequence_number,
-    event.creation_number,
-    event.index,
-    event.account_address,
-    event.type,
-    event.data
-   FROM ((v1_aptos.events event
-     JOIN v1_aptos.transactions transaction ON (((event.internal_chain_id = transaction.internal_chain_id) AND (event.version = transaction.version))))
-     JOIN v1_aptos.blocks block ON (((transaction.internal_chain_id = block.internal_chain_id) AND (transaction.version >= block.first_version) AND (transaction.version <= block.last_version))))
-  WHERE (SUBSTRING(event.type FROM (POSITION(('::'::text) IN (event.type)) + 2)) = 'ibc::ClientUpdated'::text);
-
-
---
--- Name: connection_open_ack; Type: VIEW; Schema: v1_aptos; Owner: -
---
-
-CREATE VIEW v1_aptos.connection_open_ack AS
- SELECT (event.data ->> 'client_id'::text) AS client_id,
-    (event.data ->> 'connection_id'::text) AS connection_id,
-    (event.data ->> 'counterparty_client_id'::text) AS counterparty_client_id,
-    (event.data ->> 'counterparty_connection_id'::text) AS counterparty_connection_id,
-    event.internal_chain_id,
-    block.block_hash,
-    event.height,
-    event.version AS transaction_version,
-    transaction.transaction_hash,
-    transaction.transaction_index,
-    event.transaction_event_index,
-    event.sequence_number,
-    event.creation_number,
-    event.index,
-    event.account_address,
-    event.type,
-    event.data
-   FROM ((v1_aptos.events event
-     JOIN v1_aptos.transactions transaction ON (((event.internal_chain_id = transaction.internal_chain_id) AND (event.version = transaction.version))))
-     JOIN v1_aptos.blocks block ON (((transaction.internal_chain_id = block.internal_chain_id) AND (transaction.version >= block.first_version) AND (transaction.version <= block.last_version))))
-  WHERE (SUBSTRING(event.type FROM (POSITION(('::'::text) IN (event.type)) + 2)) = 'ibc::ConnectionOpenAck'::text);
-
-
---
--- Name: connection_open_init; Type: VIEW; Schema: v1_aptos; Owner: -
---
-
-CREATE VIEW v1_aptos.connection_open_init AS
- SELECT (event.data ->> 'client_id'::text) AS client_id,
-    (event.data ->> 'connection_id'::text) AS connection_id,
-    (event.data ->> 'counterparty_client_id'::text) AS counterparty_client_id,
-    event.internal_chain_id,
-    block.block_hash,
-    event.height,
-    event.version AS transaction_version,
-    transaction.transaction_hash,
-    transaction.transaction_index,
-    event.transaction_event_index,
-    event.sequence_number,
-    event.creation_number,
-    event.index,
-    event.account_address,
-    event.type,
-    event.data
-   FROM ((v1_aptos.events event
-     JOIN v1_aptos.transactions transaction ON (((event.internal_chain_id = transaction.internal_chain_id) AND (event.version = transaction.version))))
-     JOIN v1_aptos.blocks block ON (((transaction.internal_chain_id = block.internal_chain_id) AND (transaction.version >= block.first_version) AND (transaction.version <= block.last_version))))
-  WHERE (SUBSTRING(event.type FROM (POSITION(('::'::text) IN (event.type)) + 2)) = 'ibc::ConnectionOpenInit'::text);
-
-
---
--- Name: contracts; Type: TABLE; Schema: v1_aptos; Owner: -
---
-
-CREATE TABLE v1_aptos.contracts (
-    internal_chain_id integer NOT NULL,
-    address text NOT NULL,
-    start_height bigint NOT NULL,
-    end_height bigint DEFAULT '9223372036854775807'::bigint NOT NULL,
-    description text,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp with time zone DEFAULT now() NOT NULL
-);
+COMMENT ON TABLE v1_cosmos.blocks IS 'DEPRECATED: use V1';
 
 
 --
@@ -3518,6 +3063,225 @@ CREATE TABLE v1_cosmos.contracts (
     description text,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: incentivize; Type: VIEW; Schema: v1_cosmos; Owner: -
+--
+
+CREATE VIEW v1_cosmos.incentivize AS
+ SELECT (public.attributes(events.*) ->> 'lp_token'::text) AS lp_token,
+    ((public.attributes(events.*) ->> 'start_ts'::text))::bigint AS start_ts,
+    ((public.attributes(events.*) ->> 'end_ts'::text))::bigint AS end_ts,
+    (public.attributes(events.*) ->> 'reward'::text) AS reward,
+    ((public.attributes(events.*) ->> 'rps'::text))::numeric AS rewards_per_second,
+    ((public.attributes(events.*) ->> 'msg_index'::text))::integer AS msg_index,
+    events.chain_id AS internal_chain_id,
+    events.block_hash,
+    events.height,
+    events.index,
+    events."time" AS "timestamp",
+    events.transaction_hash,
+    events.transaction_index,
+    NULL::integer AS transaction_event_index,
+    events.data
+   FROM v1_cosmos.events
+  WHERE ((events.data ->> 'type'::text) = 'wasm-incentivize'::text);
+
+
+--
+-- Name: pool_lp_token; Type: TABLE; Schema: v1_cosmos; Owner: -
+--
+
+CREATE TABLE v1_cosmos.pool_lp_token (
+    id bigint NOT NULL,
+    pool text NOT NULL,
+    lp_token text NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: TABLE pool_lp_token; Type: COMMENT; Schema: v1_cosmos; Owner: -
+--
+
+COMMENT ON TABLE v1_cosmos.pool_lp_token IS 'indexes the relation between the pool and lp tokens';
+
+
+--
+-- Name: swap; Type: VIEW; Schema: v1_cosmos; Owner: -
+--
+
+CREATE VIEW v1_cosmos.swap AS
+ SELECT (public.attributes(events.*) ->> 'sender'::text) AS sender,
+    (public.attributes(events.*) ->> 'receiver'::text) AS receiver,
+    (public.attributes(events.*) ->> 'ask_asset'::text) AS ask_asset,
+    ((public.attributes(events.*) ->> 'commission_amount'::text))::numeric AS commission_amount,
+    ((public.attributes(events.*) ->> 'fee_share_amount'::text))::numeric AS fee_share_amount,
+    ((public.attributes(events.*) ->> 'maker_fee_amount'::text))::numeric AS maker_fee_amount,
+    ((public.attributes(events.*) ->> 'offer_amount'::text))::numeric AS offer_amount,
+    (public.attributes(events.*) ->> 'offer_asset'::text) AS offer_asset,
+    ((public.attributes(events.*) ->> 'return_amount'::text))::numeric AS return_amount,
+    ((public.attributes(events.*) ->> 'spread_amount'::text))::numeric AS spread_amount,
+    (public.attributes(events.*) ->> '_contract_address'::text) AS pool_address,
+    ((public.attributes(events.*) ->> 'msg_index'::text))::integer AS msg_index,
+    events.chain_id AS internal_chain_id,
+    events.block_hash,
+    events.height,
+    events.index,
+    events."time" AS "timestamp",
+    events.transaction_hash,
+    events.transaction_index,
+    NULL::integer AS transaction_event_index,
+    events.data
+   FROM v1_cosmos.events
+  WHERE ((events.data ->> 'type'::text) = 'wasm-swap'::text);
+
+
+--
+-- Name: withdraw_liquidity; Type: VIEW; Schema: v1_cosmos; Owner: -
+--
+
+CREATE VIEW v1_cosmos.withdraw_liquidity AS
+ SELECT (public.attributes(events.*) ->> 'sender'::text) AS sender,
+    COALESCE((public.attributes(events.*) ->> 'receiver'::text), (public.attributes(events.*) ->> 'sender'::text)) AS receiver,
+    regexp_replace(split_part((public.attributes(events.*) ->> 'refund_assets'::text), ', '::text, 1), '^\d+'::text, ''::text) AS token0_denom,
+    ((regexp_matches((public.attributes(events.*) ->> 'refund_assets'::text), '^\d+'::text))[1])::numeric AS token0_amount,
+    regexp_replace(split_part((public.attributes(events.*) ->> 'refund_assets'::text), ', '::text, 2), '^\d+'::text, ''::text) AS token1_denom,
+    ((regexp_matches(split_part((public.attributes(events.*) ->> 'refund_assets'::text), ', '::text, 2), '^\d+'::text))[1])::numeric AS token1_amount,
+    ((public.attributes(events.*) ->> 'withdrawn_share'::text))::numeric AS share,
+    ( SELECT plt.pool
+           FROM v1_cosmos.pool_lp_token plt
+          WHERE ((plt.pool = (public.attributes(events.*) ->> '_contract_address'::text)) OR (plt.lp_token = (public.attributes(events.*) ->> '_contract_address'::text)))
+         LIMIT 1) AS pool_address,
+    ((public.attributes(events.*) ->> 'msg_index'::text))::integer AS msg_index,
+    events.chain_id AS internal_chain_id,
+    events.block_hash,
+    events.height,
+    events.index,
+    events."time" AS "timestamp",
+    events.transaction_hash,
+    events.transaction_index,
+    events.data
+   FROM v1_cosmos.events
+  WHERE ((events.data ->> 'type'::text) = 'wasm-withdraw_liquidity'::text);
+
+
+--
+-- Name: pool_balance; Type: VIEW; Schema: v1_cosmos; Owner: -
+--
+
+CREATE VIEW v1_cosmos.pool_balance AS
+ WITH all_heights AS (
+         SELECT DISTINCT all_events.pool_address,
+            all_events.height
+           FROM ( SELECT add_liquidity.pool_address,
+                    add_liquidity.height
+                   FROM v1_cosmos.add_liquidity
+                UNION ALL
+                 SELECT withdraw_liquidity.pool_address,
+                    withdraw_liquidity.height
+                   FROM v1_cosmos.withdraw_liquidity
+                UNION ALL
+                 SELECT swap.pool_address,
+                    swap.height
+                   FROM v1_cosmos.swap) all_events
+        ), add_liquidity AS (
+         SELECT add_liquidity.pool_address,
+            add_liquidity.token0_denom,
+            sum(add_liquidity.token0_amount) OVER (PARTITION BY add_liquidity.pool_address, add_liquidity.token0_denom ORDER BY add_liquidity.height) AS total_token0_added,
+            add_liquidity.token1_denom,
+            sum(add_liquidity.token1_amount) OVER (PARTITION BY add_liquidity.pool_address, add_liquidity.token1_denom ORDER BY add_liquidity.height) AS total_token1_added,
+            sum(add_liquidity.share) OVER (PARTITION BY add_liquidity.pool_address ORDER BY add_liquidity.height) AS total_share_added,
+            add_liquidity.height
+           FROM v1_cosmos.add_liquidity
+        ), withdraw_liquidity AS (
+         SELECT withdraw_liquidity.pool_address,
+            withdraw_liquidity.token0_denom,
+            sum(withdraw_liquidity.token0_amount) OVER (PARTITION BY withdraw_liquidity.pool_address, withdraw_liquidity.token0_denom ORDER BY withdraw_liquidity.height) AS total_token0_withdrawn,
+            withdraw_liquidity.token1_denom,
+            sum(withdraw_liquidity.token1_amount) OVER (PARTITION BY withdraw_liquidity.pool_address, withdraw_liquidity.token1_denom ORDER BY withdraw_liquidity.height) AS total_token1_withdrawn,
+            sum(withdraw_liquidity.share) OVER (PARTITION BY withdraw_liquidity.pool_address ORDER BY withdraw_liquidity.height) AS total_share_withdrawn,
+            withdraw_liquidity.height
+           FROM v1_cosmos.withdraw_liquidity
+        ), swap_impact AS (
+         SELECT s_1.pool_address,
+            s_1.height,
+                CASE
+                    WHEN (s_1.offer_asset = p.token0) THEN s_1.offer_amount
+                    WHEN (s_1.ask_asset = p.token0) THEN (((s_1.return_amount * ('-1'::integer)::numeric) - COALESCE(s_1.fee_share_amount, (0)::numeric)) - COALESCE(s_1.maker_fee_amount, (0)::numeric))
+                    ELSE (0)::numeric
+                END AS token0_swap_impact,
+                CASE
+                    WHEN (s_1.offer_asset = p.token1) THEN s_1.offer_amount
+                    WHEN (s_1.ask_asset = p.token1) THEN (((s_1.return_amount * ('-1'::integer)::numeric) - COALESCE(s_1.fee_share_amount, (0)::numeric)) - COALESCE(s_1.maker_fee_amount, (0)::numeric))
+                    ELSE (0)::numeric
+                END AS token1_swap_impact
+           FROM (v1_cosmos.swap s_1
+             JOIN ( SELECT DISTINCT pools.pool_address,
+                    pools.token0,
+                    pools.token1
+                   FROM v1_cosmos.pools) p ON ((s_1.pool_address = p.pool_address)))
+        ), swap_totals AS (
+         SELECT swap_impact.pool_address,
+            sum(swap_impact.token0_swap_impact) OVER (PARTITION BY swap_impact.pool_address ORDER BY swap_impact.height) AS total_token0_swap_impact,
+            sum(swap_impact.token1_swap_impact) OVER (PARTITION BY swap_impact.pool_address ORDER BY swap_impact.height) AS total_token1_swap_impact,
+            swap_impact.height
+           FROM swap_impact
+        )
+ SELECT h.pool_address,
+    a.token0_denom,
+    ((COALESCE(a.total_token0_added, (0)::numeric) - COALESCE(w.total_token0_withdrawn, (0)::numeric)) + COALESCE(s.total_token0_swap_impact, (0)::numeric)) AS token0_balance,
+    a.token1_denom,
+    ((COALESCE(a.total_token1_added, (0)::numeric) - COALESCE(w.total_token1_withdrawn, (0)::numeric)) + COALESCE(s.total_token1_swap_impact, (0)::numeric)) AS token1_balance,
+    (COALESCE(a.total_share_added, (0)::numeric) - COALESCE(w.total_share_withdrawn, (0)::numeric)) AS share,
+    h.height
+   FROM (((all_heights h
+     LEFT JOIN add_liquidity a ON (((h.pool_address = a.pool_address) AND (h.height >= a.height) AND (a.height = ( SELECT max(add_liquidity.height) AS max
+           FROM add_liquidity
+          WHERE ((add_liquidity.pool_address = h.pool_address) AND (add_liquidity.height <= h.height)))))))
+     LEFT JOIN withdraw_liquidity w ON (((h.pool_address = w.pool_address) AND (h.height >= w.height) AND (w.height = ( SELECT max(withdraw_liquidity.height) AS max
+           FROM withdraw_liquidity
+          WHERE ((withdraw_liquidity.pool_address = h.pool_address) AND (withdraw_liquidity.height <= h.height)))))))
+     LEFT JOIN swap_totals s ON (((h.pool_address = s.pool_address) AND (h.height >= s.height) AND (s.height = ( SELECT max(swap_totals.height) AS max
+           FROM swap_totals
+          WHERE ((swap_totals.pool_address = h.pool_address) AND (swap_totals.height <= h.height)))))));
+
+
+--
+-- Name: token; Type: TABLE; Schema: v1_cosmos; Owner: -
+--
+
+CREATE TABLE v1_cosmos.token (
+    id bigint NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    coingecko_id text NOT NULL,
+    denomination text,
+    token_name text,
+    chain_id integer,
+    decimals smallint
+);
+
+
+--
+-- Name: TABLE token; Type: COMMENT; Schema: v1_cosmos; Owner: -
+--
+
+COMMENT ON TABLE v1_cosmos.token IS 'contains the onchain representation of a token on babylon, aswell as the full token name and the coingecko id';
+
+
+--
+-- Name: token_prices; Type: TABLE; Schema: v1_cosmos; Owner: -
+--
+
+CREATE TABLE v1_cosmos.token_prices (
+    id bigint NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    price numeric,
+    last_updated_at numeric,
+    token text
 );
 
 
@@ -3630,16 +3394,80 @@ CREATE VIEW v1_cosmos.historic_pool_yield AS
 
 
 --
+-- Name: materialized_pools; Type: MATERIALIZED VIEW; Schema: v1_cosmos; Owner: -
+--
+
+CREATE MATERIALIZED VIEW v1_cosmos.materialized_pools AS
+ WITH create_pair AS (
+         SELECT (public.attributes(events.*) ->> 'action'::text) AS action,
+            (public.attributes(events.*) ->> 'pair'::text) AS pair,
+            (public.attributes(events.*) ->> '_contract_address'::text) AS factory_address,
+            (public.attributes(events.*) ->> 'msg_index'::text) AS msg_index,
+            events.chain_id AS internal_chain_id,
+            events.block_hash,
+            events.height,
+            events.index,
+            events."time" AS "timestamp",
+            events.transaction_hash,
+            events.transaction_index,
+            NULL::integer AS transaction_event_index,
+            events.data
+           FROM v1_cosmos.events
+          WHERE ((events.data ->> 'type'::text) = 'wasm-create_pair'::text)
+        ), register AS (
+         SELECT (public.attributes(events.*) ->> 'action'::text) AS action,
+            (public.attributes(events.*) ->> 'pair_contract_addr'::text) AS pair_contract_addr,
+            (public.attributes(events.*) ->> '_contract_address'::text) AS factory_address,
+            (public.attributes(events.*) ->> 'msg_index'::text) AS msg_index,
+            events.chain_id AS internal_chain_id,
+            events.block_hash,
+            events.height,
+            events.index,
+            events."time" AS "timestamp",
+            events.transaction_hash,
+            events.transaction_index,
+            NULL::integer AS transaction_event_index,
+            events.data
+           FROM v1_cosmos.events
+          WHERE ((events.data ->> 'type'::text) = 'wasm-register'::text)
+        )
+ SELECT split_part(cp.pair, '-'::text, 1) AS token0,
+    split_part(cp.pair, '-'::text, 2) AS token1,
+    r.pair_contract_addr AS pool_address,
+    (cp.msg_index)::integer AS msg_index,
+    cp.internal_chain_id,
+    cp.block_hash,
+    cp.height,
+    cp.index AS create_index,
+    r.index AS register_index,
+    cp."timestamp",
+    cp.transaction_hash,
+    cp.transaction_index AS create_transaction_index,
+    r.transaction_index AS register_transaction_index
+   FROM (create_pair cp
+     JOIN register r ON ((cp.transaction_hash = r.transaction_hash)))
+  WITH NO DATA;
+
+
+--
 -- Name: materialized_add_liquidity; Type: MATERIALIZED VIEW; Schema: v1_cosmos; Owner: -
 --
 
 CREATE MATERIALIZED VIEW v1_cosmos.materialized_add_liquidity AS
  SELECT (public.attributes(events.*) ->> 'sender'::text) AS sender,
     (public.attributes(events.*) ->> 'receiver'::text) AS receiver,
-    regexp_replace(split_part((public.attributes(events.*) ->> 'assets'::text), ', '::text, 1), '^\d+'::text, ''::text) AS token0_denom,
-    ((regexp_matches((public.attributes(events.*) ->> 'assets'::text), '^\d+'::text))[1])::numeric AS token0_amount,
-    regexp_replace(split_part((public.attributes(events.*) ->> 'assets'::text), ', '::text, 2), '^\d+'::text, ''::text) AS token1_denom,
-    ((regexp_matches(split_part((public.attributes(events.*) ->> 'assets'::text), ', '::text, 2), '^\d+'::text))[1])::numeric AS token1_amount,
+    materialized_pools.token0 AS token0_denom,
+        CASE
+            WHEN (regexp_replace(split_part((public.attributes(events.*) ->> 'assets'::text), ', '::text, 1), '^\d+'::text, ''::text) = materialized_pools.token0) THEN ("substring"(split_part((public.attributes(events.*) ->> 'assets'::text), ', '::text, 1), '^\d+'::text))::numeric
+            WHEN (regexp_replace(split_part((public.attributes(events.*) ->> 'assets'::text), ', '::text, 2), '^\d+'::text, ''::text) = materialized_pools.token0) THEN ("substring"(split_part((public.attributes(events.*) ->> 'assets'::text), ', '::text, 2), '^\d+'::text))::numeric
+            ELSE NULL::numeric
+        END AS token0_amount,
+    materialized_pools.token1 AS token1_denom,
+        CASE
+            WHEN (regexp_replace(split_part((public.attributes(events.*) ->> 'assets'::text), ', '::text, 1), '^\d+'::text, ''::text) = materialized_pools.token1) THEN ("substring"(split_part((public.attributes(events.*) ->> 'assets'::text), ', '::text, 1), '^\d+'::text))::numeric
+            WHEN (regexp_replace(split_part((public.attributes(events.*) ->> 'assets'::text), ', '::text, 2), '^\d+'::text, ''::text) = materialized_pools.token1) THEN ("substring"(split_part((public.attributes(events.*) ->> 'assets'::text), ', '::text, 2), '^\d+'::text))::numeric
+            ELSE NULL::numeric
+        END AS token1_amount,
     ((public.attributes(events.*) ->> 'share'::text))::numeric AS share,
     (public.attributes(events.*) ->> '_contract_address'::text) AS pool_address,
     ((public.attributes(events.*) ->> 'msg_index'::text))::integer AS msg_index,
@@ -3651,141 +3479,25 @@ CREATE MATERIALIZED VIEW v1_cosmos.materialized_add_liquidity AS
     events.transaction_hash,
     events.transaction_index,
     events.data
-   FROM v1_cosmos.events
+   FROM (v1_cosmos.events
+     JOIN v1_cosmos.materialized_pools ON ((materialized_pools.pool_address = (public.attributes(events.*) ->> '_contract_address'::text))))
   WHERE ((events.data ->> 'type'::text) = 'wasm-provide_liquidity'::text)
   WITH NO DATA;
 
 
 --
--- Name: materialized_historic_pool_yield; Type: MATERIALIZED VIEW; Schema: v1_cosmos; Owner: -
+-- Name: materialized_add_liquidity_totals; Type: MATERIALIZED VIEW; Schema: v1_cosmos; Owner: -
 --
 
-CREATE MATERIALIZED VIEW v1_cosmos.materialized_historic_pool_yield AS
- WITH block_data AS (
-         SELECT b.height,
-            b."time" AS "timestamp",
-            lead(b."time") OVER (ORDER BY b.height) AS next_timestamp,
-            lead(b.height) OVER (ORDER BY b.height) AS next_height
-           FROM v1_cosmos.blocks b
-        ), token_prices_by_block AS (
-         SELECT bd_1.height,
-            bd_1."timestamp",
-            bd_1.next_timestamp,
-            bd_1.next_height,
-            EXTRACT(epoch FROM (bd_1.next_timestamp - bd_1."timestamp")) AS seconds_between_blocks,
-            t.denomination,
-            tp.price,
-            t.decimals
-           FROM (((block_data bd_1
-             CROSS JOIN LATERAL ( SELECT DISTINCT token_prices.token
-                   FROM v1_cosmos.token_prices) d)
-             LEFT JOIN LATERAL ( SELECT token_prices.token,
-                    token_prices.price
-                   FROM v1_cosmos.token_prices
-                  WHERE (token_prices.token = d.token)
-                  ORDER BY (abs(EXTRACT(epoch FROM (bd_1."timestamp" - token_prices.created_at))))
-                 LIMIT 1) tp ON (true))
-             LEFT JOIN v1_cosmos.token t ON ((tp.token = t.token_name)))
-          WHERE (bd_1.next_height IS NOT NULL)
-        ), block_fees AS (
-         SELECT s.height,
-            s.pool_address,
-            s.ask_asset AS fee_token_denom,
-            sum(s.commission_amount) AS fee_amount,
-            (sum(((s.commission_amount)::double precision / power((10)::double precision, (COALESCE((tp.decimals)::integer, 6))::double precision))) * (COALESCE(tp.price, (0)::numeric))::double precision) AS fees_usd
-           FROM (v1_cosmos.swap s
-             LEFT JOIN token_prices_by_block tp ON (((s.height = tp.height) AND (s.ask_asset = tp.denomination))))
-          GROUP BY s.height, s.pool_address, s.ask_asset, tp.price, tp.decimals
-        ), block_incentives AS (
-         SELECT bp.height,
-            i.lp_token,
-            i.reward AS incentive_token_denom,
-            sum((i.rewards_per_second * tp.seconds_between_blocks)) AS incentive_amount,
-            (sum((((i.rewards_per_second * tp.seconds_between_blocks))::double precision / power((10)::double precision, (COALESCE((tp.decimals)::integer, 6))::double precision))) * (COALESCE(tp.price, (0)::numeric))::double precision) AS incentives_usd
-           FROM ((block_data bp
-             JOIN v1_cosmos.incentivize i ON ((((i.start_ts)::numeric <= EXTRACT(epoch FROM bp."timestamp")) AND ((i.end_ts)::numeric >= EXTRACT(epoch FROM bp."timestamp")))))
-             LEFT JOIN token_prices_by_block tp ON (((bp.height = tp.height) AND (i.reward = tp.denomination))))
-          GROUP BY bp.height, i.lp_token, i.reward, tp.seconds_between_blocks, tp.price, tp.decimals
-        ), pool_info AS (
-         SELECT DISTINCT pool_balance.pool_address,
-            ((pool_balance.token0_denom || ':'::text) || pool_balance.token1_denom) AS lp_token
-           FROM v1_cosmos.pool_balance
-        ), pool_liquidity AS (
-         SELECT h.height,
-            a.pool_address,
-            a.token0_denom,
-            a.token1_denom,
-            a.token0_balance,
-            a.token1_balance,
-            (((a.token0_balance)::double precision / power((10)::double precision, (COALESCE((tp0.decimals)::integer, 6))::double precision)) * (COALESCE(tp0.price, (0)::numeric))::double precision) AS token0_value_usd,
-            (((a.token1_balance)::double precision / power((10)::double precision, (COALESCE((tp1.decimals)::integer, 6))::double precision)) * (COALESCE(tp1.price, (0)::numeric))::double precision) AS token1_value_usd,
-            ((((a.token0_balance)::double precision / power((10)::double precision, (COALESCE((tp0.decimals)::integer, 6))::double precision)) * (COALESCE(tp0.price, (0)::numeric))::double precision) + (((a.token1_balance)::double precision / power((10)::double precision, (COALESCE((tp1.decimals)::integer, 6))::double precision)) * (COALESCE(tp1.price, (0)::numeric))::double precision)) AS total_liquidity_usd
-           FROM (((v1_cosmos.blocks h
-             JOIN v1_cosmos.pool_balance a ON ((h.height = a.height)))
-             LEFT JOIN token_prices_by_block tp0 ON (((h.height = tp0.height) AND (a.token0_denom = tp0.denomination))))
-             LEFT JOIN token_prices_by_block tp1 ON (((h.height = tp1.height) AND (a.token1_denom = tp1.denomination))))
-        ), total_fees_by_pool AS (
-         SELECT block_fees.height,
-            block_fees.pool_address,
-            json_agg(json_build_object('denom', block_fees.fee_token_denom, 'amount', block_fees.fee_amount, 'usd_value', block_fees.fees_usd)) AS fee_tokens,
-            sum(block_fees.fees_usd) AS total_fees_usd
-           FROM block_fees
-          GROUP BY block_fees.height, block_fees.pool_address
-        ), total_incentives_by_pool AS (
-         SELECT bi.height,
-            pi.pool_address,
-            json_agg(json_build_object('denom', bi.incentive_token_denom, 'amount', bi.incentive_amount, 'usd_value', bi.incentives_usd)) AS incentive_tokens,
-            sum(bi.incentives_usd) AS total_incentives_usd
-           FROM (block_incentives bi
-             LEFT JOIN pool_info pi ON ((bi.lp_token = pi.lp_token)))
-          GROUP BY bi.height, pi.pool_address
-        )
- SELECT bd.height,
-    bd."timestamp",
-    pl.pool_address,
-    pl.token0_denom,
-    pl.token1_denom,
-    pl.token0_balance,
-    pl.token1_balance,
-    pl.token0_value_usd,
-    pl.token1_value_usd,
-    pl.total_liquidity_usd,
-    tf.fee_tokens,
-    COALESCE(tf.total_fees_usd, (0)::double precision) AS fees_usd,
-    ti.incentive_tokens,
-    COALESCE(ti.total_incentives_usd, (0)::double precision) AS incentives_usd,
-    (COALESCE(tf.total_fees_usd, (0)::double precision) + COALESCE(ti.total_incentives_usd, (0)::double precision)) AS total_earnings_usd
-   FROM (((block_data bd
-     JOIN pool_liquidity pl ON ((bd.height = pl.height)))
-     LEFT JOIN total_fees_by_pool tf ON (((bd.height = tf.height) AND (pl.pool_address = tf.pool_address))))
-     LEFT JOIN total_incentives_by_pool ti ON (((bd.height = ti.height) AND (pl.pool_address = ti.pool_address))))
-  WHERE (bd.next_height IS NOT NULL)
-  ORDER BY bd.height, pl.pool_address
-  WITH NO DATA;
-
-
---
--- Name: materialized_incentivize; Type: MATERIALIZED VIEW; Schema: v1_cosmos; Owner: -
---
-
-CREATE MATERIALIZED VIEW v1_cosmos.materialized_incentivize AS
- SELECT (public.attributes(events.*) ->> 'lp_token'::text) AS lp_token,
-    ((public.attributes(events.*) ->> 'start_ts'::text))::bigint AS start_ts,
-    ((public.attributes(events.*) ->> 'end_ts'::text))::bigint AS end_ts,
-    (public.attributes(events.*) ->> 'reward'::text) AS reward,
-    ((public.attributes(events.*) ->> 'rps'::text))::numeric AS rewards_per_second,
-    ((public.attributes(events.*) ->> 'msg_index'::text))::integer AS msg_index,
-    events.chain_id AS internal_chain_id,
-    events.block_hash,
-    events.height,
-    events.index,
-    events."time" AS "timestamp",
-    events.transaction_hash,
-    events.transaction_index,
-    NULL::integer AS transaction_event_index,
-    events.data
-   FROM v1_cosmos.events
-  WHERE ((events.data ->> 'type'::text) = 'wasm-incentivize'::text)
+CREATE MATERIALIZED VIEW v1_cosmos.materialized_add_liquidity_totals AS
+ SELECT materialized_add_liquidity.pool_address,
+    materialized_add_liquidity.token0_denom,
+    sum(materialized_add_liquidity.token0_amount) OVER (PARTITION BY materialized_add_liquidity.pool_address, materialized_add_liquidity.token0_denom ORDER BY materialized_add_liquidity.height) AS total_token0_added,
+    materialized_add_liquidity.token1_denom,
+    sum(materialized_add_liquidity.token1_amount) OVER (PARTITION BY materialized_add_liquidity.pool_address, materialized_add_liquidity.token1_denom ORDER BY materialized_add_liquidity.height) AS total_token1_added,
+    sum(materialized_add_liquidity.share) OVER (PARTITION BY materialized_add_liquidity.pool_address ORDER BY materialized_add_liquidity.height) AS total_share_added,
+    materialized_add_liquidity.height
+   FROM v1_cosmos.materialized_add_liquidity
   WITH NO DATA;
 
 
@@ -3851,67 +3563,167 @@ CREATE MATERIALIZED VIEW v1_cosmos.materialized_withdraw_liquidity AS
 
 
 --
+-- Name: materialized_all_heights; Type: MATERIALIZED VIEW; Schema: v1_cosmos; Owner: -
+--
+
+CREATE MATERIALIZED VIEW v1_cosmos.materialized_all_heights AS
+ SELECT DISTINCT all_events.pool_address,
+    all_events.height
+   FROM ( SELECT materialized_add_liquidity.pool_address,
+            materialized_add_liquidity.height
+           FROM v1_cosmos.materialized_add_liquidity
+        UNION ALL
+         SELECT materialized_withdraw_liquidity.pool_address,
+            materialized_withdraw_liquidity.height
+           FROM v1_cosmos.materialized_withdraw_liquidity
+        UNION ALL
+         SELECT materialized_swap.pool_address,
+            materialized_swap.height
+           FROM v1_cosmos.materialized_swap) all_events
+  WITH NO DATA;
+
+
+--
+-- Name: materialized_block_data; Type: MATERIALIZED VIEW; Schema: v1_cosmos; Owner: -
+--
+
+CREATE MATERIALIZED VIEW v1_cosmos.materialized_block_data AS
+ SELECT b.height,
+    b."time" AS "timestamp",
+    lead(b."time") OVER (ORDER BY b.height) AS next_timestamp,
+    lead(b.height) OVER (ORDER BY b.height) AS next_height
+   FROM v1_cosmos.blocks b
+  WITH NO DATA;
+
+
+--
+-- Name: token_prices_by_block; Type: TABLE; Schema: v1_cosmos; Owner: -
+--
+
+CREATE TABLE v1_cosmos.token_prices_by_block (
+    height bigint NOT NULL,
+    "timestamp" timestamp with time zone NOT NULL,
+    next_timestamp timestamp with time zone NOT NULL,
+    next_height bigint NOT NULL,
+    seconds_between_blocks numeric NOT NULL,
+    denomination text NOT NULL,
+    price numeric NOT NULL,
+    decimals smallint NOT NULL,
+    token_name text NOT NULL
+);
+
+
+--
+-- Name: materialized_block_fees; Type: MATERIALIZED VIEW; Schema: v1_cosmos; Owner: -
+--
+
+CREATE MATERIALIZED VIEW v1_cosmos.materialized_block_fees AS
+ SELECT s.height,
+    s.pool_address,
+    s.ask_asset AS fee_token_denom,
+    sum(s.commission_amount) AS fee_amount,
+    (sum(((s.commission_amount)::double precision / power((10)::double precision, (COALESCE((tp.decimals)::integer, 6))::double precision))) * (COALESCE(tp.price, (0)::numeric))::double precision) AS fees_usd
+   FROM (v1_cosmos.materialized_swap s
+     LEFT JOIN v1_cosmos.token_prices_by_block tp ON (((s.height = tp.height) AND (s.ask_asset = tp.denomination))))
+  GROUP BY s.height, s.pool_address, s.ask_asset, tp.price, tp.decimals
+  WITH NO DATA;
+
+
+--
+-- Name: materialized_incentivize; Type: MATERIALIZED VIEW; Schema: v1_cosmos; Owner: -
+--
+
+CREATE MATERIALIZED VIEW v1_cosmos.materialized_incentivize AS
+ SELECT (public.attributes(events.*) ->> 'lp_token'::text) AS lp_token,
+    ((public.attributes(events.*) ->> 'start_ts'::text))::bigint AS start_ts,
+    ((public.attributes(events.*) ->> 'end_ts'::text))::bigint AS end_ts,
+    (public.attributes(events.*) ->> 'reward'::text) AS reward,
+    ((public.attributes(events.*) ->> 'rps'::text))::numeric AS rewards_per_second,
+    ((public.attributes(events.*) ->> 'msg_index'::text))::integer AS msg_index,
+    events.chain_id AS internal_chain_id,
+    events.block_hash,
+    events.height,
+    events.index,
+    events."time" AS "timestamp",
+    events.transaction_hash,
+    events.transaction_index,
+    NULL::integer AS transaction_event_index,
+    events.data
+   FROM v1_cosmos.events
+  WHERE ((events.data ->> 'type'::text) = 'wasm-incentivize'::text)
+  WITH NO DATA;
+
+
+--
+-- Name: materialized_block_incentives; Type: MATERIALIZED VIEW; Schema: v1_cosmos; Owner: -
+--
+
+CREATE MATERIALIZED VIEW v1_cosmos.materialized_block_incentives AS
+ SELECT bp.height,
+    i.lp_token,
+    i.reward AS incentive_token_denom,
+    sum((i.rewards_per_second * tp.seconds_between_blocks)) AS incentive_amount,
+    (sum((((i.rewards_per_second * tp.seconds_between_blocks))::double precision / power((10)::double precision, (COALESCE((tp.decimals)::integer, 6))::double precision))) * (COALESCE(tp.price, (0)::numeric))::double precision) AS incentives_usd
+   FROM ((v1_cosmos.materialized_block_data bp
+     JOIN v1_cosmos.materialized_incentivize i ON ((((i.start_ts)::numeric <= EXTRACT(epoch FROM bp."timestamp")) AND ((i.end_ts)::numeric >= EXTRACT(epoch FROM bp."timestamp")))))
+     LEFT JOIN v1_cosmos.token_prices_by_block tp ON (((bp.height = tp.height) AND (i.reward = tp.denomination))))
+  GROUP BY bp.height, i.lp_token, i.reward, tp.seconds_between_blocks, tp.price, tp.decimals
+  WITH NO DATA;
+
+
+--
+-- Name: materialized_swap_totals; Type: MATERIALIZED VIEW; Schema: v1_cosmos; Owner: -
+--
+
+CREATE MATERIALIZED VIEW v1_cosmos.materialized_swap_totals AS
+ WITH swap_impact AS (
+         SELECT s_1.pool_address,
+            s_1.height,
+                CASE
+                    WHEN (s_1.offer_asset = p.token0) THEN s_1.offer_amount
+                    WHEN (s_1.ask_asset = p.token0) THEN (((s_1.return_amount * ('-1'::integer)::numeric) - COALESCE(s_1.fee_share_amount, (0)::numeric)) - COALESCE(s_1.maker_fee_amount, (0)::numeric))
+                    ELSE (0)::numeric
+                END AS token0_swap_impact,
+                CASE
+                    WHEN (s_1.offer_asset = p.token1) THEN s_1.offer_amount
+                    WHEN (s_1.ask_asset = p.token1) THEN (((s_1.return_amount * ('-1'::integer)::numeric) - COALESCE(s_1.fee_share_amount, (0)::numeric)) - COALESCE(s_1.maker_fee_amount, (0)::numeric))
+                    ELSE (0)::numeric
+                END AS token1_swap_impact
+           FROM (v1_cosmos.materialized_swap s_1
+             JOIN ( SELECT DISTINCT materialized_pools.pool_address,
+                    materialized_pools.token0,
+                    materialized_pools.token1
+                   FROM v1_cosmos.materialized_pools) p ON ((s_1.pool_address = p.pool_address)))
+        )
+ SELECT swap_impact.pool_address,
+    sum(swap_impact.token0_swap_impact) OVER (PARTITION BY swap_impact.pool_address ORDER BY swap_impact.height) AS total_token0_swap_impact,
+    sum(swap_impact.token1_swap_impact) OVER (PARTITION BY swap_impact.pool_address ORDER BY swap_impact.height) AS total_token1_swap_impact,
+    swap_impact.height
+   FROM swap_impact
+  WITH NO DATA;
+
+
+--
+-- Name: materialized_withdraw_liquidity_totals; Type: MATERIALIZED VIEW; Schema: v1_cosmos; Owner: -
+--
+
+CREATE MATERIALIZED VIEW v1_cosmos.materialized_withdraw_liquidity_totals AS
+ SELECT materialized_withdraw_liquidity.pool_address,
+    materialized_withdraw_liquidity.token0_denom,
+    sum(materialized_withdraw_liquidity.token0_amount) OVER (PARTITION BY materialized_withdraw_liquidity.pool_address, materialized_withdraw_liquidity.token0_denom ORDER BY materialized_withdraw_liquidity.height) AS total_token0_withdrawn,
+    materialized_withdraw_liquidity.token1_denom,
+    sum(materialized_withdraw_liquidity.token1_amount) OVER (PARTITION BY materialized_withdraw_liquidity.pool_address, materialized_withdraw_liquidity.token1_denom ORDER BY materialized_withdraw_liquidity.height) AS total_token1_withdrawn,
+    sum(materialized_withdraw_liquidity.share) OVER (PARTITION BY materialized_withdraw_liquidity.pool_address ORDER BY materialized_withdraw_liquidity.height) AS total_share_withdrawn,
+    materialized_withdraw_liquidity.height
+   FROM v1_cosmos.materialized_withdraw_liquidity
+  WITH NO DATA;
+
+
+--
 -- Name: materialized_pool_balance; Type: MATERIALIZED VIEW; Schema: v1_cosmos; Owner: -
 --
 
 CREATE MATERIALIZED VIEW v1_cosmos.materialized_pool_balance AS
- WITH all_heights AS (
-         SELECT DISTINCT all_events.pool_address,
-            all_events.height
-           FROM ( SELECT materialized_add_liquidity.pool_address,
-                    materialized_add_liquidity.height
-                   FROM v1_cosmos.materialized_add_liquidity
-                UNION ALL
-                 SELECT materialized_withdraw_liquidity.pool_address,
-                    materialized_withdraw_liquidity.height
-                   FROM v1_cosmos.materialized_withdraw_liquidity
-                UNION ALL
-                 SELECT materialized_swap.pool_address,
-                    materialized_swap.height
-                   FROM v1_cosmos.materialized_swap) all_events
-        ), add_liquidity AS (
-         SELECT materialized_add_liquidity.pool_address,
-            materialized_add_liquidity.token0_denom,
-            sum(materialized_add_liquidity.token0_amount) OVER (PARTITION BY materialized_add_liquidity.pool_address, materialized_add_liquidity.token0_denom ORDER BY materialized_add_liquidity.height) AS total_token0_added,
-            materialized_add_liquidity.token1_denom,
-            sum(materialized_add_liquidity.token1_amount) OVER (PARTITION BY materialized_add_liquidity.pool_address, materialized_add_liquidity.token1_denom ORDER BY materialized_add_liquidity.height) AS total_token1_added,
-            sum(materialized_add_liquidity.share) OVER (PARTITION BY materialized_add_liquidity.pool_address ORDER BY materialized_add_liquidity.height) AS total_share_added,
-            materialized_add_liquidity.height
-           FROM v1_cosmos.materialized_add_liquidity
-        ), withdraw_liquidity AS (
-         SELECT materialized_withdraw_liquidity.pool_address,
-            materialized_withdraw_liquidity.token0_denom,
-            sum(materialized_withdraw_liquidity.token0_amount) OVER (PARTITION BY materialized_withdraw_liquidity.pool_address, materialized_withdraw_liquidity.token0_denom ORDER BY materialized_withdraw_liquidity.height) AS total_token0_withdrawn,
-            materialized_withdraw_liquidity.token1_denom,
-            sum(materialized_withdraw_liquidity.token1_amount) OVER (PARTITION BY materialized_withdraw_liquidity.pool_address, materialized_withdraw_liquidity.token1_denom ORDER BY materialized_withdraw_liquidity.height) AS total_token1_withdrawn,
-            sum(materialized_withdraw_liquidity.share) OVER (PARTITION BY materialized_withdraw_liquidity.pool_address ORDER BY materialized_withdraw_liquidity.height) AS total_share_withdrawn,
-            materialized_withdraw_liquidity.height
-           FROM v1_cosmos.materialized_withdraw_liquidity
-        ), swap_impact AS (
-         SELECT s_1.pool_address,
-            s_1.height,
-                CASE
-                    WHEN (s_1.offer_asset = p.token0_denom) THEN s_1.offer_amount
-                    WHEN (s_1.ask_asset = p.token0_denom) THEN ((s_1.return_amount * ('-1'::integer)::numeric) - COALESCE(s_1.fee_share_amount, (0)::numeric))
-                    ELSE (0)::numeric
-                END AS token0_swap_impact,
-                CASE
-                    WHEN (s_1.offer_asset = p.token1_denom) THEN s_1.offer_amount
-                    WHEN (s_1.ask_asset = p.token1_denom) THEN ((s_1.return_amount * ('-1'::integer)::numeric) - COALESCE(s_1.fee_share_amount, (0)::numeric))
-                    ELSE (0)::numeric
-                END AS token1_swap_impact
-           FROM (v1_cosmos.materialized_swap s_1
-             JOIN ( SELECT DISTINCT materialized_add_liquidity.pool_address,
-                    materialized_add_liquidity.token0_denom,
-                    materialized_add_liquidity.token1_denom
-                   FROM v1_cosmos.materialized_add_liquidity) p ON ((s_1.pool_address = p.pool_address)))
-        ), swap_totals AS (
-         SELECT swap_impact.pool_address,
-            sum(swap_impact.token0_swap_impact) OVER (PARTITION BY swap_impact.pool_address ORDER BY swap_impact.height) AS total_token0_swap_impact,
-            sum(swap_impact.token1_swap_impact) OVER (PARTITION BY swap_impact.pool_address ORDER BY swap_impact.height) AS total_token1_swap_impact,
-            swap_impact.height
-           FROM swap_impact
-        )
  SELECT h.pool_address,
     a.token0_denom,
     ((COALESCE(a.total_token0_added, (0)::numeric) - COALESCE(w.total_token0_withdrawn, (0)::numeric)) + COALESCE(s.total_token0_swap_impact, (0)::numeric)) AS token0_balance,
@@ -3919,16 +3731,345 @@ CREATE MATERIALIZED VIEW v1_cosmos.materialized_pool_balance AS
     ((COALESCE(a.total_token1_added, (0)::numeric) - COALESCE(w.total_token1_withdrawn, (0)::numeric)) + COALESCE(s.total_token1_swap_impact, (0)::numeric)) AS token1_balance,
     (COALESCE(a.total_share_added, (0)::numeric) - COALESCE(w.total_share_withdrawn, (0)::numeric)) AS share,
     h.height
-   FROM (((all_heights h
-     LEFT JOIN add_liquidity a ON (((h.pool_address = a.pool_address) AND (h.height >= a.height) AND (a.height = ( SELECT max(add_liquidity.height) AS max
-           FROM add_liquidity
-          WHERE ((add_liquidity.pool_address = h.pool_address) AND (add_liquidity.height <= h.height)))))))
-     LEFT JOIN withdraw_liquidity w ON (((h.pool_address = w.pool_address) AND (h.height >= w.height) AND (w.height = ( SELECT max(withdraw_liquidity.height) AS max
-           FROM withdraw_liquidity
-          WHERE ((withdraw_liquidity.pool_address = h.pool_address) AND (withdraw_liquidity.height <= h.height)))))))
-     LEFT JOIN swap_totals s ON (((h.pool_address = s.pool_address) AND (h.height >= s.height) AND (s.height = ( SELECT max(swap_totals.height) AS max
-           FROM swap_totals
-          WHERE ((swap_totals.pool_address = h.pool_address) AND (swap_totals.height <= h.height)))))))
+   FROM (((v1_cosmos.materialized_all_heights h
+     LEFT JOIN LATERAL ( SELECT a_1.pool_address,
+            a_1.token0_denom,
+            a_1.total_token0_added,
+            a_1.token1_denom,
+            a_1.total_token1_added,
+            a_1.total_share_added,
+            a_1.height
+           FROM v1_cosmos.materialized_add_liquidity_totals a_1
+          WHERE ((a_1.pool_address = h.pool_address) AND (a_1.height <= h.height))
+          ORDER BY a_1.height DESC
+         LIMIT 1) a ON (true))
+     LEFT JOIN LATERAL ( SELECT w_1.pool_address,
+            w_1.token0_denom,
+            w_1.total_token0_withdrawn,
+            w_1.token1_denom,
+            w_1.total_token1_withdrawn,
+            w_1.total_share_withdrawn,
+            w_1.height
+           FROM v1_cosmos.materialized_withdraw_liquidity_totals w_1
+          WHERE ((w_1.pool_address = h.pool_address) AND (w_1.height <= h.height))
+          ORDER BY w_1.height DESC
+         LIMIT 1) w ON (true))
+     LEFT JOIN LATERAL ( SELECT s_1.pool_address,
+            s_1.total_token0_swap_impact,
+            s_1.total_token1_swap_impact,
+            s_1.height
+           FROM v1_cosmos.materialized_swap_totals s_1
+          WHERE ((s_1.pool_address = h.pool_address) AND (s_1.height <= h.height))
+          ORDER BY s_1.height DESC
+         LIMIT 1) s ON (true))
+  WITH NO DATA;
+
+
+--
+-- Name: materialized_pool_fee_totals; Type: MATERIALIZED VIEW; Schema: v1_cosmos; Owner: -
+--
+
+CREATE MATERIALIZED VIEW v1_cosmos.materialized_pool_fee_totals AS
+ SELECT materialized_block_fees.height,
+    materialized_block_fees.pool_address,
+    json_agg(json_build_object('denom', materialized_block_fees.fee_token_denom, 'amount', materialized_block_fees.fee_amount, 'usd_value', materialized_block_fees.fees_usd)) AS fee_tokens,
+    sum(materialized_block_fees.fees_usd) AS total_fees_usd
+   FROM v1_cosmos.materialized_block_fees
+  GROUP BY materialized_block_fees.height, materialized_block_fees.pool_address
+  WITH NO DATA;
+
+
+--
+-- Name: materialized_pool_incentive_totals; Type: MATERIALIZED VIEW; Schema: v1_cosmos; Owner: -
+--
+
+CREATE MATERIALIZED VIEW v1_cosmos.materialized_pool_incentive_totals AS
+ WITH pool_info AS (
+         SELECT DISTINCT pool_lp_token.pool AS pool_address,
+            pool_lp_token.lp_token
+           FROM v1_cosmos.pool_lp_token
+        )
+ SELECT bi.height,
+    pi.pool_address,
+    json_agg(json_build_object('denom', bi.incentive_token_denom, 'amount', bi.incentive_amount, 'usd_value', bi.incentives_usd)) AS incentive_tokens,
+    sum(bi.incentives_usd) AS total_incentives_usd
+   FROM (v1_cosmos.materialized_block_incentives bi
+     JOIN pool_info pi ON ((bi.lp_token = pi.lp_token)))
+  GROUP BY bi.height, pi.pool_address
+  WITH NO DATA;
+
+
+--
+-- Name: materialized_pool_liquidity; Type: MATERIALIZED VIEW; Schema: v1_cosmos; Owner: -
+--
+
+CREATE MATERIALIZED VIEW v1_cosmos.materialized_pool_liquidity AS
+ SELECT h.height,
+    a.pool_address,
+    a.token0_denom,
+    a.token1_denom,
+    a.token0_balance,
+    a.token1_balance,
+    (((a.token0_balance)::double precision / power((10)::double precision, (COALESCE((tp0.decimals)::integer, 6))::double precision)) * (COALESCE(tp0.price, (0)::numeric))::double precision) AS token0_value_usd,
+    (((a.token1_balance)::double precision / power((10)::double precision, (COALESCE((tp1.decimals)::integer, 6))::double precision)) * (COALESCE(tp1.price, (0)::numeric))::double precision) AS token1_value_usd,
+    ((((a.token0_balance)::double precision / power((10)::double precision, (COALESCE((tp0.decimals)::integer, 6))::double precision)) * (COALESCE(tp0.price, (0)::numeric))::double precision) + (((a.token1_balance)::double precision / power((10)::double precision, (COALESCE((tp1.decimals)::integer, 6))::double precision)) * (COALESCE(tp1.price, (0)::numeric))::double precision)) AS total_liquidity_usd
+   FROM (((v1_cosmos.blocks h
+     JOIN v1_cosmos.materialized_pool_balance a ON ((h.height = a.height)))
+     LEFT JOIN v1_cosmos.token_prices_by_block tp0 ON (((h.height = tp0.height) AND (a.token0_denom = tp0.denomination))))
+     LEFT JOIN v1_cosmos.token_prices_by_block tp1 ON (((h.height = tp1.height) AND (a.token1_denom = tp1.denomination))))
+  WITH NO DATA;
+
+
+--
+-- Name: materialized_historic_pool_yield; Type: MATERIALIZED VIEW; Schema: v1_cosmos; Owner: -
+--
+
+CREATE MATERIALIZED VIEW v1_cosmos.materialized_historic_pool_yield AS
+ SELECT bd.height,
+    bd."timestamp",
+    pl.pool_address,
+    pl.token0_denom,
+    pl.token1_denom,
+    pl.token0_balance,
+    pl.token1_balance,
+    pl.token0_value_usd,
+    pl.token1_value_usd,
+    pl.total_liquidity_usd,
+    tf.fee_tokens,
+    COALESCE(tf.total_fees_usd, (0)::double precision) AS fees_usd,
+    ti.incentive_tokens,
+    COALESCE(ti.total_incentives_usd, (0)::double precision) AS incentives_usd,
+    (COALESCE(tf.total_fees_usd, (0)::double precision) + COALESCE(ti.total_incentives_usd, (0)::double precision)) AS total_earnings_usd
+   FROM (((v1_cosmos.materialized_block_data bd
+     JOIN v1_cosmos.materialized_pool_liquidity pl ON ((bd.height = pl.height)))
+     LEFT JOIN v1_cosmos.materialized_pool_fee_totals tf ON (((bd.height = tf.height) AND (pl.pool_address = tf.pool_address))))
+     LEFT JOIN v1_cosmos.materialized_pool_incentive_totals ti ON (((bd.height = ti.height) AND (pl.pool_address = ti.pool_address))))
+  WHERE (bd.next_height IS NOT NULL)
+  ORDER BY bd.height, pl.pool_address
+  WITH NO DATA;
+
+
+--
+-- Name: pool_incentive_multipliers; Type: TABLE; Schema: v1_cosmos; Owner: -
+--
+
+CREATE TABLE v1_cosmos.pool_incentive_multipliers (
+    id bigint NOT NULL,
+    pool_address text NOT NULL,
+    origin text NOT NULL,
+    multiplier numeric NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: TABLE pool_incentive_multipliers; Type: COMMENT; Schema: v1_cosmos; Owner: -
+--
+
+COMMENT ON TABLE v1_cosmos.pool_incentive_multipliers IS 'tracks the pool incentive multipliers by their origin (partner)';
+
+
+--
+-- Name: materialized_points; Type: MATERIALIZED VIEW; Schema: v1_cosmos; Owner: -
+--
+
+CREATE MATERIALIZED VIEW v1_cosmos.materialized_points AS
+ WITH poolincentivemultiplierdefinitions AS (
+         SELECT mp.pool_address,
+            json_object_agg(pim.origin, pim.multiplier) AS incentive_multipliers
+           FROM (v1_cosmos.materialized_pools mp
+             JOIN v1_cosmos.pool_incentive_multipliers pim ON ((mp.pool_address = pim.pool_address)))
+          GROUP BY mp.pool_address
+        ), hourlyavgprices AS (
+         SELECT tpb.denomination,
+            date_trunc('hour'::text, tpb."timestamp") AS hour,
+            avg(tpb.price) AS hourly_avg_price,
+            min(tpb.height) AS start_height,
+            max(tpb.height) AS end_height
+           FROM v1_cosmos.token_prices_by_block tpb
+          GROUP BY tpb.denomination, (date_trunc('hour'::text, tpb."timestamp"))
+        ), hourlyliquidityadds AS (
+         SELECT al.sender AS user_wallet,
+            al.pool_address,
+            al.token0_denom,
+            al.token1_denom,
+            date_trunc('hour'::text, al."timestamp") AS hour,
+            sum(al.token0_amount) AS token0_amount,
+            sum(al.token1_amount) AS token1_amount,
+            min(al.height) AS start_height,
+            max(al.height) AS end_height
+           FROM v1_cosmos.materialized_add_liquidity al
+          GROUP BY al.sender, al.pool_address, al.token0_denom, al.token1_denom, (date_trunc('hour'::text, al."timestamp"))
+        ), hourlliquiditytotaladds AS (
+         SELECT hal.user_wallet,
+            hal.pool_address,
+            hal.token0_denom,
+            hal.token1_denom,
+            hal.hour,
+            sum(hal.token0_amount) OVER (PARTITION BY hal.user_wallet, hal.pool_address ORDER BY hal.hour) AS cumulative_token0_amount_added,
+            sum(hal.token1_amount) OVER (PARTITION BY hal.user_wallet, hal.pool_address ORDER BY hal.hour) AS cumulative_token1_amount_added
+           FROM hourlyliquidityadds hal
+        ), hourlyliquiditysubs AS (
+         SELECT wl.receiver AS user_wallet,
+            wl.pool_address,
+            wl.token0_denom,
+            wl.token1_denom,
+            date_trunc('hour'::text, wl."timestamp") AS hour,
+            sum(wl.token0_amount) AS token0_amount,
+            sum(wl.token1_amount) AS token1_amount,
+            min(wl.height) AS start_height,
+            max(wl.height) AS end_height
+           FROM v1_cosmos.materialized_withdraw_liquidity wl
+          GROUP BY wl.receiver, wl.pool_address, wl.token0_denom, wl.token1_denom, (date_trunc('hour'::text, wl."timestamp"))
+        ), hourlyliquiditytotalsubs AS (
+         SELECT hwl.user_wallet,
+            hwl.pool_address,
+            hwl.token0_denom,
+            hwl.token1_denom,
+            hwl.hour,
+            sum(hwl.token0_amount) OVER (PARTITION BY hwl.user_wallet, hwl.pool_address ORDER BY hwl.hour) AS cumulative_token0_amount_withdrawn,
+            sum(hwl.token1_amount) OVER (PARTITION BY hwl.user_wallet, hwl.pool_address ORDER BY hwl.hour) AS cumulative_token1_amount_withdrawn
+           FROM hourlyliquiditysubs hwl
+        ), combinedhourlyliquidityprices AS (
+         SELECT all_hours.user_wallet,
+            all_hours.pool_address,
+            all_hours.hour,
+            all_hours.token0_denom,
+            all_hours.token1_denom,
+            COALESCE(hal.cumulative_token0_amount_added, (0)::numeric) AS cumulative_token0_amount_added,
+            COALESCE(hal.cumulative_token1_amount_added, (0)::numeric) AS cumulative_token1_amount_added,
+            COALESCE(hwl.cumulative_token0_amount_withdrawn, (0)::numeric) AS cumulative_token0_amount_withdrawn,
+            COALESCE(hwl.cumulative_token1_amount_withdrawn, (0)::numeric) AS cumulative_token1_amount_withdrawn
+           FROM ((( SELECT base_data.user_wallet,
+                    base_data.pool_address,
+                    all_hours_1.hour,
+                    base_data.token0_denom,
+                    base_data.token1_denom
+                   FROM (( SELECT DISTINCT hourlliquiditytotaladds.user_wallet,
+                            hourlliquiditytotaladds.pool_address,
+                            hourlliquiditytotaladds.token0_denom,
+                            hourlliquiditytotaladds.token1_denom
+                           FROM hourlliquiditytotaladds
+                        UNION
+                         SELECT DISTINCT hourlyliquiditytotalsubs.user_wallet,
+                            hourlyliquiditytotalsubs.pool_address,
+                            hourlyliquiditytotalsubs.token0_denom,
+                            hourlyliquiditytotalsubs.token1_denom
+                           FROM hourlyliquiditytotalsubs) base_data
+                     CROSS JOIN ( SELECT DISTINCT hourlyavgprices.hour
+                           FROM hourlyavgprices) all_hours_1)) all_hours
+             LEFT JOIN hourlliquiditytotaladds hal ON (((all_hours.user_wallet = hal.user_wallet) AND (all_hours.pool_address = hal.pool_address) AND (all_hours.hour = hal.hour) AND (all_hours.token0_denom = hal.token0_denom) AND (all_hours.token1_denom = hal.token1_denom))))
+             LEFT JOIN hourlyliquiditytotalsubs hwl ON (((all_hours.user_wallet = hwl.user_wallet) AND (all_hours.pool_address = hwl.pool_address) AND (all_hours.hour = hwl.hour) AND (all_hours.token0_denom = hwl.token0_denom) AND (all_hours.token1_denom = hwl.token1_denom))))
+        ), hourlyusdliquidity AS (
+         SELECT chl.user_wallet,
+            chl.pool_address,
+            chl.hour,
+            chl.token0_denom,
+            chl.token1_denom,
+            chl.cumulative_token0_amount_added,
+            chl.cumulative_token0_amount_withdrawn,
+            (chl.cumulative_token0_amount_added - chl.cumulative_token0_amount_withdrawn) AS net_cumulative_token0_amount,
+            ((((chl.cumulative_token0_amount_added - chl.cumulative_token0_amount_withdrawn))::double precision / power((10)::double precision, (t0.decimals)::double precision)) * (hap0.hourly_avg_price)::double precision) AS net_usd_cumulative_token0_amount,
+            sum((chl.cumulative_token0_amount_added - chl.cumulative_token0_amount_withdrawn)) OVER (PARTITION BY chl.user_wallet, chl.pool_address ORDER BY chl.hour) AS net_token0_amount,
+            hap0.hourly_avg_price AS t0_hourly_avg_price,
+            (((sum((chl.cumulative_token0_amount_added - chl.cumulative_token0_amount_withdrawn)) OVER (PARTITION BY chl.user_wallet, chl.pool_address ORDER BY chl.hour))::double precision / power((10)::double precision, (t0.decimals)::double precision)) * (hap0.hourly_avg_price)::double precision) AS net_usd_token0_amount,
+            chl.cumulative_token1_amount_added,
+            chl.cumulative_token1_amount_withdrawn,
+            (chl.cumulative_token1_amount_added - chl.cumulative_token1_amount_withdrawn) AS net_cumulative_token1_amount,
+            hap1.hourly_avg_price,
+            ((((chl.cumulative_token1_amount_added - chl.cumulative_token1_amount_withdrawn))::double precision / power((10)::double precision, (t1.decimals)::double precision)) * (hap1.hourly_avg_price)::double precision) AS net_usd_cumulative_token1_amount,
+            sum((chl.cumulative_token1_amount_added - chl.cumulative_token1_amount_withdrawn)) OVER (PARTITION BY chl.user_wallet, chl.pool_address ORDER BY chl.hour) AS net_token1_amount,
+            hap1.hourly_avg_price AS t1_hourly_avg_price,
+            (((sum((chl.cumulative_token1_amount_added - chl.cumulative_token1_amount_withdrawn)) OVER (PARTITION BY chl.user_wallet, chl.pool_address ORDER BY chl.hour))::double precision / power((10)::double precision, (t1.decimals)::double precision)) * (hap1.hourly_avg_price)::double precision) AS net_usd_token1_amount
+           FROM ((((combinedhourlyliquidityprices chl
+             JOIN hourlyavgprices hap0 ON (((chl.hour = hap0.hour) AND (hap0.denomination = chl.token0_denom))))
+             JOIN hourlyavgprices hap1 ON (((chl.hour = hap1.hour) AND (hap1.denomination = chl.token1_denom))))
+             JOIN v1_cosmos.token t0 ON ((t0.denomination = chl.token0_denom)))
+             JOIN v1_cosmos.token t1 ON ((t1.denomination = chl.token1_denom)))
+        ), hourlypointscalculation AS (
+         SELECT hul.user_wallet,
+            hul.pool_address,
+            hul.hour,
+            hul.token0_denom,
+            hul.token1_denom,
+            COALESCE((hul.net_usd_token0_amount + hul.net_usd_token0_amount), (0)::double precision) AS total_usd_amount,
+            json_build_object('tower', (GREATEST((0)::double precision, ((hul.net_usd_token0_amount + hul.net_usd_token1_amount) * (0.001)::double precision)) * (COALESCE(((pim.incentive_multipliers ->> 'tower'::text))::numeric, (0)::numeric))::double precision), 'escher', (GREATEST((0)::double precision, ((hul.net_usd_token0_amount + hul.net_usd_token1_amount) * (0.001)::double precision)) * (COALESCE(((pim.incentive_multipliers ->> 'escher'::text))::numeric, (0)::numeric))::double precision), 'union', (GREATEST((0)::double precision, ((hul.net_usd_token0_amount + hul.net_usd_token1_amount) * (0.001)::double precision)) * (COALESCE(((pim.incentive_multipliers ->> 'union'::text))::numeric, (0)::numeric))::double precision), 'satlayer', (GREATEST((0)::double precision, ((hul.net_usd_token0_amount + hul.net_usd_token1_amount) * (0.001)::double precision)) * (COALESCE(((pim.incentive_multipliers ->> 'satlayer'::text))::numeric, (0)::numeric))::double precision)) AS points
+           FROM (hourlyusdliquidity hul
+             JOIN poolincentivemultiplierdefinitions pim ON ((hul.pool_address = pim.pool_address)))
+        ), finalliqduititypointscalculation AS (
+         SELECT hpc.user_wallet,
+            hpc.pool_address,
+            rank() OVER (ORDER BY (sum(((hpc.points ->> 'tower'::text))::numeric)) DESC) AS liquidity_points_rank,
+            sum(((hpc.points ->> 'tower'::text))::numeric) AS total_tower_points,
+            sum(((hpc.points ->> 'escher'::text))::numeric) AS total_escher_points,
+            sum(((hpc.points ->> 'union'::text))::numeric) AS total_union_points,
+            sum(((hpc.points ->> 'satlayer'::text))::numeric) AS total_satlayer_points
+           FROM hourlypointscalculation hpc
+          GROUP BY hpc.user_wallet, hpc.pool_address
+        ), hourlyswaps AS (
+         SELECT s.receiver AS user_wallet,
+            s.pool_address,
+            s.ask_asset,
+            date_trunc('hour'::text, s."timestamp") AS hour,
+            sum((s.fee_share_amount + s.maker_fee_amount)) AS cumulative_fee_amount
+           FROM v1_cosmos.materialized_swap s
+          GROUP BY s.receiver, s.pool_address, s.ask_asset, (date_trunc('hour'::text, s."timestamp"))
+        ), combinedhourlyswapprices AS (
+         SELECT hourlyswaps.user_wallet,
+            hourlyswaps.pool_address,
+            hourlyswaps.ask_asset,
+            hourlyswaps.hour,
+            hourlyswaps.cumulative_fee_amount,
+            all_hours.c_hour
+           FROM (hourlyswaps
+             CROSS JOIN ( SELECT DISTINCT hourlyavgprices.hour AS c_hour
+                   FROM hourlyavgprices) all_hours)
+        ), hourlyswappointscalculation AS (
+         SELECT hsw.user_wallet,
+            hsw.pool_address,
+            hap.hour,
+            hsw.ask_asset,
+            sum((((hsw.cumulative_fee_amount * hap.hourly_avg_price))::double precision / power((10)::double precision, (t.decimals)::double precision))) AS hourly_swap_points
+           FROM ((combinedhourlyswapprices hsw
+             JOIN hourlyavgprices hap ON (((hap.hour = hsw.c_hour) AND (hsw.ask_asset = hap.denomination))))
+             JOIN v1_cosmos.token t ON ((t.denomination = hsw.ask_asset)))
+          GROUP BY hsw.user_wallet, hsw.pool_address, hap.hour, hsw.ask_asset
+        ), finalswappointscalculation AS (
+         SELECT hsp.user_wallet,
+            hsp.pool_address,
+            rank() OVER (ORDER BY (sum(hsp.hourly_swap_points)) DESC) AS swap_points_rank,
+            sum(hsp.hourly_swap_points) AS total_swap_points
+           FROM hourlyswappointscalculation hsp
+          GROUP BY hsp.user_wallet, hsp.pool_address
+        ), combinedpoints AS (
+         SELECT COALESCE(lpc.user_wallet, spc.user_wallet) AS user_wallet,
+            COALESCE(lpc.pool_address, spc.pool_address) AS pool_address,
+            COALESCE(lpc.total_tower_points, (0)::numeric) AS total_tower_points,
+            COALESCE(lpc.total_escher_points, (0)::numeric) AS total_escher_points,
+            COALESCE(lpc.total_union_points, (0)::numeric) AS total_union_points,
+            COALESCE(lpc.total_satlayer_points, (0)::numeric) AS total_satlayer_points,
+            COALESCE(spc.total_swap_points, (0)::double precision) AS total_swap_points,
+            spc.swap_points_rank,
+            lpc.liquidity_points_rank
+           FROM (finalliqduititypointscalculation lpc
+             FULL JOIN finalswappointscalculation spc ON (((lpc.user_wallet = spc.user_wallet) AND (lpc.pool_address = spc.pool_address))))
+        ), totalpoints AS (
+         SELECT combinedpoints.user_wallet AS address,
+            sum(combinedpoints.total_tower_points) AS lping_points,
+            sum(combinedpoints.total_swap_points) AS swapping_points,
+            ((sum(combinedpoints.total_tower_points))::double precision + sum(combinedpoints.total_swap_points)) AS total_points,
+            rank() OVER (ORDER BY ((sum(combinedpoints.total_tower_points))::double precision + sum(combinedpoints.total_swap_points)) DESC) AS rank
+           FROM combinedpoints
+          GROUP BY combinedpoints.user_wallet
+          ORDER BY (rank() OVER (ORDER BY ((sum(combinedpoints.total_tower_points))::double precision + sum(combinedpoints.total_swap_points)) DESC))
+        )
+ SELECT totalpoints.address,
+    totalpoints.lping_points,
+    totalpoints.swapping_points,
+    totalpoints.total_points,
+    totalpoints.rank
+   FROM totalpoints
   WITH NO DATA;
 
 
@@ -4047,73 +4188,50 @@ CREATE MATERIALIZED VIEW v1_cosmos.materialized_pool_user_shares AS
 
 
 --
--- Name: materialized_pools; Type: MATERIALIZED VIEW; Schema: v1_cosmos; Owner: -
+-- Name: pool_incentive_multipliers_id_seq; Type: SEQUENCE; Schema: v1_cosmos; Owner: -
 --
 
-CREATE MATERIALIZED VIEW v1_cosmos.materialized_pools AS
- WITH create_pair AS (
-         SELECT (public.attributes(events.*) ->> 'action'::text) AS action,
-            (public.attributes(events.*) ->> 'pair'::text) AS pair,
-            (public.attributes(events.*) ->> '_contract_address'::text) AS factory_address,
-            (public.attributes(events.*) ->> 'msg_index'::text) AS msg_index,
-            events.chain_id AS internal_chain_id,
-            events.block_hash,
-            events.height,
-            events.index,
-            events."time" AS "timestamp",
-            events.transaction_hash,
-            events.transaction_index,
-            NULL::integer AS transaction_event_index,
-            events.data
-           FROM v1_cosmos.events
-          WHERE ((events.data ->> 'type'::text) = 'wasm-create_pair'::text)
-        ), register AS (
-         SELECT (public.attributes(events.*) ->> 'action'::text) AS action,
-            (public.attributes(events.*) ->> 'pair_contract_addr'::text) AS pair_contract_addr,
-            (public.attributes(events.*) ->> '_contract_address'::text) AS factory_address,
-            (public.attributes(events.*) ->> 'msg_index'::text) AS msg_index,
-            events.chain_id AS internal_chain_id,
-            events.block_hash,
-            events.height,
-            events.index,
-            events."time" AS "timestamp",
-            events.transaction_hash,
-            events.transaction_index,
-            NULL::integer AS transaction_event_index,
-            events.data
-           FROM v1_cosmos.events
-          WHERE ((events.data ->> 'type'::text) = 'wasm-register'::text)
-        )
- SELECT split_part(cp.pair, '-'::text, 1) AS token0,
-    split_part(cp.pair, '-'::text, 2) AS token1,
-    r.pair_contract_addr AS pool_address,
-    (cp.msg_index)::integer AS msg_index,
-    cp.internal_chain_id,
-    cp.block_hash,
-    cp.height,
-    cp.index AS create_index,
-    r.index AS register_index,
-    cp."timestamp",
-    cp.transaction_hash,
-    cp.transaction_index AS create_transaction_index,
-    r.transaction_index AS register_transaction_index
-   FROM (create_pair cp
-     JOIN register r ON ((cp.transaction_hash = r.transaction_hash)))
-  WITH NO DATA;
-
-
---
--- Name: pool_lp_tokens_id_seq; Type: SEQUENCE; Schema: v1_cosmos; Owner: -
---
-
-ALTER TABLE v1_cosmos.pool_lp_token ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
-    SEQUENCE NAME v1_cosmos.pool_lp_tokens_id_seq
+ALTER TABLE v1_cosmos.pool_incentive_multipliers ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME v1_cosmos.pool_incentive_multipliers_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1
 );
+
+
+--
+-- Name: pool_lp_token_id_seq; Type: SEQUENCE; Schema: v1_cosmos; Owner: -
+--
+
+ALTER TABLE v1_cosmos.pool_lp_token ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME v1_cosmos.pool_lp_token_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: pool_lp_tokens_id_seq; Type: SEQUENCE; Schema: v1_cosmos; Owner: -
+--
+
+CREATE SEQUENCE v1_cosmos.pool_lp_tokens_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: pool_lp_tokens_id_seq; Type: SEQUENCE OWNED BY; Schema: v1_cosmos; Owner: -
+--
+
+ALTER SEQUENCE v1_cosmos.pool_lp_tokens_id_seq OWNED BY v1_cosmos.pool_lp_token.id;
 
 
 --
@@ -4228,58 +4346,29 @@ CREATE VIEW v1_cosmos.pool_user_shares AS
 
 
 --
--- Name: pools; Type: VIEW; Schema: v1_cosmos; Owner: -
+-- Name: referrals; Type: TABLE; Schema: v1_cosmos; Owner: -
 --
 
-CREATE VIEW v1_cosmos.pools AS
- WITH create_pair AS (
-         SELECT (public.attributes(events.*) ->> 'action'::text) AS action,
-            (public.attributes(events.*) ->> 'pair'::text) AS pair,
-            (public.attributes(events.*) ->> '_contract_address'::text) AS factory_address,
-            (public.attributes(events.*) ->> 'msg_index'::text) AS msg_index,
-            events.chain_id AS internal_chain_id,
-            events.block_hash,
-            events.height,
-            events.index,
-            events."time" AS "timestamp",
-            events.transaction_hash,
-            events.transaction_index,
-            NULL::integer AS transaction_event_index,
-            events.data
-           FROM v1_cosmos.events
-          WHERE ((events.data ->> 'type'::text) = 'wasm-create_pair'::text)
-        ), register AS (
-         SELECT (public.attributes(events.*) ->> 'action'::text) AS action,
-            (public.attributes(events.*) ->> 'pair_contract_addr'::text) AS pair_contract_addr,
-            (public.attributes(events.*) ->> '_contract_address'::text) AS factory_address,
-            (public.attributes(events.*) ->> 'msg_index'::text) AS msg_index,
-            events.chain_id AS internal_chain_id,
-            events.block_hash,
-            events.height,
-            events.index,
-            events."time" AS "timestamp",
-            events.transaction_hash,
-            events.transaction_index,
-            NULL::integer AS transaction_event_index,
-            events.data
-           FROM v1_cosmos.events
-          WHERE ((events.data ->> 'type'::text) = 'wasm-register'::text)
-        )
- SELECT split_part(cp.pair, '-'::text, 1) AS token0,
-    split_part(cp.pair, '-'::text, 2) AS token1,
-    r.pair_contract_addr AS pool_address,
-    (cp.msg_index)::integer AS msg_index,
-    cp.internal_chain_id,
-    cp.block_hash,
-    cp.height,
-    cp.index AS create_index,
-    r.index AS register_index,
-    cp."timestamp",
-    cp.transaction_hash,
-    cp.transaction_index AS create_transaction_index,
-    r.transaction_index AS register_transaction_index
-   FROM (create_pair cp
-     JOIN register r ON ((cp.transaction_hash = r.transaction_hash)));
+CREATE TABLE v1_cosmos.referrals (
+    id bigint NOT NULL,
+    referred_user_wallet_address text NOT NULL,
+    referred_by_user_wallet_address text NOT NULL,
+    created_at timestamp with time zone DEFAULT now()
+);
+
+
+--
+-- Name: referrals_id_seq; Type: SEQUENCE; Schema: v1_cosmos; Owner: -
+--
+
+ALTER TABLE v1_cosmos.referrals ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME v1_cosmos.referrals_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
 
 
 --
@@ -4332,508 +4421,29 @@ COMMENT ON TABLE v1_cosmos.transactions IS 'DEPRECATED: use V1';
 
 
 --
--- Name: logs_sync; Type: TABLE; Schema: v1_evm; Owner: -
+-- Name: user_referral_codes; Type: TABLE; Schema: v1_cosmos; Owner: -
 --
 
-CREATE TABLE v1_evm.logs_sync (
-    internal_chain_id integer,
-    block_hash text,
-    height bigint,
-    log_index integer,
-    "timestamp" timestamp with time zone,
-    transaction_hash text,
-    transaction_index integer,
-    transaction_log_index integer,
-    raw_log jsonb,
-    log_to_jsonb jsonb
+CREATE TABLE v1_cosmos.user_referral_codes (
+    id bigint NOT NULL,
+    user_wallet_address text NOT NULL,
+    referral_code character varying(8) NOT NULL,
+    created_at timestamp with time zone DEFAULT now()
 );
 
 
 --
--- Name: acknowledge_packet; Type: VIEW; Schema: v1_evm; Owner: -
+-- Name: user_referral_codes_id_seq; Type: SEQUENCE; Schema: v1_cosmos; Owner: -
 --
 
-CREATE VIEW v1_evm.acknowledge_packet AS
- SELECT (evm.log_to_jsonb ->> 'name'::text) AS name,
-    ((evm.log_to_jsonb -> 'data'::text) -> 'packet'::text) AS packet,
-    ((((evm.log_to_jsonb -> 'data'::text) -> 'packet'::text) ->> 'sequence'::text))::bigint AS sequence,
-    (((evm.log_to_jsonb -> 'data'::text) -> 'packet'::text) ->> 'source_port'::text) AS source_port,
-    (((evm.log_to_jsonb -> 'data'::text) -> 'packet'::text) ->> 'source_channel'::text) AS source_channel,
-    (((((evm.log_to_jsonb -> 'data'::text) -> 'packet'::text) -> 'timeout_height'::text) ->> 'revision_height'::text))::bigint AS timeout_revision_height,
-    (((((evm.log_to_jsonb -> 'data'::text) -> 'packet'::text) -> 'timeout_height'::text) ->> 'revision_number'::text))::integer AS timeout_revision_number,
-    (((evm.log_to_jsonb -> 'data'::text) -> 'packet'::text) ->> 'destination_port'::text) AS destination_port,
-    ((((evm.log_to_jsonb -> 'data'::text) -> 'packet'::text) ->> 'timeout_timestamp'::text))::numeric AS timeout_timestamp,
-    (((evm.log_to_jsonb -> 'data'::text) -> 'packet'::text) ->> 'destination_channel'::text) AS destination_channel,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'acknowledgement'::text) AS acknowledgement,
-    evm.internal_chain_id,
-    evm.block_hash,
-    evm.height,
-    evm.log_index,
-    evm."timestamp",
-    evm.transaction_hash,
-    evm.transaction_index,
-    evm.transaction_log_index,
-    evm.raw_log,
-    evm.log_to_jsonb
-   FROM v1_evm.logs_sync evm
-  WHERE ((evm.log_to_jsonb ->> 'name'::text) = 'AcknowledgePacket'::text);
-
-
---
--- Name: channel_open_ack; Type: VIEW; Schema: v1_evm; Owner: -
---
-
-CREATE VIEW v1_evm.channel_open_ack AS
- SELECT (evm.log_to_jsonb ->> 'name'::text) AS name,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'portId'::text) AS port_id,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'channelId'::text) AS channel_id,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'connectionId'::text) AS connection_id,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'counterpartyPortId'::text) AS counterparty_port_id,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'counterpartyChannelId'::text) AS counterparty_channel_id,
-    evm.internal_chain_id,
-    evm.block_hash,
-    evm.height,
-    evm.log_index,
-    evm."timestamp",
-    evm.transaction_hash,
-    evm.transaction_index,
-    evm.transaction_log_index,
-    evm.raw_log,
-    evm.log_to_jsonb
-   FROM v1_evm.logs_sync evm
-  WHERE ((evm.log_to_jsonb ->> 'name'::text) = 'ChannelOpenAck'::text);
-
-
---
--- Name: channel_open_confirm; Type: VIEW; Schema: v1_evm; Owner: -
---
-
-CREATE VIEW v1_evm.channel_open_confirm AS
- SELECT (evm.log_to_jsonb ->> 'name'::text) AS name,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'portId'::text) AS port_id,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'channelId'::text) AS channel_id,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'connectionId'::text) AS connection_id,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'counterpartyPortId'::text) AS counterparty_port_id,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'counterpartyChannelId'::text) AS counterparty_channel_id,
-    evm.internal_chain_id,
-    evm.block_hash,
-    evm.height,
-    evm.log_index,
-    evm."timestamp",
-    evm.transaction_hash,
-    evm.transaction_index,
-    evm.transaction_log_index,
-    evm.raw_log,
-    evm.log_to_jsonb
-   FROM v1_evm.logs_sync evm
-  WHERE ((evm.log_to_jsonb ->> 'name'::text) = 'ChannelOpenConfirm'::text);
-
-
---
--- Name: channel_open_init; Type: VIEW; Schema: v1_evm; Owner: -
---
-
-CREATE VIEW v1_evm.channel_open_init AS
- SELECT (evm.log_to_jsonb ->> 'name'::text) AS name,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'portId'::text) AS port_id,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'channelId'::text) AS channel_id,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'connectionId'::text) AS connection_id,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'counterpartyPortId'::text) AS counterparty_port_id,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'version'::text) AS version,
-    evm.internal_chain_id,
-    evm.block_hash,
-    evm.height,
-    evm.log_index,
-    evm."timestamp",
-    evm.transaction_hash,
-    evm.transaction_index,
-    evm.transaction_log_index,
-    evm.raw_log,
-    evm.log_to_jsonb
-   FROM v1_evm.logs_sync evm
-  WHERE ((evm.log_to_jsonb ->> 'name'::text) = 'ChannelOpenInit'::text);
-
-
---
--- Name: channel_open_try; Type: VIEW; Schema: v1_evm; Owner: -
---
-
-CREATE VIEW v1_evm.channel_open_try AS
- SELECT (evm.log_to_jsonb ->> 'name'::text) AS name,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'portId'::text) AS port_id,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'version'::text) AS version,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'channelId'::text) AS channel_id,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'connectionId'::text) AS connection_id,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'counterpartyPortId'::text) AS counterparty_port_id,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'counterpartyChannelId'::text) AS counterparty_channel_id,
-    evm.internal_chain_id,
-    evm.block_hash,
-    evm.height,
-    evm.log_index,
-    evm."timestamp",
-    evm.transaction_hash,
-    evm.transaction_index,
-    evm.transaction_log_index,
-    evm.raw_log,
-    evm.log_to_jsonb
-   FROM v1_evm.logs_sync evm
-  WHERE ((evm.log_to_jsonb ->> 'name'::text) = 'ChannelOpenTry'::text);
-
-
---
--- Name: client_created; Type: VIEW; Schema: v1_evm; Owner: -
---
-
-CREATE VIEW v1_evm.client_created AS
- SELECT (evm.log_to_jsonb ->> 'name'::text) AS name,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'clientId'::text) AS client_id,
-    evm.internal_chain_id,
-    evm.block_hash,
-    evm.height,
-    evm.log_index,
-    evm."timestamp",
-    evm.transaction_hash,
-    evm.transaction_index,
-    evm.transaction_log_index,
-    evm.raw_log,
-    evm.log_to_jsonb
-   FROM v1_evm.logs_sync evm
-  WHERE ((evm.log_to_jsonb ->> 'name'::text) = 'ClientCreated'::text);
-
-
---
--- Name: client_registered; Type: VIEW; Schema: v1_evm; Owner: -
---
-
-CREATE VIEW v1_evm.client_registered AS
- SELECT (evm.log_to_jsonb ->> 'name'::text) AS name,
-    ((evm.log_to_jsonb -> 'data'::text) -> 'clientAddress'::text) AS client_address,
-    ((evm.log_to_jsonb -> 'data'::text) -> 'clientType'::text) AS client_type,
-    evm.internal_chain_id,
-    evm.block_hash,
-    evm.height,
-    evm.log_index,
-    evm."timestamp",
-    evm.transaction_hash,
-    evm.transaction_index,
-    evm.transaction_log_index,
-    evm.raw_log,
-    evm.log_to_jsonb
-   FROM v1_evm.logs_sync evm
-  WHERE ((evm.log_to_jsonb ->> 'name'::text) = 'ClientRegistered'::text);
-
-
---
--- Name: client_updated; Type: VIEW; Schema: v1_evm; Owner: -
---
-
-CREATE VIEW v1_evm.client_updated AS
- SELECT (evm.log_to_jsonb ->> 'name'::text) AS name,
-    ((((evm.log_to_jsonb -> 'data'::text) -> 'height'::text) ->> 'revision_height'::text))::bigint AS revision_height,
-    ((((evm.log_to_jsonb -> 'data'::text) -> 'height'::text) ->> 'revision_number'::text))::integer AS revision_number,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'clientId'::text) AS client_id,
-    evm.internal_chain_id,
-    evm.block_hash,
-    evm.height,
-    evm.log_index,
-    evm."timestamp",
-    evm.transaction_hash,
-    evm.transaction_index,
-    evm.transaction_log_index,
-    evm.raw_log,
-    evm.log_to_jsonb
-   FROM v1_evm.logs_sync evm
-  WHERE ((evm.log_to_jsonb ->> 'name'::text) = 'ClientUpdated'::text);
-
-
---
--- Name: connection_open_ack; Type: VIEW; Schema: v1_evm; Owner: -
---
-
-CREATE VIEW v1_evm.connection_open_ack AS
- SELECT (evm.log_to_jsonb ->> 'name'::text) AS name,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'connectionId'::text) AS connection_id,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'clientId'::text) AS client_id,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'counterpartyConnectionId'::text) AS counterparty_connection_id,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'counterpartyClientId'::text) AS counterparty_client_id,
-    evm.internal_chain_id,
-    evm.block_hash,
-    evm.height,
-    evm.log_index,
-    evm."timestamp",
-    evm.transaction_hash,
-    evm.transaction_index,
-    evm.transaction_log_index,
-    evm.raw_log,
-    evm.log_to_jsonb
-   FROM v1_evm.logs_sync evm
-  WHERE ((evm.log_to_jsonb ->> 'name'::text) = 'ConnectionOpenAck'::text);
-
-
---
--- Name: connection_open_confirm; Type: VIEW; Schema: v1_evm; Owner: -
---
-
-CREATE VIEW v1_evm.connection_open_confirm AS
- SELECT (evm.log_to_jsonb ->> 'name'::text) AS name,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'connectionId'::text) AS connection_id,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'clientId'::text) AS client_id,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'counterpartyConnectionId'::text) AS counterparty_connection_id,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'counterpartyClientId'::text) AS counterparty_client_id,
-    evm.internal_chain_id,
-    evm.block_hash,
-    evm.height,
-    evm.log_index,
-    evm."timestamp",
-    evm.transaction_hash,
-    evm.transaction_index,
-    evm.transaction_log_index,
-    evm.raw_log,
-    evm.log_to_jsonb
-   FROM v1_evm.logs_sync evm
-  WHERE ((evm.log_to_jsonb ->> 'name'::text) = 'ConnectionOpenConfirm'::text);
-
-
---
--- Name: connection_open_init; Type: VIEW; Schema: v1_evm; Owner: -
---
-
-CREATE VIEW v1_evm.connection_open_init AS
- SELECT (evm.log_to_jsonb ->> 'name'::text) AS name,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'connectionId'::text) AS connection_id,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'clientId'::text) AS client_id,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'counterpartyClientId'::text) AS counterparty_client_id,
-    evm.internal_chain_id,
-    evm.block_hash,
-    evm.height,
-    evm.log_index,
-    evm."timestamp",
-    evm.transaction_hash,
-    evm.transaction_index,
-    evm.transaction_log_index,
-    evm.raw_log,
-    evm.log_to_jsonb
-   FROM v1_evm.logs_sync evm
-  WHERE ((evm.log_to_jsonb ->> 'name'::text) = 'ConnectionOpenInit'::text);
-
-
---
--- Name: connection_open_try; Type: VIEW; Schema: v1_evm; Owner: -
---
-
-CREATE VIEW v1_evm.connection_open_try AS
- SELECT (evm.log_to_jsonb ->> 'name'::text) AS name,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'connectionId'::text) AS connection_id,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'clientId'::text) AS client_id,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'counterpartyClientId'::text) AS counterparty_client_id,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'counterpartyConnectionId'::text) AS counterparty_connection_id,
-    evm.internal_chain_id,
-    evm.block_hash,
-    evm.height,
-    evm.log_index,
-    evm."timestamp",
-    evm.transaction_hash,
-    evm.transaction_index,
-    evm.transaction_log_index,
-    evm.raw_log,
-    evm.log_to_jsonb
-   FROM v1_evm.logs_sync evm
-  WHERE ((evm.log_to_jsonb ->> 'name'::text) = 'ConnectionOpenTry'::text);
-
-
---
--- Name: contracts; Type: TABLE; Schema: v1_evm; Owner: -
---
-
-CREATE TABLE v1_evm.contracts (
-    internal_chain_id integer NOT NULL,
-    address text NOT NULL,
-    abi text,
-    start_height bigint NOT NULL,
-    end_height bigint DEFAULT '9223372036854775807'::bigint NOT NULL,
-    version text,
-    description text,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp with time zone DEFAULT now() NOT NULL,
-    upgrade_transaction_hash text
+ALTER TABLE v1_cosmos.user_referral_codes ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME v1_cosmos.user_referral_codes_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
 );
-
-
---
--- Name: logs; Type: TABLE; Schema: v1_evm; Owner: -
---
-
-CREATE TABLE v1_evm.logs (
-    chain_id integer NOT NULL,
-    block_hash text NOT NULL,
-    height bigint NOT NULL,
-    "time" timestamp with time zone NOT NULL,
-    data jsonb NOT NULL
-);
-
-
---
--- Name: recv_packet; Type: VIEW; Schema: v1_evm; Owner: -
---
-
-CREATE VIEW v1_evm.recv_packet AS
- SELECT (evm.log_to_jsonb ->> 'name'::text) AS name,
-    ((evm.log_to_jsonb -> 'data'::text) -> 'packet'::text) AS packet,
-    (((evm.log_to_jsonb -> 'data'::text) -> 'packet'::text) ->> 'data'::text) AS data,
-    ((((evm.log_to_jsonb -> 'data'::text) -> 'packet'::text) ->> 'sequence'::text))::bigint AS sequence,
-    (((evm.log_to_jsonb -> 'data'::text) -> 'packet'::text) ->> 'source_port'::text) AS source_port,
-    (((evm.log_to_jsonb -> 'data'::text) -> 'packet'::text) ->> 'source_channel'::text) AS source_channel,
-    (((((evm.log_to_jsonb -> 'data'::text) -> 'packet'::text) -> 'timeout_height'::text) ->> 'revision_height'::text))::bigint AS timeout_revision_height,
-    (((((evm.log_to_jsonb -> 'data'::text) -> 'packet'::text) -> 'timeout_height'::text) ->> 'revision_number'::text))::integer AS timeout_revision_number,
-    (((evm.log_to_jsonb -> 'data'::text) -> 'packet'::text) ->> 'destination_port'::text) AS destination_port,
-    ((((evm.log_to_jsonb -> 'data'::text) -> 'packet'::text) ->> 'timeout_timestamp'::text))::numeric AS timeout_timestamp,
-    (((evm.log_to_jsonb -> 'data'::text) -> 'packet'::text) ->> 'destination_channel'::text) AS destination_channel,
-    evm.internal_chain_id,
-    evm.block_hash,
-    evm.height,
-    evm.log_index,
-    evm."timestamp",
-    evm.transaction_hash,
-    evm.transaction_index,
-    evm.transaction_log_index,
-    evm.raw_log,
-    evm.log_to_jsonb
-   FROM v1_evm.logs_sync evm
-  WHERE ((evm.log_to_jsonb ->> 'name'::text) = 'RecvPacket'::text);
-
-
---
--- Name: send_packet; Type: VIEW; Schema: v1_evm; Owner: -
---
-
-CREATE VIEW v1_evm.send_packet AS
- SELECT (evm.log_to_jsonb ->> 'name'::text) AS name,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'data'::text) AS data,
-    (((evm.log_to_jsonb -> 'data'::text) ->> 'sequence'::text))::bigint AS sequence,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'sourcePort'::text) AS source_port,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'sourceChannel'::text) AS source_channel,
-    ((((evm.log_to_jsonb -> 'data'::text) -> 'timeoutHeight'::text) ->> 'revision_height'::text))::bigint AS timeout_revision_height,
-    ((((evm.log_to_jsonb -> 'data'::text) -> 'timeoutHeight'::text) ->> 'revision_number'::text))::integer AS timeout_revision_number,
-    (((evm.log_to_jsonb -> 'data'::text) ->> 'timeoutTimestamp'::text))::numeric AS timeout_timestamp,
-    evm.internal_chain_id,
-    evm.block_hash,
-    evm.height,
-    evm.log_index,
-    evm."timestamp",
-    evm.transaction_hash,
-    evm.transaction_index,
-    evm.transaction_log_index,
-    evm.raw_log,
-    evm.log_to_jsonb
-   FROM v1_evm.logs_sync evm
-  WHERE ((evm.log_to_jsonb ->> 'name'::text) = 'SendPacket'::text);
-
-
---
--- Name: ucs1_denom_created; Type: VIEW; Schema: v1_evm; Owner: -
---
-
-CREATE VIEW v1_evm.ucs1_denom_created AS
- SELECT (evm.log_to_jsonb ->> 'name'::text) AS name,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'denom'::text) AS denom,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'token'::text) AS token,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'channelId'::text) AS channel_id,
-    (((evm.log_to_jsonb -> 'data'::text) ->> 'packetSequence'::text))::bigint AS packet_sequence,
-    evm.internal_chain_id,
-    evm.block_hash,
-    evm.height,
-    evm.log_index,
-    evm."timestamp",
-    evm.transaction_hash,
-    evm.transaction_index,
-    evm.transaction_log_index,
-    evm.raw_log,
-    evm.log_to_jsonb
-   FROM v1_evm.logs_sync evm
-  WHERE ((evm.log_to_jsonb ->> 'name'::text) = 'DenomCreated'::text);
-
-
---
--- Name: ucs1_received; Type: VIEW; Schema: v1_evm; Owner: -
---
-
-CREATE VIEW v1_evm.ucs1_received AS
- SELECT (evm.log_to_jsonb ->> 'name'::text) AS name,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'denom'::text) AS denom,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'token'::text) AS token,
-    (((evm.log_to_jsonb -> 'data'::text) ->> 'amount'::text))::numeric AS amount,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'sender'::text) AS sender,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'receiver'::text) AS receiver,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'channelId'::text) AS channel_id,
-    (((evm.log_to_jsonb -> 'data'::text) ->> 'packetSequence'::text))::bigint AS packet_sequence,
-    evm.internal_chain_id,
-    evm.block_hash,
-    evm.height,
-    evm.log_index,
-    evm."timestamp",
-    evm.transaction_hash,
-    evm.transaction_index,
-    evm.transaction_log_index,
-    evm.raw_log,
-    evm.log_to_jsonb
-   FROM v1_evm.logs_sync evm
-  WHERE ((evm.log_to_jsonb ->> 'name'::text) = 'Received'::text);
-
-
---
--- Name: ucs1_sent; Type: VIEW; Schema: v1_evm; Owner: -
---
-
-CREATE VIEW v1_evm.ucs1_sent AS
- SELECT (evm.log_to_jsonb ->> 'name'::text) AS name,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'denom'::text) AS denom,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'token'::text) AS token,
-    (((evm.log_to_jsonb -> 'data'::text) ->> 'amount'::text))::numeric AS amount,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'sender'::text) AS sender,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'receiver'::text) AS receiver,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'channelId'::text) AS channel_id,
-    (((evm.log_to_jsonb -> 'data'::text) ->> 'packetSequence'::text))::bigint AS packet_sequence,
-    evm.internal_chain_id,
-    evm.block_hash,
-    evm.height,
-    evm.log_index,
-    evm."timestamp",
-    evm.transaction_hash,
-    evm.transaction_index,
-    evm.transaction_log_index,
-    evm.raw_log,
-    evm.log_to_jsonb
-   FROM v1_evm.logs_sync evm
-  WHERE ((evm.log_to_jsonb ->> 'name'::text) = 'Sent'::text);
-
-
---
--- Name: write_acknowledgement; Type: VIEW; Schema: v1_evm; Owner: -
---
-
-CREATE VIEW v1_evm.write_acknowledgement AS
- SELECT (evm.log_to_jsonb ->> 'name'::text) AS name,
-    ((((evm.log_to_jsonb -> 'data'::text) -> 'packet'::text) ->> 'sequence'::text))::bigint AS sequence,
-    (((evm.log_to_jsonb -> 'data'::text) -> 'packet'::text) ->> 'destination_port'::text) AS destination_port,
-    (((evm.log_to_jsonb -> 'data'::text) -> 'packet'::text) ->> 'destination_channel'::text) AS destination_channel,
-    ((evm.log_to_jsonb -> 'data'::text) ->> 'acknowledgement'::text) AS acknowledgement,
-    (((evm.log_to_jsonb -> 'data'::text) -> 'packet'::text) ->> 'source_port'::text) AS source_port,
-    (((evm.log_to_jsonb -> 'data'::text) -> 'packet'::text) ->> 'source_channel'::text) AS source_channel,
-    ((((evm.log_to_jsonb -> 'data'::text) -> 'packet'::text) ->> 'timeout_timestamp'::text))::numeric AS timeout_timestamp,
-    (((((evm.log_to_jsonb -> 'data'::text) -> 'packet'::text) -> 'timeout_height'::text) ->> 'revision_height'::text))::bigint AS timeout_revision_height,
-    (((((evm.log_to_jsonb -> 'data'::text) -> 'packet'::text) -> 'timeout_height'::text) ->> 'revision_number'::text))::integer AS timeout_revision_number,
-    evm.internal_chain_id,
-    evm.block_hash,
-    evm.height,
-    evm.log_index,
-    evm."timestamp",
-    evm.transaction_hash,
-    evm.transaction_index,
-    evm.transaction_log_index,
-    evm.raw_log,
-    evm.log_to_jsonb
-   FROM v1_evm.logs_sync evm
-  WHERE ((evm.log_to_jsonb ->> 'name'::text) = 'WriteAcknowledgement'::text);
 
 
 --
@@ -5257,46 +4867,6 @@ ALTER TABLE ONLY supabase_migrations.seed_files
 
 
 --
--- Name: blocks blocks_pk; Type: CONSTRAINT; Schema: v1_aptos; Owner: -
---
-
-ALTER TABLE ONLY v1_aptos.blocks
-    ADD CONSTRAINT blocks_pk UNIQUE (internal_chain_id, height);
-
-
---
--- Name: blocks blocks_pkey; Type: CONSTRAINT; Schema: v1_aptos; Owner: -
---
-
-ALTER TABLE ONLY v1_aptos.blocks
-    ADD CONSTRAINT blocks_pkey PRIMARY KEY (internal_chain_id, block_hash);
-
-
---
--- Name: contracts contracts_pkey; Type: CONSTRAINT; Schema: v1_aptos; Owner: -
---
-
-ALTER TABLE ONLY v1_aptos.contracts
-    ADD CONSTRAINT contracts_pkey PRIMARY KEY (address, internal_chain_id, start_height);
-
-
---
--- Name: events events_pkey; Type: CONSTRAINT; Schema: v1_aptos; Owner: -
---
-
-ALTER TABLE ONLY v1_aptos.events
-    ADD CONSTRAINT events_pkey PRIMARY KEY (internal_chain_id, version, index);
-
-
---
--- Name: transactions transactions_pkey; Type: CONSTRAINT; Schema: v1_aptos; Owner: -
---
-
-ALTER TABLE ONLY v1_aptos.transactions
-    ADD CONSTRAINT transactions_pkey PRIMARY KEY (internal_chain_id, version);
-
-
---
 -- Name: blocks blocks_pkey; Type: CONSTRAINT; Schema: v1_cosmos; Owner: -
 --
 
@@ -5318,6 +4888,14 @@ ALTER TABLE ONLY v1_cosmos.contracts
 
 ALTER TABLE ONLY v1_cosmos.events
     ADD CONSTRAINT events_pkey PRIMARY KEY (chain_id, block_hash, index);
+
+
+--
+-- Name: pool_incentive_multipliers pool_incentive_multipliers_pkey; Type: CONSTRAINT; Schema: v1_cosmos; Owner: -
+--
+
+ALTER TABLE ONLY v1_cosmos.pool_incentive_multipliers
+    ADD CONSTRAINT pool_incentive_multipliers_pkey PRIMARY KEY (id);
 
 
 --
@@ -5345,6 +4923,22 @@ ALTER TABLE ONLY v1_cosmos.pool_lp_token
 
 
 --
+-- Name: referrals referrals_pkey; Type: CONSTRAINT; Schema: v1_cosmos; Owner: -
+--
+
+ALTER TABLE ONLY v1_cosmos.referrals
+    ADD CONSTRAINT referrals_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: referrals referrals_referred_user_wallet_address_key; Type: CONSTRAINT; Schema: v1_cosmos; Owner: -
+--
+
+ALTER TABLE ONLY v1_cosmos.referrals
+    ADD CONSTRAINT referrals_referred_user_wallet_address_key UNIQUE (referred_user_wallet_address);
+
+
+--
 -- Name: token token_denomination_key; Type: CONSTRAINT; Schema: v1_cosmos; Owner: -
 --
 
@@ -5358,6 +4952,14 @@ ALTER TABLE ONLY v1_cosmos.token
 
 ALTER TABLE ONLY v1_cosmos.token
     ADD CONSTRAINT token_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: token_prices_by_block token_prices_by_block_height_next_height_denomination_key; Type: CONSTRAINT; Schema: v1_cosmos; Owner: -
+--
+
+ALTER TABLE ONLY v1_cosmos.token_prices_by_block
+    ADD CONSTRAINT token_prices_by_block_height_next_height_denomination_key UNIQUE (height, next_height, denomination);
 
 
 --
@@ -5377,19 +4979,27 @@ ALTER TABLE ONLY v1_cosmos.transactions
 
 
 --
--- Name: contracts contracts_pkey; Type: CONSTRAINT; Schema: v1_evm; Owner: -
+-- Name: user_referral_codes user_referral_codes_pkey; Type: CONSTRAINT; Schema: v1_cosmos; Owner: -
 --
 
-ALTER TABLE ONLY v1_evm.contracts
-    ADD CONSTRAINT contracts_pkey PRIMARY KEY (internal_chain_id, address, start_height);
+ALTER TABLE ONLY v1_cosmos.user_referral_codes
+    ADD CONSTRAINT user_referral_codes_pkey PRIMARY KEY (id);
 
 
 --
--- Name: logs logs_copy_pkey; Type: CONSTRAINT; Schema: v1_evm; Owner: -
+-- Name: user_referral_codes user_referral_codes_referral_code_key; Type: CONSTRAINT; Schema: v1_cosmos; Owner: -
 --
 
-ALTER TABLE ONLY v1_evm.logs
-    ADD CONSTRAINT logs_copy_pkey PRIMARY KEY (chain_id, block_hash);
+ALTER TABLE ONLY v1_cosmos.user_referral_codes
+    ADD CONSTRAINT user_referral_codes_referral_code_key UNIQUE (referral_code);
+
+
+--
+-- Name: user_referral_codes user_referral_codes_user_wallet_address_key; Type: CONSTRAINT; Schema: v1_cosmos; Owner: -
+--
+
+ALTER TABLE ONLY v1_cosmos.user_referral_codes
+    ADD CONSTRAINT user_referral_codes_user_wallet_address_key UNIQUE (user_wallet_address);
 
 
 --
@@ -5750,76 +5360,6 @@ CREATE INDEX supabase_functions_hooks_request_id_idx ON supabase_functions.hooks
 
 
 --
--- Name: blocks_internal_chain_id_versions_index; Type: INDEX; Schema: v1_aptos; Owner: -
---
-
-CREATE INDEX blocks_internal_chain_id_versions_index ON v1_aptos.blocks USING btree (internal_chain_id, first_version, last_version);
-
-
---
--- Name: event_type_height; Type: INDEX; Schema: v1_aptos; Owner: -
---
-
-CREATE INDEX event_type_height ON v1_aptos.events USING btree (SUBSTRING(type FROM (POSITION(('::'::text) IN (type)) + 2)), height);
-
-
---
--- Name: idx_blocks_first_version; Type: INDEX; Schema: v1_aptos; Owner: -
---
-
-CREATE INDEX idx_blocks_first_version ON v1_aptos.blocks USING btree (internal_chain_id, first_version);
-
-
---
--- Name: idx_blocks_height; Type: INDEX; Schema: v1_aptos; Owner: -
---
-
-CREATE INDEX idx_blocks_height ON v1_aptos.blocks USING btree (internal_chain_id, height);
-
-
---
--- Name: idx_blocks_last_version; Type: INDEX; Schema: v1_aptos; Owner: -
---
-
-CREATE INDEX idx_blocks_last_version ON v1_aptos.blocks USING btree (internal_chain_id, last_version);
-
-
---
--- Name: idx_events_first_version; Type: INDEX; Schema: v1_aptos; Owner: -
---
-
-CREATE INDEX idx_events_first_version ON v1_aptos.events USING btree (internal_chain_id, version, transaction_event_index);
-
-
---
--- Name: idx_events_height; Type: INDEX; Schema: v1_aptos; Owner: -
---
-
-CREATE INDEX idx_events_height ON v1_aptos.events USING btree (internal_chain_id, height);
-
-
---
--- Name: idx_transactions_first_version; Type: INDEX; Schema: v1_aptos; Owner: -
---
-
-CREATE INDEX idx_transactions_first_version ON v1_aptos.transactions USING btree (internal_chain_id, version);
-
-
---
--- Name: idx_transactions_height; Type: INDEX; Schema: v1_aptos; Owner: -
---
-
-CREATE INDEX idx_transactions_height ON v1_aptos.transactions USING btree (internal_chain_id, height);
-
-
---
--- Name: idx_transactions_last_version; Type: INDEX; Schema: v1_aptos; Owner: -
---
-
-CREATE INDEX idx_transactions_last_version ON v1_aptos.transactions USING btree (internal_chain_id, transaction_hash);
-
-
---
 -- Name: blocks_height_idx; Type: INDEX; Schema: v1_cosmos; Owner: -
 --
 
@@ -5915,6 +5455,13 @@ CREATE INDEX idx_events_height_desc ON v1_cosmos.events USING btree (chain_id, h
 --
 
 CREATE INDEX idx_events_type ON v1_cosmos.events USING btree (((data ->> 'type'::text)));
+
+
+--
+-- Name: idx_malt_pool_height; Type: INDEX; Schema: v1_cosmos; Owner: -
+--
+
+CREATE INDEX idx_malt_pool_height ON v1_cosmos.materialized_add_liquidity_totals USING btree (pool_address, height);
 
 
 --
@@ -6041,34 +5588,6 @@ CREATE INDEX idx_materialized_incentivize_transaction_hash ON v1_cosmos.material
 --
 
 CREATE INDEX idx_materialized_incentivize_type ON v1_cosmos.materialized_incentivize USING btree (((data ->> 'type'::text)));
-
-
---
--- Name: idx_materialized_pool_balance_all_heights_pool_height; Type: INDEX; Schema: v1_cosmos; Owner: -
---
-
-CREATE INDEX idx_materialized_pool_balance_all_heights_pool_height ON v1_cosmos.materialized_pool_balance USING btree (pool_address, height);
-
-
---
--- Name: idx_materialized_pool_balance_join_pool_height_a; Type: INDEX; Schema: v1_cosmos; Owner: -
---
-
-CREATE INDEX idx_materialized_pool_balance_join_pool_height_a ON v1_cosmos.materialized_pool_balance USING btree (pool_address, height);
-
-
---
--- Name: idx_materialized_pool_balance_join_pool_height_s; Type: INDEX; Schema: v1_cosmos; Owner: -
---
-
-CREATE INDEX idx_materialized_pool_balance_join_pool_height_s ON v1_cosmos.materialized_pool_balance USING btree (pool_address, height);
-
-
---
--- Name: idx_materialized_pool_balance_join_pool_height_w; Type: INDEX; Schema: v1_cosmos; Owner: -
---
-
-CREATE INDEX idx_materialized_pool_balance_join_pool_height_w ON v1_cosmos.materialized_pool_balance USING btree (pool_address, height);
 
 
 --
@@ -6373,10 +5892,185 @@ CREATE INDEX idx_materialized_withdraw_liquidity_type ON v1_cosmos.materialized_
 
 
 --
+-- Name: idx_mst_pool_height; Type: INDEX; Schema: v1_cosmos; Owner: -
+--
+
+CREATE INDEX idx_mst_pool_height ON v1_cosmos.materialized_swap_totals USING btree (pool_address, height);
+
+
+--
+-- Name: idx_mwlt_pool_height; Type: INDEX; Schema: v1_cosmos; Owner: -
+--
+
+CREATE INDEX idx_mwlt_pool_height ON v1_cosmos.materialized_withdraw_liquidity_totals USING btree (pool_address, height);
+
+
+--
+-- Name: idx_pool_incentive_multipliers_pool_address_origin; Type: INDEX; Schema: v1_cosmos; Owner: -
+--
+
+CREATE INDEX idx_pool_incentive_multipliers_pool_address_origin ON v1_cosmos.pool_incentive_multipliers USING btree (pool_address, origin);
+
+
+--
 -- Name: idx_pool_lp_token_lp_token; Type: INDEX; Schema: v1_cosmos; Owner: -
 --
 
 CREATE INDEX idx_pool_lp_token_lp_token ON v1_cosmos.pool_lp_token USING btree (lp_token);
+
+
+--
+-- Name: idx_token_prices_token; Type: INDEX; Schema: v1_cosmos; Owner: -
+--
+
+CREATE INDEX idx_token_prices_token ON v1_cosmos.token_prices USING btree (token);
+
+
+--
+-- Name: idx_unique_add_liquidity_height_idx_txhash; Type: INDEX; Schema: v1_cosmos; Owner: -
+--
+
+CREATE UNIQUE INDEX idx_unique_add_liquidity_height_idx_txhash ON v1_cosmos.materialized_add_liquidity USING btree (height, index, transaction_hash);
+
+
+--
+-- Name: idx_unique_mah_pool_height; Type: INDEX; Schema: v1_cosmos; Owner: -
+--
+
+CREATE UNIQUE INDEX idx_unique_mah_pool_height ON v1_cosmos.materialized_all_heights USING btree (pool_address, height);
+
+
+--
+-- Name: idx_unique_materialized_incentivize_height_idx_txhash; Type: INDEX; Schema: v1_cosmos; Owner: -
+--
+
+CREATE UNIQUE INDEX idx_unique_materialized_incentivize_height_idx_txhash ON v1_cosmos.materialized_incentivize USING btree (height, index, transaction_hash);
+
+
+--
+-- Name: idx_unique_materialized_pool_balance_height_pool_address; Type: INDEX; Schema: v1_cosmos; Owner: -
+--
+
+CREATE UNIQUE INDEX idx_unique_materialized_pool_balance_height_pool_address ON v1_cosmos.materialized_pool_balance USING btree (height, pool_address);
+
+
+--
+-- Name: idx_unique_materialized_pools_pool_address; Type: INDEX; Schema: v1_cosmos; Owner: -
+--
+
+CREATE UNIQUE INDEX idx_unique_materialized_pools_pool_address ON v1_cosmos.materialized_pools USING btree (pool_address);
+
+
+--
+-- Name: idx_unique_mbd_height_next_height; Type: INDEX; Schema: v1_cosmos; Owner: -
+--
+
+CREATE UNIQUE INDEX idx_unique_mbd_height_next_height ON v1_cosmos.materialized_block_data USING btree (height, next_height);
+
+
+--
+-- Name: idx_unique_mbf_height_pool_address_ask_asset; Type: INDEX; Schema: v1_cosmos; Owner: -
+--
+
+CREATE UNIQUE INDEX idx_unique_mbf_height_pool_address_ask_asset ON v1_cosmos.materialized_block_fees USING btree (height, pool_address, fee_token_denom);
+
+
+--
+-- Name: idx_unique_mbi_height_lp_token_reward; Type: INDEX; Schema: v1_cosmos; Owner: -
+--
+
+CREATE UNIQUE INDEX idx_unique_mbi_height_lp_token_reward ON v1_cosmos.materialized_block_incentives USING btree (height, lp_token, incentive_token_denom);
+
+
+--
+-- Name: idx_unique_mhpy_height_pool_address_t0_denom_t1_denom; Type: INDEX; Schema: v1_cosmos; Owner: -
+--
+
+CREATE UNIQUE INDEX idx_unique_mhpy_height_pool_address_t0_denom_t1_denom ON v1_cosmos.materialized_historic_pool_yield USING btree (height, pool_address, token0_denom, token1_denom);
+
+
+--
+-- Name: idx_unique_mpft_height_pool_address; Type: INDEX; Schema: v1_cosmos; Owner: -
+--
+
+CREATE UNIQUE INDEX idx_unique_mpft_height_pool_address ON v1_cosmos.materialized_pool_fee_totals USING btree (height, pool_address);
+
+
+--
+-- Name: idx_unique_mpit_height_pool_address; Type: INDEX; Schema: v1_cosmos; Owner: -
+--
+
+CREATE UNIQUE INDEX idx_unique_mpit_height_pool_address ON v1_cosmos.materialized_pool_incentive_totals USING btree (height, pool_address);
+
+
+--
+-- Name: idx_unique_mpl_height_pool_address_t0_denom_t1_denom; Type: INDEX; Schema: v1_cosmos; Owner: -
+--
+
+CREATE UNIQUE INDEX idx_unique_mpl_height_pool_address_t0_denom_t1_denom ON v1_cosmos.materialized_pool_liquidity USING btree (height, pool_address, token0_denom, token1_denom);
+
+
+--
+-- Name: idx_unique_points_user_wallet; Type: INDEX; Schema: v1_cosmos; Owner: -
+--
+
+CREATE UNIQUE INDEX idx_unique_points_user_wallet ON v1_cosmos.materialized_points USING btree (address);
+
+
+--
+-- Name: idx_unique_stake_liquidity_height_idx_txhash; Type: INDEX; Schema: v1_cosmos; Owner: -
+--
+
+CREATE UNIQUE INDEX idx_unique_stake_liquidity_height_idx_txhash ON v1_cosmos.materialized_stake_liquidity USING btree (height, index, transaction_hash);
+
+
+--
+-- Name: idx_unique_swap_height_idx_txhash; Type: INDEX; Schema: v1_cosmos; Owner: -
+--
+
+CREATE UNIQUE INDEX idx_unique_swap_height_idx_txhash ON v1_cosmos.materialized_swap USING btree (height, index, transaction_hash);
+
+
+--
+-- Name: idx_unique_token_denomination; Type: INDEX; Schema: v1_cosmos; Owner: -
+--
+
+CREATE UNIQUE INDEX idx_unique_token_denomination ON v1_cosmos.token USING btree (denomination);
+
+
+--
+-- Name: idx_unique_token_prices_ceated_at_token; Type: INDEX; Schema: v1_cosmos; Owner: -
+--
+
+CREATE UNIQUE INDEX idx_unique_token_prices_ceated_at_token ON v1_cosmos.token_prices USING btree (created_at, token);
+
+
+--
+-- Name: idx_unique_token_token_name; Type: INDEX; Schema: v1_cosmos; Owner: -
+--
+
+CREATE UNIQUE INDEX idx_unique_token_token_name ON v1_cosmos.token USING btree (token_name);
+
+
+--
+-- Name: idx_unique_token_token_name_denomination; Type: INDEX; Schema: v1_cosmos; Owner: -
+--
+
+CREATE UNIQUE INDEX idx_unique_token_token_name_denomination ON v1_cosmos.token USING btree (token_name, denomination);
+
+
+--
+-- Name: idx_unique_unstake_liquidity_height_index_txhash; Type: INDEX; Schema: v1_cosmos; Owner: -
+--
+
+CREATE UNIQUE INDEX idx_unique_unstake_liquidity_height_index_txhash ON v1_cosmos.materialized_unstake_liquidity USING btree (height, index, transaction_hash);
+
+
+--
+-- Name: idx_unique_withdraw_liquidity_height_idx_txhash; Type: INDEX; Schema: v1_cosmos; Owner: -
+--
+
+CREATE UNIQUE INDEX idx_unique_withdraw_liquidity_height_idx_txhash ON v1_cosmos.materialized_withdraw_liquidity USING btree (height, index, transaction_hash);
 
 
 --
@@ -6387,6 +6081,20 @@ CREATE INDEX idx_user_total_shares_pool_owner ON v1_cosmos.materialized_pool_use
 
 
 --
+-- Name: referrals_referred_by_user_wallet_address_idx; Type: INDEX; Schema: v1_cosmos; Owner: -
+--
+
+CREATE INDEX referrals_referred_by_user_wallet_address_idx ON v1_cosmos.referrals USING btree (referred_by_user_wallet_address);
+
+
+--
+-- Name: referrals_referred_user_wallet_address_idx; Type: INDEX; Schema: v1_cosmos; Owner: -
+--
+
+CREATE INDEX referrals_referred_user_wallet_address_idx ON v1_cosmos.referrals USING btree (referred_user_wallet_address);
+
+
+--
 -- Name: transactions_chain_id_height; Type: INDEX; Schema: v1_cosmos; Owner: -
 --
 
@@ -6394,17 +6102,17 @@ CREATE INDEX transactions_chain_id_height ON v1_cosmos.transactions USING btree 
 
 
 --
--- Name: logs_chain_height_ids; Type: INDEX; Schema: v1_evm; Owner: -
+-- Name: user_referral_codes_referral_code_idx; Type: INDEX; Schema: v1_cosmos; Owner: -
 --
 
-CREATE UNIQUE INDEX logs_chain_height_ids ON v1_evm.logs USING btree (chain_id, height);
+CREATE INDEX user_referral_codes_referral_code_idx ON v1_cosmos.user_referral_codes USING btree (referral_code);
 
 
 --
--- Name: logs_sync_chain_id_height_index; Type: INDEX; Schema: v1_evm; Owner: -
+-- Name: user_referral_codes_user_wallet_address_idx; Type: INDEX; Schema: v1_cosmos; Owner: -
 --
 
-CREATE INDEX logs_sync_chain_id_height_index ON v1_evm.logs_sync USING btree (internal_chain_id, height DESC);
+CREATE INDEX user_referral_codes_user_wallet_address_idx ON v1_cosmos.user_referral_codes USING btree (user_wallet_address);
 
 
 --
@@ -6461,34 +6169,6 @@ CREATE TRIGGER tr_check_filters BEFORE INSERT OR UPDATE ON realtime.subscription
 --
 
 CREATE TRIGGER update_objects_updated_at BEFORE UPDATE ON storage.objects FOR EACH ROW EXECUTE FUNCTION storage.update_updated_at_column();
-
-
---
--- Name: blocks update_timestamp; Type: TRIGGER; Schema: v1_aptos; Owner: -
---
-
-CREATE TRIGGER update_timestamp BEFORE UPDATE ON v1_aptos.blocks FOR EACH ROW EXECUTE FUNCTION hubble.update_updated_at_column();
-
-
---
--- Name: contracts update_timestamp; Type: TRIGGER; Schema: v1_aptos; Owner: -
---
-
-CREATE TRIGGER update_timestamp BEFORE UPDATE ON v1_aptos.contracts FOR EACH ROW EXECUTE FUNCTION hubble.update_updated_at_column();
-
-
---
--- Name: events update_timestamp; Type: TRIGGER; Schema: v1_aptos; Owner: -
---
-
-CREATE TRIGGER update_timestamp BEFORE UPDATE ON v1_aptos.events FOR EACH ROW EXECUTE FUNCTION hubble.update_updated_at_column();
-
-
---
--- Name: transactions update_timestamp; Type: TRIGGER; Schema: v1_aptos; Owner: -
---
-
-CREATE TRIGGER update_timestamp BEFORE UPDATE ON v1_aptos.transactions FOR EACH ROW EXECUTE FUNCTION hubble.update_updated_at_column();
 
 
 --
@@ -6660,54 +6340,6 @@ ALTER TABLE ONLY storage.s3_multipart_uploads_parts
 
 
 --
--- Name: blocks blocks_internal_chain_id_fkey; Type: FK CONSTRAINT; Schema: v1_aptos; Owner: -
---
-
-ALTER TABLE ONLY v1_aptos.blocks
-    ADD CONSTRAINT blocks_internal_chain_id_fkey FOREIGN KEY (internal_chain_id) REFERENCES hubble.chains(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: contracts contracts_chain_id_fkey; Type: FK CONSTRAINT; Schema: v1_aptos; Owner: -
---
-
-ALTER TABLE ONLY v1_aptos.contracts
-    ADD CONSTRAINT contracts_chain_id_fkey FOREIGN KEY (internal_chain_id) REFERENCES hubble.chains(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: events events_internal_chain_id_fkey; Type: FK CONSTRAINT; Schema: v1_aptos; Owner: -
---
-
-ALTER TABLE ONLY v1_aptos.events
-    ADD CONSTRAINT events_internal_chain_id_fkey FOREIGN KEY (internal_chain_id) REFERENCES hubble.chains(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: events events_transactions_internal_chain_id_height_sequence_fk; Type: FK CONSTRAINT; Schema: v1_aptos; Owner: -
---
-
-ALTER TABLE ONLY v1_aptos.events
-    ADD CONSTRAINT events_transactions_internal_chain_id_height_sequence_fk FOREIGN KEY (internal_chain_id, version) REFERENCES v1_aptos.transactions(internal_chain_id, version);
-
-
---
--- Name: transactions transactions_blocks_internal_chain_id_height_fk; Type: FK CONSTRAINT; Schema: v1_aptos; Owner: -
---
-
-ALTER TABLE ONLY v1_aptos.transactions
-    ADD CONSTRAINT transactions_blocks_internal_chain_id_height_fk FOREIGN KEY (internal_chain_id, height) REFERENCES v1_aptos.blocks(internal_chain_id, height);
-
-
---
--- Name: transactions transactions_internal_chain_id_fkey; Type: FK CONSTRAINT; Schema: v1_aptos; Owner: -
---
-
-ALTER TABLE ONLY v1_aptos.transactions
-    ADD CONSTRAINT transactions_internal_chain_id_fkey FOREIGN KEY (internal_chain_id) REFERENCES hubble.chains(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
 -- Name: blocks blocks_chain_id_fkey; Type: FK CONSTRAINT; Schema: v1_cosmos; Owner: -
 --
 
@@ -6769,22 +6401,6 @@ ALTER TABLE ONLY v1_cosmos.transactions
 
 ALTER TABLE ONLY v1_cosmos.transactions
     ADD CONSTRAINT transactions_chain_id_fkey FOREIGN KEY (chain_id) REFERENCES hubble.chains(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: contracts contracts_internal_chain_id_fkey; Type: FK CONSTRAINT; Schema: v1_evm; Owner: -
---
-
-ALTER TABLE ONLY v1_evm.contracts
-    ADD CONSTRAINT contracts_internal_chain_id_fkey FOREIGN KEY (internal_chain_id) REFERENCES hubble.chains(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: logs logs_copy_chain_id_fkey; Type: FK CONSTRAINT; Schema: v1_evm; Owner: -
---
-
-ALTER TABLE ONLY v1_evm.logs
-    ADD CONSTRAINT logs_copy_chain_id_fkey FOREIGN KEY (chain_id) REFERENCES hubble.chains(id);
 
 
 --
@@ -6884,6 +6500,66 @@ ALTER TABLE auth.sso_providers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE auth.users ENABLE ROW LEVEL SECURITY;
 
 --
+-- Name: assets; Type: ROW SECURITY; Schema: hubble; Owner: -
+--
+
+ALTER TABLE hubble.assets ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: block_fix; Type: ROW SECURITY; Schema: hubble; Owner: -
+--
+
+ALTER TABLE hubble.block_fix ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: block_status; Type: ROW SECURITY; Schema: hubble; Owner: -
+--
+
+ALTER TABLE hubble.block_status ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: chains; Type: ROW SECURITY; Schema: hubble; Owner: -
+--
+
+ALTER TABLE hubble.chains ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: clients; Type: ROW SECURITY; Schema: hubble; Owner: -
+--
+
+ALTER TABLE hubble.clients ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: consensus_heights; Type: ROW SECURITY; Schema: hubble; Owner: -
+--
+
+ALTER TABLE hubble.consensus_heights ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: contract_status; Type: ROW SECURITY; Schema: hubble; Owner: -
+--
+
+ALTER TABLE hubble.contract_status ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: indexer_status; Type: ROW SECURITY; Schema: hubble; Owner: -
+--
+
+ALTER TABLE hubble.indexer_status ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: token_source_representations; Type: ROW SECURITY; Schema: hubble; Owner: -
+--
+
+ALTER TABLE hubble.token_source_representations ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: token_sources; Type: ROW SECURITY; Schema: hubble; Owner: -
+--
+
+ALTER TABLE hubble.token_sources ENABLE ROW LEVEL SECURITY;
+
+--
 -- Name: messages; Type: ROW SECURITY; Schema: realtime; Owner: -
 --
 
@@ -6920,6 +6596,24 @@ ALTER TABLE storage.s3_multipart_uploads ENABLE ROW LEVEL SECURITY;
 ALTER TABLE storage.s3_multipart_uploads_parts ENABLE ROW LEVEL SECURITY;
 
 --
+-- Name: blocks; Type: ROW SECURITY; Schema: v1_cosmos; Owner: -
+--
+
+ALTER TABLE v1_cosmos.blocks ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: contracts; Type: ROW SECURITY; Schema: v1_cosmos; Owner: -
+--
+
+ALTER TABLE v1_cosmos.contracts ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: events; Type: ROW SECURITY; Schema: v1_cosmos; Owner: -
+--
+
+ALTER TABLE v1_cosmos.events ENABLE ROW LEVEL SECURITY;
+
+--
 -- Name: pool_lp_token; Type: ROW SECURITY; Schema: v1_cosmos; Owner: -
 --
 
@@ -6936,6 +6630,12 @@ ALTER TABLE v1_cosmos.token ENABLE ROW LEVEL SECURITY;
 --
 
 ALTER TABLE v1_cosmos.token_prices ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: transactions; Type: ROW SECURITY; Schema: v1_cosmos; Owner: -
+--
+
+ALTER TABLE v1_cosmos.transactions ENABLE ROW LEVEL SECURITY;
 
 --
 -- Name: supabase_realtime; Type: PUBLICATION; Schema: -; Owner: -

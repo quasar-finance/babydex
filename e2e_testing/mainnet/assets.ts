@@ -3,6 +3,7 @@ export const USDC = "ibc/65D0BEC6DAD96C7F5043D1E54E54B6BB5D5B3AEC3FF6CEBB75B9E05
 export const BABY = "ubbn";
 export const EBABY = "bbn1s7jzz7cyuqmy5xpr07yepka5ngktexsferu2cr4xeww897ftj77sv30f5s";
 export const CBABY = "bbn17y5zvse30629t7r37xsdj73xsqp7qsdr7gpnh966wf5aslpn66rq5ekwsz";
+export const milkBABY = "ibc/CD7ECDBBA538632B45915ED67C4932DDB318818C00C21489D3774E560E87E420";
 export const SolvBTC = "ibc/2CC08A10459B40B0251B8CB9C036C98BED1ABBD5F03772E371DCD0FFDA3EC7F3";
 
 // union

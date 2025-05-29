@@ -19,6 +19,7 @@
     "@heroui/spinner": "^2.2.7",
     "@heroui/system": "^2.4.7",
     "@heroui/theme": "^2.4.6",
+    "@keplr-wallet/cosmos": "^0.12.237",
     "@skip-go/client": "^0.16.27",
     "@tabler/icons-react": "^3.31.0",
     "@tanstack/react-query": "^4.36.1",
@@ -51,6 +52,7 @@
     "zustand": "^5.0.3"
   },
   "devDependencies": {
+    "@keplr-wallet/types": "^0.12.236",
     "@towerfi/types": "workspace:^",
     "@types/react": "^18",
     "@types/react-dom": "^18",

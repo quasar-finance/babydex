@@ -12,6 +12,7 @@ import WithConnectedWallet from "../atoms/WithConnectedWallet";
 import type React from "react";
 import { useMemo } from "react";
 import Link from "next/link";
+import Referral from "../organisms/points/Referral";
 
 const GetPointsButton: React.FC<{ className: string }> = ({ className }) => (
   <Button
@@ -64,18 +65,7 @@ const Points: React.FC = () => {
           </div>
         </div>
 
-        <div className="w-full lg:w-[35%] p-4 border bg-origin-border border-white/10 rounded-2xl bg-gradient-to-r from-transparent via-transparent via-30% to-tw-orange-500/85">
-          <h2 className="text-lg font-bold mb-2">
-            Get {bpsToFloat(pointsShareBps, 2, 0)}% of frens points
-          </h2>
-          <p className="text-sm text-white/70 mb-4">
-            Invite friends and earn 20% of what they earn. They also get a{" "}
-            {bpsToFloat(inviteBoostBps, 2, 0)}%% boost on their points.
-          </p>
-          <Button size="sm" isDisabled>
-            Coming soon
-          </Button>
-        </div>
+        <Referral className="w-full lg:w-[35%]" />
       </div>
       <div className="flex flex-col my-4 gap-4 lg:px-4">
         <div className="flex flex-col-reverse lg:flex-row gap-6">

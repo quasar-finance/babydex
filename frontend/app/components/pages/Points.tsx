@@ -1,8 +1,7 @@
 "use client";
 
-import { bpsToFloat } from "~/utils/intl";
 import { Button } from "../atoms/Button";
-import { DefaultPoints, inviteBoostBps, pointsShareBps } from "~/utils/consts";
+import { DefaultPoints } from "~/utils/consts";
 import { Overview } from "../organisms/points/Overview";
 import { Leaderboard } from "../organisms/points/Leaderboard";
 import Pill from "../atoms/Pill";

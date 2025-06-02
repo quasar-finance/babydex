@@ -14,7 +14,7 @@ import { getQueryKey } from "@trpc/react-query";
 import CopyButton from "../../molecules/CopyButton";
 
 function createReferralLink(referralCode: string) {
-  return `https://app.tower.fi/ref/${referralCode}`;
+  return `${window.location.origin}/ref/${referralCode}`;
 }
 
 const Referral: React.FC<{ className: string }> = ({ className }) => {
@@ -39,7 +39,7 @@ const Referral: React.FC<{ className: string }> = ({ className }) => {
       },
     );
 
-  const { mutate: storeReferralCode, isLoading: isLoadingStoreReferralCode } =
+  const { mutate: storeReferralCodeMutation, isLoading: isLoadingStoreReferralCode } =
     trpc.edge.referral.storeReferralCode.useMutation({
       onMutate: () => {
         queryClient.cancelQueries(fetchReferralCodeKey);
@@ -53,7 +53,7 @@ const Referral: React.FC<{ className: string }> = ({ className }) => {
       },
       onSuccess: (data) => {
         if (!data.success) {
-          throw new Error("Failed to store referral code." + data.error?.message);
+          throw new Error("Failed to store referral code." + data.error);
         }
         toast.success({
           title: "Referral link created",
@@ -71,7 +71,7 @@ const Referral: React.FC<{ className: string }> = ({ className }) => {
   const signArbitrary = useSignArbitrary();
   const inputReferralCodeRef = useRef<HTMLInputElement>(null);
 
-  const generateReferralLink = useCallback(async () => {
+  const storeReferralCode = useCallback(async () => {
     if (!userAddress) {
       toast.error({
         title: "Wallet not connected",
@@ -86,7 +86,7 @@ const Referral: React.FC<{ className: string }> = ({ className }) => {
         "Please sign this message to generate your referral code.",
       );
 
-      storeReferralCode({
+      storeReferralCodeMutation({
         signedMessage: signature,
         userWalletAddress: userAddress,
       });
@@ -97,7 +97,7 @@ const Referral: React.FC<{ className: string }> = ({ className }) => {
           error.message || "An unexpected error occurred while signing your referral link.",
       });
     }
-  }, [userAddress, signArbitrary, storeReferralCode]);
+  }, [userAddress, signArbitrary, storeReferralCodeMutation]);
 
   return (
     <div
@@ -125,7 +125,7 @@ const Referral: React.FC<{ className: string }> = ({ className }) => {
             <Button
               size="sm"
               className="rounded-xl"
-              onPress={generateReferralLink}
+              onPress={storeReferralCode}
               isLoading={isLoadingStoreReferralCode}
             >
               <span className="text-sm">Create Referral Link</span>

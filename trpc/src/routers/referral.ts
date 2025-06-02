@@ -37,7 +37,7 @@ export const referralRouter = createTRPCRouter({
         signedMessage: cosmosSignedMessage,
       }),
     )
-    .query(async ({ ctx, input }) => {
+    .mutation(async ({ ctx, input }) => {
       return await ctx.referralService.handleReferral(
         input.referredUserWalletAddress,
         input.referralCode,

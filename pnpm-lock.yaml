@@ -131,6 +131,9 @@ importers:
       react-cloudflare-turnstile:
         specifier: ^1.1.5
         version: 1.1.11(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      react-confetti-explosion:
+        specifier: ^3.0.2
+        version: 3.0.2(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       react-dom:
         specifier: 19.0.0
         version: 19.0.0(react@19.0.0)
@@ -5439,6 +5442,12 @@ packages:
     peerDependencies:
       react: '>= 17.0.0'
       react-dom: '>= 17.0.0'
+
+  react-confetti-explosion@3.0.2:
+    resolution: {integrity: sha512-JfnbsdyGAwyJP1v/bvltSo/l2OZD69iVxgcuakfHzBjjbdQ+G5racHGkYLnBCWHbqhlhQTy5ca5cofFSdI4nkw==}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
 
   react-dom@19.0.0:
     resolution: {integrity: sha512-4GV5sHFG0e/0AD4X+ySy6UJd3jVl1iNsNHdpad0qhABJ11twS3TTBnseqsKurKcsNqCEFeGL3uLpVChpIO3QfQ==}
@@ -13993,6 +14002,11 @@ snapshots:
       safe-buffer: 5.2.1
 
   react-cloudflare-turnstile@1.1.11(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
+    dependencies:
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
+
+  react-confetti-explosion@3.0.2(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
     dependencies:
       react: 19.0.0
       react-dom: 19.0.0(react@19.0.0)

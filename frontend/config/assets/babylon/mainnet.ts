@@ -182,10 +182,10 @@ export const BabylonMainnetAssets = {
     bridge: ["ibc-eureka"],
   },
   "ibc/CC1095A93E3C2DF5630EC4F6A994647E58C33FCB94F4810DE6126EF4A8A9E060": {
-    symbol: "MILK",
+    symbol: "Milk",
     type: "ibc",
     denom: "ibc/CC1095A93E3C2DF5630EC4F6A994647E58C33FCB94F4810DE6126EF4A8A9E060",
-    name: "MILK",
+    name: "Milk",
     decimals: 6,
     logoURI:
       "https://raw.githubusercontent.com/cosmos/chain-registry/master/milkyway/images/milkbaby.svg",

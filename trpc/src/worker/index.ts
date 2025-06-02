@@ -28,11 +28,10 @@ interface Env {
 
 // const getOrigin = (request: Request): string => {
 //   const origin = request.headers.get("origin");
-//   return origin && allowedOrigins.includes(origin as typeof allowedOrigins[number]) 
-//     ? origin 
+//   return origin && allowedOrigins.includes(origin as typeof allowedOrigins[number])
+//     ? origin
 //     : allowedOrigins[0];
 // };
-
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
@@ -64,12 +63,9 @@ export default {
           user: env.SUPABASE_READONLY_USER,
           password: env.SUPABASE_READONLY_PASSWORD,
           database: env.SUPABASE_READONLY_DATABASE,
-          ssl: Boolean(env.SUPABASE_READONLY_SSL.toLowerCase() === 'true'),
+          ssl: Boolean(env.SUPABASE_READONLY_SSL?.toLowerCase() === "true"),
         });
-        const referralService = createReferralService(
-          env.SUPABASE_URL,
-          env.SUPABASE_KEY,
-        );
+        const referralService = createReferralService(env.SUPABASE_URL, env.SUPABASE_KEY);
         return {
           contracts: JSON.parse(env.CONTRACTS),
           cacheService,

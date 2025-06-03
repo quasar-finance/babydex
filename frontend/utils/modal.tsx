@@ -3,6 +3,7 @@ import ModalConnectBridge from "~/app/components/molecules/modals/ModalConnectBr
 import ModalConnectWallet from "~/app/components/molecules/modals/ModalConnectWallet";
 import ModalDepositCL from "~/app/components/molecules/modals/ModalDepositCL";
 import ModalDepositCompleted from "~/app/components/molecules/modals/ModalDepositComplete";
+import ModalReferralCode from "~/app/components/molecules/modals/ModalReferralCode";
 import ModalRemoveLiquidity from "~/app/components/molecules/modals/ModalRemoveLiquidity";
 import ModalSelectAddress from "~/app/components/molecules/modals/ModalSelectAddress";
 import ModalSelectAsset from "~/app/components/molecules/modals/ModalSelectAsset";
@@ -13,7 +14,7 @@ import { ModalTransactionDetails } from "~/app/components/molecules/modals/Modal
 import { ModalUnstakeLiquidity } from "~/app/components/molecules/modals/ModalUnstakeLiquidity";
 import { ModalTypes } from "~/types/modal";
 
-export const modals = {
+export const modals: Record<ModalTypes, React.FC<any>> = {
   [ModalTypes.connect_wallet]: ModalConnectWallet,
   [ModalTypes.connect_bridge]: ModalConnectBridge,
   [ModalTypes.swap_settings]: ModalSwapSettings,
@@ -27,4 +28,5 @@ export const modals = {
   [ModalTypes.stake_liquidity]: ModalStakeLiquidity,
   [ModalTypes.unstake_liquidity]: ModalUnstakeLiquidity,
   [ModalTypes.transaction_details]: ModalTransactionDetails,
+  [ModalTypes.referral_code]: ModalReferralCode,
 };

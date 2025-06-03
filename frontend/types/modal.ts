@@ -11,5 +11,6 @@ export enum ModalTypes {
   deposit_completed = "deposit-completed",
   stake_liquidity = "stake-liquidity",
   unstake_liquidity = "unstake-liquidity",
-  transaction_details = 'transaction_details',
+  transaction_details = "transaction_details",
+  referral_code = "referral_code",
 }

@@ -95,3 +95,11 @@ export interface PoolIncentive {
   start_ts: string;
   end_ts: string;
 }
+
+export interface Points {
+  address: string;
+  lping_points: number;
+  swapping_points: number;
+  total_points: number;
+  rank: number;
+}

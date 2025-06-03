@@ -5,6 +5,8 @@ dotenv.config({ path: path.resolve(__dirname, "../.env.testing") });
 
 interface ENV {
   NODE_ENV: string | undefined;
+  SUPABASE_URL: string | undefined;
+  SUPABASE_KEY: string | undefined;
   SUPABASE_HOST: string | undefined;
   SUPABASE_PORT: number | undefined;
   SUPABASE_USER: string | undefined;
@@ -15,6 +17,8 @@ interface ENV {
 
 interface Config {
   NODE_ENV: string;
+  SUPABASE_URL: string;
+  SUPABASE_KEY: string;
   SUPABASE_HOST: string;
   SUPABASE_PORT: number;
   SUPABASE_USER: string;
@@ -27,12 +31,14 @@ interface Config {
 const getConfig = (): ENV => {
   return {
     NODE_ENV: process.env.NODE_ENV,
+    SUPABASE_URL: process.env.SUPABASE_URL,
+    SUPABASE_KEY: process.env.SUPABASE_KEY,
     SUPABASE_HOST: process.env.SUPABASE_HOST,
     SUPABASE_PORT: process.env.SUPABASE_PORT ? Number(process.env.SUPABASE_PORT) : undefined,
     SUPABASE_USER: process.env.SUPABASE_USER,
     SUPABASE_PW: process.env.SUPABASE_PW,
     SUPABASE_DB: process.env.SUPABASE_DB,
-    SUPABASE_SSL: process.env.SUPABASE_SSL ? Boolean(process.env.SUPABASE_SSL) : false,
+    SUPABASE_SSL: process.env.SUPABASE_SSL ? process.env.SUPABASE_SSL.toLowerCase() === 'true' : false,
   };
 };
 

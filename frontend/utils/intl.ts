@@ -129,6 +129,6 @@ export function maxSlippageToBps(maxSlippage: string): number {
   return Math.floor(Number(maxSlippage) * 100);
 }
 
-export function bpsToFloat(bps: number, decimals = 4): string {
-  return (bps / 10 ** decimals).toFixed(decimals);
+export function bpsToFloat(bps: number, decimals = 4, fixed = decimals): string {
+  return (bps / 10 ** decimals).toFixed(fixed);
 }

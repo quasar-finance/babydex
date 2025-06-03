@@ -366,29 +366,6 @@ test("verifyCosmosSignature - error path: address mismatch", async () => {
   expect(pubkeyToAddress).toHaveBeenCalledWith(mockSignedMessage.pubkey, "bbn");
 });
 
-test.skip("verifyCosmosSignature - error path: error during decoding/derivation", async () => {
-  const mockSignedMessage: CosmosSignedMessage = {
-    signature: "mockSignatureBase64",
-    pubkey: { type: "invalid/PubKey", value: "mockPubkeyBase64" }, // Invalid pubkey type to trigger error
-    data: "mockDataBase64",
-  };
-  const expectedAddress = "bbn1mockaddress";
-
-  // Configure decodePubkey to throw an error
-  (decodePubkey as Mock).mockImplementation(() => {
-    throw new Error("Decoding error");
-  });
-
-  const result = await verifyCosmosSignature(mockSignedMessage, expectedAddress);
-
-  expect(result).toBeNull();
-  expect(decodePubkey).toHaveBeenCalledWith(mockSignedMessage.pubkey);
-  // Ensure other functions are not called after an early error
-  expect(pubkeyToAddress).not.toHaveBeenCalled();
-  expect(fromBase64).not.toHaveBeenCalled();
-  expect(Secp256k1.verifySignature).not.toHaveBeenCalled();
-});
-
 test("verifyCosmosSignature - error path: invalid base64 data", async () => {
   const mockSignedMessage: CosmosSignedMessage = {
     signature: "mockSignatureBase64",

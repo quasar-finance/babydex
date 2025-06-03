@@ -11,6 +11,9 @@ import { useToast } from "~/app/hooks";
 import { useCallback } from "react";
 import { ConfettiExplosion } from "react-confetti-explosion";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { inviteBoostBps } from "~/utils/consts";
+import { bpsToFloat } from "~/utils/intl";
 
 const ModalReferralCode: React.FC<{ referralCode: string }> = ({ referralCode }) => {
   const router = useRouter();
@@ -81,11 +84,19 @@ const ModalReferralCode: React.FC<{ referralCode: string }> = ({ referralCode })
           </div>
 
           <div className="flex flex-col gap-4 text-center">
-            Your referral link has been applied and you will earn 10% extra on your future points
+            Your referral link has been applied and you will earn {bpsToFloat(inviteBoostBps, 2, 0)}
+            % extra on your future points
           </div>
 
-          <div className="flex items-center justify-between gap-2 my-4">
-            <Button color="tertiary">Learn how to earn Points</Button>
+          <div className="flex items-center justify-between gap-2 mt-6 mb-2">
+            <Button
+              as={Link}
+              color="tertiary"
+              target="_blank"
+              href="https://docs.tower.fi/user-guides/points-campaigns"
+            >
+              Learn how to earn Points
+            </Button>
             <Button
               variant="ghost"
               color="primary"
@@ -121,19 +132,29 @@ const ModalReferralCode: React.FC<{ referralCode: string }> = ({ referralCode })
               </span>
             }
           >
-            <div className="mb-2">
+            <div>
               <p className="text-sm text-white/50">
                 To apply your invite link to your wallet, please connect to the app and sign the
                 transaction.
               </p>
-              <Button
-                color={isConnected ? "primary" : "tertiary"}
-                className="static mx-auto flex mt-4"
-                onClick={handlerReferralCode}
-                isLoading={isLoadingHandleReferralCode}
-              >
-                Sign the message
-              </Button>
+              <div className="static flex items-center justify-between gap-2 mt-6 mb-2">
+                <Button
+                  as={Link}
+                  color="tertiary"
+                  target="_blank"
+                  href="https://docs.tower.fi/user-guides/points-campaigns"
+                >
+                  Learn how to earn Points
+                </Button>
+                <Button
+                  color={isConnected ? "primary" : "tertiary"}
+                  className="static flex"
+                  onClick={handlerReferralCode}
+                  isLoading={isLoadingHandleReferralCode}
+                >
+                  Sign the message
+                </Button>
+              </div>
             </div>
           </WithConnectedWallet>
         </div>

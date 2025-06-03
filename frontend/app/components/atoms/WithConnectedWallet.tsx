@@ -19,7 +19,7 @@ const WithConnectedWallet: React.FC<{
       <div className="relative w-full h-full">
         <div
           className={twMerge(
-            "absolute -left-4 -top-4 flex flex-col items-center justify-center w-[calc(100%+2rem)] h-[calc(100%+2rem)] text-center backdrop-blur-sm",
+            "absolute -left-4 -top-4 flex flex-col items-center justify-center w-[calc(100%+2rem)] h-[calc(100%+2rem)] text-center backdrop-blur-sm z-10",
             className,
           )}
         >

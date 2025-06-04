@@ -6,7 +6,9 @@
     {
       "description": "Config returns contract settings specified in the custom [`ConfigResponse`] structure.",
       "type": "object",
-      "required": ["config"],
+      "required": [
+        "config"
+      ],
       "properties": {
         "config": {
           "type": "object",
@@ -18,11 +20,15 @@
     {
       "description": "PairsByAssetInfos returns a list of pairs for the specified assets.",
       "type": "object",
-      "required": ["pairs_by_asset_infos"],
+      "required": [
+        "pairs_by_asset_infos"
+      ],
       "properties": {
         "pairs_by_asset_infos": {
           "type": "object",
-          "required": ["asset_infos"],
+          "required": [
+            "asset_infos"
+          ],
           "properties": {
             "asset_infos": {
               "description": "The assets for which we return a pair",
@@ -33,13 +39,19 @@
             },
             "limit": {
               "description": "The number of pairs to read and return. Optional",
-              "type": ["integer", "null"],
+              "type": [
+                "integer",
+                "null"
+              ],
               "format": "uint32",
               "minimum": 0.0
             },
             "start_after": {
               "description": "The pair address to start reading from. Optional",
-              "type": ["string", "null"]
+              "type": [
+                "string",
+                "null"
+              ]
             }
           },
           "additionalProperties": false
@@ -50,11 +62,15 @@
     {
       "description": "PairByLpToken returns a pair info for the specified liquidity token.",
       "type": "object",
-      "required": ["pair_by_lp_token"],
+      "required": [
+        "pair_by_lp_token"
+      ],
       "properties": {
         "pair_by_lp_token": {
           "type": "object",
-          "required": ["lp_token"],
+          "required": [
+            "lp_token"
+          ],
           "properties": {
             "lp_token": {
               "description": "The liquidity token address for which we return a pair",
@@ -69,20 +85,28 @@
     {
       "description": "Pairs returns an array of pairs and their information according to the specified parameters in `start_after` and `limit` variables.",
       "type": "object",
-      "required": ["pairs"],
+      "required": [
+        "pairs"
+      ],
       "properties": {
         "pairs": {
           "type": "object",
           "properties": {
             "limit": {
               "description": "The number of pairs to read and return. Optional",
-              "type": ["integer", "null"],
+              "type": [
+                "integer",
+                "null"
+              ],
               "format": "uint32",
               "minimum": 0.0
             },
             "start_after": {
               "description": "The pair address to start reading from. Optional",
-              "type": ["string", "null"]
+              "type": [
+                "string",
+                "null"
+              ]
             }
           },
           "additionalProperties": false
@@ -93,11 +117,15 @@
     {
       "description": "FeeInfo returns fee parameters for a specific pair. The response is returned using a [`FeeInfoResponse`] structure",
       "type": "object",
-      "required": ["fee_info"],
+      "required": [
+        "fee_info"
+      ],
       "properties": {
         "fee_info": {
           "type": "object",
-          "required": ["pair_type"],
+          "required": [
+            "pair_type"
+          ],
           "properties": {
             "pair_type": {
               "description": "The pair type for which we return fee information. Pair type is a [`PairType`] struct",
@@ -116,7 +144,9 @@
     {
       "description": "Returns a vector that contains blacklisted pair types",
       "type": "object",
-      "required": ["blacklisted_pair_types"],
+      "required": [
+        "blacklisted_pair_types"
+      ],
       "properties": {
         "blacklisted_pair_types": {
           "type": "object",
@@ -137,11 +167,15 @@
         {
           "description": "Non-native Token",
           "type": "object",
-          "required": ["token"],
+          "required": [
+            "token"
+          ],
           "properties": {
             "token": {
               "type": "object",
-              "required": ["contract_addr"],
+              "required": [
+                "contract_addr"
+              ],
               "properties": {
                 "contract_addr": {
                   "$ref": "#/definitions/Addr"
@@ -155,11 +189,15 @@
         {
           "description": "Native token",
           "type": "object",
-          "required": ["native_token"],
+          "required": [
+            "native_token"
+          ],
           "properties": {
             "native_token": {
               "type": "object",
-              "required": ["denom"],
+              "required": [
+                "denom"
+              ],
               "properties": {
                 "denom": {
                   "type": "string"
@@ -178,7 +216,9 @@
         {
           "description": "XYK pair type",
           "type": "object",
-          "required": ["xyk"],
+          "required": [
+            "xyk"
+          ],
           "properties": {
             "xyk": {
               "type": "object",
@@ -190,7 +230,9 @@
         {
           "description": "Concentrated liquidity type",
           "type": "object",
-          "required": ["concentrated"],
+          "required": [
+            "concentrated"
+          ],
           "properties": {
             "concentrated": {
               "type": "object",
@@ -202,7 +244,9 @@
         {
           "description": "Custom pair type",
           "type": "object",
-          "required": ["custom"],
+          "required": [
+            "custom"
+          ],
           "properties": {
             "custom": {
               "type": "string"

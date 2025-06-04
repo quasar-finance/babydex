@@ -3,7 +3,9 @@
   "title": "InstantiateMsg",
   "description": "This structure describes the parameters used for creating a contract.",
   "type": "object",
-  "required": ["owner"],
+  "required": [
+    "owner"
+  ],
   "properties": {
     "owner": {
       "description": "Address allowed to change contract parameters",

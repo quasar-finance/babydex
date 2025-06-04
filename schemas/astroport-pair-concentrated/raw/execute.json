@@ -6,7 +6,9 @@
     {
       "description": "Receives a message of type [`Cw20ReceiveMsg`]",
       "type": "object",
-      "required": ["receive"],
+      "required": [
+        "receive"
+      ],
       "properties": {
         "receive": {
           "$ref": "#/definitions/Cw20ReceiveMsg"
@@ -17,11 +19,15 @@
     {
       "description": "ProvideLiquidity allows someone to provide liquidity in the pool",
       "type": "object",
-      "required": ["provide_liquidity"],
+      "required": [
+        "provide_liquidity"
+      ],
       "properties": {
         "provide_liquidity": {
           "type": "object",
-          "required": ["assets"],
+          "required": [
+            "assets"
+          ],
           "properties": {
             "assets": {
               "description": "The assets available in the pool",
@@ -32,7 +38,10 @@
             },
             "auto_stake": {
               "description": "Determines whether the LP tokens minted for the user is auto_staked in the Incentives contract",
-              "type": ["boolean", "null"]
+              "type": [
+                "boolean",
+                "null"
+              ]
             },
             "min_lp_to_receive": {
               "anyOf": [
@@ -46,7 +55,10 @@
             },
             "receiver": {
               "description": "The receiver of LP tokens",
-              "type": ["string", "null"]
+              "type": [
+                "string",
+                "null"
+              ]
             },
             "slippage_tolerance": {
               "description": "The slippage tolerance that allows liquidity provision only if the price in the pool doesn't move too much",
@@ -68,11 +80,15 @@
     {
       "description": "Swap performs a swap in the pool",
       "type": "object",
-      "required": ["swap"],
+      "required": [
+        "swap"
+      ],
       "properties": {
         "swap": {
           "type": "object",
-          "required": ["offer_asset"],
+          "required": [
+            "offer_asset"
+          ],
           "properties": {
             "ask_asset_info": {
               "anyOf": [
@@ -108,7 +124,10 @@
               "$ref": "#/definitions/Asset"
             },
             "to": {
-              "type": ["string", "null"]
+              "type": [
+                "string",
+                "null"
+              ]
             }
           },
           "additionalProperties": false
@@ -119,11 +138,15 @@
     {
       "description": "Update the pair configuration",
       "type": "object",
-      "required": ["update_config"],
+      "required": [
+        "update_config"
+      ],
       "properties": {
         "update_config": {
           "type": "object",
-          "required": ["params"],
+          "required": [
+            "params"
+          ],
           "properties": {
             "params": {
               "$ref": "#/definitions/Binary"
@@ -137,11 +160,16 @@
     {
       "description": "ProposeNewOwner creates a proposal to change contract ownership. The validity period for the proposal is set in the `expires_in` variable.",
       "type": "object",
-      "required": ["propose_new_owner"],
+      "required": [
+        "propose_new_owner"
+      ],
       "properties": {
         "propose_new_owner": {
           "type": "object",
-          "required": ["expires_in", "owner"],
+          "required": [
+            "expires_in",
+            "owner"
+          ],
           "properties": {
             "expires_in": {
               "description": "The date after which this proposal expires",
@@ -162,7 +190,9 @@
     {
       "description": "DropOwnershipProposal removes the existing offer to change contract ownership.",
       "type": "object",
-      "required": ["drop_ownership_proposal"],
+      "required": [
+        "drop_ownership_proposal"
+      ],
       "properties": {
         "drop_ownership_proposal": {
           "type": "object",
@@ -174,7 +204,9 @@
     {
       "description": "Used to claim contract ownership.",
       "type": "object",
-      "required": ["claim_ownership"],
+      "required": [
+        "claim_ownership"
+      ],
       "properties": {
         "claim_ownership": {
           "type": "object",
@@ -192,7 +224,10 @@
     "Asset": {
       "description": "This enum describes a Terra asset (native or CW20).",
       "type": "object",
-      "required": ["amount", "info"],
+      "required": [
+        "amount",
+        "info"
+      ],
       "properties": {
         "amount": {
           "description": "A token amount",
@@ -219,11 +254,15 @@
         {
           "description": "Non-native Token",
           "type": "object",
-          "required": ["token"],
+          "required": [
+            "token"
+          ],
           "properties": {
             "token": {
               "type": "object",
-              "required": ["contract_addr"],
+              "required": [
+                "contract_addr"
+              ],
               "properties": {
                 "contract_addr": {
                   "$ref": "#/definitions/Addr"
@@ -237,11 +276,15 @@
         {
           "description": "Native token",
           "type": "object",
-          "required": ["native_token"],
+          "required": [
+            "native_token"
+          ],
           "properties": {
             "native_token": {
               "type": "object",
-              "required": ["denom"],
+              "required": [
+                "denom"
+              ],
               "properties": {
                 "denom": {
                   "type": "string"
@@ -261,7 +304,11 @@
     "Cw20ReceiveMsg": {
       "description": "Cw20ReceiveMsg should be de/serialized under `Receive()` variant in a ExecuteMsg",
       "type": "object",
-      "required": ["amount", "msg", "sender"],
+      "required": [
+        "amount",
+        "msg",
+        "sender"
+      ],
       "properties": {
         "amount": {
           "$ref": "#/definitions/Uint128"

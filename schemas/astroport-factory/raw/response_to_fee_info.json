@@ -3,7 +3,10 @@
   "title": "FeeInfoResponse",
   "description": "A custom struct for each query response that returns an object of type [`FeeInfoResponse`].",
   "type": "object",
-  "required": ["maker_fee_bps", "total_fee_bps"],
+  "required": [
+    "maker_fee_bps",
+    "total_fee_bps"
+  ],
   "properties": {
     "fee_address": {
       "description": "Contract address to send governance fees to",

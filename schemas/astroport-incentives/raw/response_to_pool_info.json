@@ -2,7 +2,11 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "PoolInfoResponse",
   "type": "object",
-  "required": ["last_update_ts", "rewards", "total_lp"],
+  "required": [
+    "last_update_ts",
+    "rewards",
+    "total_lp"
+  ],
   "properties": {
     "last_update_ts": {
       "description": "Last time when reward indexes were updated",
@@ -38,11 +42,15 @@
         {
           "description": "Non-native Token",
           "type": "object",
-          "required": ["token"],
+          "required": [
+            "token"
+          ],
           "properties": {
             "token": {
               "type": "object",
-              "required": ["contract_addr"],
+              "required": [
+                "contract_addr"
+              ],
               "properties": {
                 "contract_addr": {
                   "$ref": "#/definitions/Addr"
@@ -56,11 +64,15 @@
         {
           "description": "Native token",
           "type": "object",
-          "required": ["native_token"],
+          "required": [
+            "native_token"
+          ],
           "properties": {
             "native_token": {
               "type": "object",
-              "required": ["denom"],
+              "required": [
+                "denom"
+              ],
               "properties": {
                 "denom": {
                   "type": "string"
@@ -79,7 +91,12 @@
     },
     "RewardInfo": {
       "type": "object",
-      "required": ["index", "orphaned", "reward", "rps"],
+      "required": [
+        "index",
+        "orphaned",
+        "reward",
+        "rps"
+      ],
       "properties": {
         "index": {
           "description": "Last checkpointed reward per LP token",
@@ -122,7 +139,9 @@
         {
           "description": "Internal rewards aka ASTRO emissions don't have next_update_ts field and they are paid out from Vesting contract.",
           "type": "object",
-          "required": ["int"],
+          "required": [
+            "int"
+          ],
           "properties": {
             "int": {
               "$ref": "#/definitions/AssetInfo"
@@ -133,11 +152,16 @@
         {
           "description": "External rewards always have corresponding schedules. Reward is paid out from Incentives contract balance.",
           "type": "object",
-          "required": ["ext"],
+          "required": [
+            "ext"
+          ],
           "properties": {
             "ext": {
               "type": "object",
-              "required": ["info", "next_update_ts"],
+              "required": [
+                "info",
+                "next_update_ts"
+              ],
               "properties": {
                 "info": {
                   "$ref": "#/definitions/AssetInfo"

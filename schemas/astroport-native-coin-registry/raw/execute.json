@@ -6,11 +6,15 @@
     {
       "description": "Adds or updates native assets with specified precisions. Only the current owner can execute this. Sender doesn't need to send any tokens.",
       "type": "object",
-      "required": ["add"],
+      "required": [
+        "add"
+      ],
       "properties": {
         "add": {
           "type": "object",
-          "required": ["native_coins"],
+          "required": [
+            "native_coins"
+          ],
           "properties": {
             "native_coins": {
               "type": "array",
@@ -39,11 +43,15 @@
     {
       "description": "Register a native asset in the registry. Sender must send any number of coins per each asset added. All funds will be returned to the sender. Permissionless",
       "type": "object",
-      "required": ["register"],
+      "required": [
+        "register"
+      ],
       "properties": {
         "register": {
           "type": "object",
-          "required": ["native_coins"],
+          "required": [
+            "native_coins"
+          ],
           "properties": {
             "native_coins": {
               "type": "array",
@@ -72,11 +80,15 @@
     {
       "description": "Removes the native assets by specified parameters Only the current owner can execute this",
       "type": "object",
-      "required": ["remove"],
+      "required": [
+        "remove"
+      ],
       "properties": {
         "remove": {
           "type": "object",
-          "required": ["native_coins"],
+          "required": [
+            "native_coins"
+          ],
           "properties": {
             "native_coins": {
               "type": "array",
@@ -93,11 +105,16 @@
     {
       "description": "Creates a request to change contract ownership Only the current owner can execute this",
       "type": "object",
-      "required": ["propose_new_owner"],
+      "required": [
+        "propose_new_owner"
+      ],
       "properties": {
         "propose_new_owner": {
           "type": "object",
-          "required": ["expires_in", "owner"],
+          "required": [
+            "expires_in",
+            "owner"
+          ],
           "properties": {
             "expires_in": {
               "description": "The validity period of the offer to change the owner",
@@ -118,7 +135,9 @@
     {
       "description": "Removes a request to change contract ownership Only the current owner can execute this",
       "type": "object",
-      "required": ["drop_ownership_proposal"],
+      "required": [
+        "drop_ownership_proposal"
+      ],
       "properties": {
         "drop_ownership_proposal": {
           "type": "object",
@@ -130,7 +149,9 @@
     {
       "description": "Claims contract ownership Only the newly proposed owner can execute this",
       "type": "object",
-      "required": ["claim_ownership"],
+      "required": [
+        "claim_ownership"
+      ],
       "properties": {
         "claim_ownership": {
           "type": "object",

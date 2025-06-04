@@ -7,7 +7,12 @@
     "title": "InstantiateMsg",
     "description": "This structure stores the basic settings for creating a new factory contract.",
     "type": "object",
-    "required": ["coin_registry_address", "owner", "pair_configs", "token_code_id"],
+    "required": [
+      "coin_registry_address",
+      "owner",
+      "pair_configs",
+      "token_code_id"
+    ],
     "properties": {
       "coin_registry_address": {
         "description": "The address of the contract that contains the coins and their accuracy",
@@ -15,11 +20,17 @@
       },
       "fee_address": {
         "description": "Contract address to send governance fees to (the Maker)",
-        "type": ["string", "null"]
+        "type": [
+          "string",
+          "null"
+        ]
       },
       "incentives_address": {
         "description": "Address of contract that is used to auto_stake LP tokens once someone provides liquidity in a pool",
-        "type": ["string", "null"]
+        "type": [
+          "string",
+          "null"
+        ]
       },
       "owner": {
         "description": "Address of owner that is allowed to change factory contract parameters",
@@ -44,7 +55,12 @@
       "PairConfig": {
         "description": "This structure stores a pair type's configuration.",
         "type": "object",
-        "required": ["code_id", "maker_fee_bps", "pair_type", "total_fee_bps"],
+        "required": [
+          "code_id",
+          "maker_fee_bps",
+          "pair_type",
+          "total_fee_bps"
+        ],
         "properties": {
           "code_id": {
             "description": "ID of contract which is allowed to create pairs of this type",
@@ -96,7 +112,9 @@
           {
             "description": "XYK pair type",
             "type": "object",
-            "required": ["xyk"],
+            "required": [
+              "xyk"
+            ],
             "properties": {
               "xyk": {
                 "type": "object",
@@ -108,7 +126,9 @@
           {
             "description": "Concentrated liquidity type",
             "type": "object",
-            "required": ["concentrated"],
+            "required": [
+              "concentrated"
+            ],
             "properties": {
               "concentrated": {
                 "type": "object",
@@ -120,7 +140,9 @@
           {
             "description": "Custom pair type",
             "type": "object",
-            "required": ["custom"],
+            "required": [
+              "custom"
+            ],
             "properties": {
               "custom": {
                 "type": "string"
@@ -140,26 +162,40 @@
       {
         "description": "UpdateConfig updates relevant code IDs",
         "type": "object",
-        "required": ["update_config"],
+        "required": [
+          "update_config"
+        ],
         "properties": {
           "update_config": {
             "type": "object",
             "properties": {
               "coin_registry_address": {
                 "description": "The address of the contract that contains the coins and their accuracy",
-                "type": ["string", "null"]
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "fee_address": {
                 "description": "Contract address to send governance fees to (the Maker)",
-                "type": ["string", "null"]
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "incentives_address": {
                 "description": "Contract address where Lp tokens can be auto_staked after someone provides liquidity in an incentivized Astroport pool",
-                "type": ["string", "null"]
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "token_code_id": {
                 "description": "CW20 token contract code identifier",
-                "type": ["integer", "null"],
+                "type": [
+                  "integer",
+                  "null"
+                ],
                 "format": "uint64",
                 "minimum": 0.0
               }
@@ -172,11 +208,15 @@
       {
         "description": "UpdatePairConfig updates the config for a pair type.",
         "type": "object",
-        "required": ["update_pair_config"],
+        "required": [
+          "update_pair_config"
+        ],
         "properties": {
           "update_pair_config": {
             "type": "object",
-            "required": ["config"],
+            "required": [
+              "config"
+            ],
             "properties": {
               "config": {
                 "description": "New [`PairConfig`] settings for a pair type",
@@ -195,11 +235,16 @@
       {
         "description": "CreatePair instantiates a new pair contract.",
         "type": "object",
-        "required": ["create_pair"],
+        "required": [
+          "create_pair"
+        ],
         "properties": {
           "create_pair": {
             "type": "object",
-            "required": ["asset_infos", "pair_type"],
+            "required": [
+              "asset_infos",
+              "pair_type"
+            ],
             "properties": {
               "asset_infos": {
                 "description": "The assets to create the pool for",
@@ -236,11 +281,16 @@
       {
         "description": "ProposeNewOwner creates a proposal to change contract ownership. The validity period for the proposal is set in the `expires_in` variable.",
         "type": "object",
-        "required": ["propose_new_owner"],
+        "required": [
+          "propose_new_owner"
+        ],
         "properties": {
           "propose_new_owner": {
             "type": "object",
-            "required": ["expires_in", "owner"],
+            "required": [
+              "expires_in",
+              "owner"
+            ],
             "properties": {
               "expires_in": {
                 "description": "The date after which this proposal expires",
@@ -261,7 +311,9 @@
       {
         "description": "DropOwnershipProposal removes the existing offer to change contract ownership.",
         "type": "object",
-        "required": ["drop_ownership_proposal"],
+        "required": [
+          "drop_ownership_proposal"
+        ],
         "properties": {
           "drop_ownership_proposal": {
             "type": "object",
@@ -273,7 +325,9 @@
       {
         "description": "Used to claim contract ownership.",
         "type": "object",
-        "required": ["claim_ownership"],
+        "required": [
+          "claim_ownership"
+        ],
         "properties": {
           "claim_ownership": {
             "type": "object",
@@ -294,11 +348,15 @@
           {
             "description": "Non-native Token",
             "type": "object",
-            "required": ["token"],
+            "required": [
+              "token"
+            ],
             "properties": {
               "token": {
                 "type": "object",
-                "required": ["contract_addr"],
+                "required": [
+                  "contract_addr"
+                ],
                 "properties": {
                   "contract_addr": {
                     "$ref": "#/definitions/Addr"
@@ -312,11 +370,15 @@
           {
             "description": "Native token",
             "type": "object",
-            "required": ["native_token"],
+            "required": [
+              "native_token"
+            ],
             "properties": {
               "native_token": {
                 "type": "object",
-                "required": ["denom"],
+                "required": [
+                  "denom"
+                ],
                 "properties": {
                   "denom": {
                     "type": "string"
@@ -336,7 +398,12 @@
       "PairConfig": {
         "description": "This structure stores a pair type's configuration.",
         "type": "object",
-        "required": ["code_id", "maker_fee_bps", "pair_type", "total_fee_bps"],
+        "required": [
+          "code_id",
+          "maker_fee_bps",
+          "pair_type",
+          "total_fee_bps"
+        ],
         "properties": {
           "code_id": {
             "description": "ID of contract which is allowed to create pairs of this type",
@@ -388,7 +455,9 @@
           {
             "description": "XYK pair type",
             "type": "object",
-            "required": ["xyk"],
+            "required": [
+              "xyk"
+            ],
             "properties": {
               "xyk": {
                 "type": "object",
@@ -400,7 +469,9 @@
           {
             "description": "Concentrated liquidity type",
             "type": "object",
-            "required": ["concentrated"],
+            "required": [
+              "concentrated"
+            ],
             "properties": {
               "concentrated": {
                 "type": "object",
@@ -412,7 +483,9 @@
           {
             "description": "Custom pair type",
             "type": "object",
-            "required": ["custom"],
+            "required": [
+              "custom"
+            ],
             "properties": {
               "custom": {
                 "type": "string"
@@ -432,7 +505,9 @@
       {
         "description": "Config returns contract settings specified in the custom [`ConfigResponse`] structure.",
         "type": "object",
-        "required": ["config"],
+        "required": [
+          "config"
+        ],
         "properties": {
           "config": {
             "type": "object",
@@ -444,11 +519,15 @@
       {
         "description": "PairsByAssetInfos returns a list of pairs for the specified assets.",
         "type": "object",
-        "required": ["pairs_by_asset_infos"],
+        "required": [
+          "pairs_by_asset_infos"
+        ],
         "properties": {
           "pairs_by_asset_infos": {
             "type": "object",
-            "required": ["asset_infos"],
+            "required": [
+              "asset_infos"
+            ],
             "properties": {
               "asset_infos": {
                 "description": "The assets for which we return a pair",
@@ -459,13 +538,19 @@
               },
               "limit": {
                 "description": "The number of pairs to read and return. Optional",
-                "type": ["integer", "null"],
+                "type": [
+                  "integer",
+                  "null"
+                ],
                 "format": "uint32",
                 "minimum": 0.0
               },
               "start_after": {
                 "description": "The pair address to start reading from. Optional",
-                "type": ["string", "null"]
+                "type": [
+                  "string",
+                  "null"
+                ]
               }
             },
             "additionalProperties": false
@@ -476,11 +561,15 @@
       {
         "description": "PairByLpToken returns a pair info for the specified liquidity token.",
         "type": "object",
-        "required": ["pair_by_lp_token"],
+        "required": [
+          "pair_by_lp_token"
+        ],
         "properties": {
           "pair_by_lp_token": {
             "type": "object",
-            "required": ["lp_token"],
+            "required": [
+              "lp_token"
+            ],
             "properties": {
               "lp_token": {
                 "description": "The liquidity token address for which we return a pair",
@@ -495,20 +584,28 @@
       {
         "description": "Pairs returns an array of pairs and their information according to the specified parameters in `start_after` and `limit` variables.",
         "type": "object",
-        "required": ["pairs"],
+        "required": [
+          "pairs"
+        ],
         "properties": {
           "pairs": {
             "type": "object",
             "properties": {
               "limit": {
                 "description": "The number of pairs to read and return. Optional",
-                "type": ["integer", "null"],
+                "type": [
+                  "integer",
+                  "null"
+                ],
                 "format": "uint32",
                 "minimum": 0.0
               },
               "start_after": {
                 "description": "The pair address to start reading from. Optional",
-                "type": ["string", "null"]
+                "type": [
+                  "string",
+                  "null"
+                ]
               }
             },
             "additionalProperties": false
@@ -519,11 +616,15 @@
       {
         "description": "FeeInfo returns fee parameters for a specific pair. The response is returned using a [`FeeInfoResponse`] structure",
         "type": "object",
-        "required": ["fee_info"],
+        "required": [
+          "fee_info"
+        ],
         "properties": {
           "fee_info": {
             "type": "object",
-            "required": ["pair_type"],
+            "required": [
+              "pair_type"
+            ],
             "properties": {
               "pair_type": {
                 "description": "The pair type for which we return fee information. Pair type is a [`PairType`] struct",
@@ -542,7 +643,9 @@
       {
         "description": "Returns a vector that contains blacklisted pair types",
         "type": "object",
-        "required": ["blacklisted_pair_types"],
+        "required": [
+          "blacklisted_pair_types"
+        ],
         "properties": {
           "blacklisted_pair_types": {
             "type": "object",
@@ -563,11 +666,15 @@
           {
             "description": "Non-native Token",
             "type": "object",
-            "required": ["token"],
+            "required": [
+              "token"
+            ],
             "properties": {
               "token": {
                 "type": "object",
-                "required": ["contract_addr"],
+                "required": [
+                  "contract_addr"
+                ],
                 "properties": {
                   "contract_addr": {
                     "$ref": "#/definitions/Addr"
@@ -581,11 +688,15 @@
           {
             "description": "Native token",
             "type": "object",
-            "required": ["native_token"],
+            "required": [
+              "native_token"
+            ],
             "properties": {
               "native_token": {
                 "type": "object",
-                "required": ["denom"],
+                "required": [
+                  "denom"
+                ],
                 "properties": {
                   "denom": {
                     "type": "string"
@@ -604,7 +715,9 @@
           {
             "description": "XYK pair type",
             "type": "object",
-            "required": ["xyk"],
+            "required": [
+              "xyk"
+            ],
             "properties": {
               "xyk": {
                 "type": "object",
@@ -616,7 +729,9 @@
           {
             "description": "Concentrated liquidity type",
             "type": "object",
-            "required": ["concentrated"],
+            "required": [
+              "concentrated"
+            ],
             "properties": {
               "concentrated": {
                 "type": "object",
@@ -628,7 +743,9 @@
           {
             "description": "Custom pair type",
             "type": "object",
-            "required": ["custom"],
+            "required": [
+              "custom"
+            ],
             "properties": {
               "custom": {
                 "type": "string"
@@ -657,7 +774,9 @@
             {
               "description": "XYK pair type",
               "type": "object",
-              "required": ["xyk"],
+              "required": [
+                "xyk"
+              ],
               "properties": {
                 "xyk": {
                   "type": "object",
@@ -669,7 +788,9 @@
             {
               "description": "Concentrated liquidity type",
               "type": "object",
-              "required": ["concentrated"],
+              "required": [
+                "concentrated"
+              ],
               "properties": {
                 "concentrated": {
                   "type": "object",
@@ -681,7 +802,9 @@
             {
               "description": "Custom pair type",
               "type": "object",
-              "required": ["custom"],
+              "required": [
+                "custom"
+              ],
               "properties": {
                 "custom": {
                   "type": "string"
@@ -698,7 +821,12 @@
       "title": "ConfigResponse",
       "description": "A custom struct for each query response that returns general contract settings/configs.",
       "type": "object",
-      "required": ["coin_registry_address", "owner", "pair_configs", "token_code_id"],
+      "required": [
+        "coin_registry_address",
+        "owner",
+        "pair_configs",
+        "token_code_id"
+      ],
       "properties": {
         "coin_registry_address": {
           "description": "The address of the contract that contains the coins and their accuracy",
@@ -761,7 +889,12 @@
         "PairConfig": {
           "description": "This structure stores a pair type's configuration.",
           "type": "object",
-          "required": ["code_id", "maker_fee_bps", "pair_type", "total_fee_bps"],
+          "required": [
+            "code_id",
+            "maker_fee_bps",
+            "pair_type",
+            "total_fee_bps"
+          ],
           "properties": {
             "code_id": {
               "description": "ID of contract which is allowed to create pairs of this type",
@@ -813,7 +946,9 @@
             {
               "description": "XYK pair type",
               "type": "object",
-              "required": ["xyk"],
+              "required": [
+                "xyk"
+              ],
               "properties": {
                 "xyk": {
                   "type": "object",
@@ -825,7 +960,9 @@
             {
               "description": "Concentrated liquidity type",
               "type": "object",
-              "required": ["concentrated"],
+              "required": [
+                "concentrated"
+              ],
               "properties": {
                 "concentrated": {
                   "type": "object",
@@ -837,7 +974,9 @@
             {
               "description": "Custom pair type",
               "type": "object",
-              "required": ["custom"],
+              "required": [
+                "custom"
+              ],
               "properties": {
                 "custom": {
                   "type": "string"
@@ -854,7 +993,10 @@
       "title": "FeeInfoResponse",
       "description": "A custom struct for each query response that returns an object of type [`FeeInfoResponse`].",
       "type": "object",
-      "required": ["maker_fee_bps", "total_fee_bps"],
+      "required": [
+        "maker_fee_bps",
+        "total_fee_bps"
+      ],
       "properties": {
         "fee_address": {
           "description": "Contract address to send governance fees to",
@@ -893,7 +1035,12 @@
       "title": "PairInfo",
       "description": "This structure stores the main parameters for an Astroport pair",
       "type": "object",
-      "required": ["asset_infos", "contract_addr", "liquidity_token", "pair_type"],
+      "required": [
+        "asset_infos",
+        "contract_addr",
+        "liquidity_token",
+        "pair_type"
+      ],
       "properties": {
         "asset_infos": {
           "description": "Asset information for the assets in the pool",
@@ -935,11 +1082,15 @@
             {
               "description": "Non-native Token",
               "type": "object",
-              "required": ["token"],
+              "required": [
+                "token"
+              ],
               "properties": {
                 "token": {
                   "type": "object",
-                  "required": ["contract_addr"],
+                  "required": [
+                    "contract_addr"
+                  ],
                   "properties": {
                     "contract_addr": {
                       "$ref": "#/definitions/Addr"
@@ -953,11 +1104,15 @@
             {
               "description": "Native token",
               "type": "object",
-              "required": ["native_token"],
+              "required": [
+                "native_token"
+              ],
               "properties": {
                 "native_token": {
                   "type": "object",
-                  "required": ["denom"],
+                  "required": [
+                    "denom"
+                  ],
                   "properties": {
                     "denom": {
                       "type": "string"
@@ -976,7 +1131,9 @@
             {
               "description": "XYK pair type",
               "type": "object",
-              "required": ["xyk"],
+              "required": [
+                "xyk"
+              ],
               "properties": {
                 "xyk": {
                   "type": "object",
@@ -988,7 +1145,9 @@
             {
               "description": "Concentrated liquidity type",
               "type": "object",
-              "required": ["concentrated"],
+              "required": [
+                "concentrated"
+              ],
               "properties": {
                 "concentrated": {
                   "type": "object",
@@ -1000,7 +1159,9 @@
             {
               "description": "Custom pair type",
               "type": "object",
-              "required": ["custom"],
+              "required": [
+                "custom"
+              ],
               "properties": {
                 "custom": {
                   "type": "string"
@@ -1030,11 +1191,15 @@
             {
               "description": "Non-native Token",
               "type": "object",
-              "required": ["token"],
+              "required": [
+                "token"
+              ],
               "properties": {
                 "token": {
                   "type": "object",
-                  "required": ["contract_addr"],
+                  "required": [
+                    "contract_addr"
+                  ],
                   "properties": {
                     "contract_addr": {
                       "$ref": "#/definitions/Addr"
@@ -1048,11 +1213,15 @@
             {
               "description": "Native token",
               "type": "object",
-              "required": ["native_token"],
+              "required": [
+                "native_token"
+              ],
               "properties": {
                 "native_token": {
                   "type": "object",
-                  "required": ["denom"],
+                  "required": [
+                    "denom"
+                  ],
                   "properties": {
                     "denom": {
                       "type": "string"
@@ -1068,7 +1237,12 @@
         "PairInfo": {
           "description": "This structure stores the main parameters for an Astroport pair",
           "type": "object",
-          "required": ["asset_infos", "contract_addr", "liquidity_token", "pair_type"],
+          "required": [
+            "asset_infos",
+            "contract_addr",
+            "liquidity_token",
+            "pair_type"
+          ],
           "properties": {
             "asset_infos": {
               "description": "Asset information for the assets in the pool",
@@ -1106,7 +1280,9 @@
             {
               "description": "XYK pair type",
               "type": "object",
-              "required": ["xyk"],
+              "required": [
+                "xyk"
+              ],
               "properties": {
                 "xyk": {
                   "type": "object",
@@ -1118,7 +1294,9 @@
             {
               "description": "Concentrated liquidity type",
               "type": "object",
-              "required": ["concentrated"],
+              "required": [
+                "concentrated"
+              ],
               "properties": {
                 "concentrated": {
                   "type": "object",
@@ -1130,7 +1308,9 @@
             {
               "description": "Custom pair type",
               "type": "object",
-              "required": ["custom"],
+              "required": [
+                "custom"
+              ],
               "properties": {
                 "custom": {
                   "type": "string"
@@ -1160,11 +1340,15 @@
             {
               "description": "Non-native Token",
               "type": "object",
-              "required": ["token"],
+              "required": [
+                "token"
+              ],
               "properties": {
                 "token": {
                   "type": "object",
-                  "required": ["contract_addr"],
+                  "required": [
+                    "contract_addr"
+                  ],
                   "properties": {
                     "contract_addr": {
                       "$ref": "#/definitions/Addr"
@@ -1178,11 +1362,15 @@
             {
               "description": "Native token",
               "type": "object",
-              "required": ["native_token"],
+              "required": [
+                "native_token"
+              ],
               "properties": {
                 "native_token": {
                   "type": "object",
-                  "required": ["denom"],
+                  "required": [
+                    "denom"
+                  ],
                   "properties": {
                     "denom": {
                       "type": "string"
@@ -1198,7 +1386,12 @@
         "PairInfo": {
           "description": "This structure stores the main parameters for an Astroport pair",
           "type": "object",
-          "required": ["asset_infos", "contract_addr", "liquidity_token", "pair_type"],
+          "required": [
+            "asset_infos",
+            "contract_addr",
+            "liquidity_token",
+            "pair_type"
+          ],
           "properties": {
             "asset_infos": {
               "description": "Asset information for the assets in the pool",
@@ -1236,7 +1429,9 @@
             {
               "description": "XYK pair type",
               "type": "object",
-              "required": ["xyk"],
+              "required": [
+                "xyk"
+              ],
               "properties": {
                 "xyk": {
                   "type": "object",
@@ -1248,7 +1443,9 @@
             {
               "description": "Concentrated liquidity type",
               "type": "object",
-              "required": ["concentrated"],
+              "required": [
+                "concentrated"
+              ],
               "properties": {
                 "concentrated": {
                   "type": "object",
@@ -1260,7 +1457,9 @@
             {
               "description": "Custom pair type",
               "type": "object",
-              "required": ["custom"],
+              "required": [
+                "custom"
+              ],
               "properties": {
                 "custom": {
                   "type": "string"

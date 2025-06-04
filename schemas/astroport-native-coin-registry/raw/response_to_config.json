@@ -3,7 +3,9 @@
   "title": "Config",
   "description": "This structure stores the main parameters for the native coin registry contract.",
   "type": "object",
-  "required": ["owner"],
+  "required": [
+    "owner"
+  ],
   "properties": {
     "owner": {
       "description": "Address that's allowed to change contract parameters",

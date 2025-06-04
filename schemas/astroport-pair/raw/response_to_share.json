@@ -13,7 +13,10 @@
     "Asset": {
       "description": "This enum describes a Terra asset (native or CW20).",
       "type": "object",
-      "required": ["amount", "info"],
+      "required": [
+        "amount",
+        "info"
+      ],
       "properties": {
         "amount": {
           "description": "A token amount",
@@ -40,11 +43,15 @@
         {
           "description": "Non-native Token",
           "type": "object",
-          "required": ["token"],
+          "required": [
+            "token"
+          ],
           "properties": {
             "token": {
               "type": "object",
-              "required": ["contract_addr"],
+              "required": [
+                "contract_addr"
+              ],
               "properties": {
                 "contract_addr": {
                   "$ref": "#/definitions/Addr"
@@ -58,11 +65,15 @@
         {
           "description": "Native token",
           "type": "object",
-          "required": ["native_token"],
+          "required": [
+            "native_token"
+          ],
           "properties": {
             "native_token": {
               "type": "object",
-              "required": ["denom"],
+              "required": [
+                "denom"
+              ],
               "properties": {
                 "denom": {
                   "type": "string"

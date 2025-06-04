@@ -6,7 +6,9 @@
     {
       "description": "Returns the configuration for the contract.",
       "type": "object",
-      "required": ["config"],
+      "required": [
+        "config"
+      ],
       "properties": {
         "config": {
           "type": "object",
@@ -18,11 +20,15 @@
     {
       "description": "Returns the information about Asset by specified denominator.",
       "type": "object",
-      "required": ["native_token"],
+      "required": [
+        "native_token"
+      ],
       "properties": {
         "native_token": {
           "type": "object",
-          "required": ["denom"],
+          "required": [
+            "denom"
+          ],
           "properties": {
             "denom": {
               "type": "string"
@@ -36,18 +42,26 @@
     {
       "description": "Returns a vector which contains the native assets.",
       "type": "object",
-      "required": ["native_tokens"],
+      "required": [
+        "native_tokens"
+      ],
       "properties": {
         "native_tokens": {
           "type": "object",
           "properties": {
             "limit": {
-              "type": ["integer", "null"],
+              "type": [
+                "integer",
+                "null"
+              ],
               "format": "uint32",
               "minimum": 0.0
             },
             "start_after": {
-              "type": ["string", "null"]
+              "type": [
+                "string",
+                "null"
+              ]
             }
           },
           "additionalProperties": false

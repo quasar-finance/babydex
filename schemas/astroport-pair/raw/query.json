@@ -6,7 +6,9 @@
     {
       "description": "Returns information about a pair in an object of type [`super::asset::PairInfo`].",
       "type": "object",
-      "required": ["pair"],
+      "required": [
+        "pair"
+      ],
       "properties": {
         "pair": {
           "type": "object",
@@ -18,7 +20,9 @@
     {
       "description": "Returns information about a pool in an object of type [`PoolResponse`].",
       "type": "object",
-      "required": ["pool"],
+      "required": [
+        "pool"
+      ],
       "properties": {
         "pool": {
           "type": "object",
@@ -30,7 +34,9 @@
     {
       "description": "Returns contract configuration settings in a custom [`ConfigResponse`] structure.",
       "type": "object",
-      "required": ["config"],
+      "required": [
+        "config"
+      ],
       "properties": {
         "config": {
           "type": "object",
@@ -42,11 +48,15 @@
     {
       "description": "Returns information about the share of the pool in a vector that contains objects of type [`Asset`].",
       "type": "object",
-      "required": ["share"],
+      "required": [
+        "share"
+      ],
       "properties": {
         "share": {
           "type": "object",
-          "required": ["amount"],
+          "required": [
+            "amount"
+          ],
           "properties": {
             "amount": {
               "$ref": "#/definitions/Uint128"
@@ -60,11 +70,15 @@
     {
       "description": "Returns information about a swap simulation in a [`SimulationResponse`] object.",
       "type": "object",
-      "required": ["simulation"],
+      "required": [
+        "simulation"
+      ],
       "properties": {
         "simulation": {
           "type": "object",
-          "required": ["offer_asset"],
+          "required": [
+            "offer_asset"
+          ],
           "properties": {
             "ask_asset_info": {
               "anyOf": [
@@ -88,11 +102,15 @@
     {
       "description": "Returns information about cumulative prices in a [`ReverseSimulationResponse`] object.",
       "type": "object",
-      "required": ["reverse_simulation"],
+      "required": [
+        "reverse_simulation"
+      ],
       "properties": {
         "reverse_simulation": {
           "type": "object",
-          "required": ["ask_asset"],
+          "required": [
+            "ask_asset"
+          ],
           "properties": {
             "ask_asset": {
               "$ref": "#/definitions/Asset"
@@ -116,7 +134,9 @@
     {
       "description": "Returns information about the cumulative prices in a [`CumulativePricesResponse`] object",
       "type": "object",
-      "required": ["cumulative_prices"],
+      "required": [
+        "cumulative_prices"
+      ],
       "properties": {
         "cumulative_prices": {
           "type": "object",
@@ -128,7 +148,9 @@
     {
       "description": "Returns current D invariant in as a [`Uint128`] value",
       "type": "object",
-      "required": ["query_compute_d"],
+      "required": [
+        "query_compute_d"
+      ],
       "properties": {
         "query_compute_d": {
           "type": "object",
@@ -140,11 +162,15 @@
     {
       "description": "Returns an estimation of assets received for the given amount of LP tokens",
       "type": "object",
-      "required": ["simulate_withdraw"],
+      "required": [
+        "simulate_withdraw"
+      ],
       "properties": {
         "simulate_withdraw": {
           "type": "object",
-          "required": ["lp_amount"],
+          "required": [
+            "lp_amount"
+          ],
           "properties": {
             "lp_amount": {
               "$ref": "#/definitions/Uint128"
@@ -158,11 +184,15 @@
     {
       "description": "Returns an estimation of shares received for the given amount of assets",
       "type": "object",
-      "required": ["simulate_provide"],
+      "required": [
+        "simulate_provide"
+      ],
       "properties": {
         "simulate_provide": {
           "type": "object",
-          "required": ["assets"],
+          "required": [
+            "assets"
+          ],
           "properties": {
             "assets": {
               "type": "array",
@@ -195,7 +225,10 @@
     "Asset": {
       "description": "This enum describes a Terra asset (native or CW20).",
       "type": "object",
-      "required": ["amount", "info"],
+      "required": [
+        "amount",
+        "info"
+      ],
       "properties": {
         "amount": {
           "description": "A token amount",
@@ -222,11 +255,15 @@
         {
           "description": "Non-native Token",
           "type": "object",
-          "required": ["token"],
+          "required": [
+            "token"
+          ],
           "properties": {
             "token": {
               "type": "object",
-              "required": ["contract_addr"],
+              "required": [
+                "contract_addr"
+              ],
               "properties": {
                 "contract_addr": {
                   "$ref": "#/definitions/Addr"
@@ -240,11 +277,15 @@
         {
           "description": "Native token",
           "type": "object",
-          "required": ["native_token"],
+          "required": [
+            "native_token"
+          ],
           "properties": {
             "native_token": {
               "type": "object",
-              "required": ["denom"],
+              "required": [
+                "denom"
+              ],
               "properties": {
                 "denom": {
                   "type": "string"

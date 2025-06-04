@@ -6,7 +6,9 @@
     {
       "description": "Receive receives a message of type [`Cw20ReceiveMsg`] and processes it depending on the received template",
       "type": "object",
-      "required": ["receive"],
+      "required": [
+        "receive"
+      ],
       "properties": {
         "receive": {
           "$ref": "#/definitions/Cw20ReceiveMsg"
@@ -17,11 +19,15 @@
     {
       "description": "ExecuteSwapOperations processes multiple swaps while mentioning the minimum amount of tokens to receive for the last swap operation",
       "type": "object",
-      "required": ["execute_swap_operations"],
+      "required": [
+        "execute_swap_operations"
+      ],
       "properties": {
         "execute_swap_operations": {
           "type": "object",
-          "required": ["operations"],
+          "required": [
+            "operations"
+          ],
           "properties": {
             "max_spread": {
               "anyOf": [
@@ -50,7 +56,10 @@
               }
             },
             "to": {
-              "type": ["string", "null"]
+              "type": [
+                "string",
+                "null"
+              ]
             }
           },
           "additionalProperties": false
@@ -61,11 +70,16 @@
     {
       "description": "Internal use ExecuteSwapOperation executes a single swap operation",
       "type": "object",
-      "required": ["execute_swap_operation"],
+      "required": [
+        "execute_swap_operation"
+      ],
       "properties": {
         "execute_swap_operation": {
           "type": "object",
-          "required": ["operation", "single"],
+          "required": [
+            "operation",
+            "single"
+          ],
           "properties": {
             "max_spread": {
               "anyOf": [
@@ -84,7 +98,10 @@
               "type": "boolean"
             },
             "to": {
-              "type": ["string", "null"]
+              "type": [
+                "string",
+                "null"
+              ]
             }
           },
           "additionalProperties": false
@@ -104,11 +121,15 @@
         {
           "description": "Non-native Token",
           "type": "object",
-          "required": ["token"],
+          "required": [
+            "token"
+          ],
           "properties": {
             "token": {
               "type": "object",
-              "required": ["contract_addr"],
+              "required": [
+                "contract_addr"
+              ],
               "properties": {
                 "contract_addr": {
                   "$ref": "#/definitions/Addr"
@@ -122,11 +143,15 @@
         {
           "description": "Native token",
           "type": "object",
-          "required": ["native_token"],
+          "required": [
+            "native_token"
+          ],
           "properties": {
             "native_token": {
               "type": "object",
-              "required": ["denom"],
+              "required": [
+                "denom"
+              ],
               "properties": {
                 "denom": {
                   "type": "string"
@@ -146,7 +171,11 @@
     "Cw20ReceiveMsg": {
       "description": "Cw20ReceiveMsg should be de/serialized under `Receive()` variant in a ExecuteMsg",
       "type": "object",
-      "required": ["amount", "msg", "sender"],
+      "required": [
+        "amount",
+        "msg",
+        "sender"
+      ],
       "properties": {
         "amount": {
           "$ref": "#/definitions/Uint128"
@@ -166,7 +195,11 @@
     },
     "SwapOperation": {
       "type": "object",
-      "required": ["ask_asset_info", "offer_asset_info", "pair_address"],
+      "required": [
+        "ask_asset_info",
+        "offer_asset_info",
+        "pair_address"
+      ],
       "properties": {
         "ask_asset_info": {
           "description": "Information about the asset we swap to",

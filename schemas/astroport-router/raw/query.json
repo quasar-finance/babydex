@@ -6,11 +6,16 @@
     {
       "description": "SimulateSwapOperations simulates multi-hop swap operations",
       "type": "object",
-      "required": ["simulate_swap_operations"],
+      "required": [
+        "simulate_swap_operations"
+      ],
       "properties": {
         "simulate_swap_operations": {
           "type": "object",
-          "required": ["offer_amount", "operations"],
+          "required": [
+            "offer_amount",
+            "operations"
+          ],
           "properties": {
             "offer_amount": {
               "description": "The amount of tokens to swap",
@@ -45,11 +50,15 @@
         {
           "description": "Non-native Token",
           "type": "object",
-          "required": ["token"],
+          "required": [
+            "token"
+          ],
           "properties": {
             "token": {
               "type": "object",
-              "required": ["contract_addr"],
+              "required": [
+                "contract_addr"
+              ],
               "properties": {
                 "contract_addr": {
                   "$ref": "#/definitions/Addr"
@@ -63,11 +72,15 @@
         {
           "description": "Native token",
           "type": "object",
-          "required": ["native_token"],
+          "required": [
+            "native_token"
+          ],
           "properties": {
             "native_token": {
               "type": "object",
-              "required": ["denom"],
+              "required": [
+                "denom"
+              ],
               "properties": {
                 "denom": {
                   "type": "string"
@@ -82,7 +95,11 @@
     },
     "SwapOperation": {
       "type": "object",
-      "required": ["ask_asset_info", "offer_asset_info", "pair_address"],
+      "required": [
+        "ask_asset_info",
+        "offer_asset_info",
+        "pair_address"
+      ],
       "properties": {
         "ask_asset_info": {
           "description": "Information about the asset we swap to",

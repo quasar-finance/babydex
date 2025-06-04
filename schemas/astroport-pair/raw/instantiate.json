@@ -3,7 +3,12 @@
   "title": "InstantiateMsg",
   "description": "This structure describes the parameters used for creating a contract.",
   "type": "object",
-  "required": ["asset_infos", "factory_addr", "pair_type", "token_code_id"],
+  "required": [
+    "asset_infos",
+    "factory_addr",
+    "pair_type",
+    "token_code_id"
+  ],
   "properties": {
     "asset_infos": {
       "description": "Information about assets in the pool",
@@ -54,11 +59,15 @@
         {
           "description": "Non-native Token",
           "type": "object",
-          "required": ["token"],
+          "required": [
+            "token"
+          ],
           "properties": {
             "token": {
               "type": "object",
-              "required": ["contract_addr"],
+              "required": [
+                "contract_addr"
+              ],
               "properties": {
                 "contract_addr": {
                   "$ref": "#/definitions/Addr"
@@ -72,11 +81,15 @@
         {
           "description": "Native token",
           "type": "object",
-          "required": ["native_token"],
+          "required": [
+            "native_token"
+          ],
           "properties": {
             "native_token": {
               "type": "object",
-              "required": ["denom"],
+              "required": [
+                "denom"
+              ],
               "properties": {
                 "denom": {
                   "type": "string"
@@ -99,7 +112,9 @@
         {
           "description": "XYK pair type",
           "type": "object",
-          "required": ["xyk"],
+          "required": [
+            "xyk"
+          ],
           "properties": {
             "xyk": {
               "type": "object",
@@ -111,7 +126,9 @@
         {
           "description": "Concentrated liquidity type",
           "type": "object",
-          "required": ["concentrated"],
+          "required": [
+            "concentrated"
+          ],
           "properties": {
             "concentrated": {
               "type": "object",
@@ -123,7 +140,9 @@
         {
           "description": "Custom pair type",
           "type": "object",
-          "required": ["custom"],
+          "required": [
+            "custom"
+          ],
           "properties": {
             "custom": {
               "type": "string"

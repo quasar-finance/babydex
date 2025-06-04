@@ -12,7 +12,9 @@
         {
           "description": "XYK pair type",
           "type": "object",
-          "required": ["xyk"],
+          "required": [
+            "xyk"
+          ],
           "properties": {
             "xyk": {
               "type": "object",
@@ -24,7 +26,9 @@
         {
           "description": "Concentrated liquidity type",
           "type": "object",
-          "required": ["concentrated"],
+          "required": [
+            "concentrated"
+          ],
           "properties": {
             "concentrated": {
               "type": "object",
@@ -36,7 +40,9 @@
         {
           "description": "Custom pair type",
           "type": "object",
-          "required": ["custom"],
+          "required": [
+            "custom"
+          ],
           "properties": {
             "custom": {
               "type": "string"

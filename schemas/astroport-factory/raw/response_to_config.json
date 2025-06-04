@@ -3,7 +3,12 @@
   "title": "ConfigResponse",
   "description": "A custom struct for each query response that returns general contract settings/configs.",
   "type": "object",
-  "required": ["coin_registry_address", "owner", "pair_configs", "token_code_id"],
+  "required": [
+    "coin_registry_address",
+    "owner",
+    "pair_configs",
+    "token_code_id"
+  ],
   "properties": {
     "coin_registry_address": {
       "description": "The address of the contract that contains the coins and their accuracy",
@@ -66,7 +71,12 @@
     "PairConfig": {
       "description": "This structure stores a pair type's configuration.",
       "type": "object",
-      "required": ["code_id", "maker_fee_bps", "pair_type", "total_fee_bps"],
+      "required": [
+        "code_id",
+        "maker_fee_bps",
+        "pair_type",
+        "total_fee_bps"
+      ],
       "properties": {
         "code_id": {
           "description": "ID of contract which is allowed to create pairs of this type",
@@ -118,7 +128,9 @@
         {
           "description": "XYK pair type",
           "type": "object",
-          "required": ["xyk"],
+          "required": [
+            "xyk"
+          ],
           "properties": {
             "xyk": {
               "type": "object",
@@ -130,7 +142,9 @@
         {
           "description": "Concentrated liquidity type",
           "type": "object",
-          "required": ["concentrated"],
+          "required": [
+            "concentrated"
+          ],
           "properties": {
             "concentrated": {
               "type": "object",
@@ -142,7 +156,9 @@
         {
           "description": "Custom pair type",
           "type": "object",
-          "required": ["custom"],
+          "required": [
+            "custom"
+          ],
           "properties": {
             "custom": {
               "type": "string"

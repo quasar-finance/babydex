@@ -115,7 +115,7 @@ export const createReferralService = (supabaseUrl: string, supabaseKey: string) 
         }
 
         if (error.code === UNIQUE_VALIDATION_ERROR_CODE && retries < maxRetries) {
-          console.warn(`Referral code ${code} already exists. Retrying...`);
+          console.warn(`Referral code ${ code } already exists. Retrying...`);
           retries++;
         } else {
           console.error("Error storing referral code:", error);
@@ -160,7 +160,7 @@ export const createReferralService = (supabaseUrl: string, supabaseKey: string) 
     }
   }
 
-  async function fetchUserWalletAddress(referralCode: string): Promise<string | null> {
+  async function fetchUserWalletAddressByReferralCode(referralCode: string): Promise<string | null> {
     try {
       const { data, error } = await supabase
         .from("user_referral_codes")
@@ -183,99 +183,124 @@ export const createReferralService = (supabaseUrl: string, supabaseKey: string) 
     }
   }
 
-  async function fetchReferredUserWalletAddress(
-    referredUserWalletAddress: string,
-  ): Promise<string | null> {
-    try {
-      const { data, error } = await supabase
-        .from("referrals")
-        .select("referred_user_wallet_address")
-        .eq("referred_user_wallet_address", referredUserWalletAddress)
-        .single();
+    async function fetchUserWalletAddressByAddress(address: string): Promise<string | null> {
+      try {
+        const { data, error } = await supabase
+          .from('user_referral_codes')
+          .select('user_wallet_address')
+          .eq('user_wallet_address', address)
+          .single(); // Expect only one result
 
-      if (error) {
-        if (error.code === SUPABASE_SELECT_SINGLE_ROW_ERROR_CODE) {
+        if (error) {
+          if (error.code === SUPABASE_SELECT_SINGLE_ROW_ERROR_CODE) {
+            return null; // No data found
+          }
+          console.error("Error fetching user wallet address", error);
           return null;
         }
 
+        return data ? data.user_wallet_address : null;
+      } catch (error: any) {
+        console.error("Error fetching user wallet address", error);
+        return null;
+      }
+    }
+
+    async function fetchReferredUserWalletAddress(referredUserWalletAddress: string): Promise<string | null> {
+      try {
+        const { data, error } = await supabase
+          .from("referrals")
+          .select("referred_user_wallet_address")
+          .eq("referred_user_wallet_address", referredUserWalletAddress)
+          .single();
+
+        if (error) {
+          if (error.code === SUPABASE_SELECT_SINGLE_ROW_ERROR_CODE) {
+            return null;
+          }
+
+          throw error;
+        }
+
+        return data ? data.referred_user_wallet_address : null;
+      } catch (error: any) {
+        console.error("Error fetching referred user wallet address", error);
+
         throw error;
       }
-
-      return data ? data.referred_user_wallet_address : null;
-    } catch (error: any) {
-      console.error("Error fetching referred user wallet address", error);
-
-      throw error;
-    }
-  }
-
-  async function handleReferral(
-    referredUserWalletAddress: string,
-    referralCode: string,
-    signedMessage: CosmosSignedMessage,
-  ): Promise<{
-    success: boolean;
-    error?: any;
-  }> {
-    if (!referredUserWalletAddress) {
-      return {
-        success: false,
-        error: "Referred user wallet address is required and cannot be empty.",
-      };
     }
 
-    if (!referralCode || referralCode.length !== 8) {
-      return { success: false, error: "Referral code is required and must be 8 characters long." };
-    }
-
-    try {
-      const verifiedAddress = await verifyCosmosSignature(signedMessage, referredUserWalletAddress);
-
-      if (!verifiedAddress) {
-        return { success: false, error: "Account ownership verification of referred user failed." };
-      }
-
-      if (verifiedAddress !== referredUserWalletAddress) {
+    async function handleReferral(
+      referredUserWalletAddress: string,
+      referralCode: string,
+      signedMessage: CosmosSignedMessage,
+    ): Promise<{
+      success: boolean;
+      error?: any;
+    }> {
+      if (!referredUserWalletAddress) {
         return {
           success: false,
-          error: "Provided wallet address of referred user does not match signed address.",
+          error: "Referred user wallet address is required and cannot be empty.",
         };
       }
 
-      if (await fetchReferredUserWalletAddress(referredUserWalletAddress)) {
-        return { success: false, error: "User has already been referred." };
+      if (!referralCode || referralCode.length !== 8) {
+        return { success: false, error: "Referral code is required and must be 8 characters long." };
       }
 
-      const referredByUserWalletAddress = await fetchUserWalletAddress(referralCode);
-      if (!referredByUserWalletAddress) {
-        return { success: false, error: "User wallet for referral code not found." };
-      }
+      try {
+        const verifiedAddress = await verifyCosmosSignature(signedMessage, referredUserWalletAddress);
 
-      if (referredByUserWalletAddress === referredUserWalletAddress) {
-        return { success: false, error: "User cannot refer to themselves." };
-      }
+        if (!verifiedAddress) {
+          return { success: false, error: "Account ownership verification of referred user failed." };
+        }
 
-      const recordResult = await recordReferral(
-        referredUserWalletAddress,
-        referredByUserWalletAddress,
-      );
-      if (!recordResult.success) {
-        return recordResult;
-      }
+        if (verifiedAddress !== referredUserWalletAddress) {
+          return {
+            success: false,
+            error: "Provided wallet address of referred user does not match signed address.",
+          };
+        }
 
-      return { success: true };
-    } catch (error: any) {
-      console.error("Error handling referral:", error);
-      return { success: false, error };
+        if (await fetchReferredUserWalletAddress(referredUserWalletAddress)) {
+          return { success: false, error: "User has already been referred." };
+        }
+
+        const referredByUserWalletAddress = await fetchUserWalletAddressByReferralCode(referralCode);
+        if (!referredByUserWalletAddress) {
+          return { success: false, error: "User wallet for referral code not found." };
+        }
+
+        if (referredByUserWalletAddress === referredUserWalletAddress) {
+          return { success: false, error: "User cannot refer to themselves." };
+        }
+
+        if (await fetchUserWalletAddressByAddress(referredUserWalletAddress)) {
+          return { success: false, error: 'User has already interacted with the DEX and created a referral code.' };
+        }
+
+        const recordResult = await recordReferral(
+          referredUserWalletAddress,
+          referredByUserWalletAddress,
+        );
+        if (!recordResult.success) {
+          return recordResult;
+        }
+
+        return { success: true };
+      } catch (error: any) {
+        console.error("Error handling referral:", error);
+        return { success: false, error };
+      }
     }
-  }
 
-  return {
-    fetchReferralCode,
-    storeReferralCode,
-    handleReferral,
-  } as Referral;
-};
+    return {
+      fetchReferralCode,
+      storeReferralCode,
+      handleReferral,
+    } as Referral;
+}
 
 // Helper function to generate an 8 char referral code
 export function generateReferralCode(): string {
@@ -322,12 +347,12 @@ export async function verifyCosmosSignature(
     );
 
     if (isValid && derivedAddress === expectedWalletAddress) {
-      console.log(`Signature verified successfully for address: ${derivedAddress}`);
+      console.log(`Signature verified successfully for address: ${ derivedAddress }`);
       return derivedAddress;
     }
 
     console.warn(
-      `Signature verification failed or address mismatch. Derived: ${derivedAddress}, Expected: ${expectedWalletAddress}`,
+      `Signature verification failed or address mismatch. Derived: ${ derivedAddress }, Expected: ${ expectedWalletAddress }`,
     );
     return null;
   } catch (error) {

@@ -34,7 +34,7 @@ const main = async () => {
     // Determine which contract to migrate to based on pair type
     const targetContract =
       "concentrated" in pairType ? "astroport_pair_concentrated" : "astroport_pair";
-    if (targetContract == "astroport_pair_concentrated") {
+    if (targetContract === "astroport_pair_concentrated") {
       const base64Msg = Buffer.from(JSON.stringify(PclupdateMsg)).toString("base64");
       const poolClient = new AstroportPairConcentratedClient(client, address, pair.contract_addr);
       await poolClient.updateConfig({ params: base64Msg });

@@ -79,11 +79,10 @@ const main = async () => {
       // Given amount of asset0 (BBN), calculate optimal asset1 (USDC)
       const asset1 = amount / priceScale;
       return { asset0: amount, asset1: Math.round(asset1) };
-    } else {
+    }
       // Given amount of asset1 (USDC), calculate optimal asset0 (BBN)
       const asset0 = amount * priceScale;
       return { asset0: Math.round(asset0), asset1: amount };
-    }
   }
 
   // Example calculations using only price scale

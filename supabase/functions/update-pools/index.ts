@@ -98,7 +98,7 @@ Deno.serve(async (req) => {
           },
         },
       );
-    } else {
+    }
       return new Response(
         JSON.stringify({
           success: true,
@@ -110,7 +110,6 @@ Deno.serve(async (req) => {
           },
         },
       );
-    }
   } catch (error) {
     console.error("Error:", error);
     return new Response(

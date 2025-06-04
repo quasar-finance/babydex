@@ -111,14 +111,14 @@ export const indexerRouter = createTRPCRouter({
         addresses: z.string().array(),
         startDate: z
           .string()
-          .refine((str) => !isNaN(Date.parse(str)), {
+          .refine((str) => !Number.isNaN(Date.parse(str)), {
             message: "Invalid date string",
           })
           .transform((str) => new Date(str))
           .nullish(),
         endDate: z
           .string()
-          .refine((str) => !isNaN(Date.parse(str)), {
+          .refine((str) => !Number.isNaN(Date.parse(str)), {
             message: "Invalid date string",
           })
           .transform((str) => new Date(str))
@@ -138,14 +138,14 @@ export const indexerRouter = createTRPCRouter({
         addresses: z.string().array(),
         startDate: z
           .string()
-          .refine((str) => !isNaN(Date.parse(str)), {
+          .refine((str) => !Number.isNaN(Date.parse(str)), {
             message: "Invalid date string",
           })
           .transform((str) => new Date(str))
           .nullish(),
         endDate: z
           .string()
-          .refine((str) => !isNaN(Date.parse(str)), {
+          .refine((str) => !Number.isNaN(Date.parse(str)), {
             message: "Invalid date string",
           })
           .transform((str) => new Date(str))
@@ -165,14 +165,14 @@ export const indexerRouter = createTRPCRouter({
         addresses: z.string().array(),
         startDate: z
           .string()
-          .refine((str) => !isNaN(Date.parse(str)), {
+          .refine((str) => !Number.isNaN(Date.parse(str)), {
             message: "Invalid date string",
           })
           .transform((str) => new Date(str))
           .nullish(),
         endDate: z
           .string()
-          .refine((str) => !isNaN(Date.parse(str)), {
+          .refine((str) => !Number.isNaN(Date.parse(str)), {
             message: "Invalid date string",
           })
           .transform((str) => new Date(str))

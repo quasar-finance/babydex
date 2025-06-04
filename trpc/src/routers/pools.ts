@@ -132,12 +132,11 @@ export const poolsRouter = createTRPCRouter({
         const optimalRatio: number = poolAmount0 / poolAmount1;
 
         return Number.isNaN(optimalRatio) ? 1 : optimalRatio;
-      } else {
+      }
         const { params } = config;
         const priceScale: number = Number(params.price_scale);
 
         return priceScale;
-      }
     }),
   getPool: createTRPCPublicProcedure
     .input(z.object({ address: z.string() }))

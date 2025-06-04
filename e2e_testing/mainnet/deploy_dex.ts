@@ -2,7 +2,7 @@ import deployed from "./deployed.json";
 import config from "./config.json";
 import contracts from "./contracts.json";
 import { getClientAndAddress } from "./lib";
-import * as fs from "fs";
+import * as fs from "node:fs";
 import type { InstantiateMsg as FactoryInitMsg, PairConfig } from "../sdk/AstroportFactory.types";
 import type { InstantiateMsg as CoinRegistryInitMsg } from "../sdk/AstroportNativeCoinRegistry.types";
 import type {
@@ -19,7 +19,7 @@ const main = async () => {
   deployed.coin_registry = await client
     .instantiate(
       address,
-      contracts["astroport_native_coin_registry"]!,
+      contracts.astroport_native_coin_registry!,
       { owner: config.admin } as CoinRegistryInitMsg,
       "Tower Coin registry",
       "auto",
@@ -35,23 +35,23 @@ const main = async () => {
     fee_address: config.fee_address,
     pair_configs: [
       {
-        code_id: contracts["astroport_pair"]!,
+        code_id: contracts.astroport_pair!,
         maker_fee_bps: 0,
         pair_type: { xyk: {} },
         total_fee_bps: 30,
       } as PairConfig,
       {
-        code_id: contracts["astroport_pair_concentrated"]!,
+        code_id: contracts.astroport_pair_concentrated!,
         maker_fee_bps: 0,
         pair_type: { concentrated: {} },
         total_fee_bps: 3000,
       } as PairConfig,
     ],
-    token_code_id: contracts["cw20_token"]!,
+    token_code_id: contracts.cw20_token!,
   } as FactoryInitMsg;
 
   deployed.factory = await client
-    .instantiate(address, contracts["astroport_factory"]!, init_msg, "Tower Factory", "auto", {
+    .instantiate(address, contracts.astroport_factory!, init_msg, "Tower Factory", "auto", {
       admin: config.admin,
     })
     .then((resp) => resp.contractAddress);
@@ -70,7 +70,7 @@ const main = async () => {
   deployed.incentives = await client
     .instantiate(
       address,
-      contracts["astroport_incentives"]!,
+      contracts.astroport_incentives!,
       incentives_init_msg,
       "Tower Incentives",
       "auto",
@@ -83,7 +83,7 @@ const main = async () => {
   deployed.router = await client
     .instantiate(
       address,
-      contracts["astroport_router"]!,
+      contracts.astroport_router!,
       incentives_init_msg,
       "Tower Router",
       "auto",

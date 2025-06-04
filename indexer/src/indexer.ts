@@ -1104,7 +1104,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     const addressesSql =
       addresses.length > 0
         ? sql` WHERE address = ${createPoolAddressArraySql(addresses)} `
-        : sql.raw(``);
+        : sql.raw("");
     const query = sql` SELECT * FROM v1_cosmos.materialized_points ${addressesSql} ORDER BY rank LIMIT ${limit}; `;
 
     try {

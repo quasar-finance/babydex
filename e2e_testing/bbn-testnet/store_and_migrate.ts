@@ -1,4 +1,4 @@
-import * as fs from "fs";
+import * as fs from "node:fs";
 import deployed from "./deployed.json";
 import contracts from "./contracts.json";
 import { getClientAndAddress } from "../lib";

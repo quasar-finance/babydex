@@ -1,4 +1,4 @@
-import path = require("path");
+import path = require("node:path");
 import dotenv = require("dotenv");
 
 dotenv.config({ path: path.resolve(__dirname, "../.env.testing") });

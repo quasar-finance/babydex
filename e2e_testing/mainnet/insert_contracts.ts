@@ -1,6 +1,6 @@
 import { Client } from "pg";
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 import { getClientAndAddress } from "../lib.js";
 import { AstroportFactoryClient } from "../sdk/AstroportFactory.client.js";
 
@@ -53,10 +53,10 @@ async function processFactoryContracts(deployedFactory: string) {
 
 // Sample contract data
 async function populateContracts(): Promise<Contract[]> {
-  var deployedContracts = readDeployedContracts();
+  const deployedContracts = readDeployedContracts();
   const contracts: Contract[] = [];
 
-  const factory = deployedContracts["factory"];
+  const factory = deployedContracts.factory;
   const pairs = await processFactoryContracts(factory); // Ensure pairs is resolved
   const pairsArray = pairs.flatMap(({ contract, token }) => [contract, token]);
 

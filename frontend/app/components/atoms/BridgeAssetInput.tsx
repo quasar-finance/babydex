@@ -7,7 +7,7 @@ import { IconChevronDown, IconWallet } from "@tabler/icons-react";
 import { ModalTypes } from "~/types/modal";
 import { useModal } from "~/app/providers/ModalProvider";
 import { Assets } from "~/config";
-import { useAccount, useBalances } from "@cosmi/react";
+import { useAccount, } from "@cosmi/react";
 import { assetNumberMask } from "~/utils/masks";
 import { useUserBalances } from "~/app/hooks/useUserBalances";
 import Divider from "./Divider";

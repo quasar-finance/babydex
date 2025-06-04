@@ -1,27 +1,24 @@
-import {createClient} from 'jsr:@supabase/supabase-js@2';
+import { createClient } from "jsr:@supabase/supabase-js@2";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
-  "db": {
-    "schema": "v1_cosmos"
-  }
+  db: {
+    schema: "v1_cosmos",
+  },
 });
-const COINGECKO_API_URL = 'https://pro-api.coingecko.com/api/v3';
+const COINGECKO_API_URL = "https://pro-api.coingecko.com/api/v3";
 const COINGECKO_API_KEY = Deno.env.get("COINGECKO_API_KEY");
 const OPTIONS = {
-  method: 'GET',
+  method: "GET",
   headers: {
-    'x-cg-pro-api-key': `${COINGECKO_API_KEY}`,
-    accept: 'application/json'
-  }
+    "x-cg-pro-api-key": `${COINGECKO_API_KEY}`,
+    accept: "application/json",
+  },
 };
 
 Deno.serve(async (req) => {
-  const {
-    reqStartDate,
-    tokenName
-  } = await req.json();
+  const { reqStartDate, tokenName } = await req.json();
 
   try {
     const startDate = new Date(reqStartDate);
@@ -35,19 +32,23 @@ Deno.serve(async (req) => {
       throw new Error(`Earliest price date before start time: ${tokenName}`);
     }
 
-    console.log(`Fetching prices for ${tokenName} from ${startDate.toISOString()} to ${endDate.toISOString()}`);
+    console.log(
+      `Fetching prices for ${tokenName} from ${startDate.toISOString()} to ${endDate.toISOString()}`,
+    );
     const prices = await fetchHistoricalPrices(token.coingecko_id, startDate, endDate);
 
     if (!prices) {
-      throw new Error(`No prices found for ${tokenName} from ${startDate.toISOString()} to ${endDate.toISOString()}`);
+      throw new Error(
+        `No prices found for ${tokenName} from ${startDate.toISOString()} to ${endDate.toISOString()}`,
+      );
     }
 
-    for (const {datetime, timestamp, price} of prices) {
-      const {data: priceExistsData, error: priceExistsError} = await supabase
-        .from('token_prices')
-        .select('price')
-        .eq('token', tokenName)
-        .eq('created_at', datetime);
+    for (const { datetime, timestamp, price } of prices) {
+      const { data: priceExistsData, error: priceExistsError } = await supabase
+        .from("token_prices")
+        .select("price")
+        .eq("token", tokenName)
+        .eq("created_at", datetime);
 
       if (priceExistsError) {
         console.warning(`Price already exists for ${tokenName} at ${datetime}:`, priceExistsError);
@@ -57,14 +58,12 @@ Deno.serve(async (req) => {
       if (priceExistsData.length === 0) {
         console.log(`Inserting price for ${tokenName} at ${datetime}: ${price}`);
 
-        const {error: insertError} = await supabase
-          .from('token_prices')
-          .insert({
-            token: tokenName,
-            price: price,
-            created_at: datetime,
-            last_updated_at: timestamp
-          });
+        const { error: insertError } = await supabase.from("token_prices").insert({
+          token: tokenName,
+          price: price,
+          created_at: datetime,
+          last_updated_at: timestamp,
+        });
 
         if (insertError) {
           console.error(`Error inserting price for ${tokenName} at ${datetime}:`, insertError);
@@ -76,36 +75,39 @@ Deno.serve(async (req) => {
       }
     }
 
-    console.log('Back filling prices complete.');
+    console.log("Back filling prices complete.");
 
-    return new Response(JSON.stringify({
-      success: true,
-      message: "Historical prices fetched and inserted",
-    }), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json"
-      }
-    });
+    return new Response(
+      JSON.stringify({
+        success: true,
+        message: "Historical prices fetched and inserted",
+      }),
+      {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
   } catch (err) {
     console.error("Error in Edge Function:", err);
-    return new Response(JSON.stringify({
-      success: false,
-      error: err.message
-    }), {
-      status: 500,
-      headers: {
-        "Content-Type": "application/json"
-      }
-    });
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: err.message,
+      }),
+      {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
   }
 });
 
 async function fetchToken(tokenName: string): Promise<unknown> {
-  const {
-    data: token,
-    error: selectError
-  } = await supabase
+  const { data: token, error: selectError } = await supabase
     .from("token")
     .select("denomination, token_name, coingecko_id")
     .eq("token_name", tokenName)
@@ -122,14 +124,11 @@ async function fetchToken(tokenName: string): Promise<unknown> {
 }
 
 async function fetchEarliestPriceDate(tokenName: string): Promise<unknown> {
-  const {
-    data: earliestPriceDate,
-    error: selectError
-  } = await supabase
+  const { data: earliestPriceDate, error: selectError } = await supabase
     .from("token_prices")
     .select("created_at")
     .eq("token", tokenName)
-    .order("created_at", {ascending: true})
+    .order("created_at", { ascending: true })
     .limit(1)
     .single();
 
@@ -144,8 +143,8 @@ async function fetchHistoricalPrices(
   tokenId: string,
   fromDate: Date,
   toDate: Date,
-): Promise<{ datetime: string; timestamp: number, price: number }[] | null> {
-  const allPrices: { datetime: string; timestamp: number, price: number }[] = [];
+): Promise<{ datetime: string; timestamp: number; price: number }[] | null> {
+  const allPrices: { datetime: string; timestamp: number; price: number }[] = [];
   let currentDate = new Date(fromDate);
 
   while (currentDate < toDate) {
@@ -165,7 +164,9 @@ async function fetchHistoricalPrices(
       const response = await fetch(url, OPTIONS);
 
       if (!response.ok) {
-        throw new Error(`CoinGecko API error for ${tokenId} from ${fromDate} to ${toDate}: ${response.status} ${response.statusText}`);
+        throw new Error(
+          `CoinGecko API error for ${tokenId} from ${fromDate} to ${toDate}: ${response.status} ${response.statusText}`,
+        );
       }
 
       const data = await response.json();

@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import ky from "ky";
 
 import Turnstile from "react-cloudflare-turnstile";

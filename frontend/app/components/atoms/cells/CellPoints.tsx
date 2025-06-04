@@ -1,4 +1,4 @@
-import { type Currency, PairType } from "@towerfi/types";
+import type { Currency, } from "@towerfi/types";
 import type React from "react";
 
 interface Props {

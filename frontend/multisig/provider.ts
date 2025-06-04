@@ -1,6 +1,6 @@
 export class MultisigProvider {
   private popup: Window | null = null;
-  private readonly ADDRESS_KEY = 'multisig_address';
+  private readonly ADDRESS_KEY = "multisig_address";
 
   get address(): string | null {
     return localStorage.getItem(this.ADDRESS_KEY);
@@ -20,13 +20,13 @@ export class MultisigProvider {
       this.popup.close();
     }
     this.popup = null;
-    localStorage.removeItem(this.ADDRESS_KEY)
+    localStorage.removeItem(this.ADDRESS_KEY);
   }
 
   async enable(chainId: string): Promise<void> {
     // Try to close any existing popup windows
     try {
-      const existingPopup = window.open('', 'Multisig Address Input');
+      const existingPopup = window.open("", "Multisig Address Input");
       if (existingPopup) {
         existingPopup.close();
       }
@@ -35,8 +35,8 @@ export class MultisigProvider {
     }
 
     // Create a popup window for address input
-    this.popup = window.open('', 'Multisig Address Input', 'width=400,height=300');
-    if (!this.popup) throw new Error('Popup blocked');
+    this.popup = window.open("", "Multisig Address Input", "width=400,height=300");
+    if (!this.popup) throw new Error("Popup blocked");
 
     // Create the popup content
     this.popup.document.write(`
@@ -90,27 +90,29 @@ export class MultisigProvider {
     // Listen for the address from the popup
     return new Promise((resolve, reject) => {
       const handleMessage = (event: MessageEvent) => {
-        if (event.data.type === 'MULTISIG_ADDRESS') {
+        if (event.data.type === "MULTISIG_ADDRESS") {
           this.address = event.data.address;
-          console.log("address set: ", this.address)
-          window.removeEventListener('message', handleMessage);
+          console.log("address set: ", this.address);
+          window.removeEventListener("message", handleMessage);
           resolve();
         }
       };
-      window.addEventListener('message', handleMessage);
+      window.addEventListener("message", handleMessage);
     });
   }
 
   getOfflineSignerOnlyAmino(chainId: string) {
     return {
       getAccounts: async () => {
-        if (!this.address) throw new Error('No address set');
-        return [{
-          address: this.address,
-          algo: 'secp256k1',
-          pubkey: new Uint8Array(0) // We don't need the pubkey for multisig
-        }];
-      }
+        if (!this.address) throw new Error("No address set");
+        return [
+          {
+            address: this.address,
+            algo: "secp256k1",
+            pubkey: new Uint8Array(0), // We don't need the pubkey for multisig
+          },
+        ];
+      },
     };
   }
 }

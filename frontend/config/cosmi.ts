@@ -30,7 +30,7 @@ export const cosmi = createConfig({
         provider: (w) => w?.cosmostation?.providers.keplr,
       },
     }),
-    multisig({shimDisconnect: true}),
+    multisig({ shimDisconnect: true }),
   ],
   batch: { multicall: { batchSize: 10, wait: 200 } },
   transports: {

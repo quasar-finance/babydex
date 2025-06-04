@@ -3,7 +3,6 @@ import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { type RouteRequest, type RouteResponse, SkipClient } from "@skip-go/client";
 import type { WalletClient } from "viem";
 import { useRef } from "react";
-import { sleep } from "~/utils/promises";
 
 type UseSkipClientParameters = {
   cacheKey?: string;

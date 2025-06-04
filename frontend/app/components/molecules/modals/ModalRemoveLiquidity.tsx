@@ -12,7 +12,7 @@ import Pill from "../../atoms/Pill";
 import Input from "../../atoms/Input";
 import { RangeSelector } from "../../atoms/RangeSelector";
 import { useDexClient } from "~/app/hooks/useDexClient";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, } from "@tanstack/react-query";
 import { useAccount } from "@cosmi/react";
 import { AssetAmountSquare } from "../../atoms/AssetAmountSquare";
 import { useWithdrawSimulation } from "~/app/hooks/useWithdrawSimulation";
@@ -101,9 +101,10 @@ const ModalRemoveLiquidity: React.FC<ModalRemoveLiquidityProps> = ({
               <span>{name}</span>
             </div>
             <Pill>
-              {pool.poolType === "concentrated" 
-                ? `${(Number(pool.config.params.mid_fee || 0) * 100).toFixed(2)}% - ${(Number(pool.config.params.out_fee || 0) * 100).toFixed(2)}%`
-                : "0.30%" // TODO make this dynamic after launch
+              {
+                pool.poolType === "concentrated"
+                  ? `${(Number(pool.config.params.mid_fee || 0) * 100).toFixed(2)}% - ${(Number(pool.config.params.out_fee || 0) * 100).toFixed(2)}%`
+                  : "0.30%" // TODO make this dynamic after launch
               }
             </Pill>
           </div>

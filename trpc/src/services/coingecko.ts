@@ -12,7 +12,7 @@ export type CoingeckoServiceReturnType = {
 };
 
 export function createCoingeckoService(
-  params: CreateCoingeckoParameters
+  params: CreateCoingeckoParameters,
 ): CoingeckoServiceReturnType {
   const { cacheService } = params;
   const api = ky.extend({ prefixUrl: "https://api.coingecko.com/api/v3" });

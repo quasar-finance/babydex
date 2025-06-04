@@ -5,7 +5,7 @@ import { useFormContext } from "react-hook-form";
 import { IconWallet } from "@tabler/icons-react";
 import { convertDenomToMicroDenom, convertMicroDenomToDenom } from "~/utils/intl";
 import { useImperativeHandle, useState } from "react";
-import { useAccount, useBalances } from "@cosmi/react";
+import { useAccount, } from "@cosmi/react";
 import { useToast } from "~/app/hooks";
 import { useModal } from "~/app/providers/ModalProvider";
 import { ModalTypes } from "~/types/modal";

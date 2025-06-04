@@ -1,7 +1,7 @@
 import { Menu, MenuButton, MenuItems, MenuItem } from "@headlessui/react";
 import { useState } from "react";
 import { twMerge } from "~/utils/twMerge";
-import { IconCheck, IconChevronDown, IconCircleCheck } from "@tabler/icons-react";
+import { IconCheck, IconChevronDown, } from "@tabler/icons-react";
 import { motion, AnimatePresence } from "motion/react";
 
 type Label = string | React.ReactNode;

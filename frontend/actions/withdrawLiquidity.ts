@@ -1,7 +1,7 @@
-import type { Account, Chain, Client, CometBftRpcSchema, Transport } from "cosmi/types";
-import { execute, type ExecuteReturnType, executeMultiple } from "cosmi/client";
+import type { Account, Chain, CometBftRpcSchema, Transport } from "cosmi/types";
+import type { ExecuteReturnType, } from "cosmi/client";
 import { toUtf8, toBase64 } from "cosmi/utils";
-import { ClientWithActions } from "~/multisig/client/types";
+import type { ClientWithActions } from "~/multisig/client/types";
 
 export type WithdrawLiquidityParameters = {
   sender: string;
@@ -20,8 +20,7 @@ export async function withdrawLiquidity<
   client: ClientWithActions<Transport, C, A, CometBftRpcSchema>,
   parameters: WithdrawLiquidityParameters,
 ): WithdrawLiquidityReturnType {
-  const { sender, lpTokenAddress, poolAddress, amount, incentiveAddress } =
-    parameters;
+  const { sender, lpTokenAddress, poolAddress, amount, incentiveAddress } = parameters;
 
   return await client.executeMultiple({
     sender,

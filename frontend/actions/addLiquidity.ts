@@ -1,8 +1,8 @@
-import { executeMultiple, type ExecuteReturnType } from "cosmi/client";
-import type { Chain, Account, CometBftRpcSchema, Transport } from "cosmi/types";
+import type { ExecuteReturnType } from "cosmi/client";
+import type { Chain, Account, Transport } from "cosmi/types";
 import type { ClientWithActions } from "~/multisig/client/types";
 import { setInnerValueToAsset } from "@towerfi/trpc";
-import { Currency } from "@towerfi/types";
+import type { Currency } from "@towerfi/types";
 import { buildIncreaseAllowanceMsg } from "./increaseAllowance";
 
 export type AddLiquidityParameters = AddLiquidityMsgParams;
@@ -47,14 +47,14 @@ export function buildAddLiquidityMsg({
   // TODO potential improvement would we to get allowance and subtract
 
   // Create increase allowance messages for CW20 assets
-  const cw20Assets = assets.filter(asset => asset.info.type === "cw-20");
-  const increaseAllowanceMsgs = cw20Assets.map(asset => 
+  const cw20Assets = assets.filter((asset) => asset.info.type === "cw-20");
+  const increaseAllowanceMsgs = cw20Assets.map((asset) =>
     buildIncreaseAllowanceMsg({
       sender,
       tokenAddress: asset.info.denom,
       spender: poolAddress,
       amount: asset.amount,
-    })
+    }),
   );
 
   const provideLiquidityMsg = {
@@ -81,7 +81,6 @@ export function buildAddLiquidityMsg({
 
   return {
     sender,
-    execMsgs: [...increaseAllowanceMsgs.map(msg => msg.execute), provideLiquidityMsg],
+    execMsgs: [...increaseAllowanceMsgs.map((msg) => msg.execute), provideLiquidityMsg],
   };
 }
-

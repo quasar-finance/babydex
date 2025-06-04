@@ -1,5 +1,5 @@
-import path = require('path');
-import dotenv = require('dotenv');
+import path = require("node:path");
+import dotenv = require("dotenv");
 
 dotenv.config({ path: path.resolve(__dirname, "../.env.testing") });
 
@@ -27,7 +27,6 @@ interface Config {
   SUPABASE_SSL: boolean;
 }
 
-
 const getConfig = (): ENV => {
   return {
     NODE_ENV: process.env.NODE_ENV,
@@ -38,7 +37,9 @@ const getConfig = (): ENV => {
     SUPABASE_USER: process.env.SUPABASE_USER,
     SUPABASE_PW: process.env.SUPABASE_PW,
     SUPABASE_DB: process.env.SUPABASE_DB,
-    SUPABASE_SSL: process.env.SUPABASE_SSL ? process.env.SUPABASE_SSL.toLowerCase() === 'true' : false,
+    SUPABASE_SSL: process.env.SUPABASE_SSL
+      ? process.env.SUPABASE_SSL.toLowerCase() === "true"
+      : false,
   };
 };
 

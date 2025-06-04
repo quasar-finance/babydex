@@ -1,4 +1,4 @@
-import type { Currency, PoolIncentive, PoolMetricSerialized } from "@towerfi/types";
+import type { Currency, PoolMetricSerialized } from "@towerfi/types";
 import { usePrices } from "./usePrices";
 import { convertMicroDenomToDenom } from "~/utils/intl";
 import { DefaultPoolMetric } from "~/utils/consts";

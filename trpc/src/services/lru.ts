@@ -11,11 +11,7 @@ export function createLruService(): Cache {
     return e ? (deserialize(e) as T) : null;
   }
 
-  async function setItem<T>(
-    key: string,
-    value: T,
-    options?: CacheSetOptions
-  ): Promise<void> {
+  async function setItem<T>(key: string, value: T, options?: CacheSetOptions): Promise<void> {
     lruInstance.set(key, serialize(value), { ttl: options?.ttl });
   }
 

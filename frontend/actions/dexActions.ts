@@ -1,4 +1,4 @@
-import type { Transport, Chain, Account, Client } from "cosmi/types";
+import type { Transport, Chain, Account, } from "cosmi/types";
 
 import {
   addLiquidity,
@@ -47,7 +47,7 @@ import {
   type IncreaseAllowanceReturnType,
 } from "./increaseAllowance";
 import { poolSwap, type PoolSwapParameters, type PoolSwapReturnType } from "./poolSwap";
-import { ClientWithActions } from "~/multisig/client/types";
+import type { ClientWithActions } from "~/multisig/client/types";
 
 export type DexActions<
   _transport extends Transport = Transport,

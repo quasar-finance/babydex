@@ -1,17 +1,14 @@
 import BasicModal from "~/app/components/templates/BasicModal";
 import { Button } from "~/app/components/atoms/Button";
 import Image from "next/image";
-import { useModal } from "~/app/providers/ModalProvider";
-import { useToast } from "~/app/hooks";
 
 import type React from "react";
 import { useAccount, useConnectors } from "@cosmi/react";
 import { babylon } from "~/config/chains/babylon";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import CopyMessage from "../../atoms/CopyMessage";
 import { IntlAddress } from "~/utils/intl";
 import { IconCopy, IconLogout } from "@tabler/icons-react";
-import { set } from "react-hook-form";
 
 function ConnectorButton({ connector, onClick }: { connector: any; onClick: () => void }) {
   const { name, id, isInstalled } = connector;

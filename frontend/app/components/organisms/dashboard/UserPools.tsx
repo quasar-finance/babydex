@@ -6,20 +6,21 @@ import { Table, TableRow } from "../../atoms/Table";
 import PoolsDashboardSkeleton from "../../molecules/skeletons/PoolsDashboardSkeleton";
 import { twMerge } from "~/utils/twMerge";
 import { CellPoolName } from "../../atoms/cells/CellPoolName";
-import { CellData } from "../../atoms/cells/CellData";
 import { CellClaimRewards } from "../../atoms/cells/CellClaimRewards";
 import { Button } from "../../atoms/Button";
 import { IconDots } from "@tabler/icons-react";
 import { ModalTypes } from "~/types/modal";
 import Link from "next/link";
 import { CellDataToken } from "../../atoms/cells/CellDataToken";
-import type { Asset, PoolInfo, PoolMetricSerialized, UserPoolBalances } from "@towerfi/types";
+import type { Asset, PoolInfo, UserPoolBalances } from "@towerfi/types";
 import { Menu, MenuButton, MenuItems, MenuItem } from "@headlessui/react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Input from "../../atoms/Input";
 import { CellVolume } from "../../atoms/cells/CellVolume";
 import { CellPoints } from "../../atoms/cells/CellPoints";
 import { useRouter } from "next/navigation";
+import CellApr from "../../atoms/cells/CellApr";
+import { PeriodToggle, type Period } from "../../atoms/PeriodToggle";
 
 interface Props {
   pools: { poolInfo: PoolInfo; userBalance: UserPoolBalances; incentives: Asset[] }[];
@@ -32,7 +33,7 @@ export const UserPools: React.FC<Props> = ({ pools, isLoading, refreshUserPools 
   const { showModal } = useModal();
   const { address } = useAccount();
   const router = useRouter();
-  const [aprTimeframe, setAprTimeframe] = useState<"1d" | "7d">("7d");
+  const [aprTimeframe, setAprTimeframe] = useState<Period>("7d");
   const [searchText, setSearchText] = useState("");
 
   const columns = [
@@ -49,13 +50,44 @@ export const UserPools: React.FC<Props> = ({ pools, isLoading, refreshUserPools 
     poolInfo.name.toLowerCase().includes(searchText.toLowerCase()),
   );
 
-  const startDate = new Date();
-  startDate.setUTCDate(startDate.getUTCDate() - (aprTimeframe === "7d" ? 7 : 1));
+  const startDate = useMemo(() => {
+    const date = new Date();
+    date.setUTCDate(date.getUTCDate() - (aprTimeframe === "7d" ? 7 : 1));
+    return date.toUTCString();
+  }, [aprTimeframe]);
+
+  const poolAddresses = useMemo(() => 
+    filteredPools.map(({ poolInfo }) => poolInfo.poolAddress),
+    [filteredPools]
+  );
+
+  const queryInput = useMemo(
+    () => ({
+      addresses: poolAddresses,
+      startDate,
+    }),
+    [poolAddresses, startDate],
+  );
+  
   const { data: metrics, isLoading: isMetricLoading } =
-    trpc.edge.indexer.getPoolMetricsByAddresses.useQuery({
-      addresses: filteredPools.map(({ poolInfo }) => poolInfo.poolAddress),
-      startDate: startDate.toUTCString(),
+    trpc.edge.indexer.getPoolMetricsByAddresses.useQuery(queryInput, {
+      enabled: poolAddresses.length > 0,
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+      staleTime: 1000 * 60 * 1, // 1 minute
     });
+
+  const { data: incentiveAprs } = trpc.edge.indexer.getPoolIncentivesByAddresses.useQuery({
+    addresses: poolAddresses,
+    interval: aprTimeframe === "7d" ? 7 : 1,
+  }, {
+    enabled: poolAddresses.length > 0,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    staleTime: 1000 * 60 * 1, // 1 minutes
+  });
 
   if (!address) {
     return (
@@ -82,26 +114,7 @@ export const UserPools: React.FC<Props> = ({ pools, isLoading, refreshUserPools 
       <div className="flex gap-3 justify-between items-center lg:pl-3 lg:pr-2 pl-3">
         <h1 className="text-xl">Your Pools</h1>
         <div className="flex gap-3 h-[42px] items-center px-2">
-          <div className="flex items-center gap-2 bg-white/5 rounded-lg p-1">
-            <button
-              type="button"
-              onClick={() => setAprTimeframe("1d")}
-              className={`px-3 py-1 rounded-md text-sm transition-colors ${
-                aprTimeframe === "1d" ? "bg-white/10" : "hover:bg-white/5"
-              }`}
-            >
-              1D
-            </button>
-            <button
-              type="button"
-              onClick={() => setAprTimeframe("7d")}
-              className={`px-3 py-1 rounded-md text-sm transition-colors ${
-                aprTimeframe === "7d" ? "bg-white/10" : "hover:bg-white/5"
-              }`}
-            >
-              7D
-            </button>
-          </div>
+          <PeriodToggle onChange={setAprTimeframe} defaultPeriod={aprTimeframe} />
           <Input
             isSearch
             placeholder="Search"
@@ -130,6 +143,7 @@ export const UserPools: React.FC<Props> = ({ pools, isLoading, refreshUserPools 
                   name={poolInfo.name}
                   poolType={poolInfo.poolType}
                   config={poolInfo.config}
+                  incentives={incentiveAprs?.[poolInfo.poolAddress]}
                   className="w-full pr-4"
                 />
                 <CellDataToken
@@ -139,16 +153,11 @@ export const UserPools: React.FC<Props> = ({ pools, isLoading, refreshUserPools 
                   tokens={poolInfo.assets}
                   className="w-full pl-4"
                 />
-                <CellData
+                <CellApr
                   title={`APR (${aprTimeframe})`}
-                  data={
-                    isMetricLoading || !metrics
-                      ? "..."
-                      : (metrics as Record<string, PoolMetricSerialized>)[poolInfo.poolAddress]
-                            ?.average_apr
-                        ? `${((metrics as Record<string, PoolMetricSerialized>)[poolInfo.poolAddress].average_apr * 100).toFixed(2)}%`
-                        : "0%"
-                  }
+                  metrics={metrics?.[poolInfo.poolAddress]}
+                  incentives={incentiveAprs?.[poolInfo.poolAddress]}
+                  isLoading={isMetricLoading}
                   className="w-full px-4"
                 />
                 <CellVolume

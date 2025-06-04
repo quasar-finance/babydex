@@ -7,12 +7,7 @@
     "title": "InstantiateMsg",
     "description": "This structure describes the parameters used for creating a contract.",
     "type": "object",
-    "required": [
-      "asset_infos",
-      "factory_addr",
-      "pair_type",
-      "token_code_id"
-    ],
+    "required": ["asset_infos", "factory_addr", "pair_type", "token_code_id"],
     "properties": {
       "asset_infos": {
         "description": "Information about assets in the pool",
@@ -63,15 +58,11 @@
           {
             "description": "Non-native Token",
             "type": "object",
-            "required": [
-              "token"
-            ],
+            "required": ["token"],
             "properties": {
               "token": {
                 "type": "object",
-                "required": [
-                  "contract_addr"
-                ],
+                "required": ["contract_addr"],
                 "properties": {
                   "contract_addr": {
                     "$ref": "#/definitions/Addr"
@@ -85,15 +76,11 @@
           {
             "description": "Native token",
             "type": "object",
-            "required": [
-              "native_token"
-            ],
+            "required": ["native_token"],
             "properties": {
               "native_token": {
                 "type": "object",
-                "required": [
-                  "denom"
-                ],
+                "required": ["denom"],
                 "properties": {
                   "denom": {
                     "type": "string"
@@ -116,9 +103,7 @@
           {
             "description": "XYK pair type",
             "type": "object",
-            "required": [
-              "xyk"
-            ],
+            "required": ["xyk"],
             "properties": {
               "xyk": {
                 "type": "object",
@@ -130,9 +115,7 @@
           {
             "description": "Concentrated liquidity type",
             "type": "object",
-            "required": [
-              "concentrated"
-            ],
+            "required": ["concentrated"],
             "properties": {
               "concentrated": {
                 "type": "object",
@@ -144,9 +127,7 @@
           {
             "description": "Custom pair type",
             "type": "object",
-            "required": [
-              "custom"
-            ],
+            "required": ["custom"],
             "properties": {
               "custom": {
                 "type": "string"
@@ -166,9 +147,7 @@
       {
         "description": "Receives a message of type [`Cw20ReceiveMsg`]",
         "type": "object",
-        "required": [
-          "receive"
-        ],
+        "required": ["receive"],
         "properties": {
           "receive": {
             "$ref": "#/definitions/Cw20ReceiveMsg"
@@ -179,15 +158,11 @@
       {
         "description": "ProvideLiquidity allows someone to provide liquidity in the pool",
         "type": "object",
-        "required": [
-          "provide_liquidity"
-        ],
+        "required": ["provide_liquidity"],
         "properties": {
           "provide_liquidity": {
             "type": "object",
-            "required": [
-              "assets"
-            ],
+            "required": ["assets"],
             "properties": {
               "assets": {
                 "description": "The assets available in the pool",
@@ -198,10 +173,7 @@
               },
               "auto_stake": {
                 "description": "Determines whether the LP tokens minted for the user is auto_staked in the Incentives contract",
-                "type": [
-                  "boolean",
-                  "null"
-                ]
+                "type": ["boolean", "null"]
               },
               "min_lp_to_receive": {
                 "anyOf": [
@@ -215,10 +187,7 @@
               },
               "receiver": {
                 "description": "The receiver of LP tokens",
-                "type": [
-                  "string",
-                  "null"
-                ]
+                "type": ["string", "null"]
               },
               "slippage_tolerance": {
                 "description": "The slippage tolerance that allows liquidity provision only if the price in the pool doesn't move too much",
@@ -240,15 +209,11 @@
       {
         "description": "Swap performs a swap in the pool",
         "type": "object",
-        "required": [
-          "swap"
-        ],
+        "required": ["swap"],
         "properties": {
           "swap": {
             "type": "object",
-            "required": [
-              "offer_asset"
-            ],
+            "required": ["offer_asset"],
             "properties": {
               "ask_asset_info": {
                 "anyOf": [
@@ -284,10 +249,7 @@
                 "$ref": "#/definitions/Asset"
               },
               "to": {
-                "type": [
-                  "string",
-                  "null"
-                ]
+                "type": ["string", "null"]
               }
             },
             "additionalProperties": false
@@ -298,15 +260,11 @@
       {
         "description": "Update the pair configuration",
         "type": "object",
-        "required": [
-          "update_config"
-        ],
+        "required": ["update_config"],
         "properties": {
           "update_config": {
             "type": "object",
-            "required": [
-              "params"
-            ],
+            "required": ["params"],
             "properties": {
               "params": {
                 "$ref": "#/definitions/Binary"
@@ -320,16 +278,11 @@
       {
         "description": "ProposeNewOwner creates a proposal to change contract ownership. The validity period for the proposal is set in the `expires_in` variable.",
         "type": "object",
-        "required": [
-          "propose_new_owner"
-        ],
+        "required": ["propose_new_owner"],
         "properties": {
           "propose_new_owner": {
             "type": "object",
-            "required": [
-              "expires_in",
-              "owner"
-            ],
+            "required": ["expires_in", "owner"],
             "properties": {
               "expires_in": {
                 "description": "The date after which this proposal expires",
@@ -350,9 +303,7 @@
       {
         "description": "DropOwnershipProposal removes the existing offer to change contract ownership.",
         "type": "object",
-        "required": [
-          "drop_ownership_proposal"
-        ],
+        "required": ["drop_ownership_proposal"],
         "properties": {
           "drop_ownership_proposal": {
             "type": "object",
@@ -364,9 +315,7 @@
       {
         "description": "Used to claim contract ownership.",
         "type": "object",
-        "required": [
-          "claim_ownership"
-        ],
+        "required": ["claim_ownership"],
         "properties": {
           "claim_ownership": {
             "type": "object",
@@ -384,10 +333,7 @@
       "Asset": {
         "description": "This enum describes a Terra asset (native or CW20).",
         "type": "object",
-        "required": [
-          "amount",
-          "info"
-        ],
+        "required": ["amount", "info"],
         "properties": {
           "amount": {
             "description": "A token amount",
@@ -414,15 +360,11 @@
           {
             "description": "Non-native Token",
             "type": "object",
-            "required": [
-              "token"
-            ],
+            "required": ["token"],
             "properties": {
               "token": {
                 "type": "object",
-                "required": [
-                  "contract_addr"
-                ],
+                "required": ["contract_addr"],
                 "properties": {
                   "contract_addr": {
                     "$ref": "#/definitions/Addr"
@@ -436,15 +378,11 @@
           {
             "description": "Native token",
             "type": "object",
-            "required": [
-              "native_token"
-            ],
+            "required": ["native_token"],
             "properties": {
               "native_token": {
                 "type": "object",
-                "required": [
-                  "denom"
-                ],
+                "required": ["denom"],
                 "properties": {
                   "denom": {
                     "type": "string"
@@ -464,11 +402,7 @@
       "Cw20ReceiveMsg": {
         "description": "Cw20ReceiveMsg should be de/serialized under `Receive()` variant in a ExecuteMsg",
         "type": "object",
-        "required": [
-          "amount",
-          "msg",
-          "sender"
-        ],
+        "required": ["amount", "msg", "sender"],
         "properties": {
           "amount": {
             "$ref": "#/definitions/Uint128"
@@ -500,9 +434,7 @@
       {
         "description": "Returns information about a pair",
         "type": "object",
-        "required": [
-          "pair"
-        ],
+        "required": ["pair"],
         "properties": {
           "pair": {
             "type": "object",
@@ -514,9 +446,7 @@
       {
         "description": "Returns information about a pool",
         "type": "object",
-        "required": [
-          "pool"
-        ],
+        "required": ["pool"],
         "properties": {
           "pool": {
             "type": "object",
@@ -528,9 +458,7 @@
       {
         "description": "Returns contract configuration",
         "type": "object",
-        "required": [
-          "config"
-        ],
+        "required": ["config"],
         "properties": {
           "config": {
             "type": "object",
@@ -542,15 +470,11 @@
       {
         "description": "Returns information about the share of the pool in a vector that contains objects of type [`Asset`].",
         "type": "object",
-        "required": [
-          "share"
-        ],
+        "required": ["share"],
         "properties": {
           "share": {
             "type": "object",
-            "required": [
-              "amount"
-            ],
+            "required": ["amount"],
             "properties": {
               "amount": {
                 "$ref": "#/definitions/Uint128"
@@ -564,15 +488,11 @@
       {
         "description": "Returns information about a swap simulation",
         "type": "object",
-        "required": [
-          "simulation"
-        ],
+        "required": ["simulation"],
         "properties": {
           "simulation": {
             "type": "object",
-            "required": [
-              "offer_asset"
-            ],
+            "required": ["offer_asset"],
             "properties": {
               "ask_asset_info": {
                 "anyOf": [
@@ -596,15 +516,11 @@
       {
         "description": "Returns information about a reverse swap simulation",
         "type": "object",
-        "required": [
-          "reverse_simulation"
-        ],
+        "required": ["reverse_simulation"],
         "properties": {
           "reverse_simulation": {
             "type": "object",
-            "required": [
-              "ask_asset"
-            ],
+            "required": ["ask_asset"],
             "properties": {
               "ask_asset": {
                 "$ref": "#/definitions/Asset"
@@ -628,9 +544,7 @@
       {
         "description": "Returns information about the cumulative prices",
         "type": "object",
-        "required": [
-          "cumulative_prices"
-        ],
+        "required": ["cumulative_prices"],
         "properties": {
           "cumulative_prices": {
             "type": "object",
@@ -642,9 +556,7 @@
       {
         "description": "Returns current D invariant",
         "type": "object",
-        "required": [
-          "compute_d"
-        ],
+        "required": ["compute_d"],
         "properties": {
           "compute_d": {
             "type": "object",
@@ -656,9 +568,7 @@
       {
         "description": "Query LP token virtual price",
         "type": "object",
-        "required": [
-          "lp_price"
-        ],
+        "required": ["lp_price"],
         "properties": {
           "lp_price": {
             "type": "object",
@@ -670,15 +580,11 @@
       {
         "description": "Returns an estimation of shares received for the given amount of assets",
         "type": "object",
-        "required": [
-          "simulate_provide"
-        ],
+        "required": ["simulate_provide"],
         "properties": {
           "simulate_provide": {
             "type": "object",
-            "required": [
-              "assets"
-            ],
+            "required": ["assets"],
             "properties": {
               "assets": {
                 "type": "array",
@@ -705,15 +611,11 @@
       {
         "description": "Returns an estimation of assets received for the given amount of LP tokens",
         "type": "object",
-        "required": [
-          "simulate_withdraw"
-        ],
+        "required": ["simulate_withdraw"],
         "properties": {
           "simulate_withdraw": {
             "type": "object",
-            "required": [
-              "lp_amount"
-            ],
+            "required": ["lp_amount"],
             "properties": {
               "lp_amount": {
                 "$ref": "#/definitions/Uint128"
@@ -733,10 +635,7 @@
       "Asset": {
         "description": "This enum describes a Terra asset (native or CW20).",
         "type": "object",
-        "required": [
-          "amount",
-          "info"
-        ],
+        "required": ["amount", "info"],
         "properties": {
           "amount": {
             "description": "A token amount",
@@ -763,15 +662,11 @@
           {
             "description": "Non-native Token",
             "type": "object",
-            "required": [
-              "token"
-            ],
+            "required": ["token"],
             "properties": {
               "token": {
                 "type": "object",
-                "required": [
-                  "contract_addr"
-                ],
+                "required": ["contract_addr"],
                 "properties": {
                   "contract_addr": {
                     "$ref": "#/definitions/Addr"
@@ -785,15 +680,11 @@
           {
             "description": "Native token",
             "type": "object",
-            "required": [
-              "native_token"
-            ],
+            "required": ["native_token"],
             "properties": {
               "native_token": {
                 "type": "object",
-                "required": [
-                  "denom"
-                ],
+                "required": ["denom"],
                 "properties": {
                   "denom": {
                     "type": "string"
@@ -830,11 +721,7 @@
       "title": "ConfigResponse",
       "description": "This struct is used to return a query result with the general contract configuration.",
       "type": "object",
-      "required": [
-        "block_time_last",
-        "factory_addr",
-        "owner"
-      ],
+      "required": ["block_time_last", "factory_addr", "owner"],
       "properties": {
         "block_time_last": {
           "description": "Last timestamp when the cumulative prices in the pool were updated",
@@ -887,11 +774,7 @@
       "title": "CumulativePricesResponse",
       "description": "This structure is used to return a cumulative prices query response.",
       "type": "object",
-      "required": [
-        "assets",
-        "cumulative_prices",
-        "total_share"
-      ],
+      "required": ["assets", "cumulative_prices", "total_share"],
       "properties": {
         "assets": {
           "description": "The assets in the pool to query",
@@ -938,10 +821,7 @@
         "Asset": {
           "description": "This enum describes a Terra asset (native or CW20).",
           "type": "object",
-          "required": [
-            "amount",
-            "info"
-          ],
+          "required": ["amount", "info"],
           "properties": {
             "amount": {
               "description": "A token amount",
@@ -968,15 +848,11 @@
             {
               "description": "Non-native Token",
               "type": "object",
-              "required": [
-                "token"
-              ],
+              "required": ["token"],
               "properties": {
                 "token": {
                   "type": "object",
-                  "required": [
-                    "contract_addr"
-                  ],
+                  "required": ["contract_addr"],
                   "properties": {
                     "contract_addr": {
                       "$ref": "#/definitions/Addr"
@@ -990,15 +866,11 @@
             {
               "description": "Native token",
               "type": "object",
-              "required": [
-                "native_token"
-              ],
+              "required": ["native_token"],
               "properties": {
                 "native_token": {
                   "type": "object",
-                  "required": [
-                    "denom"
-                  ],
+                  "required": ["denom"],
                   "properties": {
                     "denom": {
                       "type": "string"
@@ -1028,12 +900,7 @@
       "title": "PairInfo",
       "description": "This structure stores the main parameters for an Astroport pair",
       "type": "object",
-      "required": [
-        "asset_infos",
-        "contract_addr",
-        "liquidity_token",
-        "pair_type"
-      ],
+      "required": ["asset_infos", "contract_addr", "liquidity_token", "pair_type"],
       "properties": {
         "asset_infos": {
           "description": "Asset information for the assets in the pool",
@@ -1075,15 +942,11 @@
             {
               "description": "Non-native Token",
               "type": "object",
-              "required": [
-                "token"
-              ],
+              "required": ["token"],
               "properties": {
                 "token": {
                   "type": "object",
-                  "required": [
-                    "contract_addr"
-                  ],
+                  "required": ["contract_addr"],
                   "properties": {
                     "contract_addr": {
                       "$ref": "#/definitions/Addr"
@@ -1097,15 +960,11 @@
             {
               "description": "Native token",
               "type": "object",
-              "required": [
-                "native_token"
-              ],
+              "required": ["native_token"],
               "properties": {
                 "native_token": {
                   "type": "object",
-                  "required": [
-                    "denom"
-                  ],
+                  "required": ["denom"],
                   "properties": {
                     "denom": {
                       "type": "string"
@@ -1124,9 +983,7 @@
             {
               "description": "XYK pair type",
               "type": "object",
-              "required": [
-                "xyk"
-              ],
+              "required": ["xyk"],
               "properties": {
                 "xyk": {
                   "type": "object",
@@ -1138,9 +995,7 @@
             {
               "description": "Concentrated liquidity type",
               "type": "object",
-              "required": [
-                "concentrated"
-              ],
+              "required": ["concentrated"],
               "properties": {
                 "concentrated": {
                   "type": "object",
@@ -1152,9 +1007,7 @@
             {
               "description": "Custom pair type",
               "type": "object",
-              "required": [
-                "custom"
-              ],
+              "required": ["custom"],
               "properties": {
                 "custom": {
                   "type": "string"
@@ -1171,10 +1024,7 @@
       "title": "PoolResponse",
       "description": "This struct is used to return a query result with the total amount of LP tokens and assets in a specific pool.",
       "type": "object",
-      "required": [
-        "assets",
-        "total_share"
-      ],
+      "required": ["assets", "total_share"],
       "properties": {
         "assets": {
           "description": "The assets in the pool together with asset amounts",
@@ -1201,10 +1051,7 @@
         "Asset": {
           "description": "This enum describes a Terra asset (native or CW20).",
           "type": "object",
-          "required": [
-            "amount",
-            "info"
-          ],
+          "required": ["amount", "info"],
           "properties": {
             "amount": {
               "description": "A token amount",
@@ -1231,15 +1078,11 @@
             {
               "description": "Non-native Token",
               "type": "object",
-              "required": [
-                "token"
-              ],
+              "required": ["token"],
               "properties": {
                 "token": {
                   "type": "object",
-                  "required": [
-                    "contract_addr"
-                  ],
+                  "required": ["contract_addr"],
                   "properties": {
                     "contract_addr": {
                       "$ref": "#/definitions/Addr"
@@ -1253,15 +1096,11 @@
             {
               "description": "Native token",
               "type": "object",
-              "required": [
-                "native_token"
-              ],
+              "required": ["native_token"],
               "properties": {
                 "native_token": {
                   "type": "object",
-                  "required": [
-                    "denom"
-                  ],
+                  "required": ["denom"],
                   "properties": {
                     "denom": {
                       "type": "string"
@@ -1285,11 +1124,7 @@
       "title": "ReverseSimulationResponse",
       "description": "This structure holds the parameters that are returned from a reverse swap simulation response.",
       "type": "object",
-      "required": [
-        "commission_amount",
-        "offer_amount",
-        "spread_amount"
-      ],
+      "required": ["commission_amount", "offer_amount", "spread_amount"],
       "properties": {
         "commission_amount": {
           "description": "The amount of fees charged by the transaction",
@@ -1339,10 +1174,7 @@
         "Asset": {
           "description": "This enum describes a Terra asset (native or CW20).",
           "type": "object",
-          "required": [
-            "amount",
-            "info"
-          ],
+          "required": ["amount", "info"],
           "properties": {
             "amount": {
               "description": "A token amount",
@@ -1369,15 +1201,11 @@
             {
               "description": "Non-native Token",
               "type": "object",
-              "required": [
-                "token"
-              ],
+              "required": ["token"],
               "properties": {
                 "token": {
                   "type": "object",
-                  "required": [
-                    "contract_addr"
-                  ],
+                  "required": ["contract_addr"],
                   "properties": {
                     "contract_addr": {
                       "$ref": "#/definitions/Addr"
@@ -1391,15 +1219,11 @@
             {
               "description": "Native token",
               "type": "object",
-              "required": [
-                "native_token"
-              ],
+              "required": ["native_token"],
               "properties": {
                 "native_token": {
                   "type": "object",
-                  "required": [
-                    "denom"
-                  ],
+                  "required": ["denom"],
                   "properties": {
                     "denom": {
                       "type": "string"
@@ -1439,10 +1263,7 @@
         "Asset": {
           "description": "This enum describes a Terra asset (native or CW20).",
           "type": "object",
-          "required": [
-            "amount",
-            "info"
-          ],
+          "required": ["amount", "info"],
           "properties": {
             "amount": {
               "description": "A token amount",
@@ -1469,15 +1290,11 @@
             {
               "description": "Non-native Token",
               "type": "object",
-              "required": [
-                "token"
-              ],
+              "required": ["token"],
               "properties": {
                 "token": {
                   "type": "object",
-                  "required": [
-                    "contract_addr"
-                  ],
+                  "required": ["contract_addr"],
                   "properties": {
                     "contract_addr": {
                       "$ref": "#/definitions/Addr"
@@ -1491,15 +1308,11 @@
             {
               "description": "Native token",
               "type": "object",
-              "required": [
-                "native_token"
-              ],
+              "required": ["native_token"],
               "properties": {
                 "native_token": {
                   "type": "object",
-                  "required": [
-                    "denom"
-                  ],
+                  "required": ["denom"],
                   "properties": {
                     "denom": {
                       "type": "string"
@@ -1523,11 +1336,7 @@
       "title": "SimulationResponse",
       "description": "This structure holds the parameters that are returned from a swap simulation response",
       "type": "object",
-      "required": [
-        "commission_amount",
-        "return_amount",
-        "spread_amount"
-      ],
+      "required": ["commission_amount", "return_amount", "spread_amount"],
       "properties": {
         "commission_amount": {
           "description": "The amount of fees charged by the transaction",

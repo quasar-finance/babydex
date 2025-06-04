@@ -10,7 +10,7 @@ import AssetsStacked from "../../atoms/AssetsStacked";
 import Pill from "../../atoms/Pill";
 import Input from "../../atoms/Input";
 import { RangeSelector } from "../../atoms/RangeSelector";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useDexClient } from "~/app/hooks/useDexClient";
 import { useAccount } from "@cosmi/react";
 import { trpc } from "~/trpc/client";

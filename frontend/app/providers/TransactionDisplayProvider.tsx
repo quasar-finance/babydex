@@ -1,6 +1,8 @@
-import { useTransactionDisplay } from '../hooks/useTransactionDisplay';
+import { useTransactionDisplay } from "../hooks/useTransactionDisplay";
 
-export const TransactionDisplayProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const TransactionDisplayProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   useTransactionDisplay();
   return <>{children}</>;
-}; 
+};

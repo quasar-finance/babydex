@@ -3,11 +3,7 @@
   "title": "SimulationResponse",
   "description": "This structure holds the parameters that are returned from a swap simulation response",
   "type": "object",
-  "required": [
-    "commission_amount",
-    "return_amount",
-    "spread_amount"
-  ],
+  "required": ["commission_amount", "return_amount", "spread_amount"],
   "properties": {
     "commission_amount": {
       "description": "The amount of fees charged by the transaction",

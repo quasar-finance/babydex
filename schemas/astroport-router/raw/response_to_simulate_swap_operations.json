@@ -3,9 +3,7 @@
   "title": "SimulateSwapOperationsResponse",
   "description": "This structure describes a custom struct to return a query response containing the end amount of a swap simulation",
   "type": "object",
-  "required": [
-    "amount"
-  ],
+  "required": ["amount"],
   "properties": {
     "amount": {
       "description": "The amount of tokens received in a swap simulation",

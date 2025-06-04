@@ -7,12 +7,11 @@ import type { ClientWithActions } from "./types";
 // }
 
 export function createMultisigClient(params: any): ClientWithActions {
-    const { key = 'multisig', name = 'Multisig Client' } = params;
-    const client = createPublicClient({
-        ...params,
-        key,
-        name,
-    });
-    return client.extend(signingActions) as unknown as ClientWithActions;
+  const { key = "multisig", name = "Multisig Client" } = params;
+  const client = createPublicClient({
+    ...params,
+    key,
+    name,
+  });
+  return client.extend(signingActions) as unknown as ClientWithActions;
 }
-

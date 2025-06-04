@@ -5,9 +5,7 @@
     {
       "description": "Config returns the main contract parameters",
       "type": "object",
-      "required": [
-        "config"
-      ],
+      "required": ["config"],
       "properties": {
         "config": {
           "type": "object",
@@ -19,16 +17,11 @@
     {
       "description": "Deposit returns the LP token amount deposited in a specific generator",
       "type": "object",
-      "required": [
-        "query_deposit"
-      ],
+      "required": ["query_deposit"],
       "properties": {
         "query_deposit": {
           "type": "object",
-          "required": [
-            "lp_token",
-            "user"
-          ],
+          "required": ["lp_token", "user"],
           "properties": {
             "lp_token": {
               "type": "string"
@@ -45,16 +38,11 @@
     {
       "description": "PendingToken returns the amount of rewards that can be claimed by an account that deposited a specific LP token in a generator",
       "type": "object",
-      "required": [
-        "pending_rewards"
-      ],
+      "required": ["pending_rewards"],
       "properties": {
         "pending_rewards": {
           "type": "object",
-          "required": [
-            "lp_token",
-            "user"
-          ],
+          "required": ["lp_token", "user"],
           "properties": {
             "lp_token": {
               "type": "string"
@@ -71,15 +59,11 @@
     {
       "description": "RewardInfo returns reward information for a specified LP token",
       "type": "object",
-      "required": [
-        "reward_info"
-      ],
+      "required": ["reward_info"],
       "properties": {
         "reward_info": {
           "type": "object",
-          "required": [
-            "lp_token"
-          ],
+          "required": ["lp_token"],
           "properties": {
             "lp_token": {
               "type": "string"
@@ -93,15 +77,11 @@
     {
       "description": "PoolInfo returns information about a pool associated with the specified LP token",
       "type": "object",
-      "required": [
-        "pool_info"
-      ],
+      "required": ["pool_info"],
       "properties": {
         "pool_info": {
           "type": "object",
-          "required": [
-            "lp_token"
-          ],
+          "required": ["lp_token"],
           "properties": {
             "lp_token": {
               "type": "string"
@@ -115,21 +95,14 @@
     {
       "description": "Returns a list of tuples with addresses and their staked amount",
       "type": "object",
-      "required": [
-        "pool_stakers"
-      ],
+      "required": ["pool_stakers"],
       "properties": {
         "pool_stakers": {
           "type": "object",
-          "required": [
-            "lp_token"
-          ],
+          "required": ["lp_token"],
           "properties": {
             "limit": {
-              "type": [
-                "integer",
-                "null"
-              ],
+              "type": ["integer", "null"],
               "format": "uint8",
               "minimum": 0.0
             },
@@ -137,10 +110,7 @@
               "type": "string"
             },
             "start_after": {
-              "type": [
-                "string",
-                "null"
-              ]
+              "type": ["string", "null"]
             }
           },
           "additionalProperties": false
@@ -151,18 +121,13 @@
     {
       "description": "Returns paginated list of blocked tokens",
       "type": "object",
-      "required": [
-        "blocked_tokens_list"
-      ],
+      "required": ["blocked_tokens_list"],
       "properties": {
         "blocked_tokens_list": {
           "type": "object",
           "properties": {
             "limit": {
-              "type": [
-                "integer",
-                "null"
-              ],
+              "type": ["integer", "null"],
               "format": "uint8",
               "minimum": 0.0
             },
@@ -185,16 +150,11 @@
     {
       "description": "Checks whether fee expected for the specified pool if user wants to add new reward schedule",
       "type": "object",
-      "required": [
-        "is_fee_expected"
-      ],
+      "required": ["is_fee_expected"],
       "properties": {
         "is_fee_expected": {
           "type": "object",
-          "required": [
-            "lp_token",
-            "reward"
-          ],
+          "required": ["lp_token", "reward"],
           "properties": {
             "lp_token": {
               "type": "string"
@@ -211,23 +171,15 @@
     {
       "description": "Returns the list of all external reward schedules for the specified LP token",
       "type": "object",
-      "required": [
-        "external_reward_schedules"
-      ],
+      "required": ["external_reward_schedules"],
       "properties": {
         "external_reward_schedules": {
           "type": "object",
-          "required": [
-            "lp_token",
-            "reward"
-          ],
+          "required": ["lp_token", "reward"],
           "properties": {
             "limit": {
               "description": "Limit number of returned schedules.",
-              "type": [
-                "integer",
-                "null"
-              ],
+              "type": ["integer", "null"],
               "format": "uint8",
               "minimum": 0.0
             },
@@ -240,10 +192,7 @@
             },
             "start_after": {
               "description": "Start after specified timestamp",
-              "type": [
-                "integer",
-                "null"
-              ],
+              "type": ["integer", "null"],
               "format": "uint64",
               "minimum": 0.0
             }
@@ -256,28 +205,20 @@
     {
       "description": "Returns the list of all ever incentivized pools",
       "type": "object",
-      "required": [
-        "list_pools"
-      ],
+      "required": ["list_pools"],
       "properties": {
         "list_pools": {
           "type": "object",
           "properties": {
             "limit": {
               "description": "Limit number of returned pools.",
-              "type": [
-                "integer",
-                "null"
-              ],
+              "type": ["integer", "null"],
               "format": "uint8",
               "minimum": 0.0
             },
             "start_after": {
               "description": "Start after specified LP token",
-              "type": [
-                "string",
-                "null"
-              ]
+              "type": ["string", "null"]
             }
           },
           "additionalProperties": false
@@ -288,9 +229,7 @@
     {
       "description": "Returns the list of all pools receiving astro emissions",
       "type": "object",
-      "required": [
-        "active_pools"
-      ],
+      "required": ["active_pools"],
       "properties": {
         "active_pools": {
           "type": "object",
@@ -311,15 +250,11 @@
         {
           "description": "Non-native Token",
           "type": "object",
-          "required": [
-            "token"
-          ],
+          "required": ["token"],
           "properties": {
             "token": {
               "type": "object",
-              "required": [
-                "contract_addr"
-              ],
+              "required": ["contract_addr"],
               "properties": {
                 "contract_addr": {
                   "$ref": "#/definitions/Addr"
@@ -333,15 +268,11 @@
         {
           "description": "Native token",
           "type": "object",
-          "required": [
-            "native_token"
-          ],
+          "required": ["native_token"],
           "properties": {
             "native_token": {
               "type": "object",
-              "required": [
-                "denom"
-              ],
+              "required": ["denom"],
               "properties": {
                 "denom": {
                   "type": "string"

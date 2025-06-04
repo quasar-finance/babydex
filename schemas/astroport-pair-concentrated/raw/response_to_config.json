@@ -3,11 +3,7 @@
   "title": "ConfigResponse",
   "description": "This struct is used to return a query result with the general contract configuration.",
   "type": "object",
-  "required": [
-    "block_time_last",
-    "factory_addr",
-    "owner"
-  ],
+  "required": ["block_time_last", "factory_addr", "owner"],
   "properties": {
     "block_time_last": {
       "description": "Last timestamp when the cumulative prices in the pool were updated",

@@ -3,11 +3,7 @@
   "title": "ReverseSimulationResponse",
   "description": "This structure holds the parameters that are returned from a reverse swap simulation response.",
   "type": "object",
-  "required": [
-    "commission_amount",
-    "offer_amount",
-    "spread_amount"
-  ],
+  "required": ["commission_amount", "offer_amount", "spread_amount"],
   "properties": {
     "commission_amount": {
       "description": "The amount of fees charged by the transaction",

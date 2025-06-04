@@ -6,12 +6,7 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "title": "InstantiateMsg",
     "type": "object",
-    "required": [
-      "astro_token",
-      "factory",
-      "owner",
-      "vesting_contract"
-    ],
+    "required": ["astro_token", "factory", "owner", "vesting_contract"],
     "properties": {
       "astro_token": {
         "$ref": "#/definitions/AssetInfo"
@@ -20,10 +15,7 @@
         "type": "string"
       },
       "guardian": {
-        "type": [
-          "string",
-          "null"
-        ]
+        "type": ["string", "null"]
       },
       "incentivization_fee_info": {
         "anyOf": [
@@ -54,15 +46,11 @@
           {
             "description": "Non-native Token",
             "type": "object",
-            "required": [
-              "token"
-            ],
+            "required": ["token"],
             "properties": {
               "token": {
                 "type": "object",
-                "required": [
-                  "contract_addr"
-                ],
+                "required": ["contract_addr"],
                 "properties": {
                   "contract_addr": {
                     "$ref": "#/definitions/Addr"
@@ -76,15 +64,11 @@
           {
             "description": "Native token",
             "type": "object",
-            "required": [
-              "native_token"
-            ],
+            "required": ["native_token"],
             "properties": {
               "native_token": {
                 "type": "object",
-                "required": [
-                  "denom"
-                ],
+                "required": ["denom"],
                 "properties": {
                   "denom": {
                     "type": "string"
@@ -99,10 +83,7 @@
       },
       "Coin": {
         "type": "object",
-        "required": [
-          "amount",
-          "denom"
-        ],
+        "required": ["amount", "denom"],
         "properties": {
           "amount": {
             "$ref": "#/definitions/Uint128"
@@ -115,10 +96,7 @@
       },
       "IncentivizationFeeInfo": {
         "type": "object",
-        "required": [
-          "fee",
-          "fee_receiver"
-        ],
+        "required": ["fee", "fee_receiver"],
         "properties": {
           "fee": {
             "description": "To make things easier we avoid CW20 fee tokens",
@@ -152,15 +130,11 @@
       {
         "description": "Setup generators with their respective allocation points. Only the owner or generator controller can execute this.",
         "type": "object",
-        "required": [
-          "setup_pools"
-        ],
+        "required": ["setup_pools"],
         "properties": {
           "setup_pools": {
             "type": "object",
-            "required": [
-              "pools"
-            ],
+            "required": ["pools"],
             "properties": {
               "pools": {
                 "description": "The list of pools with allocation point.",
@@ -188,15 +162,11 @@
       {
         "description": "Update rewards and return it to user.",
         "type": "object",
-        "required": [
-          "claim_rewards"
-        ],
+        "required": ["claim_rewards"],
         "properties": {
           "claim_rewards": {
             "type": "object",
-            "required": [
-              "lp_tokens"
-            ],
+            "required": ["lp_tokens"],
             "properties": {
               "lp_tokens": {
                 "description": "The LP token cw20 address or token factory denom",
@@ -214,9 +184,7 @@
       {
         "description": "Receives a message of type [`Cw20ReceiveMsg`]. Handles cw20 LP token deposits.",
         "type": "object",
-        "required": [
-          "receive"
-        ],
+        "required": ["receive"],
         "properties": {
           "receive": {
             "$ref": "#/definitions/Cw20ReceiveMsg"
@@ -227,18 +195,13 @@
       {
         "description": "Stake LP tokens in the Generator. LP tokens staked on behalf of recipient if recipient is set. Otherwise LP tokens are staked on behalf of message sender.",
         "type": "object",
-        "required": [
-          "deposit"
-        ],
+        "required": ["deposit"],
         "properties": {
           "deposit": {
             "type": "object",
             "properties": {
               "recipient": {
-                "type": [
-                  "string",
-                  "null"
-                ]
+                "type": ["string", "null"]
               }
             },
             "additionalProperties": false
@@ -249,16 +212,11 @@
       {
         "description": "Withdraw LP tokens from the Generator",
         "type": "object",
-        "required": [
-          "withdraw"
-        ],
+        "required": ["withdraw"],
         "properties": {
           "withdraw": {
             "type": "object",
-            "required": [
-              "amount",
-              "lp_token"
-            ],
+            "required": ["amount", "lp_token"],
             "properties": {
               "amount": {
                 "description": "The amount to withdraw. Must not exceed total staked amount.",
@@ -281,15 +239,11 @@
       {
         "description": "Set a new amount of ASTRO to distribute per seconds. Only the owner can execute this.",
         "type": "object",
-        "required": [
-          "set_tokens_per_second"
-        ],
+        "required": ["set_tokens_per_second"],
         "properties": {
           "set_tokens_per_second": {
             "type": "object",
-            "required": [
-              "amount"
-            ],
+            "required": ["amount"],
             "properties": {
               "amount": {
                 "description": "The new amount of ASTRO to distribute per second",
@@ -308,16 +262,11 @@
       {
         "description": "Incentivize a pool with external rewards. Rewards can be in either native or cw20 form. Incentivizor must send incentivization fee along with rewards (if this reward token is new in this pool). 3rd parties are encouraged to keep endless schedules without breaks even with the small rewards. Otherwise, reward token will be removed from the pool info and go to outstanding rewards. Next schedules with the same token will be considered as \"new\". NOTE: Sender must approve allowance for cw20 reward tokens to this contract.",
         "type": "object",
-        "required": [
-          "incentivize"
-        ],
+        "required": ["incentivize"],
         "properties": {
           "incentivize": {
             "type": "object",
-            "required": [
-              "lp_token",
-              "schedule"
-            ],
+            "required": ["lp_token", "schedule"],
             "properties": {
               "lp_token": {
                 "description": "The LP token cw20 address or token factory denom",
@@ -340,9 +289,7 @@
       {
         "description": "Same as Incentivize endpoint but for multiple pools in one go.",
         "type": "object",
-        "required": [
-          "incentivize_many"
-        ],
+        "required": ["incentivize_many"],
         "properties": {
           "incentivize_many": {
             "type": "array",
@@ -366,17 +313,11 @@
       {
         "description": "Remove specific reward token from the pool. Only the owner can execute this.",
         "type": "object",
-        "required": [
-          "remove_reward_from_pool"
-        ],
+        "required": ["remove_reward_from_pool"],
         "properties": {
           "remove_reward_from_pool": {
             "type": "object",
-            "required": [
-              "lp_token",
-              "receiver",
-              "reward"
-            ],
+            "required": ["lp_token", "receiver", "reward"],
             "properties": {
               "bypass_upcoming_schedules": {
                 "description": "If there is too much spam in the state, owner can bypass upcoming schedules; Tokens from these schedules will stuck in Generator balance forever. Set true only in emergency cases i.e. if deregistration message hits gas limit during simulation. Default: false",
@@ -404,22 +345,15 @@
       {
         "description": "Claim all or up to the limit accumulated orphaned rewards. Only the owner can execute this.",
         "type": "object",
-        "required": [
-          "claim_orphaned_rewards"
-        ],
+        "required": ["claim_orphaned_rewards"],
         "properties": {
           "claim_orphaned_rewards": {
             "type": "object",
-            "required": [
-              "receiver"
-            ],
+            "required": ["receiver"],
             "properties": {
               "limit": {
                 "description": "Number of assets to claim",
-                "type": [
-                  "integer",
-                  "null"
-                ],
+                "type": ["integer", "null"],
                 "format": "uint8",
                 "minimum": 0.0
               },
@@ -436,9 +370,7 @@
       {
         "description": "Update config. Only the owner can execute it.",
         "type": "object",
-        "required": [
-          "update_config"
-        ],
+        "required": ["update_config"],
         "properties": {
           "update_config": {
             "type": "object",
@@ -456,17 +388,11 @@
               },
               "generator_controller": {
                 "description": "The new generator controller contract address",
-                "type": [
-                  "string",
-                  "null"
-                ]
+                "type": ["string", "null"]
               },
               "guardian": {
                 "description": "The new generator guardian",
-                "type": [
-                  "string",
-                  "null"
-                ]
+                "type": ["string", "null"]
               },
               "incentivization_fee_info": {
                 "description": "New incentivization fee info",
@@ -481,19 +407,13 @@
               },
               "token_transfer_gas_limit": {
                 "description": "New external incentive token transfer gas limit",
-                "type": [
-                  "integer",
-                  "null"
-                ],
+                "type": ["integer", "null"],
                 "format": "uint64",
                 "minimum": 0.0
               },
               "vesting_contract": {
                 "description": "The new vesting contract address",
-                "type": [
-                  "string",
-                  "null"
-                ]
+                "type": ["string", "null"]
               }
             },
             "additionalProperties": false
@@ -504,9 +424,7 @@
       {
         "description": "Add or remove token to the block list. Only owner or guardian can execute this. Pools which contain these tokens can't be incentivized with ASTRO rewards. Also blocked tokens can't be used as external reward. Current active pools with these tokens will be removed from active set.",
         "type": "object",
-        "required": [
-          "update_blocked_tokenslist"
-        ],
+        "required": ["update_blocked_tokenslist"],
         "properties": {
           "update_blocked_tokenslist": {
             "type": "object",
@@ -536,15 +454,11 @@
       {
         "description": "Only factory can set the allocation points to zero for the specified pool. Initiated from deregistration context in factory.",
         "type": "object",
-        "required": [
-          "deactivate_pool"
-        ],
+        "required": ["deactivate_pool"],
         "properties": {
           "deactivate_pool": {
             "type": "object",
-            "required": [
-              "lp_token"
-            ],
+            "required": ["lp_token"],
             "properties": {
               "lp_token": {
                 "type": "string"
@@ -558,9 +472,7 @@
       {
         "description": "Go through active pools and deactivate the ones which pair type is blocked",
         "type": "object",
-        "required": [
-          "deactivate_blocked_pools"
-        ],
+        "required": ["deactivate_blocked_pools"],
         "properties": {
           "deactivate_blocked_pools": {
             "type": "object",
@@ -572,16 +484,11 @@
       {
         "description": "Creates a request to change contract ownership Only the current owner can execute this.",
         "type": "object",
-        "required": [
-          "propose_new_owner"
-        ],
+        "required": ["propose_new_owner"],
         "properties": {
           "propose_new_owner": {
             "type": "object",
-            "required": [
-              "expires_in",
-              "owner"
-            ],
+            "required": ["expires_in", "owner"],
             "properties": {
               "expires_in": {
                 "description": "The validity period of the proposal to change the contract owner",
@@ -602,9 +509,7 @@
       {
         "description": "Removes a request to change contract ownership Only the current owner can execute this",
         "type": "object",
-        "required": [
-          "drop_ownership_proposal"
-        ],
+        "required": ["drop_ownership_proposal"],
         "properties": {
           "drop_ownership_proposal": {
             "type": "object",
@@ -616,9 +521,7 @@
       {
         "description": "Claims contract ownership Only the newly proposed owner can execute this",
         "type": "object",
-        "required": [
-          "claim_ownership"
-        ],
+        "required": ["claim_ownership"],
         "properties": {
           "claim_ownership": {
             "type": "object",
@@ -636,10 +539,7 @@
       "Asset": {
         "description": "This enum describes a Terra asset (native or CW20).",
         "type": "object",
-        "required": [
-          "amount",
-          "info"
-        ],
+        "required": ["amount", "info"],
         "properties": {
           "amount": {
             "description": "A token amount",
@@ -666,15 +566,11 @@
           {
             "description": "Non-native Token",
             "type": "object",
-            "required": [
-              "token"
-            ],
+            "required": ["token"],
             "properties": {
               "token": {
                 "type": "object",
-                "required": [
-                  "contract_addr"
-                ],
+                "required": ["contract_addr"],
                 "properties": {
                   "contract_addr": {
                     "$ref": "#/definitions/Addr"
@@ -688,15 +584,11 @@
           {
             "description": "Native token",
             "type": "object",
-            "required": [
-              "native_token"
-            ],
+            "required": ["native_token"],
             "properties": {
               "native_token": {
                 "type": "object",
-                "required": [
-                  "denom"
-                ],
+                "required": ["denom"],
                 "properties": {
                   "denom": {
                     "type": "string"
@@ -715,10 +607,7 @@
       },
       "Coin": {
         "type": "object",
-        "required": [
-          "amount",
-          "denom"
-        ],
+        "required": ["amount", "denom"],
         "properties": {
           "amount": {
             "$ref": "#/definitions/Uint128"
@@ -732,11 +621,7 @@
       "Cw20ReceiveMsg": {
         "description": "Cw20ReceiveMsg should be de/serialized under `Receive()` variant in a ExecuteMsg",
         "type": "object",
-        "required": [
-          "amount",
-          "msg",
-          "sender"
-        ],
+        "required": ["amount", "msg", "sender"],
         "properties": {
           "amount": {
             "$ref": "#/definitions/Uint128"
@@ -752,10 +637,7 @@
       },
       "IncentivizationFeeInfo": {
         "type": "object",
-        "required": [
-          "fee",
-          "fee_receiver"
-        ],
+        "required": ["fee", "fee_receiver"],
         "properties": {
           "fee": {
             "description": "To make things easier we avoid CW20 fee tokens",
@@ -778,10 +660,7 @@
       },
       "InputSchedule": {
         "type": "object",
-        "required": [
-          "duration_periods",
-          "reward"
-        ],
+        "required": ["duration_periods", "reward"],
         "properties": {
           "duration_periods": {
             "type": "integer",
@@ -807,9 +686,7 @@
       {
         "description": "Config returns the main contract parameters",
         "type": "object",
-        "required": [
-          "config"
-        ],
+        "required": ["config"],
         "properties": {
           "config": {
             "type": "object",
@@ -821,16 +698,11 @@
       {
         "description": "Deposit returns the LP token amount deposited in a specific generator",
         "type": "object",
-        "required": [
-          "query_deposit"
-        ],
+        "required": ["query_deposit"],
         "properties": {
           "query_deposit": {
             "type": "object",
-            "required": [
-              "lp_token",
-              "user"
-            ],
+            "required": ["lp_token", "user"],
             "properties": {
               "lp_token": {
                 "type": "string"
@@ -847,16 +719,11 @@
       {
         "description": "PendingToken returns the amount of rewards that can be claimed by an account that deposited a specific LP token in a generator",
         "type": "object",
-        "required": [
-          "pending_rewards"
-        ],
+        "required": ["pending_rewards"],
         "properties": {
           "pending_rewards": {
             "type": "object",
-            "required": [
-              "lp_token",
-              "user"
-            ],
+            "required": ["lp_token", "user"],
             "properties": {
               "lp_token": {
                 "type": "string"
@@ -873,15 +740,11 @@
       {
         "description": "RewardInfo returns reward information for a specified LP token",
         "type": "object",
-        "required": [
-          "reward_info"
-        ],
+        "required": ["reward_info"],
         "properties": {
           "reward_info": {
             "type": "object",
-            "required": [
-              "lp_token"
-            ],
+            "required": ["lp_token"],
             "properties": {
               "lp_token": {
                 "type": "string"
@@ -895,15 +758,11 @@
       {
         "description": "PoolInfo returns information about a pool associated with the specified LP token",
         "type": "object",
-        "required": [
-          "pool_info"
-        ],
+        "required": ["pool_info"],
         "properties": {
           "pool_info": {
             "type": "object",
-            "required": [
-              "lp_token"
-            ],
+            "required": ["lp_token"],
             "properties": {
               "lp_token": {
                 "type": "string"
@@ -917,21 +776,14 @@
       {
         "description": "Returns a list of tuples with addresses and their staked amount",
         "type": "object",
-        "required": [
-          "pool_stakers"
-        ],
+        "required": ["pool_stakers"],
         "properties": {
           "pool_stakers": {
             "type": "object",
-            "required": [
-              "lp_token"
-            ],
+            "required": ["lp_token"],
             "properties": {
               "limit": {
-                "type": [
-                  "integer",
-                  "null"
-                ],
+                "type": ["integer", "null"],
                 "format": "uint8",
                 "minimum": 0.0
               },
@@ -939,10 +791,7 @@
                 "type": "string"
               },
               "start_after": {
-                "type": [
-                  "string",
-                  "null"
-                ]
+                "type": ["string", "null"]
               }
             },
             "additionalProperties": false
@@ -953,18 +802,13 @@
       {
         "description": "Returns paginated list of blocked tokens",
         "type": "object",
-        "required": [
-          "blocked_tokens_list"
-        ],
+        "required": ["blocked_tokens_list"],
         "properties": {
           "blocked_tokens_list": {
             "type": "object",
             "properties": {
               "limit": {
-                "type": [
-                  "integer",
-                  "null"
-                ],
+                "type": ["integer", "null"],
                 "format": "uint8",
                 "minimum": 0.0
               },
@@ -987,16 +831,11 @@
       {
         "description": "Checks whether fee expected for the specified pool if user wants to add new reward schedule",
         "type": "object",
-        "required": [
-          "is_fee_expected"
-        ],
+        "required": ["is_fee_expected"],
         "properties": {
           "is_fee_expected": {
             "type": "object",
-            "required": [
-              "lp_token",
-              "reward"
-            ],
+            "required": ["lp_token", "reward"],
             "properties": {
               "lp_token": {
                 "type": "string"
@@ -1013,23 +852,15 @@
       {
         "description": "Returns the list of all external reward schedules for the specified LP token",
         "type": "object",
-        "required": [
-          "external_reward_schedules"
-        ],
+        "required": ["external_reward_schedules"],
         "properties": {
           "external_reward_schedules": {
             "type": "object",
-            "required": [
-              "lp_token",
-              "reward"
-            ],
+            "required": ["lp_token", "reward"],
             "properties": {
               "limit": {
                 "description": "Limit number of returned schedules.",
-                "type": [
-                  "integer",
-                  "null"
-                ],
+                "type": ["integer", "null"],
                 "format": "uint8",
                 "minimum": 0.0
               },
@@ -1042,10 +873,7 @@
               },
               "start_after": {
                 "description": "Start after specified timestamp",
-                "type": [
-                  "integer",
-                  "null"
-                ],
+                "type": ["integer", "null"],
                 "format": "uint64",
                 "minimum": 0.0
               }
@@ -1058,28 +886,20 @@
       {
         "description": "Returns the list of all ever incentivized pools",
         "type": "object",
-        "required": [
-          "list_pools"
-        ],
+        "required": ["list_pools"],
         "properties": {
           "list_pools": {
             "type": "object",
             "properties": {
               "limit": {
                 "description": "Limit number of returned pools.",
-                "type": [
-                  "integer",
-                  "null"
-                ],
+                "type": ["integer", "null"],
                 "format": "uint8",
                 "minimum": 0.0
               },
               "start_after": {
                 "description": "Start after specified LP token",
-                "type": [
-                  "string",
-                  "null"
-                ]
+                "type": ["string", "null"]
               }
             },
             "additionalProperties": false
@@ -1090,9 +910,7 @@
       {
         "description": "Returns the list of all pools receiving astro emissions",
         "type": "object",
-        "required": [
-          "active_pools"
-        ],
+        "required": ["active_pools"],
         "properties": {
           "active_pools": {
             "type": "object",
@@ -1113,15 +931,11 @@
           {
             "description": "Non-native Token",
             "type": "object",
-            "required": [
-              "token"
-            ],
+            "required": ["token"],
             "properties": {
               "token": {
                 "type": "object",
-                "required": [
-                  "contract_addr"
-                ],
+                "required": ["contract_addr"],
                 "properties": {
                   "contract_addr": {
                     "$ref": "#/definitions/Addr"
@@ -1135,15 +949,11 @@
           {
             "description": "Native token",
             "type": "object",
-            "required": [
-              "native_token"
-            ],
+            "required": ["native_token"],
             "properties": {
               "native_token": {
                 "type": "object",
-                "required": [
-                  "denom"
-                ],
+                "required": ["denom"],
                 "properties": {
                   "denom": {
                     "type": "string"
@@ -1203,15 +1013,11 @@
             {
               "description": "Non-native Token",
               "type": "object",
-              "required": [
-                "token"
-              ],
+              "required": ["token"],
               "properties": {
                 "token": {
                   "type": "object",
-                  "required": [
-                    "contract_addr"
-                  ],
+                  "required": ["contract_addr"],
                   "properties": {
                     "contract_addr": {
                       "$ref": "#/definitions/Addr"
@@ -1225,15 +1031,11 @@
             {
               "description": "Native token",
               "type": "object",
-              "required": [
-                "native_token"
-              ],
+              "required": ["native_token"],
               "properties": {
                 "native_token": {
                   "type": "object",
-                  "required": [
-                    "denom"
-                  ],
+                  "required": ["denom"],
                   "properties": {
                     "denom": {
                       "type": "string"
@@ -1328,10 +1130,7 @@
         },
         "token_transfer_gas_limit": {
           "description": "Max allowed gas limit per one external incentive token transfer. If token transfer hits this gas limit, reward will be considered as claimed while in reality it will be stuck in the contract. If None, there is no gas limit.",
-          "type": [
-            "integer",
-            "null"
-          ],
+          "type": ["integer", "null"],
           "format": "uint64",
           "minimum": 0.0
         },
@@ -1364,15 +1163,11 @@
             {
               "description": "Non-native Token",
               "type": "object",
-              "required": [
-                "token"
-              ],
+              "required": ["token"],
               "properties": {
                 "token": {
                   "type": "object",
-                  "required": [
-                    "contract_addr"
-                  ],
+                  "required": ["contract_addr"],
                   "properties": {
                     "contract_addr": {
                       "$ref": "#/definitions/Addr"
@@ -1386,15 +1181,11 @@
             {
               "description": "Native token",
               "type": "object",
-              "required": [
-                "native_token"
-              ],
+              "required": ["native_token"],
               "properties": {
                 "native_token": {
                   "type": "object",
-                  "required": [
-                    "denom"
-                  ],
+                  "required": ["denom"],
                   "properties": {
                     "denom": {
                       "type": "string"
@@ -1409,10 +1200,7 @@
         },
         "Coin": {
           "type": "object",
-          "required": [
-            "amount",
-            "denom"
-          ],
+          "required": ["amount", "denom"],
           "properties": {
             "amount": {
               "$ref": "#/definitions/Uint128"
@@ -1425,10 +1213,7 @@
         },
         "IncentivizationFeeInfo": {
           "type": "object",
-          "required": [
-            "fee",
-            "fee_receiver"
-          ],
+          "required": ["fee", "fee_receiver"],
           "properties": {
             "fee": {
               "description": "To make things easier we avoid CW20 fee tokens",
@@ -1469,11 +1254,7 @@
         },
         "ScheduleResponse": {
           "type": "object",
-          "required": [
-            "end_ts",
-            "rps",
-            "start_ts"
-          ],
+          "required": ["end_ts", "rps", "start_ts"],
           "properties": {
             "end_ts": {
               "type": "integer",
@@ -1521,10 +1302,7 @@
         "Asset": {
           "description": "This enum describes a Terra asset (native or CW20).",
           "type": "object",
-          "required": [
-            "amount",
-            "info"
-          ],
+          "required": ["amount", "info"],
           "properties": {
             "amount": {
               "description": "A token amount",
@@ -1551,15 +1329,11 @@
             {
               "description": "Non-native Token",
               "type": "object",
-              "required": [
-                "token"
-              ],
+              "required": ["token"],
               "properties": {
                 "token": {
                   "type": "object",
-                  "required": [
-                    "contract_addr"
-                  ],
+                  "required": ["contract_addr"],
                   "properties": {
                     "contract_addr": {
                       "$ref": "#/definitions/Addr"
@@ -1573,15 +1347,11 @@
             {
               "description": "Native token",
               "type": "object",
-              "required": [
-                "native_token"
-              ],
+              "required": ["native_token"],
               "properties": {
                 "native_token": {
                   "type": "object",
-                  "required": [
-                    "denom"
-                  ],
+                  "required": ["denom"],
                   "properties": {
                     "denom": {
                       "type": "string"
@@ -1604,11 +1374,7 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "PoolInfoResponse",
       "type": "object",
-      "required": [
-        "last_update_ts",
-        "rewards",
-        "total_lp"
-      ],
+      "required": ["last_update_ts", "rewards", "total_lp"],
       "properties": {
         "last_update_ts": {
           "description": "Last time when reward indexes were updated",
@@ -1644,15 +1410,11 @@
             {
               "description": "Non-native Token",
               "type": "object",
-              "required": [
-                "token"
-              ],
+              "required": ["token"],
               "properties": {
                 "token": {
                   "type": "object",
-                  "required": [
-                    "contract_addr"
-                  ],
+                  "required": ["contract_addr"],
                   "properties": {
                     "contract_addr": {
                       "$ref": "#/definitions/Addr"
@@ -1666,15 +1428,11 @@
             {
               "description": "Native token",
               "type": "object",
-              "required": [
-                "native_token"
-              ],
+              "required": ["native_token"],
               "properties": {
                 "native_token": {
                   "type": "object",
-                  "required": [
-                    "denom"
-                  ],
+                  "required": ["denom"],
                   "properties": {
                     "denom": {
                       "type": "string"
@@ -1693,12 +1451,7 @@
         },
         "RewardInfo": {
           "type": "object",
-          "required": [
-            "index",
-            "orphaned",
-            "reward",
-            "rps"
-          ],
+          "required": ["index", "orphaned", "reward", "rps"],
           "properties": {
             "index": {
               "description": "Last checkpointed reward per LP token",
@@ -1741,9 +1494,7 @@
             {
               "description": "Internal rewards aka ASTRO emissions don't have next_update_ts field and they are paid out from Vesting contract.",
               "type": "object",
-              "required": [
-                "int"
-              ],
+              "required": ["int"],
               "properties": {
                 "int": {
                   "$ref": "#/definitions/AssetInfo"
@@ -1754,16 +1505,11 @@
             {
               "description": "External rewards always have corresponding schedules. Reward is paid out from Incentives contract balance.",
               "type": "object",
-              "required": [
-                "ext"
-              ],
+              "required": ["ext"],
               "properties": {
                 "ext": {
                   "type": "object",
-                  "required": [
-                    "info",
-                    "next_update_ts"
-                  ],
+                  "required": ["info", "next_update_ts"],
                   "properties": {
                     "info": {
                       "$ref": "#/definitions/AssetInfo"
@@ -1836,15 +1582,11 @@
             {
               "description": "Non-native Token",
               "type": "object",
-              "required": [
-                "token"
-              ],
+              "required": ["token"],
               "properties": {
                 "token": {
                   "type": "object",
-                  "required": [
-                    "contract_addr"
-                  ],
+                  "required": ["contract_addr"],
                   "properties": {
                     "contract_addr": {
                       "$ref": "#/definitions/Addr"
@@ -1858,15 +1600,11 @@
             {
               "description": "Native token",
               "type": "object",
-              "required": [
-                "native_token"
-              ],
+              "required": ["native_token"],
               "properties": {
                 "native_token": {
                   "type": "object",
-                  "required": [
-                    "denom"
-                  ],
+                  "required": ["denom"],
                   "properties": {
                     "denom": {
                       "type": "string"
@@ -1885,12 +1623,7 @@
         },
         "RewardInfo": {
           "type": "object",
-          "required": [
-            "index",
-            "orphaned",
-            "reward",
-            "rps"
-          ],
+          "required": ["index", "orphaned", "reward", "rps"],
           "properties": {
             "index": {
               "description": "Last checkpointed reward per LP token",
@@ -1933,9 +1666,7 @@
             {
               "description": "Internal rewards aka ASTRO emissions don't have next_update_ts field and they are paid out from Vesting contract.",
               "type": "object",
-              "required": [
-                "int"
-              ],
+              "required": ["int"],
               "properties": {
                 "int": {
                   "$ref": "#/definitions/AssetInfo"
@@ -1946,16 +1677,11 @@
             {
               "description": "External rewards always have corresponding schedules. Reward is paid out from Incentives contract balance.",
               "type": "object",
-              "required": [
-                "ext"
-              ],
+              "required": ["ext"],
               "properties": {
                 "ext": {
                   "type": "object",
-                  "required": [
-                    "info",
-                    "next_update_ts"
-                  ],
+                  "required": ["info", "next_update_ts"],
                   "properties": {
                     "info": {
                       "$ref": "#/definitions/AssetInfo"

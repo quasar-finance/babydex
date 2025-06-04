@@ -1,4 +1,4 @@
-import { useAccount, useBalances } from "@cosmi/react";
+
 import type { Currency } from "@towerfi/types";
 import { useCallback, useState } from "react";
 

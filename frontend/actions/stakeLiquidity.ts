@@ -1,10 +1,9 @@
-import type { Account, Chain, Client, CometBftRpcSchema, Transport } from "cosmi/types";
-import type { AssetInfo } from "@towerfi/types";
+import type { Account, Chain, CometBftRpcSchema, Transport } from "cosmi/types";
 
-import { execute, type ExecuteReturnType } from "cosmi/client";
+import type { ExecuteReturnType } from "cosmi/client";
 import { toUtf8 } from "cosmi/utils";
 import { toBase64 } from "cosmi/utils";
-import { ClientWithActions } from "~/multisig/client/types";
+import type { ClientWithActions } from "~/multisig/client/types";
 
 export type StakeLiquidityParameters = {
   sender: string;

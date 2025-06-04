@@ -169,5 +169,5 @@ export const BabylonMainnetAssets = {
     coingeckoId: "solv-protocol-solvbtc-bbn",
     bridge: ["union"],
     ethereumAddresses: { union: "0x17140b69FfaDfF9e87BF1D86D99119ee10AD24ff" },
-  }
+  },
 } as unknown as Record<string, Currency>;

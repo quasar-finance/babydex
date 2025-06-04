@@ -1,11 +1,10 @@
-import { number, z } from "zod";
+import { z } from "zod";
 import { createCallerFactory, createTRPCPublicProcedure, createTRPCRouter } from "../config.js";
 
 import { appRouter } from "../router.js";
 
 import type {
   PoolInfo,
-  RewardInfo,
   ConfigResponse,
   CumulativePricesResponse,
   PairInfo,

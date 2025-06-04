@@ -8,10 +8,7 @@
   "definitions": {
     "CoinResponse": {
       "type": "object",
-      "required": [
-        "decimals",
-        "denom"
-      ],
+      "required": ["decimals", "denom"],
       "properties": {
         "decimals": {
           "description": "The asset precision",

@@ -43,8 +43,8 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
 
   // Handle nested form data for tokens with dots in their symbols
   const getFormValue = (data: any, symbol: string) => {
-    if (symbol.includes('.')) {
-      const [prefix, suffix] = symbol.split('.');
+    if (symbol.includes(".")) {
+      const [prefix, suffix] = symbol.split(".");
       return data[prefix]?.[suffix];
     }
     return data[symbol];
@@ -56,8 +56,12 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
   const [t0DenomBalance, t1DenomBalance] = useMemo(() => {
     const [balance0, balance1] = balances;
     return [
-      balance0 ? convertMicroDenomToDenom(balance0.amount, balance0.decimals, balance0.decimals, false) : 0,
-      balance1 ? convertMicroDenomToDenom(balance1.amount, balance1.decimals, balance1.decimals, false) : 0,
+      balance0
+        ? convertMicroDenomToDenom(balance0.amount, balance0.decimals, balance0.decimals, false)
+        : 0,
+      balance1
+        ? convertMicroDenomToDenom(balance1.amount, balance1.decimals, balance1.decimals, false)
+        : 0,
     ];
   }, [balances]);
 
@@ -72,15 +76,21 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
       );
       try {
         if (!signingClient) throw new Error("we couldn't submit the tx");
-        
-        const token0Amount = convertDenomToMicroDenom(getFormValue(data, token0.symbol), token0.decimals);
-        const token1Amount = convertDenomToMicroDenom(getFormValue(data, token1.symbol), token1.decimals);
+
+        const token0Amount = convertDenomToMicroDenom(
+          getFormValue(data, token0.symbol),
+          token0.decimals,
+        );
+        const token1Amount = convertDenomToMicroDenom(
+          getFormValue(data, token1.symbol),
+          token1.decimals,
+        );
 
         const sortedTokens = [
           { amount: token0Amount, info: token0 },
           { amount: token1Amount, info: token1 },
         ].sort((a, b) => {
-          if (a.info.type === 'cw-20' || b.info.type === 'cw-20') {
+          if (a.info.type === "cw-20" || b.info.type === "cw-20") {
             return 0;
           }
           return a.info.denom.localeCompare(b.info.denom);
@@ -138,9 +148,13 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
               const regex = /^\d+(\.\d{0,18})?$/;
               if (target.value === "" || regex.test(target.value)) {
                 setValue(token0.symbol, target.value, { shouldValidate: true });
-                setValue(token1.symbol, formatDecimals(Number(target.value) / optimalRatio, token1.decimals), {
-                  shouldValidate: true,
-                });
+                setValue(
+                  token1.symbol,
+                  formatDecimals(Number(target.value) / optimalRatio, token1.decimals),
+                  {
+                    shouldValidate: true,
+                  },
+                );
               }
             }}
           />
@@ -149,10 +163,16 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
           <div
             className="flex gap-1 items-center cursor-pointer"
             onClick={() => {
-              setValue(token0.symbol, formatDecimals(t0DenomBalance, token0.decimals), { shouldValidate: true });
-              setValue(token1.symbol, formatDecimals(t0DenomBalance / optimalRatio, token1.decimals), {
+              setValue(token0.symbol, formatDecimals(t0DenomBalance, token0.decimals), {
                 shouldValidate: true,
               });
+              setValue(
+                token1.symbol,
+                formatDecimals(t0DenomBalance / optimalRatio, token1.decimals),
+                {
+                  shouldValidate: true,
+                },
+              );
             }}
           >
             <IconWallet className="h-4 w-4" />
@@ -184,9 +204,13 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
               const regex = /^\d+(\.\d{0,18})?$/;
               if (target.value === "" || regex.test(target.value)) {
                 setValue(token1.symbol, target.value, { shouldValidate: true });
-                setValue(token0.symbol, formatDecimals(Number(target.value) * optimalRatio, token0.decimals), {
-                  shouldValidate: true,
-                });
+                setValue(
+                  token0.symbol,
+                  formatDecimals(Number(target.value) * optimalRatio, token0.decimals),
+                  {
+                    shouldValidate: true,
+                  },
+                );
               }
             }}
           />
@@ -196,9 +220,13 @@ export const DoubleSideAddLiquidity: React.FC<Props> = ({ pool, submitRef }) => 
             className="flex gap-1 items-center cursor-pointer"
             onClick={() => {
               setValue(token1.symbol, t1DenomBalance, { shouldValidate: true });
-              setValue(token0.symbol, formatDecimals(Number(t1DenomBalance) * optimalRatio, token0.decimals), {
-                shouldValidate: true,
-              });
+              setValue(
+                token0.symbol,
+                formatDecimals(Number(t1DenomBalance) * optimalRatio, token0.decimals),
+                {
+                  shouldValidate: true,
+                },
+              );
             }}
           >
             <IconWallet className="h-4 w-4" />

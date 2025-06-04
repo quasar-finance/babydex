@@ -1,9 +1,9 @@
-import type { Account, Chain, Client, CometBftRpcSchema, Transport } from "cosmi/types";
+import type { Account, Chain, CometBftRpcSchema, Transport } from "cosmi/types";
 import type { Currency } from "@towerfi/types";
 
-import { execute, type ExecuteReturnType } from "cosmi/client";
+import type { ExecuteReturnType } from "cosmi/client";
 import { setInnerValueToAsset } from "@towerfi/trpc";
-import { ClientWithActions } from "~/multisig/client/types";
+import type { ClientWithActions } from "~/multisig/client/types";
 
 export type PoolSwapParameters = {
   sender: string;

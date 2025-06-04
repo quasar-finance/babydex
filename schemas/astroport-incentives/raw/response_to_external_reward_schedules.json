@@ -12,11 +12,7 @@
     },
     "ScheduleResponse": {
       "type": "object",
-      "required": [
-        "end_ts",
-        "rps",
-        "start_ts"
-      ],
+      "required": ["end_ts", "rps", "start_ts"],
       "properties": {
         "end_ts": {
           "type": "integer",

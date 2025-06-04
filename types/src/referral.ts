@@ -6,4 +6,4 @@ export type CosmosSignedMessage = {
     value: string; // Base64 encoded public key
   };
   data: string; // The original data (UTF-8 string) that was signed, base64 encoded
-}
+};

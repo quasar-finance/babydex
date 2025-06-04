@@ -84,15 +84,15 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await deleteReferralCode();
+  await deleteReferralCodes();
   await deleteReferrals();
 });
 
-async function deleteReferralCode() {
+async function deleteReferralCodes() {
   const { error } = await supabase
     .from('user_referral_codes')
     .delete()
-    .eq('user_wallet_address', TEST_USER_WALLET_ADDRESS);
+    .or(`user_wallet_address.eq.${TEST_USER_WALLET_ADDRESS}, user_wallet_address.eq.${TEST_REFERRED_USER_WALLET_ADDRESS}`);
 
   expect(error).toBeNull;
 }
@@ -235,6 +235,22 @@ test('handleReferral returns an error if users try to refer themselves', async (
   const result = await referralService.handleReferral(TEST_USER_WALLET_ADDRESS, store_result.code, mockSignedMessage);
   expect(result.success).toBe(false);
   expect(result.error).toBe('User cannot refer to themselves.');
+});
+
+test('handleReferral returns an error if referred user already created referral code', async () => {
+  const store_result = await referralService.storeReferralCode(TEST_USER_WALLET_ADDRESS, mockSignedMessage);
+
+  expect(store_result.success).toBe(true);
+
+  (pubkeyToAddress as Mock).mockReturnValue(TEST_REFERRED_USER_WALLET_ADDRESS);
+
+  const store_referral_result = await referralService.storeReferralCode(TEST_REFERRED_USER_WALLET_ADDRESS, mockSignedMessage);
+
+  expect(store_referral_result.success).toBe(true);
+
+  const result = await referralService.handleReferral(TEST_REFERRED_USER_WALLET_ADDRESS, store_result.code, mockSignedMessage);
+  expect(result.success).toBe(false);
+  expect(result.error).toBe('User has already interacted with the DEX and created a referral code.');
 });
 
 // Test suite for verifyCosmosSignature

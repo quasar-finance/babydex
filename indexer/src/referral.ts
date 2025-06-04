@@ -148,7 +148,7 @@ export const createReferralService = (supabaseUrl: string, supabaseKey: string) 
     }
   }
 
-  async function fetchUserWalletAddress(referralCode: string): Promise<string | null> {
+  async function fetchUserWalletAddressByReferralCode(referralCode: string): Promise<string | null> {
     try {
       const { data, error } = await supabase
         .from('user_referral_codes')
@@ -168,6 +168,63 @@ export const createReferralService = (supabaseUrl: string, supabaseKey: string) 
     } catch (error: any) {
       console.error("Error fetching user wallet address", error);
       return null;
+    }
+  }
+
+  async function fetchUserWalletAddressByAddress(address: string): Promise<string | null> {
+    try {
+      const { data, error } = await supabase
+        .from('user_referral_codes')
+        .select('user_wallet_address')
+        .eq('user_wallet_address', address)
+        .single(); // Expect only one result
+
+      if (error) {
+        if (error.code === SUPABASE_SELECT_SINGLE_ROW_ERROR_CODE) {
+          return null; // No data found
+        }
+        console.error("Error fetching user wallet address", error);
+        return null;
+      }
+
+      return data ? data.user_wallet_address : null;
+    } catch (error: any) {
+      console.error("Error fetching user wallet address", error);
+      return null;
+    }
+  }
+
+  async function fetchSwapCountByAddress(address: string): Promise<number | null> {
+    try {
+      const { count, error } = await supabase
+        .from('materialized_swap')
+        .select('*', { count: 'exact', head: true })
+        .or(`sender.eq.${ address },receiver.eq.${ address }`);
+
+      if (error) {
+        throw error;
+      }
+
+      return count;
+    } catch (error: any) {
+      throw new Error("Error fetching swap count: ", error);
+    }
+  }
+
+  async function fetchAddLiquidityCountByAddress(address: string): Promise<number | null> {
+    try {
+      const { count, error } = await supabase
+        .from('materialized_add_liquidity')
+        .select('*', { count: 'exact', head: true })
+        .eq('sender', address);
+
+      if (error) {
+        throw error;
+      }
+
+      return count;
+    } catch (error: any) {
+      throw new Error("Error fetching swap count: ", error);
     }
   }
 
@@ -226,13 +283,25 @@ export const createReferralService = (supabaseUrl: string, supabaseKey: string) 
         return { success: false, error: 'User has already been referred.' };
       }
 
-      const referredByUserWalletAddress = await fetchUserWalletAddress(referralCode);
+      const referredByUserWalletAddress = await fetchUserWalletAddressByReferralCode(referralCode);
       if (!referredByUserWalletAddress) {
         return { success: false, error: 'User wallet for referral code not found.' };
       }
 
       if (referredByUserWalletAddress === referredUserWalletAddress) {
         return { success: false, error: 'User cannot refer to themselves.' };
+      }
+
+      if (await fetchUserWalletAddressByAddress(referredUserWalletAddress)) {
+        return { success: false, error: 'User has already interacted with the DEX and created a referral code.' };
+      }
+
+      if(await fetchSwapCountByAddress(referredByUserWalletAddress)) {
+        return { success: false, error: 'User has already interacted with the DEX and executed a swap.' };
+      }
+
+      if(await fetchAddLiquidityCountByAddress(referredByUserWalletAddress)) {
+        return { success: false, error: 'User has already interacted with the DEX and added liquidity.' };
       }
 
       const recordResult = await recordReferral(referredUserWalletAddress, referredByUserWalletAddress);

@@ -36,7 +36,7 @@ export const poolsRouter = createTRPCRouter({
         userBalance: UserPoolBalances;
         incentives: Asset[];
       }[] = await Promise.all(
-        balances.map(async (balance) => ({
+        balances.map(async (balance: UserPoolBalances) => ({
           poolInfo: await caller.local.pools.getPool({ address: balance.pool_address }),
           userBalance: balance,
           incentives: await publicClient

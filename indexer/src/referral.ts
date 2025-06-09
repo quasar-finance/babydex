@@ -399,17 +399,17 @@ export const createReferralService = (supabaseUrl: string, supabaseKey: string) 
       }
 
       if (await fetchUserWalletAddressByAddress(referredUserWalletAddress)) {
-        return { success: false, error: 'User has already interacted with the DEX and created a referral code.' };
+        return { success: false, error: "User has already interacted with the DEX and created a referral code." };
       }
 
       const points = await fetchPointsByAddress(referredUserWalletAddress);
 
       if (points && points.swapping_points > 0) {
-        return { success: false, error: 'User has already interacted with the DEX and executed a swap.' };
+        return { success: false, error: "User has already interacted with the DEX and executed a swap." };
       }
 
       if (points && points.lping_points > 0) {
-        return { success: false, error: 'User has already interacted with the DEX and added liquidity.' };
+        return { success: false, error: "User has already interacted with the DEX and added liquidity." };
       }
 
       const recordResult = await recordReferral(

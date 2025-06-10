@@ -2,7 +2,6 @@ import BasicModal from "~/app/components/templates/BasicModal";
 import { Button } from "~/app/components/atoms/Button";
 import Image from "next/image";
 import { useModal } from "~/app/providers/ModalProvider";
-import { useToast } from "~/app/hooks";
 
 import type React from "react";
 import { useAccount, useConnectors } from "@cosmi/react";
@@ -12,7 +11,9 @@ import { useEffect } from "react";
 function ConnectorButton({ connector, onClick }: { connector: any; onClick: () => void }) {
   const { name, id, isInstalled, icon } = connector;
 
-  const walletIcon = icon ?? `https://raw.githubusercontent.com/quasar-finance/quasar-resources/main/assets/wallet/${id}.webp`;
+  const walletIcon =
+    icon ??
+    `https://raw.githubusercontent.com/quasar-finance/quasar-resources/main/assets/wallet/${id}.webp`;
 
   return (
     <Button
@@ -41,14 +42,15 @@ function ConnectorButton({ connector, onClick }: { connector: any; onClick: () =
   );
 }
 
-const ModalConnectWallet: React.FC = () => {
+const ModalConnectWallet: React.FC<{ onConnect: () => void }> = ({ onConnect }) => {
   const connectors = useConnectors();
   const { isConnected } = useAccount();
-  const { toast } = useToast();
   const { hideModal } = useModal();
 
   useEffect(() => {
-    if (isConnected) hideModal();
+    if (isConnected) {
+      hideModal();
+    }
   }, [isConnected]);
 
   return (
@@ -58,7 +60,10 @@ const ModalConnectWallet: React.FC = () => {
           <ConnectorButton
             key={connector.uid}
             connector={connector}
-            onClick={() => connector.connect({ chainId: babylon.id })}
+            onClick={async () => {
+              await connector.connect({ chainId: babylon.id });
+              onConnect();
+            }}
           />
         ))}
       </div>

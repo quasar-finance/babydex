@@ -33,4 +33,9 @@ export type {
   PoolMetricSerialized,
   PoolIncentive,
   AggregatedMetrics,
+  Points
 } from "./indexer.js";
+
+export type {
+  CosmosSignedMessage
+} from "./referral.js";

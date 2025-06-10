@@ -84,7 +84,7 @@ export const AssetInput: React.FC<AssetInputProps> = ({
   const denomBalance = convertMicroDenomToDenom(
     balance,
     asset.decimals,
-    asset.decimals === 6 ? 2 : asset.decimals,
+    asset.decimals,
     false,
   );
 

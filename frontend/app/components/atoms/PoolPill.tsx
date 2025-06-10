@@ -59,9 +59,17 @@ export const PoolFeePill: React.FC<{
 };
 
 export const PoolIncentivesPill: React.FC<{
-  incentives: PoolIncentive | undefined;
+  incentives: PoolIncentive | PoolIncentive[] | undefined;
   className?: string;
 }> = ({ incentives, className }) => {
+  const incentiveArray = incentives 
+    ? Array.isArray(incentives) 
+      ? incentives 
+      : [incentives]
+    : [];
+
+  const hasIncentives = incentiveArray.length > 0;
+
   const tooltipContent = (
     <div className="flex flex-col gap-3 p-2">
       <div className="flex items-center gap-2">
@@ -75,35 +83,39 @@ export const PoolIncentivesPill: React.FC<{
           View campaigns
         </a>
       </div>
-      {incentives && (
+      {hasIncentives && (
         <div className="flex flex-col gap-2">
           <div className="text-sm text-white/50">Current Campaigns:</div>
-          <div className="flex flex-col gap-1">
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-white/80">
-                ${Assets[incentives.reward_token]?.symbol || incentives.reward_token.toUpperCase()}
-              </span>
-              <span className="text-white/80 ml-2">
-                {convertMicroDenomToDenom(
-                  Number(incentives.rewards_per_second) * 60 * 60 * 24, // Convert to daily
-                  incentives.token_decimals,
-                  incentives.token_decimals,
-                  true,
-                )}
-                /day
-              </span>
-            </div>
-            <div className="text-xs text-white/50">
-              {new Date(Number(incentives.start_ts) * 1000).toLocaleDateString("en-US", {
-                day: "numeric",
-                month: "short",
-              })}{" "}
-              →{" "}
-              {new Date(Number(incentives.end_ts) * 1000).toLocaleDateString("en-US", {
-                day: "numeric",
-                month: "short",
-              })}
-            </div>
+          <div className="flex flex-col gap-2">
+            {incentiveArray.map((incentive, index) => (
+              <div key={index} className="flex flex-col gap-1">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-white/80">
+                    ${Assets[incentive.reward_token]?.symbol || incentive.reward_token.toUpperCase()}
+                  </span>
+                  <span className="text-white/80 ml-2">
+                    {convertMicroDenomToDenom(
+                      Number(incentive.rewards_per_second) * 60 * 60 * 24, // Convert to daily
+                      incentive.token_decimals,
+                      incentive.token_decimals,
+                      true,
+                    )}
+                    /day
+                  </span>
+                </div>
+                <div className="text-xs text-white/50">
+                  {new Date(Number(incentive.start_ts) * 1000).toLocaleDateString("en-US", {
+                    day: "numeric",
+                    month: "short",
+                  })}{" "}
+                  →{" "}
+                  {new Date(Number(incentive.end_ts) * 1000).toLocaleDateString("en-US", {
+                    day: "numeric",
+                    month: "short",
+                  })}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
@@ -112,7 +124,7 @@ export const PoolIncentivesPill: React.FC<{
 
   return (
     <div className={twMerge("flex items-center gap-2", className)}>
-      {!!incentives && (
+      {hasIncentives && (
         <Pill color="yellow">
           <Tooltip content={tooltipContent}>
             <div className="flex items-center gap-1">

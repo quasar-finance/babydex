@@ -84,7 +84,7 @@ export type Indexer = {
   getPoolIncentivesByPoolAddresses: (
     interval: number,
     addresses: string[],
-  ) => Promise<Record<string, PoolIncentive> | null>;
+  ) => Promise<Record<string, PoolIncentive[]> | null>;
   getCurrentPoolVolumes: (page: number, limit: number) => Promise<Record<string, unknown>[] | null>;
   getPoolVolumesByPoolAddresses: (addresses: string[]) => Promise<Record<string, unknown>[] | null>;
   getPoolMetricsByPoolAddresses: (
@@ -467,7 +467,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
   async function getPoolIncentivesByPoolAddresses(
     interval: number,
     addresses: string[],
-  ): Promise<Record<string, PoolIncentive> | null> {
+  ): Promise<Record<string, PoolIncentive[]> | null> {
     const intervalSql = createIntervalSql(interval);
     const poolAddressesSql = createPoolAddressArraySql(addresses);
     const dayInSecondsSql = sql.raw("86400");
@@ -511,12 +511,13 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
 
     try {
       const result = await client.execute(query);
-      return result.rows.reduce<Record<string, PoolIncentive>>(
+      return result.rows.reduce<Record<string, PoolIncentive[]>>(
         (acc, row) => ({
           ...acc,
-          [row.pool_address as string]: {
-            ...(row as unknown as PoolIncentive),
-          } as PoolIncentive,
+          [row.pool_address as string]: [
+            ...(acc[row.pool_address as string] || []),
+            row as unknown as PoolIncentive,
+          ],
         }),
         {},
       );

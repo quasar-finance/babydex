@@ -19,7 +19,7 @@ export const Footer: React.FC = () => {
               className="absolute bottom-0 left-0 w-full h-full object-cover select-none min-h-[35rem] bg-black-300"
               draggable="false"
               initial={{ opacity: 0, y: 100 }}
-              animate={{ 
+              animate={{
                 opacity: 1,
                 y: 0,
                 transition: {
@@ -27,7 +27,7 @@ export const Footer: React.FC = () => {
                   type: "spring",
                   damping: 36.2,
                   stiffness: 563,
-                }
+                },
               }}
               exit={{ opacity: 0, y: 100 }}
             />

@@ -29,31 +29,30 @@ export type PoolInfo = {
   rewards: [];
 };
 
-
-type AssetInfo = 
-  | { 
-      token: { 
-        contract_addr: string
-      } 
+type AssetInfo =
+  | {
+      token: {
+        contract_addr: string;
+      };
     }
-  | { 
-      native_token: { 
-        denom: string 
-      } 
+  | {
+      native_token: {
+        denom: string;
+      };
     };
 
-type RewardType = 
+type RewardType =
   | { int: AssetInfo }
-  | { 
+  | {
       ext: {
         info: AssetInfo;
         next_update_ts: number;
-      }
+      };
     };
 
 export type RewardInfo = {
-  reward: RewardType;  // The reward token info and type
-  rps: string;        // Decimal256 in Rust maps to string in TypeScript for precision
-  index: string;      // Last checkpointed reward per LP token
-  orphaned: string;   // Orphaned rewards between incentivization and first stake
-}
+  reward: RewardType; // The reward token info and type
+  rps: string; // Decimal256 in Rust maps to string in TypeScript for precision
+  index: string; // Last checkpointed reward per LP token
+  orphaned: string; // Orphaned rewards between incentivization and first stake
+};

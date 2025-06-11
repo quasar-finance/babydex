@@ -1,9 +1,8 @@
 import { Client } from "pg";
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 import { getClientAndAddress } from "../lib";
 import { AstroportFactoryClient } from "../sdk/AstroportFactory.client";
-import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 
 // PostgreSQL connection details
 const client = new Client({
@@ -29,35 +28,35 @@ function readDeployedContracts(): Record<string, string> {
 
 // Function to query the created block for a contract
 async function getCreatedBlock(contract_address: string): Promise<number> {
-//     const {client, address} = await getClientAndAddress();
-//     const response = await client.getContract(contract_address);
-//   // Placeholder for actual logic to get the created block
-//   // This should be replaced with the actual query to get the block height
-//   return response.; // Example block height
-    // arbitrary value, but should be gotten from onchain when the contract was created
-    return 401000
+  //     const {client, address} = await getClientAndAddress();
+  //     const response = await client.getContract(contract_address);
+  //   // Placeholder for actual logic to get the created block
+  //   // This should be replaced with the actual query to get the block height
+  //   return response.; // Example block height
+  // arbitrary value, but should be gotten from onchain when the contract was created
+  return 401000;
 }
 
 // Function to process contracts deployed by the factory
-async function processFactoryContracts(deployedFactory: string)  {
-    const {client, address} = await getClientAndAddress();
+async function processFactoryContracts(deployedFactory: string) {
+  const { client, address } = await getClientAndAddress();
 
-    const factoryClient = new AstroportFactoryClient(client, address, deployedFactory);
+  const factoryClient = new AstroportFactoryClient(client, address, deployedFactory);
 
-    const pairs = await factoryClient.pairs({});
-    
-    const processed_pairs = pairs.map((pair) => {
-        return {contract: pair.contract_addr, token: pair.liquidity_token}
-    })
-    return processed_pairs
+  const pairs = await factoryClient.pairs({});
+
+  const processed_pairs = pairs.map((pair) => {
+    return { contract: pair.contract_addr, token: pair.liquidity_token };
+  });
+  return processed_pairs;
 }
 
 // Sample contract data
 async function populateContracts(): Promise<Contract[]> {
-  var deployedContracts = readDeployedContracts();
+  const deployedContracts = readDeployedContracts();
   const contracts: Contract[] = [];
 
-  const factory = deployedContracts["factory"];
+  const factory = deployedContracts.factory;
   const pairs = await processFactoryContracts(factory); // Ensure pairs is resolved
   const pairsArray = pairs.flatMap(({ contract, token }) => [contract, token]);
 
@@ -107,12 +106,12 @@ async function insertContracts(contracts: Contract[]) {
       ]);
       console.log(`Inserted contract into v1_cosmos: ${contract.address}`);
 
-    //   await client.query(insertHubbleContractStatusQuery, [
-    //     contract.internal_chain_id,
-    //     contract.address,
-    //     contract.start_height,
-    //   ]);
-    //   console.log(`Inserted/Updated contract status in hubble: ${contract.address}`);
+      //   await client.query(insertHubbleContractStatusQuery, [
+      //     contract.internal_chain_id,
+      //     contract.address,
+      //     contract.start_height,
+      //   ]);
+      //   console.log(`Inserted/Updated contract status in hubble: ${contract.address}`);
     }
   } catch (error) {
     console.error("Error inserting contracts:", error);
@@ -125,6 +124,6 @@ async function insertContracts(contracts: Contract[]) {
 // Run the insertion function
 (async () => {
   const contracts = await populateContracts();
-  console.log(contracts)
+  console.log(contracts);
   await insertContracts(contracts);
 })();

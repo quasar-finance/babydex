@@ -1,6 +1,5 @@
-import type { Client, Transport, Chain, Account, CometBftRpcSchema, Coin } from 'cosmi/types';
-import type { SigningActions } from './signingActions';
-
+import type { Client, Transport, Chain, Account, CometBftRpcSchema, Coin } from "cosmi/types";
+import type { SigningActions } from "./signingActions";
 
 export type MsgExecuteContract = {
   "@type": "/cosmwasm.wasm.v1.MsgExecuteContract";
@@ -42,8 +41,8 @@ export const TxBody = {
     memo: data.memo ?? "",
     timeout_height: data.timeoutHeight?.toString() ?? "0",
     extension_options: data.extension_options ?? [],
-    non_critical_extension_options: data.non_critical_extension_options ?? []
-  })
+    non_critical_extension_options: data.non_critical_extension_options ?? [],
+  }),
 };
 
 export type Transaction = {
@@ -56,5 +55,5 @@ export type ClientWithActions<
   TTransport extends Transport = Transport,
   TChain extends Chain | undefined = Chain | undefined,
   TAccount extends Account | undefined = Account | undefined,
-  TRpcSchema extends CometBftRpcSchema = CometBftRpcSchema
-> = Client<TTransport, TChain, TAccount, TRpcSchema> & SigningActions<TTransport, TChain, TAccount>; 
+  TRpcSchema extends CometBftRpcSchema = CometBftRpcSchema,
+> = Client<TTransport, TChain, TAccount, TRpcSchema> & SigningActions<TTransport, TChain, TAccount>;

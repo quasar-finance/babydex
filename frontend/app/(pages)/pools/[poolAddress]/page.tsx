@@ -3,7 +3,7 @@ import Pool from "~/app/components/pages/Pool";
 export default async function PoolPage({
   params,
 }: {
-  params: Promise<{ poolAddress: string }>
+  params: Promise<{ poolAddress: string }>;
 }) {
   const { poolAddress } = await params;
 
@@ -12,4 +12,4 @@ export default async function PoolPage({
       <Pool address={poolAddress} />
     </div>
   );
-};
+}

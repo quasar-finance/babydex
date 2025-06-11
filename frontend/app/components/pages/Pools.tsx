@@ -10,7 +10,7 @@ import type React from "react";
 import PoolsSkeleton from "../molecules/skeletons/PoolsSkeleton";
 import { CellPoolName } from "../atoms/cells/CellPoolName";
 import { CellTVL } from "../atoms/cells/CellTVL";
-import { type Column, SortableTable, type SortDirection, Table, TableRow } from "../atoms/Table";
+import { type Column, SortableTable, type SortDirection, TableRow } from "../atoms/Table";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { Pagination } from "../atoms/Pagination";
 import { blockedPoolAddresses } from "~/utils/consts";

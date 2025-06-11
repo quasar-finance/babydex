@@ -1,11 +1,10 @@
-import { number, z } from "zod";
+import { z } from "zod";
 import { createCallerFactory, createTRPCPublicProcedure, createTRPCRouter } from "../config.js";
 
 import { appRouter } from "../router.js";
 
 import type {
   PoolInfo,
-  RewardInfo,
   ConfigResponse,
   CumulativePricesResponse,
   PairInfo,
@@ -133,12 +132,11 @@ export const poolsRouter = createTRPCRouter({
         const optimalRatio: number = poolAmount0 / poolAmount1;
 
         return Number.isNaN(optimalRatio) ? 1 : optimalRatio;
-      } else {
+      }
         const { params } = config;
         const priceScale: number = Number(params.price_scale);
 
         return priceScale;
-      }
     }),
   getPool: createTRPCPublicProcedure
     .input(z.object({ address: z.string() }))

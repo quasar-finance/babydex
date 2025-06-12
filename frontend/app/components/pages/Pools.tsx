@@ -128,19 +128,12 @@ const Pools: React.FC = () => {
   const totalPools = Math.ceil(filteredPools.length / numberPerPage);
 
   const sortedPools = [...filteredPools].sort((a, b) => {
-    if (isMetricLoading || !metrics) {
-      // Default sort by poolLiquidity when metrics aren't loaded
-      return sortDirection === "desc"
-        ? Number(b.poolLiquidity) - Number(a.poolLiquidity)
-        : Number(a.poolLiquidity) - Number(b.poolLiquidity);
-    }
-
-    const metricA = metrics[a.poolAddress] || DefaultPoolMetric();
+    const metricA = metrics?.[a.poolAddress] || DefaultPoolMetric();
     metricA.token0_decimals =
       metricA.token0_decimals || Assets[metricA.token0_denom]?.decimals || 0;
     metricA.token1_decimals =
       metricA.token1_decimals || Assets[metricA.token1_denom]?.decimals || 0;
-    const metricB = metrics[b.poolAddress] || DefaultPoolMetric();
+    const metricB = metrics?.[b.poolAddress] || DefaultPoolMetric();
     metricB.token0_decimals =
       metricB.token0_decimals || Assets[metricB.token0_denom]?.decimals || 0;
     metricB.token1_decimals =

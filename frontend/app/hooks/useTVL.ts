@@ -1,8 +1,36 @@
 import type { PoolInfo } from "@towerfi/types";
 import { useWithdrawSimulation } from "./useWithdrawSimulation";
 import { usePrices } from "./usePrices";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { convertMicroDenomToDenom } from "~/utils/intl";
+import { create } from "zustand";
+
+interface PoolTVLRecordStore {
+  records: Record<string, number>;
+  setRecord: (poolAddress: string, value: number) => void;
+  getRecord: (poolAddress: string) => number | undefined;
+  deleteRecord: (poolAddress: string) => void;
+}
+
+export const usePoolTVLRecordStore = create<PoolTVLRecordStore>((set, get) => ({
+  records: {},
+  setRecord: (poolAddress, value) => {
+    set((state) => ({
+      records: {
+        ...state.records,
+        [poolAddress]: value,
+      },
+    }));
+  },
+  getRecord: (poolAddress) => {
+    return get().records[poolAddress];
+  },
+  deleteRecord: (poolAddress) =>
+    set((state) => {
+      const { [poolAddress]: deleted, ...rest } = state.records;
+      return { records: rest };
+    }),
+}));
 
 export function useTVL({
   poolLiquidity,
@@ -16,6 +44,7 @@ export function useTVL({
   });
 
   const { getPrice } = usePrices();
+  const { setRecord } = usePoolTVLRecordStore();
 
   const TVL = useMemo(() => {
     if (!simulation) return 0;
@@ -32,8 +61,13 @@ export function useTVL({
       { format: false },
     );
 
-    return token0Price + token1Price;
-  }, [simulation]);
+    const tvl = token0Price + token1Price;
+    return tvl;
+  }, [simulation, getPrice, poolAddress]);
+
+  useEffect(() => {
+    setRecord(poolAddress, TVL);
+  }, [TVL, poolAddress]);
 
   return {
     TVL,

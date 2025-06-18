@@ -1154,8 +1154,6 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
         .from(referrals);
 
       if (!referralRelationships || referralRelationships.length === 0) {
-        console.log('No referral relationships found. No bonus points to calculate.');
-
         return userPoints;
       }
 
@@ -1179,10 +1177,6 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
           const refereeBonus = originalRefereeBasePoints * 0.10;
           // Only modify total_points; don't store referee_bonus_points as a separate property
           refereePoints.total_points += refereeBonus;
-        } else {
-          if (!refereePoints) {
-            console.warn(`Referee wallet ${ refereeWallet } from referral not found in input points object.`);
-          }
         }
       }
 
@@ -1199,10 +1193,6 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
           const referrerBonus = originalRefereeBasePoints * 0.20;
 
           referrerPoints.total_points += referrerBonus;
-        } else {
-          if (!referrerPoints) {
-            console.warn(`Referrer wallet ${ referrerWallet } from referral not found in input points object.`);
-          }
         }
       }
 

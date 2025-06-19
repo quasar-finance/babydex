@@ -49,6 +49,9 @@ const UNIQUE_VALIDATION_ERROR_CODE = "23505";
 // PGRST116 is supabase postgresql js error when single() row is requested but no row is found
 const SUPABASE_SELECT_SINGLE_ROW_ERROR_CODE = "PGRST116";
 
+// The threshold we use before a user cannot be referred anymore
+const REFERRAL_POINTS_THRESHOLD = 42;
+
 /**
  * A function that creates a referral service for managing referral codes
  * and user-related referral operations. It uses Supabase for backend support.
@@ -404,11 +407,11 @@ export const createReferralService = (supabaseUrl: string, supabaseKey: string) 
 
       const points = await fetchPointsByAddress(referredUserWalletAddress);
 
-      if (points && points.swapping_points > 0) {
+      if (points && points.swapping_points > REFERRAL_POINTS_THRESHOLD) {
         return { success: false, error: "User has already interacted with the DEX and executed a swap." };
       }
 
-      if (points && points.lping_points > 0) {
+      if (points && points.lping_points > REFERRAL_POINTS_THRESHOLD) {
         return { success: false, error: "User has already interacted with the DEX and added liquidity." };
       }
 

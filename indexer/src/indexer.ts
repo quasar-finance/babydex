@@ -22,7 +22,7 @@ import {
   materializedUnstakeLiquidityInV1Cosmos,
   materializedWithdrawLiquidityInV1Cosmos,
 } from "./drizzle/schema.js";
-import { integer, pgSchema, serial, text } from "drizzle-orm/pg-core";
+import {bigint, integer, pgSchema, serial, text, timestamp} from "drizzle-orm/pg-core";
 
 const v1Cosmos = pgSchema("v1_cosmos");
 const userShares = v1Cosmos.table("pool_user_shares", {
@@ -38,6 +38,13 @@ const poolLpToken = v1Cosmos.table("pool_lp_token", {
   id: serial("id").primaryKey(),
   pool: text("pool").notNull(),
   lp_token: text("lp_token").notNull(),
+});
+
+const referrals = v1Cosmos.table('referrals', {
+  id: bigint('id', { mode: 'number' }).primaryKey().notNull(), // Assuming bigint primary key
+  referredUserWalletAddress: text('referred_user_wallet_address').notNull().unique(),
+  referredByUserWalletAddress: text('referred_by_user_wallet_address').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 
 export const views = {
@@ -1100,13 +1107,13 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     addresses: string[],
     limit?: number | null
   ): Promise<Record<string, Points>> {
-    limit = limit ?? 50;
+    limit = limit ?? 100;
     const addressesSql = addresses.length > 0 ? sql` WHERE address = ${createPoolAddressArraySql(addresses)} ` : sql.raw(``);
     const query = sql` SELECT * FROM v1_cosmos.materialized_points ${addressesSql} ORDER BY rank LIMIT ${limit}; `;
 
     try {
       const result = await client.execute(query);
-      return result.rows.reduce<Record<string, Points>>((acc, row) => {
+      const points = result.rows.reduce<Record<string, Points>>((acc, row) => {
         const address: string = row.address as string;
         const lping_points: number = parseFloat(row.lping_points as string);
         const swapping_points: number = parseFloat(row.swapping_points as string);
@@ -1122,9 +1129,77 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
         } as Points;
         return acc;
       }, {});
+
+      return calculateBonusPoints(points);
     } catch (error) {
       console.error("Error executing query:", error);
       throw error;
+    }
+  }
+
+  /**
+   * Calculates and updates bonus points based on referral relationships.
+   * Referees are awarded a 10% bonus on their points, and referrers are awarded a 20% bonus based on the referee's original points.
+   *
+   * @param {Record<string, Points>} userPoints - A record of user wallet addresses mapped to their corresponding Points objects, where Points include total_points.
+   * @return {Promise<Record<string, Points>>} A promise resolving to the updated userPoints object after applying bonus points. Original input remains unaltered.
+   */
+  async function calculateBonusPoints(userPoints: Record<string, Points>): Promise<Record<string, Points>> {
+    try {
+      const referralRelationships = await client
+        .select({
+          referred_user_wallet_address: referrals.referredUserWalletAddress,
+          referred_by_user_wallet_address: referrals.referredByUserWalletAddress,
+        })
+        .from(referrals);
+
+      if (!referralRelationships || referralRelationships.length === 0) {
+        return userPoints;
+      }
+
+      // Create a deep copy or a map of original total_points for accurate calculations.
+      // This is crucial because a referee's points might be used for a referrer calculation,
+      // but the referee's points might also receive a bonus themselves.
+      const originalTotalPointsMap: Record<string, number> = {};
+      for (const address in userPoints) {
+        if (userPoints.hasOwnProperty(address) && userPoints[address] !== undefined) {
+          originalTotalPointsMap[address] = userPoints[address].total_points;
+        }
+      }
+
+      // First Pass: Calculate and apply Referee Bonuses (10%)
+      for (const referral of referralRelationships) {
+        const refereeWallet = referral.referred_user_wallet_address;
+        const refereePoints = userPoints[refereeWallet];
+        const originalRefereeBasePoints = originalTotalPointsMap[refereeWallet]; // Use original base points
+
+        if (refereePoints && originalRefereeBasePoints !== undefined) {
+          const refereeBonus = originalRefereeBasePoints * 0.10;
+          // Only modify total_points; don't store referee_bonus_points as a separate property
+          refereePoints.total_points += refereeBonus;
+        }
+      }
+
+      // Second Pass: Calculate and apply Referrer Bonuses (20%)
+      for (const referral of referralRelationships) {
+        const refereeWallet = referral.referred_user_wallet_address;
+        const referrerWallet = referral.referred_by_user_wallet_address;
+
+        const referrerPoints = userPoints[referrerWallet];
+        // Still use original base points of the referee
+        const originalRefereeBasePoints = originalTotalPointsMap[refereeWallet];
+
+        if (referrerPoints && originalRefereeBasePoints !== undefined) {
+          const referrerBonus = originalRefereeBasePoints * 0.20;
+
+          referrerPoints.total_points += referrerBonus;
+        }
+      }
+
+      return userPoints;
+    } catch (err) {
+      console.error('An unexpected error occurred during bonus point calculation:', err);
+      return userPoints;
     }
   }
 

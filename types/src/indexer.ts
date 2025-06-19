@@ -102,4 +102,6 @@ export interface Points {
   swapping_points: number;
   total_points: number;
   rank: number;
+  referral_link_points?: number;
+  invite_boost_points?: number;
 }

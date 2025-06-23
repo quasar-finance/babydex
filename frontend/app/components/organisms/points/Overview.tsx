@@ -6,8 +6,8 @@ export const Overview: React.FC<{ points: Points }> = ({ points }) => {
     { points: points.total_points, title: "Total", highlight: true },
     { points: points.lping_points, title: "LPing" },
     { points: points.swapping_points, title: "Swapping" },
-    { points: null, title: "Referral Link" },
-    { points: null, title: "Invite Boost" },
+    { points: points.referral_link_points, title: "Referral Link" },
+    { points: points.invite_boost_points, title: "Invite Boost" },
   ];
 
   return (

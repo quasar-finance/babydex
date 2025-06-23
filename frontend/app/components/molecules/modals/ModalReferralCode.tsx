@@ -39,8 +39,8 @@ const ModalReferralCode: React.FC<{ referralCode: string }> = ({ referralCode })
       }
 
       toast.success({
-        title: "Referral link created",
-        description: "You can now share your referral link with friends to earn points.",
+        title: "Referral code accepted",
+        description: "Your referral code has been successfully applied.",
       });
     },
   });
@@ -50,7 +50,7 @@ const ModalReferralCode: React.FC<{ referralCode: string }> = ({ referralCode })
     if (!userAddress) {
       toast.error({
         title: "Wallet not connected",
-        description: "Please connect your wallet to create a referral link.",
+        description: "Please connect your wallet to accept a referral code.",
       });
 
       return;

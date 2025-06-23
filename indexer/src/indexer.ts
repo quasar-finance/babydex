@@ -1163,8 +1163,6 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
         } as Points;
         return acc;
       }, {});
-
-      return calculateBonusPoints(points);
     } catch (error) {
       console.error("Error executing query:", error);
       throw error;

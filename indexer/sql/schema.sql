@@ -3032,6 +3032,31 @@ CREATE VIEW v1_cosmos.add_liquidity AS
 
 
 --
+-- Name: blacklisted_points_addresses; Type: TABLE; Schema: v1_cosmos; Owner: -
+--
+
+CREATE TABLE v1_cosmos.blacklisted_points_addresses (
+    id bigint NOT NULL,
+    address text NOT NULL,
+    created_at timestamp with time zone DEFAULT now()
+);
+
+
+--
+-- Name: blacklisted_points_addresses_id_seq; Type: SEQUENCE; Schema: v1_cosmos; Owner: -
+--
+
+ALTER TABLE v1_cosmos.blacklisted_points_addresses ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME v1_cosmos.blacklisted_points_addresses_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
 -- Name: blocks; Type: TABLE; Schema: v1_cosmos; Owner: -
 --
 
@@ -3850,6 +3875,163 @@ CREATE MATERIALIZED VIEW v1_cosmos.materialized_historic_pool_yield AS
 
 
 --
+-- Name: transactions; Type: TABLE; Schema: v1_cosmos; Owner: -
+--
+
+CREATE TABLE v1_cosmos.transactions (
+    chain_id integer NOT NULL,
+    block_hash text NOT NULL,
+    height bigint NOT NULL,
+    data jsonb NOT NULL,
+    hash text NOT NULL,
+    index integer NOT NULL
+);
+
+
+--
+-- Name: TABLE transactions; Type: COMMENT; Schema: v1_cosmos; Owner: -
+--
+
+COMMENT ON TABLE v1_cosmos.transactions IS 'DEPRECATED: use V1';
+
+
+--
+-- Name: materialized_hourly_swap_points; Type: MATERIALIZED VIEW; Schema: v1_cosmos; Owner: -
+--
+
+CREATE MATERIALIZED VIEW v1_cosmos.materialized_hourly_swap_points AS
+ WITH hourlyavgprices AS (
+         SELECT t.denomination,
+            date_trunc('hour'::text, tp.created_at) AS hour,
+            avg(tp.price) AS hourly_avg_price
+           FROM (v1_cosmos.token_prices tp
+             JOIN v1_cosmos.token t ON ((t.token_name = tp.token)))
+          GROUP BY t.denomination, (date_trunc('hour'::text, tp.created_at))
+        ), feepayer AS (
+         SELECT ((t.data -> 'tx_result'::text) -> 'events'::text) AS events_array,
+            t.hash AS transaction_hash,
+            t.block_hash,
+            fee_payer_logic.calculated_fee_payer_value AS fee_payer,
+            fee_payer_logic.calculated_ask_asset AS ask_asset,
+            fee_payer_logic.calculated_fee_share_amount AS fee_share_amount,
+            fee_payer_logic.calculated_maker_fee_amount AS maker_fee_amount,
+            fee_payer_logic.calculated_commision_amount AS commission_amount,
+            fee_payer_logic.event_index
+           FROM (v1_cosmos.transactions t
+             CROSS JOIN LATERAL ( WITH indexedevents AS (
+                         SELECT ie.event_data AS event,
+                            ie.idx AS event_index
+                           FROM jsonb_array_elements(((t.data -> 'tx_result'::text) -> 'events'::text)) WITH ORDINALITY ie(event_data, idx)
+                        ), eventattributesextracted AS (
+                         SELECT ie.event_index,
+                            (ie.event ->> 'type'::text) AS event_type,
+                            (ie.event ->> 'action'::text) AS event_action,
+                            ( SELECT (attr.value ->> 'value'::text)
+                                   FROM jsonb_array_elements((ie.event -> 'attributes'::text)) attr(value)
+                                  WHERE ((attr.value ->> 'key'::text) = 'fee_payer'::text)
+                                 LIMIT 1) AS fee_payer,
+                            ( SELECT (attr.value ->> 'value'::text)
+                                   FROM jsonb_array_elements((ie.event -> 'attributes'::text)) attr(value)
+                                  WHERE ((attr.value ->> 'key'::text) = 'receiver'::text)
+                                 LIMIT 1) AS receiver,
+                            ( SELECT (attr.value ->> 'value'::text)
+                                   FROM jsonb_array_elements((ie.event -> 'attributes'::text)) attr(value)
+                                  WHERE ((attr.value ->> 'key'::text) = 'to'::text)
+                                 LIMIT 1) AS transfer_to,
+                            ( SELECT (attr.value ->> 'value'::text)
+                                   FROM jsonb_array_elements((ie.event -> 'attributes'::text)) attr(value)
+                                  WHERE ((attr.value ->> 'key'::text) = 'ask_asset'::text)
+                                 LIMIT 1) AS ask_asset,
+                            (( SELECT (attr.value ->> 'value'::text)
+                                   FROM jsonb_array_elements((ie.event -> 'attributes'::text)) attr(value)
+                                  WHERE ((attr.value ->> 'key'::text) = 'fee_share_amount'::text)
+                                 LIMIT 1))::numeric AS fee_share_amount,
+                            (( SELECT (attr.value ->> 'value'::text)
+                                   FROM jsonb_array_elements((ie.event -> 'attributes'::text)) attr(value)
+                                  WHERE ((attr.value ->> 'key'::text) = 'maker_fee_amount'::text)
+                                 LIMIT 1))::numeric AS maker_fee_amount,
+                            (( SELECT (attr.value ->> 'value'::text)
+                                   FROM jsonb_array_elements((ie.event -> 'attributes'::text)) attr(value)
+                                  WHERE ((attr.value ->> 'key'::text) = 'commission_amount'::text)
+                                 LIMIT 1))::numeric AS commission_amount
+                           FROM indexedevents ie
+                        ), wasmswapindex AS (
+                         SELECT eventattributesextracted.event_index,
+                            eventattributesextracted.receiver,
+                            eventattributesextracted.ask_asset,
+                            eventattributesextracted.fee_share_amount,
+                            eventattributesextracted.maker_fee_amount,
+                            eventattributesextracted.commission_amount
+                           FROM eventattributesextracted
+                          WHERE (eventattributesextracted.event_type = 'wasm-swap'::text)
+                          ORDER BY eventattributesextracted.event_index DESC
+                         LIMIT 1
+                        ), feepayer AS (
+                         SELECT eventattributesextracted.fee_payer
+                           FROM eventattributesextracted
+                          WHERE ((eventattributesextracted.event_type = 'tx'::text) AND (eventattributesextracted.fee_payer IS NOT NULL))
+                         LIMIT 1
+                        )
+                 SELECT ( SELECT feepayer.fee_payer
+                           FROM feepayer) AS calculated_fee_payer_value,
+                    ( SELECT wasmswapindex.ask_asset
+                           FROM wasmswapindex) AS calculated_ask_asset,
+                    ( SELECT wasmswapindex.fee_share_amount
+                           FROM wasmswapindex) AS calculated_fee_share_amount,
+                    ( SELECT wasmswapindex.maker_fee_amount
+                           FROM wasmswapindex) AS calculated_maker_fee_amount,
+                    ( SELECT wasmswapindex.commission_amount
+                           FROM wasmswapindex) AS calculated_commision_amount,
+                    ( SELECT wasmswapindex.event_index
+                           FROM wasmswapindex) AS event_index) fee_payer_logic)
+        ), swaps AS (
+         SELECT fp.fee_payer AS user_wallet,
+            s.pool_address,
+            fp.ask_asset,
+            s."timestamp",
+            fp.fee_share_amount,
+            fp.maker_fee_amount,
+            fp.commission_amount,
+            s.transaction_hash,
+            s.block_hash
+           FROM (v1_cosmos.materialized_swap s
+             JOIN feepayer fp ON (((s.block_hash = fp.block_hash) AND (s.transaction_hash = fp.transaction_hash))))
+          WHERE (fp.fee_payer IS NOT NULL)
+        ), hourlyswaps AS (
+         SELECT s.user_wallet,
+            s.pool_address,
+            s.ask_asset,
+            date_trunc('hour'::text, s."timestamp") AS hour,
+            sum((s.fee_share_amount + s.maker_fee_amount)) AS cumulative_fee_amount,
+            json_agg(s.transaction_hash) AS txs
+           FROM swaps s
+          GROUP BY s.user_wallet, s.pool_address, s.ask_asset, (date_trunc('hour'::text, s."timestamp"))
+        ), hourlyswappointscalculation AS (
+         SELECT hs.user_wallet,
+            hs.pool_address,
+            hap.hour,
+            hs.ask_asset,
+            hs.cumulative_fee_amount AS sum_hourly_cumulative_fee_amount,
+            hap.hourly_avg_price AS avg_hourly_price,
+            (((hs.cumulative_fee_amount)::double precision / power((10)::double precision, (t.decimals)::double precision)) * (hap.hourly_avg_price)::double precision) AS hourly_swap_points,
+            hs.txs
+           FROM ((hourlyswaps hs
+             JOIN hourlyavgprices hap ON (((hap.hour = hs.hour) AND (hs.ask_asset = hap.denomination))))
+             JOIN v1_cosmos.token t ON ((t.denomination = hs.ask_asset)))
+        )
+ SELECT hourlyswappointscalculation.user_wallet,
+    hourlyswappointscalculation.pool_address,
+    hourlyswappointscalculation.hour,
+    hourlyswappointscalculation.ask_asset,
+    hourlyswappointscalculation.sum_hourly_cumulative_fee_amount,
+    hourlyswappointscalculation.avg_hourly_price,
+    hourlyswappointscalculation.hourly_swap_points,
+    hourlyswappointscalculation.txs
+   FROM hourlyswappointscalculation
+  WITH NO DATA;
+
+
+--
 -- Name: pool_incentive_multipliers; Type: TABLE; Schema: v1_cosmos; Owner: -
 --
 
@@ -3882,13 +4064,12 @@ CREATE MATERIALIZED VIEW v1_cosmos.materialized_points AS
              JOIN v1_cosmos.pool_incentive_multipliers pim ON ((mp.pool_address = pim.pool_address)))
           GROUP BY mp.pool_address
         ), hourlyavgprices AS (
-         SELECT tpb.denomination,
-            date_trunc('hour'::text, tpb."timestamp") AS hour,
-            avg(tpb.price) AS hourly_avg_price,
-            min(tpb.height) AS start_height,
-            max(tpb.height) AS end_height
-           FROM v1_cosmos.token_prices_by_block tpb
-          GROUP BY tpb.denomination, (date_trunc('hour'::text, tpb."timestamp"))
+         SELECT t.denomination,
+            date_trunc('hour'::text, tp.created_at) AS hour,
+            avg(tp.price) AS hourly_avg_price
+           FROM (v1_cosmos.token_prices tp
+             JOIN v1_cosmos.token t ON ((t.token_name = tp.token)))
+          GROUP BY t.denomination, (date_trunc('hour'::text, tp.created_at))
         ), hourlyliquidityadds AS (
          SELECT al.sender AS user_wallet,
             al.pool_address,
@@ -3896,9 +4077,7 @@ CREATE MATERIALIZED VIEW v1_cosmos.materialized_points AS
             al.token1_denom,
             date_trunc('hour'::text, al."timestamp") AS hour,
             sum(al.token0_amount) AS token0_amount,
-            sum(al.token1_amount) AS token1_amount,
-            min(al.height) AS start_height,
-            max(al.height) AS end_height
+            sum(al.token1_amount) AS token1_amount
            FROM v1_cosmos.materialized_add_liquidity al
           GROUP BY al.sender, al.pool_address, al.token0_denom, al.token1_denom, (date_trunc('hour'::text, al."timestamp"))
         ), hourlliquiditytotaladds AS (
@@ -4007,34 +4186,112 @@ CREATE MATERIALIZED VIEW v1_cosmos.materialized_points AS
             sum(((hpc.points ->> 'satlayer'::text))::numeric) AS total_satlayer_points
            FROM hourlypointscalculation hpc
           GROUP BY hpc.user_wallet, hpc.pool_address
+        ), feepayer AS (
+         SELECT ((t.data -> 'tx_result'::text) -> 'events'::text) AS events_array,
+            t.hash AS transaction_hash,
+            t.block_hash,
+            fee_payer_logic.calculated_fee_payer_value AS fee_payer,
+            fee_payer_logic.calculated_ask_asset AS ask_asset,
+            fee_payer_logic.calculated_fee_share_amount AS fee_share_amount,
+            fee_payer_logic.calculated_maker_fee_amount AS maker_fee_amount,
+            fee_payer_logic.calculated_commision_amount AS commission_amount,
+            fee_payer_logic.event_index
+           FROM (v1_cosmos.transactions t
+             CROSS JOIN LATERAL ( WITH indexedevents AS (
+                         SELECT ie.event_data AS event,
+                            ie.idx AS event_index
+                           FROM jsonb_array_elements(((t.data -> 'tx_result'::text) -> 'events'::text)) WITH ORDINALITY ie(event_data, idx)
+                        ), eventattributesextracted AS (
+                         SELECT ie.event_index,
+                            (ie.event ->> 'type'::text) AS event_type,
+                            (ie.event ->> 'action'::text) AS event_action,
+                            ( SELECT (attr.value ->> 'value'::text)
+                                   FROM jsonb_array_elements((ie.event -> 'attributes'::text)) attr(value)
+                                  WHERE ((attr.value ->> 'key'::text) = 'fee_payer'::text)
+                                 LIMIT 1) AS fee_payer,
+                            ( SELECT (attr.value ->> 'value'::text)
+                                   FROM jsonb_array_elements((ie.event -> 'attributes'::text)) attr(value)
+                                  WHERE ((attr.value ->> 'key'::text) = 'receiver'::text)
+                                 LIMIT 1) AS receiver,
+                            ( SELECT (attr.value ->> 'value'::text)
+                                   FROM jsonb_array_elements((ie.event -> 'attributes'::text)) attr(value)
+                                  WHERE ((attr.value ->> 'key'::text) = 'to'::text)
+                                 LIMIT 1) AS transfer_to,
+                            ( SELECT (attr.value ->> 'value'::text)
+                                   FROM jsonb_array_elements((ie.event -> 'attributes'::text)) attr(value)
+                                  WHERE ((attr.value ->> 'key'::text) = 'ask_asset'::text)
+                                 LIMIT 1) AS ask_asset,
+                            (( SELECT (attr.value ->> 'value'::text)
+                                   FROM jsonb_array_elements((ie.event -> 'attributes'::text)) attr(value)
+                                  WHERE ((attr.value ->> 'key'::text) = 'fee_share_amount'::text)
+                                 LIMIT 1))::numeric AS fee_share_amount,
+                            (( SELECT (attr.value ->> 'value'::text)
+                                   FROM jsonb_array_elements((ie.event -> 'attributes'::text)) attr(value)
+                                  WHERE ((attr.value ->> 'key'::text) = 'maker_fee_amount'::text)
+                                 LIMIT 1))::numeric AS maker_fee_amount,
+                            (( SELECT (attr.value ->> 'value'::text)
+                                   FROM jsonb_array_elements((ie.event -> 'attributes'::text)) attr(value)
+                                  WHERE ((attr.value ->> 'key'::text) = 'commission_amount'::text)
+                                 LIMIT 1))::numeric AS commission_amount
+                           FROM indexedevents ie
+                        ), wasmswapindex AS (
+                         SELECT eventattributesextracted.event_index,
+                            eventattributesextracted.receiver,
+                            eventattributesextracted.ask_asset,
+                            eventattributesextracted.fee_share_amount,
+                            eventattributesextracted.maker_fee_amount,
+                            eventattributesextracted.commission_amount
+                           FROM eventattributesextracted
+                          WHERE (eventattributesextracted.event_type = 'wasm-swap'::text)
+                          ORDER BY eventattributesextracted.event_index DESC
+                         LIMIT 1
+                        ), feepayer AS (
+                         SELECT eventattributesextracted.fee_payer
+                           FROM eventattributesextracted
+                          WHERE ((eventattributesextracted.event_type = 'tx'::text) AND (eventattributesextracted.fee_payer IS NOT NULL))
+                         LIMIT 1
+                        )
+                 SELECT ( SELECT feepayer.fee_payer
+                           FROM feepayer) AS calculated_fee_payer_value,
+                    ( SELECT wasmswapindex.ask_asset
+                           FROM wasmswapindex) AS calculated_ask_asset,
+                    ( SELECT wasmswapindex.fee_share_amount
+                           FROM wasmswapindex) AS calculated_fee_share_amount,
+                    ( SELECT wasmswapindex.maker_fee_amount
+                           FROM wasmswapindex) AS calculated_maker_fee_amount,
+                    ( SELECT wasmswapindex.commission_amount
+                           FROM wasmswapindex) AS calculated_commision_amount,
+                    ( SELECT wasmswapindex.event_index
+                           FROM wasmswapindex) AS event_index) fee_payer_logic)
+        ), swaps AS (
+         SELECT fp.fee_payer AS user_wallet,
+            s.pool_address,
+            s.ask_asset,
+            s."timestamp",
+            s.fee_share_amount,
+            s.maker_fee_amount
+           FROM (v1_cosmos.materialized_swap s
+             JOIN feepayer fp ON (((s.block_hash = fp.block_hash) AND (s.transaction_hash = fp.transaction_hash))))
+          WHERE (fp.fee_payer IS NOT NULL)
         ), hourlyswaps AS (
-         SELECT s.receiver AS user_wallet,
+         SELECT s.user_wallet,
             s.pool_address,
             s.ask_asset,
             date_trunc('hour'::text, s."timestamp") AS hour,
             sum((s.fee_share_amount + s.maker_fee_amount)) AS cumulative_fee_amount
-           FROM v1_cosmos.materialized_swap s
-          GROUP BY s.receiver, s.pool_address, s.ask_asset, (date_trunc('hour'::text, s."timestamp"))
-        ), combinedhourlyswapprices AS (
-         SELECT hourlyswaps.user_wallet,
-            hourlyswaps.pool_address,
-            hourlyswaps.ask_asset,
-            hourlyswaps.hour,
-            hourlyswaps.cumulative_fee_amount,
-            all_hours.c_hour
-           FROM (hourlyswaps
-             CROSS JOIN ( SELECT DISTINCT hourlyavgprices.hour AS c_hour
-                   FROM hourlyavgprices) all_hours)
+           FROM swaps s
+          GROUP BY s.user_wallet, s.pool_address, s.ask_asset, (date_trunc('hour'::text, s."timestamp"))
         ), hourlyswappointscalculation AS (
-         SELECT hsw.user_wallet,
-            hsw.pool_address,
+         SELECT hs.user_wallet,
+            hs.pool_address,
             hap.hour,
-            hsw.ask_asset,
-            sum((((hsw.cumulative_fee_amount * hap.hourly_avg_price))::double precision / power((10)::double precision, (t.decimals)::double precision))) AS hourly_swap_points
-           FROM ((combinedhourlyswapprices hsw
-             JOIN hourlyavgprices hap ON (((hap.hour = hsw.c_hour) AND (hsw.ask_asset = hap.denomination))))
-             JOIN v1_cosmos.token t ON ((t.denomination = hsw.ask_asset)))
-          GROUP BY hsw.user_wallet, hsw.pool_address, hap.hour, hsw.ask_asset
+            hs.ask_asset,
+            hs.cumulative_fee_amount AS sum_hourly_cumulative_fee_amount,
+            hap.hourly_avg_price AS avg_hourly_price,
+            (((hs.cumulative_fee_amount)::double precision / power((10)::double precision, (t.decimals)::double precision)) * (hap.hourly_avg_price)::double precision) AS hourly_swap_points
+           FROM ((hourlyswaps hs
+             JOIN hourlyavgprices hap ON (((hap.hour = hs.hour) AND (hs.ask_asset = hap.denomination))))
+             JOIN v1_cosmos.token t ON ((t.denomination = hs.ask_asset)))
         ), finalswappointscalculation AS (
          SELECT hsp.user_wallet,
             hsp.pool_address,
@@ -4397,27 +4654,6 @@ ALTER TABLE v1_cosmos.token_prices ALTER COLUMN id ADD GENERATED BY DEFAULT AS I
     NO MAXVALUE
     CACHE 1
 );
-
-
---
--- Name: transactions; Type: TABLE; Schema: v1_cosmos; Owner: -
---
-
-CREATE TABLE v1_cosmos.transactions (
-    chain_id integer NOT NULL,
-    block_hash text NOT NULL,
-    height bigint NOT NULL,
-    data jsonb NOT NULL,
-    hash text NOT NULL,
-    index integer NOT NULL
-);
-
-
---
--- Name: TABLE transactions; Type: COMMENT; Schema: v1_cosmos; Owner: -
---
-
-COMMENT ON TABLE v1_cosmos.transactions IS 'DEPRECATED: use V1';
 
 
 --
@@ -4864,6 +5100,22 @@ ALTER TABLE ONLY supabase_migrations.schema_migrations
 
 ALTER TABLE ONLY supabase_migrations.seed_files
     ADD CONSTRAINT seed_files_pkey PRIMARY KEY (path);
+
+
+--
+-- Name: blacklisted_points_addresses blacklisted_points_addresses_address_key; Type: CONSTRAINT; Schema: v1_cosmos; Owner: -
+--
+
+ALTER TABLE ONLY v1_cosmos.blacklisted_points_addresses
+    ADD CONSTRAINT blacklisted_points_addresses_address_key UNIQUE (address);
+
+
+--
+-- Name: blacklisted_points_addresses blacklisted_points_addresses_pkey; Type: CONSTRAINT; Schema: v1_cosmos; Owner: -
+--
+
+ALTER TABLE ONLY v1_cosmos.blacklisted_points_addresses
+    ADD CONSTRAINT blacklisted_points_addresses_pkey PRIMARY KEY (id);
 
 
 --
@@ -5357,6 +5609,13 @@ CREATE INDEX supabase_functions_hooks_h_table_id_h_name_idx ON supabase_function
 --
 
 CREATE INDEX supabase_functions_hooks_request_id_idx ON supabase_functions.hooks USING btree (request_id);
+
+
+--
+-- Name: blacklisted_points_addresses_address_idx; Type: INDEX; Schema: v1_cosmos; Owner: -
+--
+
+CREATE INDEX blacklisted_points_addresses_address_idx ON v1_cosmos.blacklisted_points_addresses USING btree (address);
 
 
 --
@@ -6594,6 +6853,20 @@ ALTER TABLE storage.s3_multipart_uploads ENABLE ROW LEVEL SECURITY;
 --
 
 ALTER TABLE storage.s3_multipart_uploads_parts ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: events Enable pg read access for all users; Type: POLICY; Schema: v1_cosmos; Owner: -
+--
+
+CREATE POLICY "Enable pg read access for all users" ON v1_cosmos.events FOR SELECT TO postgres USING (true);
+
+
+--
+-- Name: events Enable read access for all users; Type: POLICY; Schema: v1_cosmos; Owner: -
+--
+
+CREATE POLICY "Enable read access for all users" ON v1_cosmos.events FOR SELECT USING (true);
+
 
 --
 -- Name: blocks; Type: ROW SECURITY; Schema: v1_cosmos; Owner: -

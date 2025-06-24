@@ -1,14 +1,8 @@
-import { drizzle } from "drizzle-orm/node-postgres";
-import { Pool } from "pg";
-import {asc, desc, eq, inArray, or, sql, type SQL} from "drizzle-orm";
-import { StringChunk } from "drizzle-orm/sql/sql";
-import type {
-  AggregatedMetrics,
-  PoolIncentive,
-  PoolMetric,
-  PoolMetricSerialized,
-  Points
-} from "@towerfi/types";
+import {drizzle} from "drizzle-orm/node-postgres";
+import {Pool} from "pg";
+import {asc, desc, eq, inArray, notInArray, or, sql, type SQL} from "drizzle-orm";
+import {StringChunk} from "drizzle-orm/sql/sql";
+import type {AggregatedMetrics, Points, PoolIncentive, PoolMetric, PoolMetricSerialized} from "@towerfi/types";
 
 import {
   materializedAddLiquidityInV1Cosmos,
@@ -22,7 +16,7 @@ import {
   materializedUnstakeLiquidityInV1Cosmos,
   materializedWithdrawLiquidityInV1Cosmos,
 } from "./drizzle/schema.js";
-import {bigint, integer, pgSchema, serial, text, timestamp} from "drizzle-orm/pg-core";
+import {bigint, integer, numeric, pgSchema, serial, text, timestamp} from "drizzle-orm/pg-core";
 
 const v1Cosmos = pgSchema("v1_cosmos");
 const userShares = v1Cosmos.table("pool_user_shares", {
@@ -45,6 +39,14 @@ const referrals = v1Cosmos.table('referrals', {
   referredUserWalletAddress: text('referred_user_wallet_address').notNull().unique(),
   referredByUserWalletAddress: text('referred_by_user_wallet_address').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+});
+
+const materializedPoints = v1Cosmos.table('materialized_points', {
+  address: text('address').primaryKey().notNull(),
+  lpingPoints: numeric('lping_points').notNull(),
+  swappingPoints: numeric('swapping_points').notNull(),
+  totalPoints: numeric('total_points').notNull(),
+  rank: integer('rank').notNull(),
 });
 
 export const views = {
@@ -1126,8 +1128,22 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     }
 
     limit = limit ?? 100;
-    const addressesSql = addresses.length > 0 ? sql` WHERE address = ${createPoolAddressArraySql(addresses)} ` : sql.raw(``);
-    const query = sql` SELECT * FROM v1_cosmos.materialized_points ${addressesSql} ORDER BY rank LIMIT ${limit}; `;
+    let query = client
+      .select()
+      .from(materializedPoints)
+      .orderBy(materializedPoints.rank)
+      .$dynamic();
+
+    if (addresses.length > 0) {
+      query = query.where(inArray(materializedPoints.address, addresses));
+    } else {
+      const blacklistedAddresses = await fetchBlacklistedPointsAddresses();
+      if (blacklistedAddresses.length > 0) {
+        query = query.where(notInArray(materializedPoints.address, blacklistedAddresses));
+      }
+    }
+
+    query = query.limit(limit);
 
     try {
       const result = await client.execute(query);
@@ -1277,6 +1293,17 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
 
   function createIntervalSql(interval: number) {
     return sql.raw(Math.min(Math.max(1, interval), 365).toString());
+  }
+
+  async function fetchBlacklistedPointsAddresses(): Promise<string[]> {
+    const addressesResult =  await client
+      .execute(sql.raw(`SELECT address FROM v1_cosmos.blacklisted_points_addresses`));
+
+    if (!addressesResult || addressesResult.rows.length === 0) {
+      return [];
+    }
+
+    return addressesResult.rows.map((row) => row['address'] as string);
   }
 
   async function findHeightsByDateRange(

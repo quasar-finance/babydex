@@ -12,24 +12,24 @@ export const Header: React.FC = () => {
   const isLg = useMediaQuery("lg");
   return (
     <>
-      <div className="w-full text-[#0F0F0F] bg-tw-orange-400 flex items-center justify-center gap-3 sm:gap-1 px-2 py-1 sm:py-2">
-        <span>
-          Our Points Referral Campaign is now{" "}
-          <span className="animate-pulse text-tw-green-700">LIVE</span>
-        </span>
-        <div className="animate-pulse text-tw-green-700 hidden sm:block">
-          <IconCircleDot />
+      <nav className="sticky top-0 w-full border-b-1 border-b-white/10 pb-4 backdrop-blur-lg z-50 ">
+        <div className="w-full text-[#0F0F0F] bg-tw-orange-400 flex items-center justify-center gap-3 sm:gap-1 px-2 py-1 sm:py-2 mb-4">
+          <span>
+            Our Points Referral Campaign is now{" "}
+            <span className="animate-pulse text-tw-green-700 font-bold">LIVE</span>
+          </span>
+          <div className="animate-pulse text-tw-green-700 hidden sm:block">
+            <IconCircleDot />
+          </div>
+          <a
+            href="https://docs.tower.fi/user-guides/points-campaigns"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:underline text-sm font-bold"
+          >
+            Learn More
+          </a>
         </div>
-        <a
-          href="https://docs.tower.fi/user-guides/points-campaigns"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hover:underline text-sm font-bold"
-        >
-          Learn More
-        </a>
-      </div>
-      <nav className="sticky top-0 w-full border-b-1 border-b-white/10 pb-4 pt-4 backdrop-blur-lg z-50 ">
         <div className="flex gap-6 items-center justify-between max-w-[84.5rem] mx-auto px-4">
           <div className="flex gap-10 items-center justify-center">
             <Link href="/">

@@ -1134,10 +1134,11 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
       .orderBy(materializedPoints.rank)
       .$dynamic();
 
+    let blacklistedAddresses: string[] = [];
     if (addresses.length > 0) {
       query = query.where(inArray(materializedPoints.address, addresses));
     } else {
-      const blacklistedAddresses = await fetchBlacklistedPointsAddresses();
+      blacklistedAddresses = await fetchBlacklistedPointsAddresses();
       if (blacklistedAddresses.length > 0) {
         query = query.where(notInArray(materializedPoints.address, blacklistedAddresses));
       }
@@ -1146,7 +1147,17 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     query = query.limit(limit);
 
     try {
-      const result = await client.execute(query);
+      // As we precalculate rank based on totals points, and we might filter some ranks
+      // via the above blacklisting, we need to ensure to dense the rankings
+      let result;
+      if (blacklistedAddresses.length > 0 ) {
+        result = await client.execute(sql`SELECT *,
+            DENSE_RANK() OVER (ORDER BY filtered_points.rank) AS rank
+            FROM (${query.getSQL()}) AS filtered_points`);
+      } else {
+        result = await client.execute(query);
+      }
+
       return result.rows.reduce<Record<string, Points>>((acc, row) => {
         const address: string = row.address as string;
         const lping_points: number = parseFloat(row.lping_points as string);

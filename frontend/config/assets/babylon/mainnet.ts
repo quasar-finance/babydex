@@ -180,4 +180,14 @@ export const BabylonMainnetAssets = {
     coingeckoId: "babylon",
     bridge: ["ibc-eureka"],
   },
+  "ibc/CC1095A93E3C2DF5630EC4F6A994647E58C33FCB94F4810DE6126EF4A8A9E060": {
+    symbol: "MILK",
+    type: "ibc",
+    denom: "ibc/CC1095A93E3C2DF5630EC4F6A994647E58C33FCB94F4810DE6126EF4A8A9E060",
+    name: "Milk",
+    decimals: 6,
+    logoURI: "/milkyway/icon.webp",
+    coingeckoId: "milkyway-2",
+    bridge: ["ibc-eureka"],
+  },
 } as unknown as Record<string, Currency>;

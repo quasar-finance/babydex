@@ -1,6 +1,6 @@
 import {drizzle} from "drizzle-orm/node-postgres";
 import {Pool} from "pg";
-import {asc, desc, eq, inArray, notInArray, or, sql, type SQL} from "drizzle-orm";
+import {and, asc, desc, eq, inArray, notInArray, or, sql, type SQL} from "drizzle-orm";
 import {StringChunk} from "drizzle-orm/sql/sql";
 import type {AggregatedMetrics, Points, PoolIncentive, PoolMetric, PoolMetricSerialized} from "@towerfi/types";
 
@@ -1134,14 +1134,11 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
       .orderBy(materializedPoints.rank)
       .$dynamic();
 
-    let blacklistedAddresses: string[] = [];
-    if (addresses.length > 0) {
-      query = query.where(inArray(materializedPoints.address, addresses));
+    let blacklistedAddresses: string[] =  await fetchBlacklistedPointsAddresses();
+    if (addresses.length > 0 && blacklistedAddresses.length > 0) {
+      query = query.where(and(inArray(materializedPoints.address, addresses), notInArray(materializedPoints.address, blacklistedAddresses)));
     } else {
-      blacklistedAddresses = await fetchBlacklistedPointsAddresses();
-      if (blacklistedAddresses.length > 0) {
-        query = query.where(notInArray(materializedPoints.address, blacklistedAddresses));
-      }
+      query = query.where(notInArray(materializedPoints.address, blacklistedAddresses));
     }
 
     query = query.limit(limit);

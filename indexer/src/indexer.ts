@@ -1128,32 +1128,42 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     }
 
     limit = limit ?? 100;
-    let query = client
-      .select()
-      .from(materializedPoints)
-      .orderBy(materializedPoints.rank)
-      .$dynamic();
-
-    let blacklistedAddresses: string[] =  await fetchBlacklistedPointsAddresses();
-    if (addresses.length > 0 && blacklistedAddresses.length > 0) {
-      query = query.where(and(inArray(materializedPoints.address, addresses), notInArray(materializedPoints.address, blacklistedAddresses)));
-    } else {
-      query = query.where(notInArray(materializedPoints.address, blacklistedAddresses));
+    let addressSql = sql``;
+    if (addresses.length > 0) {
+       addressSql = sql` AND pcr.address = ${createPoolAddressArraySql(addresses)}`;
     }
 
-    query = query.limit(limit);
 
     try {
       // As we precalculate rank based on totals points, and we might filter some ranks
       // via the above blacklisting, we need to ensure to dense the rankings
-      let result;
-      if (blacklistedAddresses.length > 0 ) {
-        result = await client.execute(sql`SELECT *,
-            DENSE_RANK() OVER (ORDER BY filtered_points.rank) AS rank
-            FROM (${query.getSQL()}) AS filtered_points`);
-      } else {
-        result = await client.execute(query);
-      }
+      const result = await client.execute(sql`
+            WITH ExcludedAddresses AS (
+                SELECT address
+                from v1_cosmos.blacklisted_points_addresses AS address),
+                 AllPointsWithExclusionFlag AS (
+                     SELECT mp.rank                                            AS original_rank,
+                            mp.*,                                                               
+                            CASE WHEN ea.address IS NOT NULL THEN 1 ELSE 0 END AS is_excluded_flag
+                     FROM v1_cosmos.materialized_points mp
+                              LEFT JOIN ExcludedAddresses ea ON mp.address = ea.address),
+                 PreCalculatedAdjustments AS (
+                     -- Calculate a cumulative count of excluded addresses up to each original_rank.
+                     SELECT apf.*,
+                            -- 'cumulative_excluded_count' tells us how many excluded addresses have an original_rank
+                            -- less than or equal to the current row's original_rank.
+                            SUM(apf.is_excluded_flag) OVER (ORDER BY apf.original_rank) AS cumulative_excluded_count
+                     FROM AllPointsWithExclusionFlag apf)
+            SELECT pcr.*,
+                   pcr.original_rank,
+                   pcr.original_rank - pcr.cumulative_excluded_count                                AS rank,
+                   DENSE_RANK() OVER (ORDER BY (pcr.original_rank - pcr.cumulative_excluded_count)) as densed_rank
+            FROM PreCalculatedAdjustments pcr
+            WHERE pcr.is_excluded_flag = 0
+                ${addressSql}
+            ORDER BY pcr.rank
+            LIMIT ${limit};
+        `);
 
       return result.rows.reduce<Record<string, Points>>((acc, row) => {
         const address: string = row.address as string;

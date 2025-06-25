@@ -171,13 +171,13 @@ export const ModalAddLiquidity: React.FC<Props> = ({
                 Connect Wallet
               </Button>
             )}
-            <div className="place-self-end gap-3 flex items-center justify-center text-xs text-white/50">
+            {/* <div className="place-self-end gap-3 flex items-center justify-center text-xs text-white/50">
               <div className="flex gap-1 items-center justify-center">
                 <IconCoins className="h-4 w-4" />
                 <p>Fee</p>
               </div>
               <p className="text-white">-</p>
-            </div>
+            </div> */}
           </div>
         </form>
       </FormProvider>

@@ -10,10 +10,10 @@ import type React from "react";
 import PoolsSkeleton from "../molecules/skeletons/PoolsSkeleton";
 import { CellPoolName } from "../atoms/cells/CellPoolName";
 import { CellTVL } from "../atoms/cells/CellTVL";
-import { Table, TableRow } from "../atoms/Table";
+import { type Column, SortableTable, type SortDirection, Table, TableRow } from "../atoms/Table";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { Pagination } from "../atoms/Pagination";
-import { blockedPoolAddresses } from "~/utils/consts";
+import { blockedPoolAddresses, DefaultPoolMetric } from "~/utils/consts";
 import type { PoolMetricSerialized } from "@towerfi/types";
 import { CellVolume } from "../atoms/cells/CellVolume";
 import { CellPoints } from "../atoms/cells/CellPoints";
@@ -22,10 +22,15 @@ import { convertMicroDenomToDenom } from "~/utils/intl";
 import CellApr from "../atoms/cells/CellApr";
 import { useRouter } from "next/navigation";
 import { PeriodToggle, type Period } from "../atoms/PeriodToggle";
+import { Assets } from "~/config";
+import { usePoolTVLRecordStore } from "~/app/hooks/useTVL";
+
+type SortableField = "poolLiquidity" | "apr" | "volume";
 
 const Pools: React.FC = () => {
   const { showModal } = useModal();
   const { getPrice } = usePrices();
+  const { getRecord: getTVLRecord } = usePoolTVLRecordStore();
   const router = useRouter();
   const gridClass = "grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr] gap-4";
   const { data: pools = [], isLoading } = trpc.local.pools.getPools.useQuery({
@@ -40,8 +45,8 @@ const Pools: React.FC = () => {
     },
     [setAprTimeframe],
   );
-  const [sortField, setSortField] = useState<"poolLiquidity" | "apr" | "volume">("poolLiquidity");
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+  const [sortField, setSortField] = useState<SortableField>("poolLiquidity");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
   const poolAddresses = useMemo(() => [...pools.map((pool) => pool.poolAddress)].sort(), [pools]);
 
@@ -101,7 +106,7 @@ const Pools: React.FC = () => {
     return swapApr + incentives_apr;
   };
 
-  const columns = [
+  const columns: Column[] = [
     { key: "name", title: "Pool", className: "col-span-2 lg:col-span-1" },
     { key: "poolLiquidity", title: "TVL", sortable: true },
     { key: "apr", title: "APR", sortable: true },
@@ -123,15 +128,16 @@ const Pools: React.FC = () => {
   const totalPools = Math.ceil(filteredPools.length / numberPerPage);
 
   const sortedPools = [...filteredPools].sort((a, b) => {
-    if (isMetricLoading || !metrics) {
-      // Default sort by poolLiquidity when metrics aren't loaded
-      return sortDirection === "desc"
-        ? Number(b.poolLiquidity) - Number(a.poolLiquidity)
-        : Number(a.poolLiquidity) - Number(b.poolLiquidity);
-    }
-
-    const metricA = metrics[a.poolAddress];
-    const metricB = metrics[b.poolAddress];
+    const metricA = metrics?.[a.poolAddress] || DefaultPoolMetric();
+    metricA.token0_decimals =
+      metricA.token0_decimals || Assets[metricA.token0_denom]?.decimals || 0;
+    metricA.token1_decimals =
+      metricA.token1_decimals || Assets[metricA.token1_denom]?.decimals || 0;
+    const metricB = metrics?.[b.poolAddress] || DefaultPoolMetric();
+    metricB.token0_decimals =
+      metricB.token0_decimals || Assets[metricB.token0_denom]?.decimals || 0;
+    metricB.token1_decimals =
+      metricB.token1_decimals || Assets[metricB.token1_denom]?.decimals || 0;
     const incentiveA = incentiveAprs?.[a.poolAddress];
     const incentiveB = incentiveAprs?.[b.poolAddress];
 
@@ -148,43 +154,43 @@ const Pools: React.FC = () => {
         // Convert token0 volume to USD
         const token0VolumeA = getPrice(
           convertMicroDenomToDenom(
-            metricA?.token0_swap_volume || 0,
-            metricA?.token0_decimals || 0,
-            metricA?.token0_decimals || 0,
+            metricA.token0_swap_volume,
+            metricA.token0_decimals,
+            metricA.token0_decimals,
             false,
           ),
-          metricA?.token0_denom || "",
+          metricA.token0_denom,
           { format: false },
         );
         const token0VolumeB = getPrice(
           convertMicroDenomToDenom(
-            metricB?.token0_swap_volume || 0,
-            metricB?.token0_decimals || 0,
-            metricB?.token0_decimals || 0,
+            metricB.token0_swap_volume,
+            metricB.token0_decimals,
+            metricB.token0_decimals,
             false,
           ),
-          metricB?.token0_denom || "",
+          metricB.token0_denom,
           { format: false },
         );
         // Convert token1 volume to USD
         const token1VolumeA = getPrice(
           convertMicroDenomToDenom(
-            metricA?.token1_swap_volume || 0,
-            metricA?.token1_decimals || 0,
-            metricA?.token1_decimals || 0,
+            metricA.token1_swap_volume,
+            metricA.token1_decimals,
+            metricA.token1_decimals,
             false,
           ),
-          metricA?.token1_denom || "",
+          metricA.token1_denom,
           { format: false },
         );
         const token1VolumeB = getPrice(
           convertMicroDenomToDenom(
-            metricB?.token1_swap_volume || 0,
-            metricB?.token1_decimals || 0,
-            metricB?.token1_decimals || 0,
+            metricB.token1_swap_volume,
+            metricB.token1_decimals,
+            metricB.token1_decimals,
             false,
           ),
-          metricB?.token1_denom || "",
+          metricB.token1_denom,
           { format: false },
         );
         // Sum USD volumes
@@ -192,19 +198,17 @@ const Pools: React.FC = () => {
         valueB = token0VolumeB + token1VolumeB;
         break;
       }
-      case "poolLiquidity":
-        valueA = metricA?.tvl_usd || 0;
-        valueB = metricB?.tvl_usd || 0;
-        break;
       default:
-        valueA = Number(a.poolLiquidity);
-        valueB = Number(b.poolLiquidity);
+        valueA = getTVLRecord(a.poolAddress) || 0;
+        valueB = getTVLRecord(b.poolAddress) || 0;
     }
 
     return sortDirection === "desc" ? valueB - valueA : valueA - valueB;
   });
 
-  const handleSort = (field: "poolLiquidity" | "apr" | "volume") => {
+  const handleSort = (col: Column) => {
+    const field = col.key as SortableField;
+
     if (field === sortField) {
       setSortDirection(sortDirection === "desc" ? "asc" : "desc");
     } else {
@@ -228,23 +232,11 @@ const Pools: React.FC = () => {
         </div>
       </div>
 
-      <Table
-        columns={columns.map((col) => ({
-          ...col,
-          title: col.sortable ? (
-            <div
-              className="flex items-center gap-2 cursor-pointer hover:text-white"
-              onClick={() => handleSort(col.key as "poolLiquidity" | "apr" | "volume")}
-            >
-              {col.title}
-              {col.sortable && sortField === col.key && (
-                <span>{sortDirection === "desc" ? "↓" : "↑"}</span>
-              )}
-            </div>
-          ) : (
-            col.title
-          ),
-        }))}
+      <SortableTable
+        columns={columns}
+        sortField={sortField}
+        sortDirection={sortDirection}
+        handleSort={handleSort}
         gridClass={gridClass}
       >
         {isLoading && <PoolsSkeleton className={twMerge("grid", gridClass)} />}
@@ -295,7 +287,7 @@ const Pools: React.FC = () => {
               </div>
             </TableRow>
           ))}
-      </Table>
+      </SortableTable>
       {filteredPools.length > numberPerPage && (
         <Pagination
           total={totalPools}

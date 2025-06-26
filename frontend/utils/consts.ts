@@ -1,6 +1,7 @@
 import type {
   BaseCurrency,
   CW20Currency,
+  Points,
   PoolIncentive,
   PoolMetricSerialized,
 } from "@towerfi/types";
@@ -11,6 +12,7 @@ export const navLinks: { label: string; to: string; isDisabled?: boolean; isExte
     { label: "Swap", to: "/swap" },
     { label: "Pools", to: "/pools" },
     { label: "Dashboard", to: "/dashboard" },
+    { label: "Points", to: "/points" },
     ...(isTestnet ? [{ label: "Faucet", to: "/faucet" }] : []),
   ];
 
@@ -147,3 +149,16 @@ export function DefaultCW20Currency(): CW20Currency {
     contractAddress: "",
   };
 }
+
+export function DefaultPoints(): Points {
+  return {
+    address: "",
+    total_points: 0,
+    lping_points: 0,
+    swapping_points: 0,
+    rank: 0,
+  };
+}
+
+export const pointsShareBps = 2000;
+export const inviteBoostBps = 1000;

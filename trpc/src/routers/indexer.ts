@@ -156,4 +156,15 @@ export const indexerRouter = createTRPCRouter({
         input.endDate,
       );
     }),
+  getPoints: createTRPCPublicProcedure
+    .input(z.object({
+      addresses: z.string().array(),
+      limit: z.number().min(1).max(100).nullish(),
+    }))
+    .query(async ({ctx, input}) => {
+      return await ctx.indexerService.getPoints(
+        input.addresses,
+        input.limit,
+      );
+    })
 });

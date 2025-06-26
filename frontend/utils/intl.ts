@@ -7,7 +7,7 @@ export function IntlAddress(address: string): string {
 export function convertMicroDenomToDenom(
   amount?: number | string,
   decimals = 6,
-  fixed = 2,
+  fixed = 6,
   rounded = true,
 ) {
   if (!amount) return 0;
@@ -129,6 +129,6 @@ export function maxSlippageToBps(maxSlippage: string): number {
   return Math.floor(Number(maxSlippage) * 100);
 }
 
-export function bpsToFloat(bps: number, decimals = 4): string {
-  return (bps / 10 ** decimals).toFixed(decimals);
+export function bpsToFloat(bps: number, decimals = 4, fixed = decimals): string {
+  return (bps / 10 ** decimals).toFixed(fixed);
 }

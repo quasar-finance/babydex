@@ -7,8 +7,7 @@ export const BabylonMainnetAssets = {
     type: "native",
     decimals: 6,
     symbol: "BABY",
-    logoURI:
-      "https://raw.githubusercontent.com/cosmos/chain-registry/master/babylon/images/logo.svg",
+    logoURI: "/assets/baby-mint.svg",
     coingeckoId: "babylon",
     ethereumAddresses: {
       union: "0xe53dcec07d16d88e386ae0710e86d9a400f83c31",
@@ -182,14 +181,13 @@ export const BabylonMainnetAssets = {
     bridge: ["ibc-eureka"],
   },
   "ibc/CC1095A93E3C2DF5630EC4F6A994647E58C33FCB94F4810DE6126EF4A8A9E060": {
-    symbol: "Milk",
+    symbol: "MILK",
     type: "ibc",
     denom: "ibc/CC1095A93E3C2DF5630EC4F6A994647E58C33FCB94F4810DE6126EF4A8A9E060",
     name: "Milk",
     decimals: 6,
-    logoURI:
-      "https://raw.githubusercontent.com/cosmos/chain-registry/master/milkyway/images/milkbaby.svg",
+    logoURI: "/milkyway/icon.webp",
     coingeckoId: "milkyway-2",
     bridge: ["ibc-eureka"],
-  }
+  },
 } as unknown as Record<string, Currency>;

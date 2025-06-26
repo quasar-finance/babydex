@@ -1,6 +1,6 @@
 import type React from "react";
 import { navLinks } from "~/utils/consts";
-import { motion, AnimatePresence } from "motion/react";
+import { motion } from "motion/react";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -33,7 +33,8 @@ export const NavLinks: React.FC<Props> = ({ closeMenu }) => {
   return (
     <motion.ul className="gap-10 lg:gap-8 flex-1 text-base w-full lg:w-auto flex flex-col lg:flex-row ">
       {navLinks.map(({ label, to, isDisabled = false, isExternal = false }) => {
-        const isActive = pathname === to || (to !== '/' && pathname.startsWith(to + '/'));
+        const isActive = pathname === to || (to !== "/" && pathname.startsWith(to + "/"));
+
         return (
           <li
             key={to}

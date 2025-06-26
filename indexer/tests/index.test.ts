@@ -261,6 +261,10 @@ test('get incentive apr by addresses', async () => {
 
 test('get aggregated metrics by addresses', async () => {
   const res = await indexer.getAggregatedMetricsByPoolAddresses([
+    "bbn1xt4ahzz2x8hpkc0tk6ekte9x6crw4w6u0r67cyt3kz9syh24pd7s4m2t0z",
+    "bbn1ma0g752dl0yujasnfs9yrk6uew7d0a2zrgvg62cfnlfftu2y0egqvustk6",
+    "bbn1w798gp0zqv3s9hjl3jlnwxtwhykga6rn93p46q2crsdqhaj3y4gsxallqs",
+    "bbn1xsmqvl8lqr2uwl50aetu0572rss9hrza5kddpfj9ky3jq80fv2tssfrw9q",
     "bbn1xut80d09q0tgtch8p0z4k5f88d3uvt8cvtzm5h3tu3tsy4jk9xlsfjc5m7",
     "bbn1rwx6w02alc4kaz7xpyg3rlxpjl4g63x5jq292mkxgg65zqpn5llqmyfzfq",
     "bbn1r4x3lvn20vpls2ammp4ch5z08nge6h77p43ktl04efptgqxgl0qsxnwehd",
@@ -297,9 +301,32 @@ test('get aggregated metrics by addresses', async () => {
     "bbn1lpxsk8a8dxdpy8r6yqlz0gmjc7427wg9h25sj46c8d6jaglmzxsq6u09de",
     "bbn1478sh2c7xgk2xufh32l3p4vsyeyd5xemqm6f2jrwz39wa9atgkps7z9d52",
     "bbn1yset4m9m6lrpyz7s8nlc2r2adretctcjvfzsx9akf2dj6c95xqmq4g4z4r",
+    "bbn1qdh2egr3aneuvqf6mruxzjwxjw8splnv6shzzlm3kwsdrd0xpzksnpfqx8",
+    "bbn1jwd3e9smv9n7p20fud8ll9erz6ave95hn7e4w25sv9n450tpg3vqsqeg3d",
+    "bbn194ddnlskmjcmwuphtqtunk0ql8tpw56mpphgnx2h059exh07qk8s6te2y8",
+    "bbn17h0x720g7hnvtp9qyayu8hqqs5a4yxg88zdyeue9fjcpy82rvhgs2e7a7n",
+    "bbn1yelhv5ge7276fwad5wf5wxfwnqzxu2kcx2fdgcnuh3ku8jjurx8qufygxa",
+    "bbn1f3dhfq9w435lqhjshytdw9pmezcv7mugzvufu3famj8k33xazhwqtzq56c",
+    "bbn1gw8ry0djv7mes2nrpp082ahu2t8xzdfrc62qxq4dpxnk0h7egneslhxqe6",
   ]);
 
   console.log(res);
 
   expect(Object.keys(res).length).toBe(11);
+});
+
+test('query points', async () => {
+  const res =  await indexer.getPoints([]);
+
+  console.log(res);
+
+  expect(Object.keys(res).length).toBeGreaterThan(0);
+});
+
+test('query points with address', async () => {
+  const res =  await indexer.getPoints(["bbn1dnl4umj7dvnt85fcffn5r8rghac3ezatmtk7pa"]);
+
+  console.log(res);
+
+  expect(Object.keys(res).length).toBeGreaterThan(0);
 });

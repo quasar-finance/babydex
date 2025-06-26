@@ -169,4 +169,25 @@ export const BabylonMainnetAssets = {
     bridge: ["union"],
     ethereumAddresses: { union: "0x17140b69FfaDfF9e87BF1D86D99119ee10AD24ff" },
   },
+  "ibc/CD7ECDBBA538632B45915ED67C4932DDB318818C00C21489D3774E560E87E420": {
+    symbol: "milkBABY",
+    type: "ibc",
+    denom: "ibc/CD7ECDBBA538632B45915ED67C4932DDB318818C00C21489D3774E560E87E420",
+    name: "milkBABY",
+    decimals: 6,
+    logoURI:
+      "https://raw.githubusercontent.com/cosmos/chain-registry/master/milkyway/images/milkbaby.svg",
+    coingeckoId: "babylon",
+    bridge: ["ibc-eureka"],
+  },
+  "ibc/CC1095A93E3C2DF5630EC4F6A994647E58C33FCB94F4810DE6126EF4A8A9E060": {
+    symbol: "MILK",
+    type: "ibc",
+    denom: "ibc/CC1095A93E3C2DF5630EC4F6A994647E58C33FCB94F4810DE6126EF4A8A9E060",
+    name: "Milk",
+    decimals: 6,
+    logoURI: "/milkyway/icon.webp",
+    coingeckoId: "milkyway-2",
+    bridge: ["ibc-eureka"],
+  },
 } as unknown as Record<string, Currency>;

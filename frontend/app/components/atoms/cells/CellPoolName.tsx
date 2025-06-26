@@ -6,7 +6,7 @@ import { PoolFeePill, PoolIncentivesPill, PoolTypePill } from "../PoolPill";
 
 interface Props extends Pick<PoolInfo, "assets" | "name" | "poolType" | "config"> {
   className?: string;
-  incentives?: PoolIncentive;
+  incentives?: PoolIncentive | PoolIncentive[];
 }
 
 export const CellPoolName: React.FC<Props> = ({

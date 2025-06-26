@@ -7,7 +7,7 @@ import { useAPR } from "~/app/hooks/useAPR";
 interface Props {
   title: string;
   metrics?: PoolMetricSerialized | null;
-  incentives?: PoolIncentive | null;
+  incentives?: PoolIncentive | PoolIncentive[] | null;
   isLoading?: boolean;
   className?: string;
 }

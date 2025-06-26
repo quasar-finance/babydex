@@ -201,8 +201,6 @@ const Pools: React.FC = () => {
       default:
         valueA = getTVLRecord(a.poolAddress) || 0;
         valueB = getTVLRecord(b.poolAddress) || 0;
-
-        console.log(`Sorting by poolLiquidity: ${a.name} (${valueA}) vs ${b.name} (${valueB})`);
     }
 
     return sortDirection === "desc" ? valueB - valueA : valueA - valueB;

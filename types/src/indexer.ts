@@ -1,3 +1,19 @@
+export type IndexerFilters = {
+  orderBy?: "asc" | "desc";
+  limit?: number;
+  orderByColumn?: string;
+  page?: number;
+};
+
+export type IndexerDbCredentials = {
+  host: string;
+  port: number;
+  user: string;
+  password: string;
+  database: string;
+  ssl: string;  // can be boolean | "require" | "allow" | "prefer" | "verify-full" | options from node:tls
+};
+
 export type UserPoolBalances = {
   owner: string;
   pool_address: string;

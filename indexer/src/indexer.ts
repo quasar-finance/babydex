@@ -1,8 +1,16 @@
 import {drizzle} from "drizzle-orm/node-postgres";
 import {Pool} from "pg";
-import {and, asc, desc, eq, inArray, notInArray, or, sql, type SQL} from "drizzle-orm";
+import {asc, desc, eq, inArray, or, sql, type SQL} from "drizzle-orm";
 import {StringChunk} from "drizzle-orm/sql/sql";
-import type {AggregatedMetrics, Points, PoolIncentive, PoolMetric, PoolMetricSerialized} from "@towerfi/types";
+import type {
+  AggregatedMetrics,
+  IndexerDbCredentials,
+  IndexerFilters,
+  Points,
+  PoolIncentive,
+  PoolMetric,
+  PoolMetricSerialized
+} from "@towerfi/types";
 
 import {
   materializedAddLiquidityInV1Cosmos,
@@ -16,7 +24,7 @@ import {
   materializedUnstakeLiquidityInV1Cosmos,
   materializedWithdrawLiquidityInV1Cosmos,
 } from "./drizzle/schema.js";
-import {bigint, integer, numeric, pgSchema, serial, text, timestamp} from "drizzle-orm/pg-core";
+import {bigint, integer, pgSchema, serial, text, timestamp} from "drizzle-orm/pg-core";
 
 const v1Cosmos = pgSchema("v1_cosmos");
 const userShares = v1Cosmos.table("pool_user_shares", {
@@ -39,14 +47,6 @@ const referrals = v1Cosmos.table('referrals', {
   referredUserWalletAddress: text('referred_user_wallet_address').notNull().unique(),
   referredByUserWalletAddress: text('referred_by_user_wallet_address').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
-});
-
-const materializedPoints = v1Cosmos.table('materialized_points', {
-  address: text('address').primaryKey().notNull(),
-  lpingPoints: numeric('lping_points').notNull(),
-  swappingPoints: numeric('swapping_points').notNull(),
-  totalPoints: numeric('total_points').notNull(),
-  rank: integer('rank').notNull(),
 });
 
 export const views = {
@@ -115,28 +115,12 @@ export type Indexer = {
   getPoints: (addresses: string[], limit?: number | null) => Promise<Record<string, Points> | null>;
 };
 
-export type IndexerFilters = {
-  orderBy?: "asc" | "desc";
-  limit?: number;
-  orderByColumn?: string;
-  page?: number;
-};
-
-export type IndexerDbCredentials = {
-  host: string;
-  port: number;
-  user: string;
-  password: string;
-  database: string;
-  ssl: boolean;
-};
-
-export const createIndexerService = (config: IndexerDbCredentials) => {
+export const createIndexerService = (config: IndexerDbCredentials): Indexer => {
   const pool = new Pool(config);
 
   const client = drizzle(pool);
 
-  async function queryView(viewName: keyof typeof views, filters?: IndexerFilters) {
+  async function queryView(viewName: keyof typeof views, filters?: IndexerFilters): Promise<any[]> {
     const query = client.select().from(views[viewName]);
 
     if (!filters) return await query;

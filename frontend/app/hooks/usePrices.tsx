@@ -4,7 +4,10 @@ import { useQuery } from "@tanstack/react-query";
 import { Assets } from "~/config";
 import type { Currency } from "@towerfi/types";
 import type { Prettify } from "cosmi/types";
-import { convertMicroDenomToDenom } from "~/utils/intl";
+import { convertDenomToMicroDenom, convertMicroDenomToDenom } from "~/utils/intl";
+import { usePublicClient } from "@cosmi/react";
+import { setInnerValueToAsset } from "@towerfi/trpc";
+import type { UseSwapSimulationReturnType } from "./useSwapSimulation";
 
 export type FormatNumberOptions = {
   language: string;
@@ -53,6 +56,17 @@ type FormatOptions<T> = {
   format?: T;
 };
 
+const assetsWithBaseDenom = Object.fromEntries(
+  Object.entries(Assets).filter(([, asset]) => asset.swapToBasePoolAddress) as [
+    string,
+    Currency & {
+      swapToBasePoolAddress: NonNullable<Currency["swapToBasePoolAddress"]>;
+    },
+  ][],
+);
+
+export const PricesVersion = "0.1.0";
+
 export function usePrices(parameters: UsePricesParameters = {}) {
   const {
     defaultCurrency = "USD",
@@ -78,8 +92,16 @@ export function usePrices(parameters: UsePricesParameters = {}) {
     } = options || {};
     const price = (() => {
       const indexCurrency = currency.toLowerCase();
-      if (!data || !data?.[denom]?.prices?.[indexCurrency]) return 0;
-      return Number(amount) * data[denom].prices[indexCurrency];
+
+      // if the coingecko data are not available, or the denom is not found, return 0
+      if (!data) {
+        return 0;
+      }
+
+      const price = data.coingecko[denom]?.prices?.[indexCurrency] || 0;
+      const coefficient = data.coefficient[denom] || 1;
+
+      return Number(amount) * price * coefficient;
     })();
 
     return (format ? formatter(price, { ...formatOptions, currency }) : price) as T extends true
@@ -110,7 +132,13 @@ export function usePrices(parameters: UsePricesParameters = {}) {
     ) as T extends true ? string : number;
   }
 
-  const { data, ...rest } = useQuery<Prices>({
+  const publicClient = usePublicClient();
+
+  const { data, ...rest } = useQuery<{
+    coingecko: Prices;
+    coefficient: Record<string, number>;
+    version: string;
+  }>({
     enabled: typeof window !== "undefined",
     queryKey: ["prices", currencies],
     queryFn: async () => {
@@ -119,13 +147,6 @@ export function usePrices(parameters: UsePricesParameters = {}) {
       );
 
       const coinPrices = await (async () => {
-        // if (window.location.protocol !== "https:") {
-        //   return Object.keys(coinsByCoingeckoId).reduce((acc, key) => {
-        //     const usd = Math.random() * 100_000;
-        //     acc[key] = { usd, eur: usd * 0.95 };
-        //     return acc;
-        //   }, Object.create({}));
-        // }
         const response = await fetch(
           `https://api.coingecko.com/api/v3/simple/price?ids=${Object.keys(coinsByCoingeckoId).join(",")}&vs_currencies=${currencies.join(",")}`,
         );
@@ -139,16 +160,65 @@ export function usePrices(parameters: UsePricesParameters = {}) {
         return acc;
       }, Object.create({}));
 
-      localStorage.setItem("prices", JSON.stringify(prices));
-      return prices;
+      const assets = Object.values(assetsWithBaseDenom);
+      const baseDenomCoefficient: Record<string, number> = {};
+      for (const asset of assets) {
+        const baseDenom = Assets[asset.swapToBaseDenom || ""];
+        const amount = convertDenomToMicroDenom(1, asset.decimals);
+        try {
+          const response = await publicClient.queryContractSmart<
+            UseSwapSimulationReturnType["data"]
+          >({
+            address: asset.swapToBasePoolAddress,
+            msg: {
+              simulation: {
+                offer_asset: {
+                  amount: amount,
+                  info: setInnerValueToAsset(asset),
+                },
+              },
+            },
+          });
+
+          // if the base denom is not found, assume it has the same decimals as the asset
+          const decimals = baseDenom?.decimals || asset.decimals;
+
+          baseDenomCoefficient[asset.denom] =
+            convertMicroDenomToDenom(response?.return_amount || "0", decimals, decimals, false) ||
+            1;
+        } catch (error) {
+          // ignore the error, the coefficient will be 1
+        }
+      }
+
+      const result = {
+        version: PricesVersion,
+        coingecko: prices,
+        coefficient: baseDenomCoefficient,
+      };
+
+      localStorage.setItem("prices", JSON.stringify(result));
+      return result;
     },
     initialData: () => {
-      if (typeof window === "undefined") return {};
+      const defaultData = {
+        coingecko: {},
+        coefficient: {},
+        version: PricesVersion,
+      };
+      if (typeof window === "undefined") return defaultData;
       try {
         const prices = localStorage.getItem("prices");
-        return prices ? JSON.parse(prices) : {};
+        const result = prices ? JSON.parse(prices) : {};
+
+        if (result.version !== PricesVersion) {
+          localStorage.removeItem("prices");
+          return defaultData;
+        }
+
+        return result;
       } catch (error) {
-        return {};
+        return defaultData;
       }
     },
     refetchInterval,

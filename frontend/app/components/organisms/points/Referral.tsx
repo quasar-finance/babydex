@@ -107,11 +107,12 @@ const Referral: React.FC<{ className: string }> = ({ className }) => {
       )}
     >
       <h2 className="text-lg font-bold mb-2">
-        Get {bpsToFloat(pointsShareBps, 2, 0)}% of frens points
+        Get {bpsToFloat(pointsShareBps, 2, 0)}% of frens points (additional)
       </h2>
       <p className="text-sm text-white/70 mb-4">
-        Invite friends and earn {bpsToFloat(pointsShareBps, 2, 0)}% of what they earn. They also get
-        a {bpsToFloat(inviteBoostBps, 2, 0)}% boost on their points.
+        Invite friends and earn {bpsToFloat(pointsShareBps, 2, 0)}% of what they earn (new
+        additional points). They also get a {bpsToFloat(inviteBoostBps, 2, 0)}% boost on their
+        points.
       </p>
       {!userAddress && (
         <p className="text-xs text-white/70 mb-4">

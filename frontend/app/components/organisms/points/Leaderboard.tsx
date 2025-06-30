@@ -83,7 +83,7 @@ export const Leaderboard: React.FC<{ userPoints: Points }> = ({ userPoints }) =>
           className={twMerge(
             "grid rounded-2xl p-4 items-center bg-[#1b1b1b] my-1",
             address === userAddress &&
-              "sticky top-20 bottom-1 backdrop-blur-sm bg-yellow-500/10 border-yellow-500 border",
+              "sticky top-32 bottom-1 backdrop-blur-sm bg-yellow-500/10 border-yellow-500 border",
             gridClass,
           )}
         >

@@ -183,7 +183,7 @@ export const BabylonMainnetAssets = {
       "https://raw.githubusercontent.com/cosmos/chain-registry/master/milkyway/images/milkbaby.svg",
     coingeckoId: "babylon",
     bridge: ["ibc-eureka"],
-    swapToBasePoolAddress: "bbn1cduudfszcm9slm8qxlaqvnpzg2u0hkus94fe3pwt9x446dtw6eeqwvlnpk",
+    swapToBasePoolAddress: "bbn1y3eh23v8egxlmaupzetz98yu0jwtzv7qce5r3c2tq8xj25ld3l4qy7tnrm",
   },
   "ibc/CC1095A93E3C2DF5630EC4F6A994647E58C33FCB94F4810DE6126EF4A8A9E060": {
     symbol: "MILK",

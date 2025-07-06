@@ -1,3 +1,5 @@
+import type {ConnectionOptions} from "tls";
+
 export type IndexerFilters = {
   orderBy?: "asc" | "desc";
   limit?: number;
@@ -11,7 +13,7 @@ export type IndexerDbCredentials = {
   user: string;
   password: string;
   database: string;
-  ssl: string;  // can be boolean | "require" | "allow" | "prefer" | "verify-full" | options from node:tls
+  ssl?:  boolean | ConnectionOptions | undefined;
 };
 
 export type UserPoolBalances = {

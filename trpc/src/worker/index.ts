@@ -17,26 +17,9 @@ interface Env {
   SUPABASE_READONLY_USER: string;
   SUPABASE_READONLY_PASSWORD: string;
   SUPABASE_READONLY_DATABASE: string;
-  SUPABASE_READONLY_SSL: string;
+  SUPABASE_DATABASE_CA?: string | undefined;
 }
 
-// const allowedOrigins = [
-//   "https://tower-frontend-git-feat-add-pool-metrics-quasar-fi.vercel.app",
-//   "https://tower.fi",
-//   "http://localhost:3000"
-// ] as const;
-
-// const getOrigin = (request: Request): string => {
-//   const origin = request.headers.get("origin");
-//   return origin && allowedOrigins.includes(origin as typeof allowedOrigins[number])
-//     ? origin
-//     : allowedOrigins[0];
-// };
-
-const headers = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-};
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     if (request.method === "OPTIONS") {
@@ -63,7 +46,9 @@ export default {
           user: env.SUPABASE_READONLY_USER,
           password: env.SUPABASE_READONLY_PASSWORD,
           database: env.SUPABASE_READONLY_DATABASE,
-          ssl: Boolean(env.SUPABASE_READONLY_SSL?.toLowerCase() === "true"),
+          ssl: env.SUPABASE_DATABASE_CA && env.SUPABASE_DATABASE_CA.length > 0
+            ? { ca: env.SUPABASE_DATABASE_CA!, rejectUnauthorized: false, }
+            : false
         });
         const referralService = createReferralService(env.SUPABASE_URL, env.SUPABASE_KEY);
         return {

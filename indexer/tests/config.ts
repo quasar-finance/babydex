@@ -1,5 +1,6 @@
 import path = require('path');
 import dotenv = require('dotenv');
+import type {ConnectionOptions} from "tls";
 
 dotenv.config({ path: path.resolve(__dirname, "../.env.testing") });
 
@@ -12,7 +13,7 @@ interface ENV {
   SUPABASE_USER: string | undefined;
   SUPABASE_PW: string | undefined;
   SUPABASE_DB: string | undefined;
-  SUPABASE_SSL: boolean | undefined;
+  SUPABASE_SSL?: boolean | ConnectionOptions | undefined;
 }
 
 interface Config {
@@ -24,7 +25,7 @@ interface Config {
   SUPABASE_USER: string;
   SUPABASE_PW: string;
   SUPABASE_DB: string;
-  SUPABASE_SSL: boolean;
+  SUPABASE_SSL: boolean | ConnectionOptions | undefined;
 }
 
 
@@ -38,7 +39,9 @@ const getConfig = (): ENV => {
     SUPABASE_USER: process.env.SUPABASE_USER,
     SUPABASE_PW: process.env.SUPABASE_PW,
     SUPABASE_DB: process.env.SUPABASE_DB,
-    SUPABASE_SSL: process.env.SUPABASE_SSL ? process.env.SUPABASE_SSL.toLowerCase() === 'true' : false,
+    SUPABASE_SSL: process.env.DATABASE_CA.length > 0
+      ? { ca: process.env.DATABASE_CA!, rejectUnauthorized: false, }
+      : false,
   };
 };
 

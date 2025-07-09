@@ -56,9 +56,9 @@ export const UserPools: React.FC<Props> = ({ pools, isLoading, refreshUserPools 
     return date.toUTCString();
   }, [aprTimeframe]);
 
-  const poolAddresses = useMemo(() => 
-    filteredPools.map(({ poolInfo }) => poolInfo.poolAddress),
-    [filteredPools]
+  const poolAddresses = useMemo(
+    () => filteredPools.map(({ poolInfo }) => poolInfo.poolAddress),
+    [filteredPools],
   );
 
   const queryInput = useMemo(
@@ -68,7 +68,7 @@ export const UserPools: React.FC<Props> = ({ pools, isLoading, refreshUserPools 
     }),
     [poolAddresses, startDate],
   );
-  
+
   const { data: metrics, isLoading: isMetricLoading } =
     trpc.edge.indexer.getPoolMetricsByAddresses.useQuery(queryInput, {
       enabled: poolAddresses.length > 0,
@@ -78,16 +78,19 @@ export const UserPools: React.FC<Props> = ({ pools, isLoading, refreshUserPools 
       staleTime: 1000 * 60 * 1, // 1 minute
     });
 
-  const { data: incentiveAprs } = trpc.edge.indexer.getPoolIncentivesByAddresses.useQuery({
-    addresses: poolAddresses,
-    interval: aprTimeframe === "7d" ? 7 : 1,
-  }, {
-    enabled: poolAddresses.length > 0,
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    refetchOnReconnect: false,
-    staleTime: 1000 * 60 * 1, // 1 minutes
-  });
+  const { data: incentiveAprs } = trpc.edge.indexer.getPoolIncentivesByAddresses.useQuery(
+    {
+      addresses: poolAddresses,
+      interval: aprTimeframe === "7d" ? 7 : 1,
+    },
+    {
+      enabled: poolAddresses.length > 0,
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+      staleTime: 1000 * 60 * 1, // 1 minutes
+    },
+  );
 
   if (!address) {
     return (

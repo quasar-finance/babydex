@@ -9,11 +9,7 @@ export function createRedisService(): Cache {
     return e ? (deserialize(e) as T) : null;
   }
 
-  async function setItem<T>(
-    key: string,
-    value: T,
-    options?: CacheSetOptions
-  ): Promise<void> {
+  async function setItem<T>(key: string, value: T, options?: CacheSetOptions): Promise<void> {
     await redis.set(key, serialize(value), { EX: options?.ttl });
   }
 

@@ -93,7 +93,9 @@ async function deleteReferralCodes() {
   const { error } = await supabase
     .from("user_referral_codes")
     .delete()
-    .or(`user_wallet_address.eq.${TEST_USER_WALLET_ADDRESS}, user_wallet_address.eq.${TEST_REFERRED_USER_WALLET_ADDRESS}`);
+    .or(
+      `user_wallet_address.eq.${TEST_USER_WALLET_ADDRESS}, user_wallet_address.eq.${TEST_REFERRED_USER_WALLET_ADDRESS}`,
+    );
 
   expect(error).toBeNull;
 }
@@ -273,23 +275,7 @@ test("handleReferral returns an error if users try to refer themselves", async (
   expect(result.error).toBe("User cannot refer to themselves.");
 });
 
-test('handleReferral returns an error if referred user already created referral code', async () => {
-  const store_result = await referralService.storeReferralCode(TEST_USER_WALLET_ADDRESS, mockSignedMessage);
-
-  expect(store_result.success).toBe(true);
-
-  (pubkeyToAddress as Mock).mockReturnValue(TEST_REFERRED_USER_WALLET_ADDRESS);
-
-  const store_referral_result = await referralService.storeReferralCode(TEST_REFERRED_USER_WALLET_ADDRESS, mockSignedMessage);
-
-  expect(store_referral_result.success).toBe(true);
-
-  const result = await referralService.handleReferral(TEST_REFERRED_USER_WALLET_ADDRESS, store_result.code, mockSignedMessage);
-  expect(result.success).toBe(false);
-  expect(result.error).toBe('User has already interacted with the DEX and created a referral code.');
-});
-
-test('handleReferral returns an error if referred user already swapped', async () => {
+test("handleReferral returns an error if referred user already created referral code", async () => {
   const store_result = await referralService.storeReferralCode(
     TEST_USER_WALLET_ADDRESS,
     mockSignedMessage,
@@ -297,10 +283,38 @@ test('handleReferral returns an error if referred user already swapped', async (
 
   expect(store_result.success).toBe(true);
 
-  (pubkeyToAddress as Mock).mockReturnValue('bbn1klp9nyhen3nr9xx2anh9d0a7lt957vqek7d063');
+  (pubkeyToAddress as Mock).mockReturnValue(TEST_REFERRED_USER_WALLET_ADDRESS);
+
+  const store_referral_result = await referralService.storeReferralCode(
+    TEST_REFERRED_USER_WALLET_ADDRESS,
+    mockSignedMessage,
+  );
+
+  expect(store_referral_result.success).toBe(true);
 
   const result = await referralService.handleReferral(
-    'bbn1klp9nyhen3nr9xx2anh9d0a7lt957vqek7d063',
+    TEST_REFERRED_USER_WALLET_ADDRESS,
+    store_result.code,
+    mockSignedMessage,
+  );
+  expect(result.success).toBe(false);
+  expect(result.error).toBe(
+    "User has already interacted with the DEX and created a referral code.",
+  );
+});
+
+test("handleReferral returns an error if referred user already swapped", async () => {
+  const store_result = await referralService.storeReferralCode(
+    TEST_USER_WALLET_ADDRESS,
+    mockSignedMessage,
+  );
+
+  expect(store_result.success).toBe(true);
+
+  (pubkeyToAddress as Mock).mockReturnValue("bbn1klp9nyhen3nr9xx2anh9d0a7lt957vqek7d063");
+
+  const result = await referralService.handleReferral(
+    "bbn1klp9nyhen3nr9xx2anh9d0a7lt957vqek7d063",
     store_result.code,
     mockSignedMessage,
   );
@@ -308,7 +322,7 @@ test('handleReferral returns an error if referred user already swapped', async (
   expect(result.error).toBe("User has already interacted with the DEX and executed a swap.");
 });
 
-test('handleReferral returns an error if referred user already added liquidity', async () => {
+test("handleReferral returns an error if referred user already added liquidity", async () => {
   const store_result = await referralService.storeReferralCode(
     TEST_USER_WALLET_ADDRESS,
     mockSignedMessage,
@@ -316,10 +330,10 @@ test('handleReferral returns an error if referred user already added liquidity',
 
   expect(store_result.success).toBe(true);
 
-  (pubkeyToAddress as Mock).mockReturnValue('bbn1dnl4umj7dvnt85fcffn5r8rghac3ezatmtk7pa');
+  (pubkeyToAddress as Mock).mockReturnValue("bbn1dnl4umj7dvnt85fcffn5r8rghac3ezatmtk7pa");
 
   const result = await referralService.handleReferral(
-    'bbn1dnl4umj7dvnt85fcffn5r8rghac3ezatmtk7pa',
+    "bbn1dnl4umj7dvnt85fcffn5r8rghac3ezatmtk7pa",
     store_result.code,
     mockSignedMessage,
   );

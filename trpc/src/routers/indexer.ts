@@ -106,15 +106,25 @@ export const indexerRouter = createTRPCRouter({
       );
     }),
   getPoolIncentiveAprsByAddresses: createTRPCPublicProcedure
-    .input(z.object({
-      addresses: z.string().array(),
-      startDate: z.string().refine(str => !isNaN(Date.parse(str)), {
-        message: "Invalid date string"
-      }).transform(str => new Date(str)).nullish(),
-      endDate: z.string().refine(str => !isNaN(Date.parse(str)), {
-        message: "Invalid date string"
-      }).transform(str => new Date(str)).nullish()
-    }))
+    .input(
+      z.object({
+        addresses: z.string().array(),
+        startDate: z
+          .string()
+          .refine((str) => !Number.isNaN(Date.parse(str)), {
+            message: "Invalid date string",
+          })
+          .transform((str) => new Date(str))
+          .nullish(),
+        endDate: z
+          .string()
+          .refine((str) => !Number.isNaN(Date.parse(str)), {
+            message: "Invalid date string",
+          })
+          .transform((str) => new Date(str))
+          .nullish(),
+      }),
+    )
     .query(async ({ ctx, input }) => {
       return await ctx.indexerService.getPoolIncentiveAprsByPoolAddresses(
         input.addresses,
@@ -123,15 +133,25 @@ export const indexerRouter = createTRPCRouter({
       );
     }),
   getPoolMetricsByAddresses: createTRPCPublicProcedure
-    .input(z.object({ 
-      addresses: z.string().array(), 
-      startDate: z.string().refine(str => !isNaN(Date.parse(str)), {
-        message: "Invalid date string"
-      }).transform(str => new Date(str)).nullish(), 
-      endDate: z.string().refine(str => !isNaN(Date.parse(str)), {
-        message: "Invalid date string"
-      }).transform(str => new Date(str)).nullish() 
-    }))
+    .input(
+      z.object({
+        addresses: z.string().array(),
+        startDate: z
+          .string()
+          .refine((str) => !Number.isNaN(Date.parse(str)), {
+            message: "Invalid date string",
+          })
+          .transform((str) => new Date(str))
+          .nullish(),
+        endDate: z
+          .string()
+          .refine((str) => !Number.isNaN(Date.parse(str)), {
+            message: "Invalid date string",
+          })
+          .transform((str) => new Date(str))
+          .nullish(),
+      }),
+    )
     .query(async ({ ctx, input }) => {
       return await ctx.indexerService.getPoolMetricsByPoolAddresses(
         input.addresses,
@@ -140,15 +160,25 @@ export const indexerRouter = createTRPCRouter({
       );
     }),
   getAggregatedMetricsByAddresses: createTRPCPublicProcedure
-    .input(z.object({
-      addresses: z.string().array(),
-      startDate: z.string().refine(str => !isNaN(Date.parse(str)), {
-        message: "Invalid date string"
-      }).transform(str => new Date(str)).nullish(),
-      endDate: z.string().refine(str => !isNaN(Date.parse(str)), {
-        message: "Invalid date string"
-      }).transform(str => new Date(str)).nullish()
-    }))
+    .input(
+      z.object({
+        addresses: z.string().array(),
+        startDate: z
+          .string()
+          .refine((str) => !Number.isNaN(Date.parse(str)), {
+            message: "Invalid date string",
+          })
+          .transform((str) => new Date(str))
+          .nullish(),
+        endDate: z
+          .string()
+          .refine((str) => !Number.isNaN(Date.parse(str)), {
+            message: "Invalid date string",
+          })
+          .transform((str) => new Date(str))
+          .nullish(),
+      }),
+    )
     .query(async ({ ctx, input }) => {
       return await ctx.indexerService.getAggregatedMetricsByPoolAddresses(
         input.addresses,
@@ -157,14 +187,13 @@ export const indexerRouter = createTRPCRouter({
       );
     }),
   getPoints: createTRPCPublicProcedure
-    .input(z.object({
-      addresses: z.string().array(),
-      limit: z.number().min(1).max(100).nullish(),
-    }))
-    .query(async ({ctx, input}) => {
-      return await ctx.indexerService.getPoints(
-        input.addresses,
-        input.limit,
-      );
-    })
+    .input(
+      z.object({
+        addresses: z.string().array(),
+        limit: z.number().min(1).max(100).nullish(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      return await ctx.indexerService.getPoints(input.addresses, input.limit);
+    }),
 });

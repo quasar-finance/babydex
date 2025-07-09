@@ -1,6 +1,6 @@
-import type { Account, Chain, Client, CometBftRpcSchema, Transport } from "cosmi/types";
-import { execute, type ExecuteReturnType } from "cosmi/client";
-import { ClientWithActions } from "~/multisig/client/types";
+import type { Account, Chain, CometBftRpcSchema, Transport } from "cosmi/types";
+import type { ExecuteReturnType } from "cosmi/client";
+import type { ClientWithActions } from "~/multisig/client/types";
 
 export type ClaimRewardsParameters = {
   incentiveAddress: string;

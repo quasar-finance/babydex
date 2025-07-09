@@ -1,7 +1,6 @@
 import type React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { twMerge } from "~/utils/twMerge";
-import { motion } from "motion/react";
 
 interface Props {
   value: number;

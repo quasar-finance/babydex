@@ -1,8 +1,14 @@
-import {drizzle} from "drizzle-orm/node-postgres";
-import {Pool} from "pg";
-import {and, asc, desc, eq, inArray, notInArray, or, sql, type SQL} from "drizzle-orm";
-import {StringChunk} from "drizzle-orm/sql/sql";
-import type {AggregatedMetrics, Points, PoolIncentive, PoolMetric, PoolMetricSerialized} from "@towerfi/types";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
+import { asc, desc, eq, inArray, or, sql, type SQL } from "drizzle-orm";
+import { StringChunk } from "drizzle-orm/sql/sql";
+import type {
+  AggregatedMetrics,
+  Points,
+  PoolIncentive,
+  PoolMetric,
+  PoolMetricSerialized,
+} from "@towerfi/types";
 
 import {
   materializedAddLiquidityInV1Cosmos,
@@ -16,7 +22,7 @@ import {
   materializedUnstakeLiquidityInV1Cosmos,
   materializedWithdrawLiquidityInV1Cosmos,
 } from "./drizzle/schema.js";
-import {bigint, integer, numeric, pgSchema, serial, text, timestamp} from "drizzle-orm/pg-core";
+import { bigint, integer, numeric, pgSchema, serial, text, timestamp } from "drizzle-orm/pg-core";
 
 const v1Cosmos = pgSchema("v1_cosmos");
 const userShares = v1Cosmos.table("pool_user_shares", {
@@ -34,19 +40,19 @@ const poolLpToken = v1Cosmos.table("pool_lp_token", {
   lp_token: text("lp_token").notNull(),
 });
 
-const referrals = v1Cosmos.table('referrals', {
-  id: bigint('id', { mode: 'number' }).primaryKey().notNull(),
-  referredUserWalletAddress: text('referred_user_wallet_address').notNull().unique(),
-  referredByUserWalletAddress: text('referred_by_user_wallet_address').notNull(),
-  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+const referrals = v1Cosmos.table("referrals", {
+  id: bigint("id", { mode: "number" }).primaryKey().notNull(),
+  referredUserWalletAddress: text("referred_user_wallet_address").notNull().unique(),
+  referredByUserWalletAddress: text("referred_by_user_wallet_address").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });
 
-const materializedPoints = v1Cosmos.table('materialized_points', {
-  address: text('address').primaryKey().notNull(),
-  lpingPoints: numeric('lping_points').notNull(),
-  swappingPoints: numeric('swapping_points').notNull(),
-  totalPoints: numeric('total_points').notNull(),
-  rank: integer('rank').notNull(),
+const materializedPoints = v1Cosmos.table("materialized_points", {
+  address: text("address").primaryKey().notNull(),
+  lpingPoints: numeric("lping_points").notNull(),
+  swappingPoints: numeric("swapping_points").notNull(),
+  totalPoints: numeric("total_points").notNull(),
+  rank: integer("rank").notNull(),
 });
 
 export const views = {
@@ -522,16 +528,14 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
 
     try {
       const result = await client.execute(query);
-      return result.rows.reduce<Record<string, PoolIncentive[]>>(
-        (acc, row) => ({
-          ...acc,
-          [row.pool_address as string]: [
-            ...(acc[row.pool_address as string] || []),
-            row as unknown as PoolIncentive,
-          ],
-        }),
-        {},
-      );
+      return result.rows.reduce<Record<string, PoolIncentive[]>>((acc, row) => {
+        acc[row.pool_address as string] = [
+          ...(acc[row.pool_address as string] || []),
+          row as unknown as PoolIncentive,
+        ];
+
+        return acc;
+      }, {});
     } catch (error) {
       console.error("Error executing raw query:", error);
       throw error;
@@ -896,17 +900,15 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     try {
       const result = await client.execute(query);
 
-      return result.rows.reduce<Record<string, PoolMetric>>(
-        (acc, row) => ({
-          ...acc,
-          [row.pool_address as string]: {
-            ...(row as Omit<PoolMetric, "metric_start_height" | "metric_end_height">),
-            metric_start_height: startHeight ? startHeight.toString() : null,
-            metric_end_height: endHeight ? endHeight.toString() : null,
-          } as PoolMetric,
-        }),
-        {},
-      );
+      return result.rows.reduce<Record<string, PoolMetric>>((acc, row) => {
+        acc[row.pool_address as string] = {
+          ...(row as Omit<PoolMetric, "metric_start_height" | "metric_end_height">),
+          metric_start_height: startHeight ? startHeight.toString() : null,
+          metric_end_height: endHeight ? endHeight.toString() : null,
+        } as PoolMetric;
+
+        return acc;
+      }, {});
     } catch (error) {
       console.error("Error executing raw query:", error);
 
@@ -1108,7 +1110,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
 
   async function getPoints(
     addresses: string[],
-    limit?: number | null
+    limit?: number | null,
   ): Promise<Record<string, Points>> {
     try {
       const points = await getBasePoints(addresses, limit);
@@ -1122,7 +1124,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
 
   async function getBasePoints(
     addresses: string[],
-    limit?: number | null
+    limit?: number | null,
   ): Promise<Record<string, Points>> {
     if (limit === 0) {
       return {};
@@ -1131,9 +1133,8 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     limit = limit ?? 100;
     let addressSql = sql``;
     if (addresses.length > 0) {
-       addressSql = sql` AND pcr.address = ${createPoolAddressArraySql(addresses)}`;
+      addressSql = sql` AND pcr.address = ${createPoolAddressArraySql(addresses)}`;
     }
-
 
     try {
       // As we precalculate rank based on totals points, and we might filter some ranks
@@ -1168,10 +1169,10 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
 
       return result.rows.reduce<Record<string, Points>>((acc, row) => {
         const address: string = row.address as string;
-        const lping_points: number = parseFloat(row.lping_points as string);
-        const swapping_points: number = parseFloat(row.swapping_points as string);
-        const total_points: number = parseFloat(row.total_points as string);
-        const rank: number = parseInt(row.rank as string);
+        const lping_points: number = Number.parseFloat(row.lping_points as string);
+        const swapping_points: number = Number.parseFloat(row.swapping_points as string);
+        const total_points: number = Number.parseFloat(row.total_points as string);
+        const rank: number = Number.parseInt(row.rank as string);
 
         acc[address] = {
           address,
@@ -1195,7 +1196,9 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
    * @param {Record<string, Points>} userPoints - A record of user wallet addresses mapped to their corresponding Points objects, where Points include total_points.
    * @return {Promise<Record<string, Points>>} A promise resolving to the updated userPoints object after applying bonus points. Original input remains unaltered.
    */
-  async function calculateBonusPoints(userPoints: Record<string, Points>): Promise<Record<string, Points>> {
+  async function calculateBonusPoints(
+    userPoints: Record<string, Points>,
+  ): Promise<Record<string, Points>> {
     try {
       const userWalletAddresses = Object.keys(userPoints);
 
@@ -1212,13 +1215,13 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
         .where(
           or(
             inArray(referrals.referredUserWalletAddress, userWalletAddresses),
-            inArray(referrals.referredByUserWalletAddress, userWalletAddresses)
-          )
+            inArray(referrals.referredByUserWalletAddress, userWalletAddresses),
+          ),
         );
 
       if (!referralRelationships || referralRelationships.length === 0) {
         for (const address in userPoints) {
-          if (userPoints.hasOwnProperty(address) && userPoints[address] !== undefined) {
+          if (Object.hasOwn(userPoints, address) && userPoints[address] !== undefined) {
             userPoints[address].invite_boost_points = 0;
             userPoints[address].referral_link_points = 0;
           }
@@ -1228,7 +1231,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
       }
 
       const allRefereeWalletsInRelationships = new Set(
-        referralRelationships.map(r => r.referred_user_wallet_address)
+        referralRelationships.map((r) => r.referred_user_wallet_address),
       );
 
       const missingRefereeWallets: string[] = [];
@@ -1246,7 +1249,7 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
 
       const originalTotalPointsMap: Record<string, number> = {};
       for (const address in userPoints) {
-        if (userPoints.hasOwnProperty(address) && userPoints[address] !== undefined) {
+        if (Object.hasOwn(userPoints, address) && userPoints[address] !== undefined) {
           originalTotalPointsMap[address] = userPoints[address].total_points;
           userPoints[address].invite_boost_points = 0;
           userPoints[address].referral_link_points = 0;
@@ -1254,7 +1257,10 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
       }
 
       for (const address in fetchedMissingPoints) {
-        if (fetchedMissingPoints.hasOwnProperty(address) && fetchedMissingPoints[address] !== undefined) {
+        if (
+          Object.hasOwn(fetchedMissingPoints, address) &&
+          fetchedMissingPoints[address] !== undefined
+        ) {
           originalTotalPointsMap[address] = fetchedMissingPoints[address].total_points;
         }
       }
@@ -1269,9 +1275,10 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
         if (originalRefereeBasePoints !== undefined) {
           // Apply bonus only if the referee is among the users passed into the function
           if (refereePoints) {
-            const refereeBonus = originalRefereeBasePoints * 0.10;
+            const refereeBonus = originalRefereeBasePoints * 0.1;
 
-            refereePoints.invite_boost_points = (refereePoints.invite_boost_points || 0) + refereeBonus;
+            refereePoints.invite_boost_points =
+              (refereePoints.invite_boost_points || 0) + refereeBonus;
             refereePoints.total_points += refereeBonus;
           }
         }
@@ -1286,16 +1293,17 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
         const originalRefereeBasePoints = originalTotalPointsMap[refereeWallet];
 
         if (referrerPoints && originalRefereeBasePoints !== undefined) {
-          const referrerBonus = originalRefereeBasePoints * 0.20;
+          const referrerBonus = originalRefereeBasePoints * 0.2;
 
-          referrerPoints.referral_link_points = (referrerPoints.referral_link_points || 0) + referrerBonus;
+          referrerPoints.referral_link_points =
+            (referrerPoints.referral_link_points || 0) + referrerBonus;
           referrerPoints.total_points += referrerBonus;
         }
       }
 
       return userPoints;
     } catch (err) {
-      console.error('An unexpected error occurred during bonus point calculation:', err);
+      console.error("An unexpected error occurred during bonus point calculation:", err);
       return userPoints;
     }
   }
@@ -1315,14 +1323,15 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
   }
 
   async function fetchBlacklistedPointsAddresses(): Promise<string[]> {
-    const addressesResult =  await client
-      .execute(sql.raw(`SELECT address FROM v1_cosmos.blacklisted_points_addresses`));
+    const addressesResult = await client.execute(
+      sql.raw("SELECT address FROM v1_cosmos.blacklisted_points_addresses"),
+    );
 
     if (!addressesResult || addressesResult.rows.length === 0) {
       return [];
     }
 
-    return addressesResult.rows.map((row) => row['address'] as string);
+    return addressesResult.rows.map((row) => row.address as string);
   }
 
   async function findHeightsByDateRange(
@@ -1406,6 +1415,6 @@ export const createIndexerService = (config: IndexerDbCredentials) => {
     getPoolMetricsByPoolAddresses,
     getPoolIncentiveAprsByPoolAddresses,
     getAggregatedMetricsByPoolAddresses,
-    getPoints
+    getPoints,
   } as Indexer;
 };

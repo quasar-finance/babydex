@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-    --background: #0F0F0F;
-    --foreground: #F7F5EB;
+  --background: #0f0f0f;
+  --foreground: #f7f5eb;
   --scrollbar-width: 8px;
   --scrollbar-bg-color: #191919;
   --scrollbar-thumb-color: rgba(238, 173, 33, 0.5);
@@ -13,30 +13,29 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0F0F0F;
-    --foreground: #F7F5EB;
+    --background: #0f0f0f;
+    --foreground: #f7f5eb;
     --scrollbar-bg-color: #191919;
-  --scrollbar-thumb-color: rgba(238, 173, 33, 0.5);
-  --scrollbar-thumb-hover-color: rgba(238, 173, 33, 1);
+    --scrollbar-thumb-color: rgba(238, 173, 33, 0.5);
+    --scrollbar-thumb-hover-color: rgba(238, 173, 33, 1);
   }
 }
 
 @layer base {
-
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-  scrollbar-width: thin;
+  * {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    scrollbar-width: thin;
     scrollbar-color: var(--scrollbar-thumb-color) var(--scrollbar-bg-color);
-}
+  }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  @apply font-inter;
-  letter-spacing: 0.02em;
-}
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    @apply font-inter;
+    letter-spacing: 0.02em;
+  }
 
   input[type="number"]::-webkit-inner-spin-button,
   input[type="number"]::-webkit-outer-spin-button {
@@ -45,8 +44,8 @@ body {
   }
 
   input[type="number"] {
-  -moz-appearance: textfield;
-}
+    -moz-appearance: textfield;
+  }
 
   input,
   input:focus {

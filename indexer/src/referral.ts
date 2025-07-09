@@ -1,8 +1,8 @@
-import {createClient} from "@supabase/supabase-js";
-import {pubkeyToAddress} from "@cosmjs/amino";
-import {fromBase64} from "@cosmjs/encoding";
-import {Secp256k1, Secp256k1Signature} from "@cosmjs/crypto";
-import type {CosmosSignedMessage, Points} from "@towerfi/types";
+import { createClient } from "@supabase/supabase-js";
+import { pubkeyToAddress } from "@cosmjs/amino";
+import { fromBase64 } from "@cosmjs/encoding";
+import { Secp256k1, Secp256k1Signature } from "@cosmjs/crypto";
+import type { CosmosSignedMessage, Points } from "@towerfi/types";
 
 /**
  * Referral type describes methods for managing referral codes
@@ -177,7 +177,7 @@ export const createReferralService = (supabaseUrl: string, supabaseKey: string) 
         }
 
         if (error.code === UNIQUE_VALIDATION_ERROR_CODE && retries < maxRetries) {
-          console.warn(`Referral code ${ code } already exists. Retrying...`);
+          console.warn(`Referral code ${code} already exists. Retrying...`);
           retries++;
         } else {
           console.error("Error storing referral code:", error);
@@ -235,7 +235,9 @@ export const createReferralService = (supabaseUrl: string, supabaseKey: string) 
    * @param {string} referralCode - The referral code used to find the associated wallet address.
    * @return {Promise<string | null>} A promise that resolves to the user's wallet address if found, or null if not found or an error occurs.
    */
-  async function fetchUserWalletAddressByReferralCode(referralCode: string): Promise<string | null> {
+  async function fetchUserWalletAddressByReferralCode(
+    referralCode: string,
+  ): Promise<string | null> {
     try {
       const { data, error } = await supabase
         .from("user_referral_codes")
@@ -267,9 +269,9 @@ export const createReferralService = (supabaseUrl: string, supabaseKey: string) 
   async function fetchUserWalletAddressByAddress(address: string): Promise<string | null> {
     try {
       const { data, error } = await supabase
-        .from('user_referral_codes')
-        .select('user_wallet_address')
-        .eq('user_wallet_address', address)
+        .from("user_referral_codes")
+        .select("user_wallet_address")
+        .eq("user_wallet_address", address)
         .single(); // Expect only one result
 
       if (error) {
@@ -297,9 +299,9 @@ export const createReferralService = (supabaseUrl: string, supabaseKey: string) 
   async function fetchPointsByAddress(address: string): Promise<Points | null> {
     try {
       const { data, error } = await supabase
-        .from('materialized_points')
-        .select('*', { count: 'exact' })
-        .eq('address', address)
+        .from("materialized_points")
+        .select("*", { count: "exact" })
+        .eq("address", address)
         .single();
 
       if (error) {
@@ -310,7 +312,7 @@ export const createReferralService = (supabaseUrl: string, supabaseKey: string) 
         throw error;
       }
 
-      return data ? data as Points : null;
+      return data ? (data as Points) : null;
     } catch (error: any) {
       throw new Error("Error fetching points: ", error);
     }
@@ -322,7 +324,9 @@ export const createReferralService = (supabaseUrl: string, supabaseKey: string) 
    * @param {string} referredUserWalletAddress - The wallet address of the referred user to lookup.
    * @return {Promise<string | null>} A promise that resolves to the referred user's wallet address if found; otherwise, null.
    */
-  async function fetchReferredUserWalletAddress(referredUserWalletAddress: string): Promise<string | null> {
+  async function fetchReferredUserWalletAddress(
+    referredUserWalletAddress: string,
+  ): Promise<string | null> {
     try {
       const { data, error } = await supabase
         .from("referrals")
@@ -402,17 +406,26 @@ export const createReferralService = (supabaseUrl: string, supabaseKey: string) 
       }
 
       if (await fetchUserWalletAddressByAddress(referredUserWalletAddress)) {
-        return { success: false, error: "User has already interacted with the DEX and created a referral code." };
+        return {
+          success: false,
+          error: "User has already interacted with the DEX and created a referral code.",
+        };
       }
 
       const points = await fetchPointsByAddress(referredUserWalletAddress);
 
       if (points && points.swapping_points > REFERRAL_POINTS_THRESHOLD) {
-        return { success: false, error: "User has already interacted with the DEX and executed a swap." };
+        return {
+          success: false,
+          error: "User has already interacted with the DEX and executed a swap.",
+        };
       }
 
       if (points && points.lping_points > REFERRAL_POINTS_THRESHOLD) {
-        return { success: false, error: "User has already interacted with the DEX and added liquidity." };
+        return {
+          success: false,
+          error: "User has already interacted with the DEX and added liquidity.",
+        };
       }
 
       const recordResult = await recordReferral(
@@ -435,7 +448,7 @@ export const createReferralService = (supabaseUrl: string, supabaseKey: string) 
     storeReferralCode,
     handleReferral,
   } as Referral;
-}
+};
 
 /**
  * Generates a random referral code consisting of 8 alphanumeric characters.
@@ -486,12 +499,12 @@ export async function verifyCosmosSignature(
     );
 
     if (isValid && derivedAddress === expectedWalletAddress) {
-      console.log(`Signature successfully verified for address: ${ derivedAddress }`);
+      console.log(`Signature successfully verified for address: ${derivedAddress}`);
       return derivedAddress;
     }
 
     console.warn(
-      `Signature verification failed or address mismatch. Derived: ${ derivedAddress }, Expected: ${ expectedWalletAddress }`,
+      `Signature verification failed or address mismatch. Derived: ${derivedAddress}, Expected: ${expectedWalletAddress}`,
     );
     return null;
   } catch (error) {

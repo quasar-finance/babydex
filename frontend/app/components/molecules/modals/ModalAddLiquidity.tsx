@@ -1,18 +1,14 @@
 import { useMemo, useRef, useState } from "react";
 import { Button } from "~/app/components/atoms/Button";
 import BasicModal from "~/app/components/templates/BasicModal";
-
-import IconCoins from "~/app/components/atoms/icons/IconCoins";
 import Divider from "~/app/components/atoms/Divider";
 
 import type { PoolInfo } from "@towerfi/types";
 import { useAccount } from "@cosmi/react";
 import { ModalTypes } from "~/types/modal";
 import { useModal } from "~/app/providers/ModalProvider";
-import { SingleSideAddLiquidity } from "../SingleSideAddLiquidity";
 import { DoubleSideAddLiquidity } from "../DoubleSideAddLiquidity";
 import { FormProvider, useForm } from "react-hook-form";
-import { Tab, TabList, Tabs } from "../../atoms/Tabs";
 import AssetsStacked from "../../atoms/AssetsStacked";
 import { Popover, PopoverContent, PopoverTrigger } from "../../atoms/Popover";
 import MaxSlippageSwitcher from "../MaxSlippageSwitcher";

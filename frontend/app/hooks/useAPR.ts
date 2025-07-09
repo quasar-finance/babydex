@@ -1,7 +1,7 @@
 import type { PoolIncentive, PoolMetricSerialized } from "@towerfi/types";
 import { usePrices } from "./usePrices";
 import { convertMicroDenomToDenom } from "~/utils/intl";
-import { DefaultPoolIncentive, DefaultPoolMetric } from "~/utils/consts";
+import { DefaultPoolMetric } from "~/utils/consts";
 
 const yearInSeconds = 31557600;
 
@@ -25,16 +25,12 @@ export function useAPR(
   let incentives_apr = 0;
 
   // Handle both single incentive and array of incentives
-  const incentiveArray = incentives 
-    ? Array.isArray(incentives) 
-      ? incentives 
-      : [incentives]
-    : [];
+  const incentiveArray = incentives ? (Array.isArray(incentives) ? incentives : [incentives]) : [];
 
   // Calculate total APR from all incentives
   for (const incentive of incentiveArray) {
     const total_incentives = incentive.rewards_per_second * yearInSeconds;
-    
+
     if (total_incentives > 0) {
       const price = getPrice(
         convertMicroDenomToDenom(

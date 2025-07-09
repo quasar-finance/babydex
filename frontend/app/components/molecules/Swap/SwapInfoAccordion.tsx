@@ -1,7 +1,6 @@
 import type { RouteResponse } from "@skip-go/client";
 import { IconChevronDown } from "@tabler/icons-react";
 import { useState } from "react";
-import IconCoins from "~/app/components/atoms/icons/IconCoins";
 import { useSwapStore } from "~/app/hooks/useSwapStore";
 import { bpsToFloat, convertMicroDenomToDenom, maxSlippageToBps } from "~/utils/intl";
 import { twMerge } from "~/utils/twMerge";

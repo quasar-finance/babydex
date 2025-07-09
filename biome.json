@@ -20,6 +20,7 @@
         "noDelete": "off"
       },
       "complexity": {
+        "noBannedTypes": "off",
         "noForEach": "off"
       },
       "recommended": true,
@@ -27,7 +28,8 @@
         "useSelfClosingElements": "off",
         "noNonNullAssertion": "off",
         "noParameterAssign": "off",
-        "useTemplate": "off"
+        "useTemplate": "off",
+        "useImportType": "error"
       },
       "a11y": {
         "useKeyWithClickEvents": "off",
@@ -39,5 +41,8 @@
         "noArrayIndexKey": "off"
       }
     }
+  },
+  "files": {
+    "ignore": ["trpc/.wrangler/**", "schemas/**", "frontend/.next/**"]
   }
 }

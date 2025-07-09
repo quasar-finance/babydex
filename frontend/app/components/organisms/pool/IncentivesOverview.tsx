@@ -3,9 +3,11 @@ import { Assets } from "~/config";
 import { convertMicroDenomToDenom } from "~/utils/intl";
 import AssetsStacked from "../../atoms/AssetsStacked";
 
-export const IncentivesOverview: React.FC<{ incentives: PoolIncentive | PoolIncentive[] }> = ({ incentives }) => {
+export const IncentivesOverview: React.FC<{ incentives: PoolIncentive | PoolIncentive[] }> = ({
+  incentives,
+}) => {
   const incentiveArray = Array.isArray(incentives) ? incentives : [incentives];
-  
+
   return (
     <div className="flex flex-col gap-3">
       {incentiveArray.map((incentive, index) => (

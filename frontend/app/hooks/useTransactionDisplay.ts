@@ -1,26 +1,30 @@
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
 // Custom JSON serializer that handles BigInt
 const customStringify = (obj: any): string => {
-  return JSON.stringify(obj, (key, value) => {
-    if (typeof value === 'bigint') {
-      return value.toString();
-    }
-    return value;
-  }, 2);
+  return JSON.stringify(
+    obj,
+    (key, value) => {
+      if (typeof value === "bigint") {
+        return value.toString();
+      }
+      return value;
+    },
+    2,
+  );
 };
 
 export function useTransactionDisplay() {
   useEffect(() => {
     const handleTransaction = (event: CustomEvent) => {
-      console.log("handling tx")
-      console.log(event)
+      console.log("handling tx");
+      console.log(event);
       const { transaction } = event.detail;
-      console.log("pop up")
-      console.log(event)
-      
+      console.log("pop up");
+      console.log(event);
+
       // Create a new window
-      const popup = window.open('', 'Transaction Details', 'width=800,height=600');
+      const popup = window.open("", "Transaction Details", "width=800,height=600");
       if (!popup) return;
 
       // Write the HTML content
@@ -86,9 +90,9 @@ export function useTransactionDisplay() {
       `);
     };
 
-    window.addEventListener('showTransaction', handleTransaction as EventListener);
+    window.addEventListener("showTransaction", handleTransaction as EventListener);
     return () => {
-      window.removeEventListener('showTransaction', handleTransaction as EventListener);
+      window.removeEventListener("showTransaction", handleTransaction as EventListener);
     };
   }, []);
-} 
+}

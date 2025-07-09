@@ -62,11 +62,7 @@ export const PoolIncentivesPill: React.FC<{
   incentives: PoolIncentive | PoolIncentive[] | undefined;
   className?: string;
 }> = ({ incentives, className }) => {
-  const incentiveArray = incentives 
-    ? Array.isArray(incentives) 
-      ? incentives 
-      : [incentives]
-    : [];
+  const incentiveArray = incentives ? (Array.isArray(incentives) ? incentives : [incentives]) : [];
 
   const hasIncentives = incentiveArray.length > 0;
 
@@ -91,7 +87,8 @@ export const PoolIncentivesPill: React.FC<{
               <div key={index} className="flex flex-col gap-1">
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-white/80">
-                    ${Assets[incentive.reward_token]?.symbol || incentive.reward_token.toUpperCase()}
+                    $
+                    {Assets[incentive.reward_token]?.symbol || incentive.reward_token.toUpperCase()}
                   </span>
                   <span className="text-white/80 ml-2">
                     {convertMicroDenomToDenom(

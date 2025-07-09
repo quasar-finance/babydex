@@ -29,12 +29,7 @@ export const TransactionDisplayModal: React.FC<TransactionDisplayModalProps> = (
           <pre className="bg-tw-bg p-4 rounded-lg overflow-auto max-h-[60vh] text-sm">
             {JSON.stringify(transaction, null, 2)}
           </pre>
-          <Button
-            className="absolute top-2 right-2"
-            variant="ghost"
-            size="sm"
-            onPress={handleCopy}
-          >
+          <Button className="absolute top-2 right-2" variant="ghost" size="sm" onPress={handleCopy}>
             <IconCopy className="w-4 h-4" />
             {copied ? "Copied!" : "Copy"}
           </Button>
@@ -47,4 +42,4 @@ export const TransactionDisplayModal: React.FC<TransactionDisplayModalProps> = (
       </div>
     </Modal>
   );
-}; 
+};

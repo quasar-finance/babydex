@@ -50,6 +50,7 @@ export const BabylonMainnetAssets = {
     logoURI:
       "https://raw.githubusercontent.com/cosmos/chain-registry/master/babylon/images/eBABY.svg",
     coingeckoId: "babylon",
+    swapToBasePoolAddress: "bbn1hs95lgvuy0p6jn4v7js5x8plfdqw867lsuh5xv6d2ua20jprkgeslpzjvl",
   },
   bbn17y5zvse30629t7r37xsdj73xsqp7qsdr7gpnh966wf5aslpn66rq5ekwsz: {
     symbol: "cBABY",
@@ -60,6 +61,7 @@ export const BabylonMainnetAssets = {
     logoURI:
       "https://raw.githubusercontent.com/cosmos/chain-registry/master/babylon/images/cbaby.svg",
     coingeckoId: "babylon",
+    swapToBasePoolAddress: "bbn1cduudfszcm9slm8qxlaqvnpzg2u0hkus94fe3pwt9x446dtw6eeqwvlnpk",
   },
   "ibc/2CC08A10459B40B0251B8CB9C036C98BED1ABBD5F03772E371DCD0FFDA3EC7F3": {
     symbol: "SolvBTC",
@@ -144,6 +146,7 @@ export const BabylonMainnetAssets = {
     coingeckoId: "universal-btc",
     bridge: ["union"],
     ethereumAddresses: { union: "0xf7de2b7afdb07aa5dd143180ed758165821e076e" },
+    swapToBasePoolAddress: "bbn1478sh2c7xgk2xufh32l3p4vsyeyd5xemqm6f2jrwz39wa9atgkps7z9d52",
   },
   bbn1ztf5dlsljzmxn800yeydplwyvpp828fjkyy29gtjzerd4mu4kxsscmzc0a: {
     symbol: "XSolvBTC.union",
@@ -168,6 +171,7 @@ export const BabylonMainnetAssets = {
     coingeckoId: "solv-protocol-solvbtc-bbn",
     bridge: ["union"],
     ethereumAddresses: { union: "0x17140b69FfaDfF9e87BF1D86D99119ee10AD24ff" },
+    swapToBasePoolAddress: "bbn1cswu9n4nkpns2fc30jextsx0cvqwadp9gullfrlp94nhrzaexgtsxavsju",
   },
   "ibc/CD7ECDBBA538632B45915ED67C4932DDB318818C00C21489D3774E560E87E420": {
     symbol: "milkBABY",
@@ -179,6 +183,7 @@ export const BabylonMainnetAssets = {
       "https://raw.githubusercontent.com/cosmos/chain-registry/master/milkyway/images/milkbaby.svg",
     coingeckoId: "babylon",
     bridge: ["ibc-eureka"],
+    swapToBasePoolAddress: "bbn1y3eh23v8egxlmaupzetz98yu0jwtzv7qce5r3c2tq8xj25ld3l4qy7tnrm",
   },
   "ibc/CC1095A93E3C2DF5630EC4F6A994647E58C33FCB94F4810DE6126EF4A8A9E060": {
     symbol: "MILK",

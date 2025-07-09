@@ -10,7 +10,7 @@
     "build:app": "turbo build",
     "clean": "turbo clean",
     "prepare": "husky",
-    "lint": "biome check"
+    "lint-fix": "biome check --fix"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",

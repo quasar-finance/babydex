@@ -1,5 +1,5 @@
 import { useAccount, usePublicClient } from "@cosmi/react";
-import { useQuery, type UseQueryResult } from "@tanstack/react-query";
+import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 
 import type { Currency, WithAmount } from "@towerfi/types";
 import { getCw20Balance } from "~/actions/getCw20Balance";

@@ -1,14 +1,14 @@
-import type { PoolInfo } from "@towerfi/types";
-import { useMemo } from "react";
-import { trpc } from "~/trpc/client";
-import Skeleton from "../../atoms/Skeleton";
-import { useModal } from "~/app/providers/ModalProvider";
-import { Button } from "../../atoms/Button";
-import { ModalTypes } from "~/types/modal";
 import { IconRefresh } from "@tabler/icons-react";
-import { CellDataToken } from "../../atoms/cells/CellDataToken";
-import { CellClaimRewards } from "../../atoms/cells/CellClaimRewards";
+import type { PoolInfo } from "@towerfi/types";
 import clsx from "clsx";
+import { useMemo } from "react";
+import { useModal } from "~/app/providers/ModalProvider";
+import { trpc } from "~/trpc/client";
+import { ModalTypes } from "~/types/modal";
+import { Button } from "../../atoms/Button";
+import Skeleton from "../../atoms/Skeleton";
+import { CellClaimRewards } from "../../atoms/cells/CellClaimRewards";
+import { CellDataToken } from "../../atoms/cells/CellDataToken";
 
 export const UserPositions: React.FC<{
   userAddress: string;

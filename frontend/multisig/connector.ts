@@ -1,6 +1,4 @@
-import { type Connector, ProviderNotFoundError, createConnector } from "wagmi";
-import { createMultisigClient } from "./client/client";
-import { MultisigProvider } from "./provider";
+import type { Chain } from "cosmi/types";
 import {
   type Address,
   type Prettify,
@@ -8,7 +6,9 @@ import {
   type RpcError,
   UserRejectedRequestError,
 } from "viem";
-import type { Chain } from "cosmi/types";
+import { type Connector, ProviderNotFoundError, createConnector } from "wagmi";
+import { createMultisigClient } from "./client/client";
+import { MultisigProvider } from "./provider";
 
 type Target = {
   icon?: string | undefined;

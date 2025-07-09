@@ -1,7 +1,7 @@
-import type { AstroportFactoryClient } from "../sdk/AstroportFactory.client";
-import { getClientAndAddress } from "../lib";
-import { AstroportPairConcentratedClient } from "../sdk/AstroportPairConcentrated.client";
 import { type Coin, coin } from "@cosmjs/proto-signing";
+import { getClientAndAddress } from "../lib";
+import type { AstroportFactoryClient } from "../sdk/AstroportFactory.client";
+import { AstroportPairConcentratedClient } from "../sdk/AstroportPairConcentrated.client";
 
 interface PoolInfo {
   contractAddr: string;

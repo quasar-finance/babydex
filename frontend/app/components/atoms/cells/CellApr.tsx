@@ -1,8 +1,8 @@
-import type React from "react";
-import { CellData } from "./CellData";
-import Tooltip from "../Tooltip";
 import type { PoolIncentive, PoolMetricSerialized } from "@towerfi/types";
+import type React from "react";
 import { useAPR } from "~/app/hooks/useAPR";
+import Tooltip from "../Tooltip";
+import { CellData } from "./CellData";
 
 interface Props {
   title: string;

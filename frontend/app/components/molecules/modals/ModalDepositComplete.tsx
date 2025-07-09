@@ -1,9 +1,9 @@
 import BasicModal from "~/app/components/templates/BasicModal";
 
 import type React from "react";
-import { Button } from "../../atoms/Button";
 import { useModal } from "~/app/providers/ModalProvider";
 import { convertMicroDenomToDenom } from "~/utils/intl";
+import { Button } from "../../atoms/Button";
 
 const ModalDepositCompleted: React.FC = () => {
   const { hideModal, modalProps } = useModal();

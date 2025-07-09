@@ -3,7 +3,7 @@ import clsx from "clsx";
 import { twMerge } from "~/utils/twMerge";
 import IconSearch from "./icons/IconSearch";
 
-import { forwardRef, type ReactElement } from "react";
+import { type ReactElement, forwardRef } from "react";
 import type { FieldError } from "react-hook-form";
 
 export type InputProps = React.DetailedHTMLProps<

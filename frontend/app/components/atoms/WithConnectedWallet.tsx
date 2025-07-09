@@ -1,8 +1,8 @@
 import { useAccount } from "@cosmi/react";
-import { Button } from "./Button";
-import { ModalTypes } from "~/types/modal";
 import { useModal } from "~/app/providers/ModalProvider";
+import { ModalTypes } from "~/types/modal";
 import { twMerge } from "~/utils/twMerge";
+import { Button } from "./Button";
 
 const WithConnectedWallet: React.FC<{
   connectWalletChildren?: React.ReactNode;

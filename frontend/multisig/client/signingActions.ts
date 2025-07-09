@@ -1,7 +1,7 @@
 import type { ExecuteMultipleParameters, ExecuteParameters, ExecuteReturnType } from "cosmi/client";
 
 import type { Account, Chain, Client, Transport } from "cosmi/types";
-import { TxBody, type Transaction } from "./types";
+import { type Transaction, TxBody } from "./types";
 
 export type SigningActions<
   _transport extends Transport = Transport,

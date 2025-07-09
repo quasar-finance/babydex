@@ -1,5 +1,5 @@
 import { usePublicClient } from "@cosmi/react";
-import { useQuery, type UseQueryResult } from "@tanstack/react-query";
+import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { getInnerValueFromAsset } from "@towerfi/trpc";
 import type { Asset, Currency, WithAmount, WithPrice } from "@towerfi/types";
 

@@ -1,6 +1,6 @@
 import clsx from "clsx";
-import { useState } from "react";
 import { motion } from "motion/react";
+import { useState } from "react";
 import { copyToClipboard } from "~/utils/browser";
 
 import type { HTMLAttributes, PropsWithChildren } from "react";

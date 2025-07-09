@@ -1,12 +1,12 @@
 import type { PoolInfo } from "@towerfi/types";
-import { useTVL } from "~/app/hooks/useTVL";
-import Skeleton from "../../atoms/Skeleton";
-import { periodToNumber, type Period } from "../../atoms/PeriodToggle";
-import { useAPR } from "~/app/hooks/useAPR";
-import { trpc } from "~/trpc/client";
 import { useMemo } from "react";
-import { useVolume } from "~/app/hooks/useVolume";
+import { useAPR } from "~/app/hooks/useAPR";
 import { formatNumber } from "~/app/hooks/usePrices";
+import { useTVL } from "~/app/hooks/useTVL";
+import { useVolume } from "~/app/hooks/useVolume";
+import { trpc } from "~/trpc/client";
+import { type Period, periodToNumber } from "../../atoms/PeriodToggle";
+import Skeleton from "../../atoms/Skeleton";
 import Tooltip from "../../atoms/Tooltip";
 import { CellAprBreakDown } from "../../atoms/cells/CellApr";
 

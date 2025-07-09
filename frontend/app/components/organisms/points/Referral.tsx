@@ -1,16 +1,16 @@
+import { useQueryClient } from "@tanstack/react-query";
+import { getQueryKey } from "@trpc/react-query";
+import { useCallback, useMemo, useRef } from "react";
+import { useAccount } from "wagmi";
+import { useToast } from "~/app/hooks";
+import useSignArbitrary from "~/app/hooks/useSignArbitrary";
+import { trpc } from "~/trpc/client";
 import { inviteBoostBps, pointsShareBps } from "~/utils/consts";
 import { bpsToFloat } from "~/utils/intl";
 import { twMerge } from "~/utils/twMerge";
 import { Button } from "../../atoms/Button";
-import { trpc } from "~/trpc/client";
-import { useAccount } from "wagmi";
-import useSignArbitrary from "~/app/hooks/useSignArbitrary";
-import { useCallback, useMemo, useRef } from "react";
-import Skeleton from "../../atoms/Skeleton";
 import Input from "../../atoms/Input";
-import { useToast } from "~/app/hooks";
-import { useQueryClient } from "@tanstack/react-query";
-import { getQueryKey } from "@trpc/react-query";
+import Skeleton from "../../atoms/Skeleton";
 import CopyButton from "../../molecules/CopyButton";
 
 function createReferralLink(referralCode: string) {

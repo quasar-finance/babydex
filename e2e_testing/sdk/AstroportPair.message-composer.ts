@@ -6,9 +6,9 @@
 
 import type { Coin } from "@cosmjs/amino";
 import type { MsgExecuteContractEncodeObject } from "@cosmjs/cosmwasm-stargate";
-import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
 import { toUtf8 } from "@cosmjs/encoding";
-import type { AssetInfo, Binary, Uint128, Decimal, Asset } from "./AstroportPair.types";
+import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
+import type { Asset, AssetInfo, Binary, Decimal, Uint128 } from "./AstroportPair.types";
 export interface AstroportPairMsg {
   contractAddress: string;
   sender: string;

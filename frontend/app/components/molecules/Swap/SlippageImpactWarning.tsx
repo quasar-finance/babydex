@@ -1,6 +1,6 @@
 import { IconInfoCircle } from "@tabler/icons-react";
-import { twMerge } from "~/utils/twMerge";
 import { Spinner } from "~/app/components/atoms/Spinner";
+import { twMerge } from "~/utils/twMerge";
 
 interface Props {
   priceImpact: number;

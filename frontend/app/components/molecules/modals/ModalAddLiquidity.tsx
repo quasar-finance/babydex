@@ -1,19 +1,19 @@
 import { useMemo, useRef, useState } from "react";
 import { Button } from "~/app/components/atoms/Button";
-import BasicModal from "~/app/components/templates/BasicModal";
 import Divider from "~/app/components/atoms/Divider";
+import BasicModal from "~/app/components/templates/BasicModal";
 
-import type { PoolInfo } from "@towerfi/types";
 import { useAccount } from "@cosmi/react";
-import { ModalTypes } from "~/types/modal";
-import { useModal } from "~/app/providers/ModalProvider";
-import { DoubleSideAddLiquidity } from "../DoubleSideAddLiquidity";
+import { IconSettingsFilled } from "@tabler/icons-react";
+import type { PoolInfo } from "@towerfi/types";
 import { FormProvider, useForm } from "react-hook-form";
+import { useModal } from "~/app/providers/ModalProvider";
+import { ModalTypes } from "~/types/modal";
+import { twMerge } from "~/utils/twMerge";
 import AssetsStacked from "../../atoms/AssetsStacked";
 import { Popover, PopoverContent, PopoverTrigger } from "../../atoms/Popover";
+import { DoubleSideAddLiquidity } from "../DoubleSideAddLiquidity";
 import MaxSlippageSwitcher from "../MaxSlippageSwitcher";
-import { IconSettingsFilled } from "@tabler/icons-react";
-import { twMerge } from "~/utils/twMerge";
 
 interface Props {
   pool: PoolInfo;

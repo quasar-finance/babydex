@@ -1,9 +1,9 @@
-import { afterEach, beforeEach, expect, type Mock, test, vi } from "vitest";
-import { createReferralService } from "../src/";
-import sanitizedConfig from "./config";
-import { generateReferralCode, verifyCosmosSignature } from "../src/referral";
 import { createClient } from "@supabase/supabase-js";
 import type { CosmosSignedMessage } from "@towerfi/types";
+import { type Mock, afterEach, beforeEach, expect, test, vi } from "vitest";
+import { createReferralService } from "../src/";
+import { generateReferralCode, verifyCosmosSignature } from "../src/referral";
+import sanitizedConfig from "./config";
 
 vi.mock("@cosmjs/amino", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@cosmjs/amino")>();
@@ -51,9 +51,9 @@ vi.mock("@cosmjs/crypto", async (importOriginal) => {
 // Re-import the mocked functions after mocking the modules
 // These imports will now refer to the mocked versions of the @cosmjs functions
 import { pubkeyToAddress } from "@cosmjs/amino";
-import { decodePubkey } from "@cosmjs/proto-signing";
-import { fromBase64 } from "@cosmjs/encoding";
 import { Secp256k1, Secp256k1Signature } from "@cosmjs/crypto";
+import { fromBase64 } from "@cosmjs/encoding";
+import { decodePubkey } from "@cosmjs/proto-signing";
 
 const options = {
   db: { schema: "v1_cosmos" },

@@ -2,10 +2,10 @@ import { appRouter, createCoingeckoService, createLruService } from "@towerfi/tr
 import { createTRPCReact, getFetch, httpBatchLink, loggerLink, splitLink } from "@trpc/react-query";
 
 import type { AppRouter } from "@towerfi/trpc";
-import { createLocalTRPCLink } from "./router";
-import { contracts, Assets } from "~/config";
-import { createPublicClient, http } from "cosmi";
+import { http, createPublicClient } from "cosmi";
+import { Assets, contracts } from "~/config";
 import { babylon } from "~/config/chains/babylon";
+import { createLocalTRPCLink } from "./router";
 
 const cacheService = createLruService();
 const coingeckoService = createCoingeckoService({ cacheService });

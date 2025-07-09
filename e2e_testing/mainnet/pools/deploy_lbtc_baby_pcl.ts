@@ -1,6 +1,6 @@
 import deployed from "../../deployed.json";
-import { AstroportFactoryClient } from "../../sdk/AstroportFactory.client";
 import { getClientAndAddress } from "../../lib";
+import { AstroportFactoryClient } from "../../sdk/AstroportFactory.client";
 
 const toBase64 = (object: any) => {
   return Buffer.from(JSON.stringify(object)).toString("base64");

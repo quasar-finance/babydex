@@ -4,24 +4,24 @@
  * and run the @cosmwasm/ts-codegen generate command to regenerate this file.
  */
 
-import * as _0 from "./AstroportFactory.types";
 import * as _1 from "./AstroportFactory.client";
 import * as _2 from "./AstroportFactory.message-composer";
-import * as _3 from "./AstroportIncentives.types";
+import * as _0 from "./AstroportFactory.types";
 import * as _4 from "./AstroportIncentives.client";
 import * as _5 from "./AstroportIncentives.message-composer";
-import * as _6 from "./AstroportNativeCoinRegistry.types";
+import * as _3 from "./AstroportIncentives.types";
 import * as _7 from "./AstroportNativeCoinRegistry.client";
 import * as _8 from "./AstroportNativeCoinRegistry.message-composer";
-import * as _9 from "./AstroportPair.types";
+import * as _6 from "./AstroportNativeCoinRegistry.types";
 import * as _10 from "./AstroportPair.client";
 import * as _11 from "./AstroportPair.message-composer";
-import * as _12 from "./AstroportPairConcentrated.types";
+import * as _9 from "./AstroportPair.types";
 import * as _13 from "./AstroportPairConcentrated.client";
 import * as _14 from "./AstroportPairConcentrated.message-composer";
-import * as _15 from "./AstroportRouter.types";
+import * as _12 from "./AstroportPairConcentrated.types";
 import * as _16 from "./AstroportRouter.client";
 import * as _17 from "./AstroportRouter.message-composer";
+import * as _15 from "./AstroportRouter.types";
 export namespace contracts {
   export const AstroportFactory = {
     ..._0,

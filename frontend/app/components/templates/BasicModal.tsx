@@ -1,6 +1,6 @@
+import { IconX } from "@tabler/icons-react";
 import { motion } from "motion/react";
 import { useModal } from "~/app/providers/ModalProvider";
-import { IconX } from "@tabler/icons-react";
 import { twMerge } from "~/utils/twMerge";
 import Divider from "../atoms/Divider";
 

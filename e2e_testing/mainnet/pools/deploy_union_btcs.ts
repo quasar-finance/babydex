@@ -1,8 +1,8 @@
-import deployed from "../deployed.json";
 import { AstroportFactoryClient } from "../../sdk/AstroportFactory.client";
+import { EBABY, LBTCUnion, PumpBTCUnion, SolvBTCUnion, stBTCUnion, uniBTCUnion } from "../assets";
+import deployed from "../deployed.json";
 import { getClientAndAddress } from "../lib";
 import { pclNarrowParams, pclWideParams } from "../pcl_params";
-import { uniBTCUnion, LBTCUnion, SolvBTCUnion, PumpBTCUnion, stBTCUnion, EBABY } from "../assets";
 
 const toBase64 = (object: any) => {
   return Buffer.from(JSON.stringify(object)).toString("base64");

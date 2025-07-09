@@ -1,5 +1,5 @@
-import type React from "react";
 import Script from "next/script";
+import type React from "react";
 
 export const AnalyticsScripts: React.FC = () => {
   return (

@@ -1,8 +1,8 @@
 import * as fs from "node:fs";
-import deployed from "./deployed.json";
-import contracts from "./contracts.json";
 import { getClientAndAddress } from "../lib";
 import { AstroportFactoryClient } from "../sdk/AstroportFactory.client";
+import contracts from "./contracts.json";
+import deployed from "./deployed.json";
 
 const WASM_PATH = "../../artifacts/$path.wasm";
 const CONTRACTS = ["astroport_pair", "astroport_pair_concentrated"];

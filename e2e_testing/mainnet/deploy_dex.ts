@@ -1,15 +1,15 @@
-import deployed from "./deployed.json";
-import config from "./config.json";
-import contracts from "./contracts.json";
-import { getClientAndAddress } from "./lib";
 import * as fs from "node:fs";
 import type { InstantiateMsg as FactoryInitMsg, PairConfig } from "../sdk/AstroportFactory.types";
-import type { InstantiateMsg as CoinRegistryInitMsg } from "../sdk/AstroportNativeCoinRegistry.types";
 import type {
-  IncentivizationFeeInfo,
   InstantiateMsg as IncentivesInitMsg,
+  IncentivizationFeeInfo,
 } from "../sdk/AstroportIncentives.types";
+import type { InstantiateMsg as CoinRegistryInitMsg } from "../sdk/AstroportNativeCoinRegistry.types";
 import type { AssetInfo } from "../sdk/AstroportPair.types";
+import config from "./config.json";
+import contracts from "./contracts.json";
+import deployed from "./deployed.json";
+import { getClientAndAddress } from "./lib";
 
 const main = async () => {
   const { client, address } = await getClientAndAddress();

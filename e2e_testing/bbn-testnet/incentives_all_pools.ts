@@ -1,7 +1,7 @@
-import deployed from "./deployed.json";
-import { AstroportFactoryClient } from "../sdk/AstroportFactory.client";
 import { getClientAndAddress } from "../lib";
+import { AstroportFactoryClient } from "../sdk/AstroportFactory.client";
 import { AstroportIncentivesClient } from "../sdk/AstroportIncentives.client";
+import deployed from "./deployed.json";
 
 const main = async () => {
   const { client, address } = await getClientAndAddress();

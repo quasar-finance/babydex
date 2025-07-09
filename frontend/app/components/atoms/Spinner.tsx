@@ -1,5 +1,5 @@
 "use client";
-import { extendVariants, Spinner as NextSpinner } from "@heroui/react";
+import { Spinner as NextSpinner, extendVariants } from "@heroui/react";
 
 export const Spinner = extendVariants(NextSpinner, {
   variants: {

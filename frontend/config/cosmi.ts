@@ -1,4 +1,4 @@
-import { createConfig, http, keplrish } from "@cosmi/react";
+import { http, createConfig, keplrish } from "@cosmi/react";
 import { babylon } from "~/config/chains/babylon";
 import { multisig } from "~/multisig/connector";
 

@@ -1,10 +1,10 @@
 "use client";
 
-import type React from "react";
 import type { PoolInfo } from "@towerfi/types";
-import { twMerge } from "~/utils/twMerge";
-import { useTVL } from "~/app/hooks/useTVL";
+import type React from "react";
 import { formatNumber } from "~/app/hooks/usePrices";
+import { useTVL } from "~/app/hooks/useTVL";
+import { twMerge } from "~/utils/twMerge";
 
 interface Props extends Pick<PoolInfo, "poolLiquidity" | "poolAddress" | "assets"> {
   className?: string;

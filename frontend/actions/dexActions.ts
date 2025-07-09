@@ -1,53 +1,53 @@
-import type { Transport, Chain, Account } from "cosmi/types";
+import type { Account, Chain, Transport } from "cosmi/types";
 
 import {
-  addLiquidity,
   type AddLiquidityParameters,
   type AddLiquidityReturnType,
+  addLiquidity,
 } from "./addLiquidity";
 
 import {
-  withdrawLiquidity,
   type WithdrawLiquidityParameters,
   type WithdrawLiquidityReturnType,
+  withdrawLiquidity,
 } from "./withdrawLiquidity";
 
 import {
-  stakeLiquidity,
   type StakeLiquidityParameters,
   type StakeLiquidityReturnType,
+  stakeLiquidity,
 } from "./stakeLiquidity";
 
 import {
-  unstakeLiquidity,
   type UnstakeLiquidityParameters,
   type UnstakeLiquidityReturnType,
+  unstakeLiquidity,
 } from "./unstakeLiquidity";
 
 import {
-  claimRewards,
   type ClaimRewardsParameters,
   type ClaimRewardsReturnType,
+  claimRewards,
 } from "./claimRewards";
 
 import {
-  getCw20Allowance,
   type GetCw20AllowanceParameters,
   type GetCw20AllowanceReturnType,
+  getCw20Allowance,
 } from "./getCw20Allowance";
 import {
-  getCw20Balance,
   type GetCw20BalanceParameters,
   type GetCw20BalanceReturnType,
+  getCw20Balance,
 } from "./getCw20Balance";
 
+import type { ClientWithActions } from "~/multisig/client/types";
 import {
-  increaseAllowance,
   type IncreaseAllowanceParameters,
   type IncreaseAllowanceReturnType,
+  increaseAllowance,
 } from "./increaseAllowance";
-import { poolSwap, type PoolSwapParameters, type PoolSwapReturnType } from "./poolSwap";
-import type { ClientWithActions } from "~/multisig/client/types";
+import { type PoolSwapParameters, type PoolSwapReturnType, poolSwap } from "./poolSwap";
 
 export type DexActions<
   _transport extends Transport = Transport,

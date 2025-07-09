@@ -1,5 +1,5 @@
-import { AstroportFactoryClient } from "../sdk/AstroportFactory.client";
 import { getClientAndAddress } from "../lib";
+import { AstroportFactoryClient } from "../sdk/AstroportFactory.client";
 import deployed from "./deployed.json";
 
 const toBase64 = (object: any) => {

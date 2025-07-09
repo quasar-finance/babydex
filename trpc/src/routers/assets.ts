@@ -1,7 +1,7 @@
-import { createCallerFactory, createTRPCPublicProcedure, createTRPCRouter } from "../config.js";
 import { z } from "zod";
+import { createCallerFactory, createTRPCPublicProcedure, createTRPCRouter } from "../config.js";
 
-import type { WithPrice, Currency, CW20Currency } from "@towerfi/types";
+import type { CW20Currency, Currency, WithPrice } from "@towerfi/types";
 import { appRouter } from "../router.js";
 
 export const assetsRouter = createTRPCRouter({

@@ -1,9 +1,9 @@
+import { coin } from "@cosmjs/proto-signing";
+import { getClientAndAddress } from "../lib";
+import { AstroportFactoryClient } from "../sdk/AstroportFactory.client";
+import { AstroportRouterClient } from "../sdk/AstroportRouter.client";
 import deployed from "./deployed.json";
 import tokens from "./tokens.json"; // Assuming this file contains token decimal information
-import { AstroportRouterClient } from "../sdk/AstroportRouter.client";
-import { AstroportFactoryClient } from "../sdk/AstroportFactory.client";
-import { getClientAndAddress } from "../lib";
-import { coin } from "@cosmjs/proto-signing";
 
 async function findPairAddress(
   factoryClient: AstroportFactoryClient,

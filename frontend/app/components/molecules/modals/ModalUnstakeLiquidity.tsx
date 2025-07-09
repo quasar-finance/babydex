@@ -5,20 +5,20 @@ import { twMerge } from "~/utils/twMerge";
 
 import Divider from "~/app/components/atoms/Divider";
 
-import type { PoolInfo, UserPoolBalances } from "@towerfi/types";
-import AssetsStacked from "../../atoms/AssetsStacked";
-import Pill from "../../atoms/Pill";
-import Input from "../../atoms/Input";
-import { RangeSelector } from "../../atoms/RangeSelector";
-import { AssetAmountSquare } from "../../atoms/AssetAmountSquare";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useDexClient } from "~/app/hooks/useDexClient";
 import { useAccount } from "@cosmi/react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { PoolInfo, UserPoolBalances } from "@towerfi/types";
+import { useToast } from "~/app/hooks";
+import { useDexClient } from "~/app/hooks/useDexClient";
+import { useWithdrawSimulation } from "~/app/hooks/useWithdrawSimulation";
 import { contracts } from "~/config";
 import { trpc } from "~/trpc/client";
-import { useWithdrawSimulation } from "~/app/hooks/useWithdrawSimulation";
-import { useToast } from "~/app/hooks";
 import { toFullNumberString } from "~/utils/intl";
+import { AssetAmountSquare } from "../../atoms/AssetAmountSquare";
+import AssetsStacked from "../../atoms/AssetsStacked";
+import Input from "../../atoms/Input";
+import Pill from "../../atoms/Pill";
+import { RangeSelector } from "../../atoms/RangeSelector";
 
 interface Props {
   pool: PoolInfo;

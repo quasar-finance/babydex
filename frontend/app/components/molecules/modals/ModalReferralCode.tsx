@@ -1,19 +1,19 @@
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type React from "react";
-import BasicModal from "~/app/components/templates/BasicModal";
-import WithConnectedWallet from "../../atoms/WithConnectedWallet";
-import { Button } from "../../atoms/Button";
-import { ModalTypes } from "~/types/modal";
-import { useModal } from "~/app/providers/ModalProvider";
-import { useAccount } from "wagmi";
-import useSignArbitrary from "~/app/hooks/useSignArbitrary";
-import { trpc } from "~/trpc/client";
-import { useToast } from "~/app/hooks";
 import { useCallback } from "react";
 import { ConfettiExplosion } from "react-confetti-explosion";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { useAccount } from "wagmi";
+import BasicModal from "~/app/components/templates/BasicModal";
+import { useToast } from "~/app/hooks";
+import useSignArbitrary from "~/app/hooks/useSignArbitrary";
+import { useModal } from "~/app/providers/ModalProvider";
+import { trpc } from "~/trpc/client";
+import { ModalTypes } from "~/types/modal";
 import { inviteBoostBps } from "~/utils/consts";
 import { bpsToFloat } from "~/utils/intl";
+import { Button } from "../../atoms/Button";
+import WithConnectedWallet from "../../atoms/WithConnectedWallet";
 
 const ModalReferralCode: React.FC<{ referralCode: string }> = ({ referralCode }) => {
   const router = useRouter();

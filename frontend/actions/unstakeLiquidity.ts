@@ -1,5 +1,5 @@
-import type { Account, Chain, CometBftRpcSchema, Transport } from "cosmi/types";
 import type { ExecuteReturnType } from "cosmi/client";
+import type { Account, Chain, CometBftRpcSchema, Transport } from "cosmi/types";
 import type { ClientWithActions } from "~/multisig/client/types";
 
 export type UnstakeLiquidityParameters = {

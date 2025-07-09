@@ -3,8 +3,8 @@ import { useAccount, useSigningClient } from "@cosmi/react";
 import { useMutation } from "@tanstack/react-query";
 import { getCw20Allowance } from "~/actions/getCw20Allowance";
 import { increaseAllowance as increaseAllowanceAction } from "~/actions/increaseAllowance";
-import { useToast } from "./useToast";
 import { TxError } from "~/utils/formatTxErrors";
+import { useToast } from "./useToast";
 
 export function useCw20Allowance() {
   const { toast } = useToast();

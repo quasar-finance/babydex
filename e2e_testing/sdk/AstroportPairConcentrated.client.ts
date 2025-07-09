@@ -4,26 +4,26 @@
  * and run the @cosmwasm/ts-codegen generate command to regenerate this file.
  */
 
-import type {
-  CosmWasmClient,
-  SigningCosmWasmClient,
-  ExecuteResult,
-} from "@cosmjs/cosmwasm-stargate";
 import type { Coin, StdFee } from "@cosmjs/amino";
 import type {
+  CosmWasmClient,
+  ExecuteResult,
+  SigningCosmWasmClient,
+} from "@cosmjs/cosmwasm-stargate";
+import type {
+  ArrayOfAsset,
+  Asset,
   AssetInfo,
   Binary,
-  Uint128,
-  Decimal,
-  Asset,
-  Decimal256,
   ConfigResponse,
   CumulativePricesResponse,
+  Decimal,
+  Decimal256,
   PairInfo,
   PoolResponse,
   ReverseSimulationResponse,
-  ArrayOfAsset,
   SimulationResponse,
+  Uint128,
 } from "./AstroportPairConcentrated.types";
 export interface AstroportPairConcentratedReadOnlyInterface {
   contractAddress: string;

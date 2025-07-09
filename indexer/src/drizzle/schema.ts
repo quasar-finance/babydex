@@ -1,20 +1,20 @@
-import {
-  pgSchema,
-  foreignKey,
-  integer,
-  text,
-  bigint,
-  timestamp,
-  index,
-  serial,
-  boolean,
-  numeric,
-  jsonb,
-  smallint,
-  doublePrecision,
-  json,
-} from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
+import {
+  bigint,
+  boolean,
+  doublePrecision,
+  foreignKey,
+  index,
+  integer,
+  json,
+  jsonb,
+  numeric,
+  pgSchema,
+  serial,
+  smallint,
+  text,
+  timestamp,
+} from "drizzle-orm/pg-core";
 
 export const v1Cosmos = pgSchema("v1_cosmos");
 export const hubble = pgSchema("hubble");

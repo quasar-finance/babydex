@@ -1,8 +1,8 @@
-import deployed from "../deployed.json";
 import { AstroportFactoryClient } from "../../sdk/AstroportFactory.client";
+import { BABY, EBABY } from "../assets";
+import deployed from "../deployed.json";
 import { getClientAndAddress } from "../lib";
 import { pclLSDParams } from "../pcl_params";
-import { BABY, EBABY } from "../assets";
 
 const toBase64 = (object: any) => {
   return Buffer.from(JSON.stringify(object)).toString("base64");

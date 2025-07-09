@@ -1,8 +1,8 @@
 import type { Currency, PoolMetricSerialized } from "@towerfi/types";
-import { usePrices } from "./usePrices";
-import { convertMicroDenomToDenom } from "~/utils/intl";
-import { DefaultPoolMetric } from "~/utils/consts";
 import { useMemo } from "react";
+import { DefaultPoolMetric } from "~/utils/consts";
+import { convertMicroDenomToDenom } from "~/utils/intl";
+import { usePrices } from "./usePrices";
 
 export function useVolume(assets: Currency[], metrics?: PoolMetricSerialized | null) {
   if (metrics == null) {

@@ -1,5 +1,5 @@
-import { persist, subscribeWithSelector } from "zustand/middleware";
 import { create } from "zustand";
+import { persist, subscribeWithSelector } from "zustand/middleware";
 
 type State = {
   slippage: string;

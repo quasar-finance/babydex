@@ -1,4 +1,4 @@
-import type { Client, Transport, Chain, Account, CometBftRpcSchema, Coin } from "cosmi/types";
+import type { Account, Chain, Client, Coin, CometBftRpcSchema, Transport } from "cosmi/types";
 import type { SigningActions } from "./signingActions";
 
 export type MsgExecuteContract = {

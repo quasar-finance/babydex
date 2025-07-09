@@ -1,15 +1,15 @@
 import { relations } from "drizzle-orm/relations";
 import {
-  chainsInHubble,
-  contractStatusInHubble,
-  clientsInHubble,
-  consensusHeightsInHubble,
   assetsInHubble,
   blocksInV1Cosmos,
-  eventsInV1Cosmos,
-  transactionsInV1Cosmos,
+  chainsInHubble,
+  clientsInHubble,
+  consensusHeightsInHubble,
+  contractStatusInHubble,
   contractsInV1Cosmos,
+  eventsInV1Cosmos,
   tokenInV1Cosmos,
+  transactionsInV1Cosmos,
 } from "./schema.js";
 
 export const contractStatusInHubbleRelations = relations(contractStatusInHubble, ({ one }) => ({

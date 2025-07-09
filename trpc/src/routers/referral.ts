@@ -1,5 +1,5 @@
-import { createTRPCPublicProcedure, createTRPCRouter } from "../config.js";
 import { z } from "zod";
+import { createTRPCPublicProcedure, createTRPCRouter } from "../config.js";
 
 const cosmosSignedMessage = z.object({
   signature: z.string(), // Base64 encoded signature

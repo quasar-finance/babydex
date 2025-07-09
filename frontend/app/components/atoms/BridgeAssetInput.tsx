@@ -1,15 +1,15 @@
-import type { Currency } from "@towerfi/types";
-import { useController, type Control } from "react-hook-form";
-import { convertMicroDenomToDenom, IntlAddress } from "~/utils/intl";
-import { motion } from "motion/react";
 import { IconChevronDown, IconWallet } from "@tabler/icons-react";
+import type { Currency } from "@towerfi/types";
+import { motion } from "motion/react";
+import { type Control, useController } from "react-hook-form";
+import { IntlAddress, convertMicroDenomToDenom } from "~/utils/intl";
 
-import { ModalTypes } from "~/types/modal";
+import { useAccount } from "@cosmi/react";
+import { useUserBalances } from "~/app/hooks/useUserBalances";
 import { useModal } from "~/app/providers/ModalProvider";
 import { Assets } from "~/config";
-import { useAccount } from "@cosmi/react";
+import { ModalTypes } from "~/types/modal";
 import { assetNumberMask } from "~/utils/masks";
-import { useUserBalances } from "~/app/hooks/useUserBalances";
 import Divider from "./Divider";
 
 type BridgeAssetInputProps = {

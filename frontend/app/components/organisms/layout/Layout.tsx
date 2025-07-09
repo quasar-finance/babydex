@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, type PropsWithChildren } from "react";
-import { Header } from "./Header";
-import { Footer } from "./Footer";
 import * as amplitude from "@amplitude/analytics-browser";
 import mixpanel from "mixpanel-browser";
+import { type PropsWithChildren, useEffect } from "react";
+import { Footer } from "./Footer";
+import { Header } from "./Header";
 
 if (typeof window !== "undefined") {
   amplitude.init("ea5eb25990baaab354865581cff0c417", undefined, {

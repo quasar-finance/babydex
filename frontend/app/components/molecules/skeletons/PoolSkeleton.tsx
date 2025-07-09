@@ -1,6 +1,6 @@
 import type React from "react";
-import Skeleton from "../../atoms/Skeleton";
 import { Fragment } from "react";
+import Skeleton from "../../atoms/Skeleton";
 
 interface Props {
   className?: string;

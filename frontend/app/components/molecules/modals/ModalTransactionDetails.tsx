@@ -1,7 +1,7 @@
-import BasicModal from "~/app/components/templates/BasicModal";
-import { Button } from "../../atoms/Button";
 import { IconCopy } from "@tabler/icons-react";
 import { useState } from "react";
+import BasicModal from "~/app/components/templates/BasicModal";
+import { Button } from "../../atoms/Button";
 
 interface ModalTransactionDetailsProps {
   transaction: any; // Replace with proper type

@@ -1,16 +1,16 @@
 "use client";
 
-import { Button } from "../atoms/Button";
-import { DefaultPoints } from "~/utils/consts";
-import { Overview } from "../organisms/points/Overview";
-import { Leaderboard } from "../organisms/points/Leaderboard";
-import Pill from "../atoms/Pill";
-import { trpc } from "~/trpc/client";
 import { useAccount } from "@cosmi/react";
-import WithConnectedWallet from "../atoms/WithConnectedWallet";
+import Link from "next/link";
 import type React from "react";
 import { useMemo } from "react";
-import Link from "next/link";
+import { trpc } from "~/trpc/client";
+import { DefaultPoints } from "~/utils/consts";
+import { Button } from "../atoms/Button";
+import Pill from "../atoms/Pill";
+import WithConnectedWallet from "../atoms/WithConnectedWallet";
+import { Leaderboard } from "../organisms/points/Leaderboard";
+import { Overview } from "../organisms/points/Overview";
 import Referral from "../organisms/points/Referral";
 
 const GetPointsButton: React.FC<{ className: string }> = ({ className }) => (

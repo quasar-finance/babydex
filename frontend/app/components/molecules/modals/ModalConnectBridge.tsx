@@ -1,14 +1,14 @@
-import BasicModal from "~/app/components/templates/BasicModal";
-import { Button } from "~/app/components/atoms/Button";
 import Image from "next/image";
+import { Button } from "~/app/components/atoms/Button";
+import BasicModal from "~/app/components/templates/BasicModal";
 
-import type React from "react";
 import { useAccount, useConnectors } from "@cosmi/react";
-import { babylon } from "~/config/chains/babylon";
-import { useState } from "react";
-import CopyMessage from "../../atoms/CopyMessage";
-import { IntlAddress } from "~/utils/intl";
 import { IconCopy, IconLogout } from "@tabler/icons-react";
+import type React from "react";
+import { useState } from "react";
+import { babylon } from "~/config/chains/babylon";
+import { IntlAddress } from "~/utils/intl";
+import CopyMessage from "../../atoms/CopyMessage";
 
 function ConnectorButton({ connector, onClick }: { connector: any; onClick: () => void }) {
   const { name, id, isInstalled } = connector;

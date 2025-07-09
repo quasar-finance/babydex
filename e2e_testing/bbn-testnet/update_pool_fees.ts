@@ -1,8 +1,8 @@
-import deployed from "./deployed.json";
-import { AstroportFactoryClient } from "../sdk/AstroportFactory.client";
 import { getClientAndAddress } from "../lib";
-import { AstroportPairConcentratedClient } from "../sdk/AstroportPairConcentrated.client";
+import { AstroportFactoryClient } from "../sdk/AstroportFactory.client";
 import { AstroportPairClient } from "../sdk/AstroportPair.client";
+import { AstroportPairConcentratedClient } from "../sdk/AstroportPairConcentrated.client";
+import deployed from "./deployed.json";
 
 interface EnableFeeShareParams {
   fee_share_bps: number; // TypeScript doesn't have u16, so we use number

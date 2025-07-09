@@ -1,7 +1,7 @@
-import deployed from "../deployed.json";
 import { AstroportFactoryClient } from "../../sdk/AstroportFactory.client";
-import { getClientAndAddress } from "../lib";
 import { SolvBTC, USDC } from "../assets";
+import deployed from "../deployed.json";
+import { getClientAndAddress } from "../lib";
 import { pclNarrowParams, pclWideParams } from "../pcl_params";
 
 const toBase64 = (object: any) => {

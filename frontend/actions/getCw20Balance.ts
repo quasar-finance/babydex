@@ -1,5 +1,5 @@
-import type { Account, Chain, Client, CometBftRpcSchema, Transport } from "cosmi/types";
 import { queryContractSmart } from "cosmi/client";
+import type { Account, Chain, Client, CometBftRpcSchema, Transport } from "cosmi/types";
 
 export type GetCw20BalanceParameters = {
   address: string;

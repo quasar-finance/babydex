@@ -1,9 +1,9 @@
-import { createTRPCRouter, createTRPCPublicProcedure } from "./config.js";
-import { userRouter } from "./routers/user.js";
-import { poolsRouter } from "./routers/pools.js";
+import { createTRPCPublicProcedure, createTRPCRouter } from "./config.js";
 import { assetsRouter } from "./routers/assets.js";
 import { indexerRouter } from "./routers/indexer.js";
+import { poolsRouter } from "./routers/pools.js";
 import { referralRouter } from "./routers/referral.js";
+import { userRouter } from "./routers/user.js";
 
 export const edgeRouter = createTRPCRouter({
   user: userRouter,

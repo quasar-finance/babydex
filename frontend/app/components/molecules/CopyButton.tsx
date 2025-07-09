@@ -1,6 +1,6 @@
+import { IconCopy, IconCopyCheck } from "@tabler/icons-react";
 import { Fragment, useRef, useState } from "react";
 import { Button } from "../atoms/Button";
-import { IconCopy, IconCopyCheck } from "@tabler/icons-react";
 
 const CopyButton: React.FC<
   {

@@ -1,8 +1,8 @@
 import { useAccount } from "@cosmi/react";
-import CopyMessage from "../atoms/CopyMessage";
-import { IntlAddress } from "~/utils/intl";
 import { IconCopy, IconLogout } from "@tabler/icons-react";
+import { IntlAddress } from "~/utils/intl";
 import { Button } from "../atoms/Button";
+import CopyMessage from "../atoms/CopyMessage";
 
 export const WalletDetails: React.FC = () => {
   const { address = "", connector, chain, isConnected } = useAccount();

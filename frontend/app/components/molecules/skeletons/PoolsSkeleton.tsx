@@ -1,8 +1,8 @@
 import type React from "react";
-import Skeleton from "../../atoms/Skeleton";
 import AssetsStacked from "../../atoms/AssetsStacked";
-import Pill from "../../atoms/Pill";
 import { Button } from "../../atoms/Button";
+import Pill from "../../atoms/Pill";
+import Skeleton from "../../atoms/Skeleton";
 import { TableRow } from "../../atoms/Table";
 
 interface Props {

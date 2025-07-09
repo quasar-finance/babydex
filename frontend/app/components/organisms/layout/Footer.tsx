@@ -1,10 +1,10 @@
+import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import type React from "react";
 import { socialLinks, supportLinks } from "~/utils/consts";
-import IconSocial from "../../atoms/icons/IconSocial";
-import { usePathname } from "next/navigation";
 import { asciiLetters } from "../../ascii/letters";
-import { motion, AnimatePresence } from "motion/react";
+import IconSocial from "../../atoms/icons/IconSocial";
 
 export const Footer: React.FC = () => {
   const pathname = usePathname();

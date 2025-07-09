@@ -1,9 +1,9 @@
 "use client";
 import {
-  extendVariants,
   Popover as NextPopover,
-  PopoverTrigger as NextPopoverTrigger,
   PopoverContent as NextPopoverContent,
+  PopoverTrigger as NextPopoverTrigger,
+  extendVariants,
 } from "@heroui/react";
 
 export const Popover = extendVariants(NextPopover, {

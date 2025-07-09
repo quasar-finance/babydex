@@ -1,8 +1,8 @@
-import { Menu, MenuButton, MenuItems, MenuItem } from "@headlessui/react";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
+import { IconCheck, IconChevronDown } from "@tabler/icons-react";
+import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { twMerge } from "~/utils/twMerge";
-import { IconCheck, IconChevronDown } from "@tabler/icons-react";
-import { motion, AnimatePresence } from "motion/react";
 
 type Label = string | React.ReactNode;
 type Item = { value: string; label: Label };

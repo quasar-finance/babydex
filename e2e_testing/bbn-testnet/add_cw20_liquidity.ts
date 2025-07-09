@@ -1,7 +1,7 @@
+import { type Coin, coin } from "@cosmjs/proto-signing";
 import { getClientAndAddress } from "../lib";
 import { AstroportPairConcentratedClient } from "../sdk/AstroportPairConcentrated.client";
 import type { Asset } from "../sdk/AstroportPairConcentrated.types";
-import { type Coin, coin } from "@cosmjs/proto-signing";
 
 const main = async () => {
   const { client, address } = await getClientAndAddress();

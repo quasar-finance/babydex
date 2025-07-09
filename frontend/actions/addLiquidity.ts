@@ -1,8 +1,8 @@
-import type { ExecuteReturnType } from "cosmi/client";
-import type { Chain, Account, Transport } from "cosmi/types";
-import type { ClientWithActions } from "~/multisig/client/types";
 import { setInnerValueToAsset } from "@towerfi/trpc";
 import type { Currency } from "@towerfi/types";
+import type { ExecuteReturnType } from "cosmi/client";
+import type { Account, Chain, Transport } from "cosmi/types";
+import type { ClientWithActions } from "~/multisig/client/types";
 import { buildIncreaseAllowanceMsg } from "./increaseAllowance";
 
 export type AddLiquidityParameters = AddLiquidityMsgParams;

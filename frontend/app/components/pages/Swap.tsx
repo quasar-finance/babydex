@@ -1,22 +1,22 @@
 "use client";
 
-import { IconArrowsLeftRight, IconRepeat, IconSettingsFilled } from "@tabler/icons-react";
-import { Button } from "../atoms/Button";
-import { ModalTypes } from "~/types/modal";
-import { useModal } from "~/app/providers/ModalProvider";
-import { motion } from "motion/react";
-import SwapInfoAccordion from "../molecules/Swap/SwapInfoAccordion";
 import { useAccount, useBalances } from "@cosmi/react";
-import { Tab, TabList, TabContent, Tabs } from "../atoms/Tabs";
-import { SkipSwap } from "../organisms/swap/Swap";
-import { Bridge } from "../organisms/swap/Bridge";
-import { useSkipClient } from "~/app/hooks/useSkipClient";
+import { IconArrowsLeftRight, IconRepeat, IconSettingsFilled } from "@tabler/icons-react";
+import { motion } from "motion/react";
+import { Suspense, useMemo, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useToast } from "~/app/hooks";
-import { Suspense, useMemo, useState } from "react";
+import { useSkipClient } from "~/app/hooks/useSkipClient";
 import { useSwapStore } from "~/app/hooks/useSwapStore";
-import TruncateText from "../atoms/TruncateText";
+import { useModal } from "~/app/providers/ModalProvider";
+import { ModalTypes } from "~/types/modal";
+import { Button } from "../atoms/Button";
 import { Spinner } from "../atoms/Spinner";
+import { Tab, TabContent, TabList, Tabs } from "../atoms/Tabs";
+import TruncateText from "../atoms/TruncateText";
+import SwapInfoAccordion from "../molecules/Swap/SwapInfoAccordion";
+import { Bridge } from "../organisms/swap/Bridge";
+import { SkipSwap } from "../organisms/swap/Swap";
 
 const SwapComponent: React.FC = () => {
   const [action, setAction] = useState("swap");

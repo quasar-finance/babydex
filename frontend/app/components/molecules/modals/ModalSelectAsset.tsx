@@ -1,15 +1,15 @@
 import type { Currency } from "@towerfi/types";
 import { useCallback, useState } from "react";
 
+import clsx from "clsx";
 import Input from "~/app/components/atoms/Input";
 import BasicModal from "~/app/components/templates/BasicModal";
+import { usePrices } from "~/app/hooks/usePrices";
+import { useUserBalances } from "~/app/hooks/useUserBalances";
 import { useModal } from "~/app/providers/ModalProvider";
 import { convertMicroDenomToDenom } from "~/utils/intl";
-import TruncateText from "../../atoms/TruncateText";
-import { useUserBalances } from "~/app/hooks/useUserBalances";
-import { usePrices } from "~/app/hooks/usePrices";
 import Tooltip from "../../atoms/Tooltip";
-import clsx from "clsx";
+import TruncateText from "../../atoms/TruncateText";
 
 type ModalSelectAssetProps = {
   assets: (Currency & { disabled?: boolean; tooltip?: string })[];

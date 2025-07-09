@@ -1,8 +1,8 @@
+import { makeADR36AminoSignDoc, serializeSignDoc } from "@keplr-wallet/cosmos";
 import type { Keplr } from "@keplr-wallet/types";
 import type { CosmosSignedMessage } from "@towerfi/types";
 import { useCallback } from "react";
 import { useAccount } from "wagmi";
-import { makeADR36AminoSignDoc, serializeSignDoc } from "@keplr-wallet/cosmos";
 import { babylon } from "~/config/chains/babylon";
 
 export default function useSignArbitrary() {

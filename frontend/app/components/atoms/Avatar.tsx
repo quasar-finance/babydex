@@ -1,7 +1,7 @@
 "use client";
-import { useMemo } from "react";
-import { createAvatar } from "@dicebear/core";
 import { identicon } from "@dicebear/collection";
+import { createAvatar } from "@dicebear/core";
+import { useMemo } from "react";
 import { twMerge } from "~/utils/twMerge";
 
 interface AvatarProps {

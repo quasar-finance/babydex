@@ -1,11 +1,11 @@
-import Link from "next/link";
-import { NavLinks } from "./NavLinks";
-import { MenuMobile } from "./MenuMobile";
-import { useState } from "react";
-import { ConnectWallet } from "../../molecules/ConnectWallet";
-import { Hamburguer } from "../../atoms/Hamburguer";
-import { useMediaQuery } from "~/app/hooks";
 import { IconCircleDot } from "@tabler/icons-react";
+import Link from "next/link";
+import { useState } from "react";
+import { useMediaQuery } from "~/app/hooks";
+import { Hamburguer } from "../../atoms/Hamburguer";
+import { ConnectWallet } from "../../molecules/ConnectWallet";
+import { MenuMobile } from "./MenuMobile";
+import { NavLinks } from "./NavLinks";
 
 export const Header: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);

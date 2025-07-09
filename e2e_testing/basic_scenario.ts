@@ -1,7 +1,7 @@
 import deployed from "./bbn-testnet/deployed.json";
 import config from "./config.json";
-import { AstroportFactoryClient } from "./sdk/AstroportFactory.client";
 import { getClientAndAddress } from "./lib";
+import { AstroportFactoryClient } from "./sdk/AstroportFactory.client";
 import { AstroportIncentivesClient } from "./sdk/AstroportIncentives.client";
 
 const toBase64 = (object: any) => {

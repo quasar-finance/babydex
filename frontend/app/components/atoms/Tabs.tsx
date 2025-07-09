@@ -1,6 +1,6 @@
+import { AnimatePresence, motion } from "motion/react";
 import React from "react";
-import { createContext, type PropsWithChildren, useContext, useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { type PropsWithChildren, createContext, useContext, useState } from "react";
 import { twMerge } from "~/utils/twMerge";
 
 interface TabsProps {

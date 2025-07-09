@@ -1,8 +1,8 @@
-import deployed from "../deployed.json";
+import { type Coin, coin } from "@cosmjs/stargate";
 import { AstroportFactoryClient } from "../../sdk/AstroportFactory.client";
-import { getClientAndAddress } from "../lib";
-import { coin, type Coin } from "@cosmjs/stargate";
 import { AstroportPairClient } from "../../sdk/AstroportPair.client";
+import deployed from "../deployed.json";
+import { getClientAndAddress } from "../lib";
 
 const toBase64 = (object: any) => {
   return Buffer.from(JSON.stringify(object)).toString("base64");

@@ -1,8 +1,8 @@
-import type React from "react";
-import { navLinks } from "~/utils/consts";
 import { motion } from "motion/react";
 import { usePathname, useRouter } from "next/navigation";
+import type React from "react";
 import { useEffect, useState } from "react";
+import { navLinks } from "~/utils/consts";
 
 interface Props {
   closeMenu?: () => void;

@@ -1,7 +1,3 @@
-import { drizzle } from "drizzle-orm/node-postgres";
-import { Pool } from "pg";
-import { asc, desc, eq, inArray, or, sql, type SQL } from "drizzle-orm";
-import { StringChunk } from "drizzle-orm/sql/sql";
 import type {
   AggregatedMetrics,
   Points,
@@ -9,20 +5,24 @@ import type {
   PoolMetric,
   PoolMetricSerialized,
 } from "@towerfi/types";
+import { type SQL, asc, desc, eq, inArray, or, sql } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { StringChunk } from "drizzle-orm/sql/sql";
+import { Pool } from "pg";
 
+import { bigint, integer, numeric, pgSchema, serial, text, timestamp } from "drizzle-orm/pg-core";
 import {
   materializedAddLiquidityInV1Cosmos,
   materializedHistoricPoolYieldInV1Cosmos,
   materializedIncentivizeInV1Cosmos,
   materializedPoolBalanceInV1Cosmos,
-  materializedPoolsInV1Cosmos,
   materializedPoolUserSharesInV1Cosmos,
+  materializedPoolsInV1Cosmos,
   materializedStakeLiquidityInV1Cosmos,
   materializedSwapInV1Cosmos,
   materializedUnstakeLiquidityInV1Cosmos,
   materializedWithdrawLiquidityInV1Cosmos,
 } from "./drizzle/schema.js";
-import { bigint, integer, numeric, pgSchema, serial, text, timestamp } from "drizzle-orm/pg-core";
 
 const v1Cosmos = pgSchema("v1_cosmos");
 const userShares = v1Cosmos.table("pool_user_shares", {

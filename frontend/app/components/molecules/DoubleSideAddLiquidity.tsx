@@ -1,20 +1,20 @@
-import { useFormContext } from "react-hook-form";
+import { useAccount } from "@cosmi/react";
+import { IconWallet } from "@tabler/icons-react";
 import type { PoolInfo } from "@towerfi/types";
 import type React from "react";
-import { useAccount } from "@cosmi/react";
-import { convertDenomToMicroDenom, convertMicroDenomToDenom, formatDecimals } from "~/utils/intl";
-import { useToast } from "~/app/hooks";
-import { IconWallet } from "@tabler/icons-react";
-import { trpc } from "~/trpc/client";
-import { useModal } from "~/app/providers/ModalProvider";
-import { ModalTypes } from "~/types/modal";
-import type { DepositFormData } from "./modals/ModalAddLiquidity";
 import { useImperativeHandle, useMemo } from "react";
-import { useDexClient } from "~/app/hooks/useDexClient";
-import { TxError } from "~/utils/formatTxErrors";
-import { useUserBalances } from "~/app/hooks/useUserBalances";
+import { useFormContext } from "react-hook-form";
+import { useToast } from "~/app/hooks";
 import { useCw20Allowance } from "~/app/hooks/useCw20Allowance";
+import { useDexClient } from "~/app/hooks/useDexClient";
 import { usePrices } from "~/app/hooks/usePrices";
+import { useUserBalances } from "~/app/hooks/useUserBalances";
+import { useModal } from "~/app/providers/ModalProvider";
+import { trpc } from "~/trpc/client";
+import { ModalTypes } from "~/types/modal";
+import { TxError } from "~/utils/formatTxErrors";
+import { convertDenomToMicroDenom, convertMicroDenomToDenom, formatDecimals } from "~/utils/intl";
+import type { DepositFormData } from "./modals/ModalAddLiquidity";
 
 interface Props {
   pool: PoolInfo;

@@ -1,16 +1,16 @@
-import type { Currency } from "@towerfi/types";
-import { useController, type Control } from "react-hook-form";
-import { convertMicroDenomToDenom } from "~/utils/intl";
-import { motion } from "motion/react";
 import { IconChevronDown, IconWallet } from "@tabler/icons-react";
+import type { Currency } from "@towerfi/types";
+import { motion } from "motion/react";
+import { type Control, useController } from "react-hook-form";
+import { convertMicroDenomToDenom } from "~/utils/intl";
 
-import { ModalTypes } from "~/types/modal";
+import clsx from "clsx";
+import { usePrices } from "~/app/hooks/usePrices";
+import { useUserBalances } from "~/app/hooks/useUserBalances";
 import { useModal } from "~/app/providers/ModalProvider";
 import { Assets } from "~/config";
+import { ModalTypes } from "~/types/modal";
 import { assetNumberMask } from "~/utils/masks";
-import { useUserBalances } from "~/app/hooks/useUserBalances";
-import { usePrices } from "~/app/hooks/usePrices";
-import clsx from "clsx";
 
 type AssetInputProps = {
   assets: Currency[];

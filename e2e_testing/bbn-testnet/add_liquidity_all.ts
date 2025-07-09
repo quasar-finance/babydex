@@ -1,9 +1,9 @@
+import { type Coin, coin } from "@cosmjs/proto-signing";
+import { getClientAndAddress } from "../lib";
+import { AstroportFactoryClient } from "../sdk/AstroportFactory.client";
+import { AstroportPairConcentratedClient } from "../sdk/AstroportPairConcentrated.client";
 import deployed from "./deployed.json";
 import tokens from "./tokens.json";
-import { AstroportFactoryClient } from "../sdk/AstroportFactory.client";
-import { getClientAndAddress } from "../lib";
-import { AstroportPairConcentratedClient } from "../sdk/AstroportPairConcentrated.client";
-import { type Coin, coin } from "@cosmjs/proto-signing";
 
 // Amount to add for each token (before decimal adjustment)
 const BASE_AMOUNT = 1;

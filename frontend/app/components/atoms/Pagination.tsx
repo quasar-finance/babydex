@@ -1,9 +1,9 @@
+import { IconChevronLeft, IconChevronRight, IconDots } from "@tabler/icons-react";
+import { motion } from "motion/react";
 import { useMemo, useState } from "react";
 import type React from "react";
-import { motion } from "motion/react";
 import { twMerge } from "~/utils/twMerge";
 import { Button } from "./Button";
-import { IconChevronLeft, IconChevronRight, IconDots } from "@tabler/icons-react";
 
 interface PaginationProps {
   total: number;

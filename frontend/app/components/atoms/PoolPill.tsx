@@ -1,10 +1,10 @@
 import { IconInfoCircleFilled } from "@tabler/icons-react";
 import type { PoolIncentive, PoolInfo } from "@towerfi/types";
+import { Assets } from "~/config";
+import { convertMicroDenomToDenom } from "~/utils/intl";
+import { twMerge } from "~/utils/twMerge";
 import Pill from "./Pill";
 import Tooltip from "./Tooltip";
-import { convertMicroDenomToDenom } from "~/utils/intl";
-import { Assets } from "~/config";
-import { twMerge } from "~/utils/twMerge";
 
 export const getPoolTypeDescription = (poolType: string, params?: PoolInfo["config"]["params"]) => {
   if (poolType === "concentrated") {

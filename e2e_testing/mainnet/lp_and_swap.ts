@@ -1,8 +1,8 @@
-import deployed from "./deployed.json";
-import { AstroportPairClient } from "../sdk/AstroportPair.client";
-import { getClientAndAddress } from "./lib";
-import { AstroportRouterClient } from "../sdk/AstroportRouter.client";
 import { coin } from "@cosmjs/proto-signing";
+import { AstroportPairClient } from "../sdk/AstroportPair.client";
+import { AstroportRouterClient } from "../sdk/AstroportRouter.client";
+import deployed from "./deployed.json";
+import { getClientAndAddress } from "./lib";
 
 interface PoolInfo {
   contractAddr: string;

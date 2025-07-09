@@ -1,8 +1,8 @@
 import { useAccount } from "@cosmi/react";
-import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { type RouteRequest, type RouteResponse, SkipClient } from "@skip-go/client";
-import type { WalletClient } from "viem";
+import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { useRef } from "react";
+import type { WalletClient } from "viem";
 
 type UseSkipClientParameters = {
   cacheKey?: string;

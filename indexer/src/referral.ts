@@ -1,7 +1,7 @@
-import { createClient } from "@supabase/supabase-js";
 import { pubkeyToAddress } from "@cosmjs/amino";
-import { fromBase64 } from "@cosmjs/encoding";
 import { Secp256k1, Secp256k1Signature } from "@cosmjs/crypto";
+import { fromBase64 } from "@cosmjs/encoding";
+import { createClient } from "@supabase/supabase-js";
 import type { CosmosSignedMessage, Points } from "@towerfi/types";
 
 /**

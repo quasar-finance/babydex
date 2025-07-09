@@ -1,12 +1,12 @@
-import BasicModal from "~/app/components/templates/BasicModal";
-import { Button } from "~/app/components/atoms/Button";
 import Image from "next/image";
+import { Button } from "~/app/components/atoms/Button";
+import BasicModal from "~/app/components/templates/BasicModal";
 import { useModal } from "~/app/providers/ModalProvider";
 
-import type React from "react";
 import { useAccount, useConnectors } from "@cosmi/react";
-import { babylon } from "~/config/chains/babylon";
+import type React from "react";
 import { useEffect } from "react";
+import { babylon } from "~/config/chains/babylon";
 
 function ConnectorButton({ connector, onClick }: { connector: any; onClick: () => void }) {
   const { name, id, isInstalled, icon } = connector;

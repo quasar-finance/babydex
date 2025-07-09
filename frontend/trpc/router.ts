@@ -1,9 +1,9 @@
+import { TRPCClientError, type TRPCLink } from "@trpc/client";
 import { initTRPC } from "@trpc/server";
 import { observable } from "@trpc/server/observable";
-import { TRPCClientError, type TRPCLink } from "@trpc/client";
 
-import type { AnyRouter } from "@trpc/server";
 import type { ContextOptions } from "@towerfi/trpc";
+import type { AnyRouter } from "@trpc/server";
 
 export const createInnerTRPCContext = (opts: ContextOptions) => {
   return opts;

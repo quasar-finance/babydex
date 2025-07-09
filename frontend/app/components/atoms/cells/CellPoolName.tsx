@@ -1,7 +1,7 @@
-import type React from "react";
-import AssetsStacked from "../AssetsStacked";
 import type { PoolIncentive, PoolInfo } from "@towerfi/types";
+import type React from "react";
 import { twMerge } from "~/utils/twMerge";
+import AssetsStacked from "../AssetsStacked";
 import { PoolFeePill, PoolIncentivesPill, PoolTypePill } from "../PoolPill";
 
 interface Props extends Pick<PoolInfo, "assets" | "name" | "poolType" | "config"> {

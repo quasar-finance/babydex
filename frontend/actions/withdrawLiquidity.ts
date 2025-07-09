@@ -1,6 +1,6 @@
-import type { Account, Chain, CometBftRpcSchema, Transport } from "cosmi/types";
 import type { ExecuteReturnType } from "cosmi/client";
-import { toUtf8, toBase64 } from "cosmi/utils";
+import type { Account, Chain, CometBftRpcSchema, Transport } from "cosmi/types";
+import { toBase64, toUtf8 } from "cosmi/utils";
 import type { ClientWithActions } from "~/multisig/client/types";
 
 export type WithdrawLiquidityParameters = {

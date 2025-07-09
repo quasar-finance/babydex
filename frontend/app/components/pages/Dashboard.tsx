@@ -1,15 +1,15 @@
 "use client";
 
-import type React from "react";
-import { Button } from "../atoms/Button";
-import { trpc } from "~/trpc/client";
 import { useAccount } from "@cosmi/react";
-import { UserPools } from "../organisms/dashboard/UserPools";
-import { useDexClient } from "~/app/hooks/useDexClient";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { contracts } from "~/config";
-import { useToast } from "~/app/hooks";
 import Link from "next/link";
+import type React from "react";
+import { useToast } from "~/app/hooks";
+import { useDexClient } from "~/app/hooks/useDexClient";
+import { contracts } from "~/config";
+import { trpc } from "~/trpc/client";
+import { Button } from "../atoms/Button";
+import { UserPools } from "../organisms/dashboard/UserPools";
 
 const Dashboard: React.FC = () => {
   const { address, chain } = useAccount();

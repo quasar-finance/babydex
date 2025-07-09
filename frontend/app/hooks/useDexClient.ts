@@ -1,6 +1,6 @@
 import { useSigningClient } from "@cosmi/react";
-import { dexActions } from "../../actions/dexActions";
 import { signingActions } from "~/multisig/client/signingActions";
+import { dexActions } from "../../actions/dexActions";
 
 export function useDexClient() {
   const { data: signingClient, ...rest } = useSigningClient();

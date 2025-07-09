@@ -1,5 +1,5 @@
 import { usePublicClient } from "@cosmi/react";
-import { useQuery, type UseQueryResult } from "@tanstack/react-query";
+import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { setInnerValueToAsset } from "@towerfi/trpc";
 import type { Currency, WithPrice } from "@towerfi/types";
 import BigNumber from "bignumber.js";

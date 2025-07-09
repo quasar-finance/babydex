@@ -1,12 +1,12 @@
 "use client";
 
+import { usePublicClient } from "@cosmi/react";
 import { useQuery } from "@tanstack/react-query";
-import { Assets } from "~/config";
+import { setInnerValueToAsset } from "@towerfi/trpc";
 import type { Currency } from "@towerfi/types";
 import type { Prettify } from "cosmi/types";
+import { Assets } from "~/config";
 import { convertDenomToMicroDenom, convertMicroDenomToDenom } from "~/utils/intl";
-import { usePublicClient } from "@cosmi/react";
-import { setInnerValueToAsset } from "@towerfi/trpc";
 import type { UseSwapSimulationReturnType } from "./useSwapSimulation";
 
 export type FormatNumberOptions = {

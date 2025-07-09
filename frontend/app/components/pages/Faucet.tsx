@@ -1,19 +1,19 @@
 "use client";
 
+import ky from "ky";
 import type React from "react";
 import { useEffect, useState } from "react";
-import ky from "ky";
 
-import Turnstile from "react-cloudflare-turnstile";
 import { useAccount } from "@cosmi/react";
+import Turnstile from "react-cloudflare-turnstile";
 
+import { useToast } from "~/app/hooks";
 import { Button } from "../atoms/Button";
 import Dropdown from "../atoms/Dropdown";
 import Input from "../atoms/Input";
-import { useToast } from "~/app/hooks";
 
-import Link from "next/link";
 import { useMutation } from "@tanstack/react-query";
+import Link from "next/link";
 import { BabylonTestnetAssets as Assets } from "~/config/assets/babylon/testnet";
 
 const FAUCET_API_URL = process.env.NEXT_PUBLIC_FAUCET_API_URL ?? "";

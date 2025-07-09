@@ -1,11 +1,11 @@
-import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
-import { createRedisService } from "../services/redis.js";
-import { createCoingeckoService } from "../services/coingecko.js";
 import { createIndexerService, createReferralService } from "@towerfi/indexer";
+import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
+import { createCoingeckoService } from "../services/coingecko.js";
+import { createRedisService } from "../services/redis.js";
 
-import { edgeRouter } from "../router.js";
-import { createPublicClient, http } from "cosmi";
+import { http, createPublicClient } from "cosmi";
 import { createTRPCRouter } from "../config.js";
+import { edgeRouter } from "../router.js";
 
 interface Env {
   CONTRACTS: string;

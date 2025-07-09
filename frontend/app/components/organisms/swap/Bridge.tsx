@@ -1,14 +1,14 @@
+import { IconChevronDown } from "@tabler/icons-react";
+import type { Bridge as BridgeType, Currency } from "@towerfi/types";
+import { AnimatePresence, motion } from "motion/react";
+import Link from "next/link";
 import type React from "react";
 import { useEffect, useMemo, useState } from "react";
-import { Assets } from "~/config";
-import { Button } from "../../atoms/Button";
-import Link from "next/link";
-import { motion, AnimatePresence } from "motion/react";
-import { IconChevronDown } from "@tabler/icons-react";
 import { useModal } from "~/app/providers/ModalProvider";
-import type { Bridge as BridgeType, Currency } from "@towerfi/types";
+import { Assets } from "~/config";
 import { ModalTypes } from "~/types/modal";
 import { twMerge } from "~/utils/twMerge";
+import { Button } from "../../atoms/Button";
 
 const assetsWithBridgeTooltip = Object.values(Assets).map((a) => {
   return {

@@ -1,24 +1,24 @@
 "use client";
 
-import { trpc } from "~/trpc/client";
-import BackButton from "../atoms/BackButton";
-import PoolSkeleton from "../molecules/skeletons/PoolSkeleton";
+import { useAccount } from "@cosmi/react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Fragment, useCallback, useState } from "react";
+import { useModal } from "~/app/providers/ModalProvider";
+import { trpc } from "~/trpc/client";
+import { ModalTypes } from "~/types/modal";
 import AssetsStacked from "../atoms/AssetsStacked";
+import BackButton from "../atoms/BackButton";
+import { Button } from "../atoms/Button";
+import { FadeInOut } from "../atoms/FadeInOut";
+import { type Period, PeriodToggle, periodToNumber } from "../atoms/PeriodToggle";
 import { PoolFeePill, PoolIncentivesPill, PoolTypePill } from "../atoms/PoolPill";
 import Skeleton from "../atoms/Skeleton";
-import { Metrics } from "../organisms/pool/Metrics";
-import { PeriodToggle, periodToNumber, type Period } from "../atoms/PeriodToggle";
-import { Overview } from "../organisms/pool/Overview";
-import { useAccount } from "@cosmi/react";
-import { Button } from "../atoms/Button";
-import { ModalTypes } from "~/types/modal";
-import { UserPositions } from "../organisms/pool/UserPositions";
-import { useModal } from "~/app/providers/ModalProvider";
 import { ModalAddLiquidity } from "../molecules/modals/ModalAddLiquidity";
-import { FadeInOut } from "../atoms/FadeInOut";
+import PoolSkeleton from "../molecules/skeletons/PoolSkeleton";
+import { Metrics } from "../organisms/pool/Metrics";
+import { Overview } from "../organisms/pool/Overview";
 import { Swap } from "../organisms/pool/Swap";
-import { useQueryClient } from "@tanstack/react-query";
+import { UserPositions } from "../organisms/pool/UserPositions";
 
 const Pool: React.FC<{
   address: string;

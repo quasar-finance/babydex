@@ -1,11 +1,11 @@
 import type { RouteResponse } from "@skip-go/client";
 import { IconChevronDown } from "@tabler/icons-react";
+import BigNumber from "bignumber.js";
 import { useState } from "react";
 import { useSwapStore } from "~/app/hooks/useSwapStore";
+import { Assets } from "~/config";
 import { bpsToFloat, convertMicroDenomToDenom, maxSlippageToBps } from "~/utils/intl";
 import { twMerge } from "~/utils/twMerge";
-import { Assets } from "~/config";
-import BigNumber from "bignumber.js";
 
 interface Props {
   simulation?: Pick<

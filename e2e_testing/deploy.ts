@@ -1,13 +1,13 @@
 import * as fs from "node:fs";
-import type { InstantiateMsg as FactoryInitMsg, PairConfig } from "./sdk/AstroportFactory.types";
-import type { InstantiateMsg as CoinRegistryInitMsg } from "./sdk/AstroportNativeCoinRegistry.types";
-import type {
-  IncentivizationFeeInfo,
-  InstantiateMsg as IncentivesInitMsg,
-} from "./sdk/AstroportIncentives.types";
-import type { AssetInfo } from "./sdk/AstroportPair.types";
 import config from "./config.json";
 import { getClientAndAddress } from "./lib";
+import type { InstantiateMsg as FactoryInitMsg, PairConfig } from "./sdk/AstroportFactory.types";
+import type {
+  InstantiateMsg as IncentivesInitMsg,
+  IncentivizationFeeInfo,
+} from "./sdk/AstroportIncentives.types";
+import type { InstantiateMsg as CoinRegistryInitMsg } from "./sdk/AstroportNativeCoinRegistry.types";
+import type { AssetInfo } from "./sdk/AstroportPair.types";
 
 const WASM_PATH = "../artifacts/$path.wasm";
 const CONTRACTS = [

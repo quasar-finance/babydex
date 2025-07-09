@@ -1,9 +1,9 @@
 import type { PoolInfo } from "@towerfi/types";
-import { useWithdrawSimulation } from "./useWithdrawSimulation";
-import { usePrices } from "./usePrices";
 import { useEffect, useMemo } from "react";
-import { convertMicroDenomToDenom } from "~/utils/intl";
 import { create } from "zustand";
+import { convertMicroDenomToDenom } from "~/utils/intl";
+import { usePrices } from "./usePrices";
+import { useWithdrawSimulation } from "./useWithdrawSimulation";
 
 interface PoolTVLRecordStore {
   records: Record<string, number>;

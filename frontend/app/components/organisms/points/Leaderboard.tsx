@@ -1,11 +1,11 @@
-import type React from "react";
-import { Table, type Column } from "../../atoms/Table";
-import { twMerge } from "~/utils/twMerge";
-import { trpc } from "~/trpc/client";
-import Skeleton from "../../atoms/Skeleton";
 import { useAccount } from "@cosmi/react";
 import type { Points } from "@towerfi/types";
+import type React from "react";
 import { useMemo } from "react";
+import { trpc } from "~/trpc/client";
+import { twMerge } from "~/utils/twMerge";
+import Skeleton from "../../atoms/Skeleton";
+import { type Column, Table } from "../../atoms/Table";
 
 export const Leaderboard: React.FC<{ userPoints: Points }> = ({ userPoints }) => {
   const { data: allPoints, isLoading: allPointsLoading } = trpc.edge.indexer.getPoints.useQuery({

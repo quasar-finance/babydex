@@ -1,8 +1,8 @@
-import deployed from "./deployed.json";
-import { AstroportFactoryClient } from "../sdk/AstroportFactory.client";
 import { getClientAndAddress } from "../lib";
-import { AstroportPairConcentratedClient } from "../sdk/AstroportPairConcentrated.client";
+import { AstroportFactoryClient } from "../sdk/AstroportFactory.client";
 import { AstroportIncentivesClient } from "../sdk/AstroportIncentives.client";
+import { AstroportPairConcentratedClient } from "../sdk/AstroportPairConcentrated.client";
+import deployed from "./deployed.json";
 
 interface PoolInfo {
   contractAddr: string;

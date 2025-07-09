@@ -4,29 +4,29 @@
  * and run the @cosmwasm/ts-codegen generate command to regenerate this file.
  */
 
-import type {
-  CosmWasmClient,
-  SigningCosmWasmClient,
-  ExecuteResult,
-} from "@cosmjs/cosmwasm-stargate";
 import type { StdFee } from "@cosmjs/amino";
 import type {
-  AssetInfo,
-  Uint128,
-  IncentivizationFeeInfo,
-  Coin,
-  Binary,
-  InputSchedule,
-  ArrayOfTupleOfStringAndUint128,
+  CosmWasmClient,
+  ExecuteResult,
+  SigningCosmWasmClient,
+} from "@cosmjs/cosmwasm-stargate";
+import type {
+  ArrayOfAsset,
   ArrayOfAssetInfo,
-  Config,
+  ArrayOfRewardInfo,
   ArrayOfScheduleResponse,
+  ArrayOfString,
+  ArrayOfTupleOfStringAndUint128,
+  AssetInfo,
+  Binary,
   // biome-ignore lint/suspicious/noShadowRestrictedNames: <explanation>
   Boolean,
-  ArrayOfString,
-  ArrayOfAsset,
+  Coin,
+  Config,
+  IncentivizationFeeInfo,
+  InputSchedule,
   PoolInfoResponse,
-  ArrayOfRewardInfo,
+  Uint128,
 } from "./AstroportIncentives.types";
 export interface AstroportIncentivesReadOnlyInterface {
   contractAddress: string;

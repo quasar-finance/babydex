@@ -4,16 +4,16 @@
  * and run the @cosmwasm/ts-codegen generate command to regenerate this file.
  */
 
-import type {
-  CosmWasmClient,
-  SigningCosmWasmClient,
-  ExecuteResult,
-} from "@cosmjs/cosmwasm-stargate";
 import type { Coin, StdFee } from "@cosmjs/amino";
 import type {
-  Config,
-  CoinResponse,
+  CosmWasmClient,
+  ExecuteResult,
+  SigningCosmWasmClient,
+} from "@cosmjs/cosmwasm-stargate";
+import type {
   ArrayOfCoinResponse,
+  CoinResponse,
+  Config,
 } from "./AstroportNativeCoinRegistry.types";
 export interface AstroportNativeCoinRegistryReadOnlyInterface {
   contractAddress: string;

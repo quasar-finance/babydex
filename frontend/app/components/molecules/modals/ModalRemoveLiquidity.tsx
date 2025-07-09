@@ -6,18 +6,18 @@ import { twMerge } from "~/utils/twMerge";
 import Divider from "~/app/components/atoms/Divider";
 import { contracts } from "~/config";
 
-import type { PoolInfo, UserPoolBalances } from "@towerfi/types";
-import AssetsStacked from "../../atoms/AssetsStacked";
-import Pill from "../../atoms/Pill";
-import Input from "../../atoms/Input";
-import { RangeSelector } from "../../atoms/RangeSelector";
-import { useDexClient } from "~/app/hooks/useDexClient";
-import { useMutation } from "@tanstack/react-query";
 import { useAccount } from "@cosmi/react";
-import { AssetAmountSquare } from "../../atoms/AssetAmountSquare";
-import { useWithdrawSimulation } from "~/app/hooks/useWithdrawSimulation";
+import { useMutation } from "@tanstack/react-query";
+import type { PoolInfo, UserPoolBalances } from "@towerfi/types";
 import { useToast } from "~/app/hooks";
+import { useDexClient } from "~/app/hooks/useDexClient";
+import { useWithdrawSimulation } from "~/app/hooks/useWithdrawSimulation";
 import { useModal } from "~/app/providers/ModalProvider";
+import { AssetAmountSquare } from "../../atoms/AssetAmountSquare";
+import AssetsStacked from "../../atoms/AssetsStacked";
+import Input from "../../atoms/Input";
+import Pill from "../../atoms/Pill";
+import { RangeSelector } from "../../atoms/RangeSelector";
 
 interface ModalRemoveLiquidityProps {
   pool: PoolInfo;

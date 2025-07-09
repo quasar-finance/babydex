@@ -1,5 +1,5 @@
 "use client";
-import { extendVariants, Button as NextButton } from "@heroui/react";
+import { Button as NextButton, extendVariants } from "@heroui/react";
 
 export const Button = extendVariants(NextButton, {
   variants: {

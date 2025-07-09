@@ -1,12 +1,12 @@
 "use client";
 
-import type React from "react";
-import { twMerge } from "~/utils/twMerge";
-import { formatNumber } from "~/app/hooks/usePrices";
 import type { PoolMetricSerialized } from "@towerfi/types";
 import type { Currency } from "@towerfi/types";
-import type { Period } from "../PeriodToggle";
+import type React from "react";
+import { formatNumber } from "~/app/hooks/usePrices";
 import { useVolume } from "~/app/hooks/useVolume";
+import { twMerge } from "~/utils/twMerge";
+import type { Period } from "../PeriodToggle";
 
 interface Props {
   title: string;

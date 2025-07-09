@@ -1,11 +1,11 @@
+import type { Currency, WithPrice } from "@towerfi/types";
 import type React from "react";
+import { useWithdrawSimulation } from "~/app/hooks/useWithdrawSimulation";
 import { twMerge } from "~/utils/twMerge";
 import Tooltip from "../Tooltip";
-import type { Currency, WithPrice } from "@towerfi/types";
-import { useWithdrawSimulation } from "~/app/hooks/useWithdrawSimulation";
 
-import { convertMicroDenomToDenom, toFullNumberString } from "~/utils/intl";
 import { formatNumber, usePrices } from "~/app/hooks/usePrices";
+import { convertMicroDenomToDenom, toFullNumberString } from "~/utils/intl";
 
 interface Props {
   title: string;

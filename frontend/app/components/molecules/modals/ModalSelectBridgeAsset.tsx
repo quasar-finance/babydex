@@ -3,13 +3,13 @@ import { useCallback, useState } from "react";
 
 import Input from "~/app/components/atoms/Input";
 import BasicModal from "~/app/components/templates/BasicModal";
+import { useUserBalances } from "~/app/hooks/useUserBalances";
 import { useModal } from "~/app/providers/ModalProvider";
 import { convertMicroDenomToDenom } from "~/utils/intl";
-import TruncateText from "../../atoms/TruncateText";
-import { useUserBalances } from "~/app/hooks/useUserBalances";
-import { Button } from "../../atoms/Button";
 import { twMerge } from "~/utils/twMerge";
+import { Button } from "../../atoms/Button";
 import Divider from "../../atoms/Divider";
+import TruncateText from "../../atoms/TruncateText";
 
 type ModalSelectBridgeAssetProps = {
   assets: Currency[];

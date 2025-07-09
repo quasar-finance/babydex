@@ -1,7 +1,7 @@
 import type { PoolIncentive, PoolMetricSerialized } from "@towerfi/types";
-import { usePrices } from "./usePrices";
-import { convertMicroDenomToDenom } from "~/utils/intl";
 import { DefaultPoolMetric } from "~/utils/consts";
+import { convertMicroDenomToDenom } from "~/utils/intl";
+import { usePrices } from "./usePrices";
 
 const yearInSeconds = 31557600;
 

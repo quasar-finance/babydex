@@ -1,15 +1,15 @@
+import { IconCopy, IconExternalLink } from "@tabler/icons-react";
 import type { PoolInfo } from "@towerfi/types";
+import { useToast } from "~/app/hooks";
 import { useSwapSimulation } from "~/app/hooks/useSwapSimulation";
+import { trpc } from "~/trpc/client";
+import { copyToClipboard } from "~/utils/browser";
 import { convertDenomToMicroDenom, convertMicroDenomToDenom } from "~/utils/intl";
+import { addressShorten } from "~/utils/masks";
+import { type Period, periodToNumber } from "../../atoms/PeriodToggle";
 import Skeleton from "../../atoms/Skeleton";
 import { CellPoints } from "../../atoms/cells/CellPoints";
-import { trpc } from "~/trpc/client";
-import { type Period, periodToNumber } from "../../atoms/PeriodToggle";
 import { IncentivesOverview } from "./IncentivesOverview";
-import { addressShorten } from "~/utils/masks";
-import { IconCopy, IconExternalLink } from "@tabler/icons-react";
-import { copyToClipboard } from "~/utils/browser";
-import { useToast } from "~/app/hooks";
 
 export const Overview: React.FC<{ pool: PoolInfo; aprTimeframe: Period }> = ({
   pool,

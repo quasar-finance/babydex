@@ -1,16 +1,16 @@
 "use client";
 
 import type React from "react";
-import Avatar from "../atoms/Avatar";
-import { Button } from "../atoms/Button";
 import { useModal } from "~/app/providers/ModalProvider";
 import { ModalTypes } from "~/types/modal";
+import Avatar from "../atoms/Avatar";
+import { Button } from "../atoms/Button";
 
-import { IntlAddress } from "~/utils/intl";
 import { useAccount } from "@cosmi/react";
+import { useEffect, useState } from "react";
+import { IntlAddress } from "~/utils/intl";
 import { Popover, PopoverContent, PopoverTrigger } from "../atoms/Popover";
 import { WalletDetails } from "./WalletDetails";
-import { useEffect, useState } from "react";
 
 export const ConnectWallet: React.FC = () => {
   const { showModal } = useModal();

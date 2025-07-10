@@ -1,7 +1,8 @@
 import {expect, test} from 'vitest';
 import {createIndexerService} from '../src/';
-import {IndexerDbCredentials, views} from "../src/indexer";
+import { views} from "../src/indexer";
 import sanitizedConfig from "./config";
+import {IndexerDbCredentials} from "@towerfi/types";
 
 const config = {
   host: sanitizedConfig.SUPABASE_HOST,

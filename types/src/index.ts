@@ -28,6 +28,8 @@ export type {
 } from "./contracts.js";
 
 export type {
+  IndexerDbCredentials,
+  IndexerFilters,
   UserPoolBalances,
   PoolMetric,
   PoolMetricSerialized,

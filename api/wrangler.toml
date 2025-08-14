@@ -1,0 +1,62 @@
+name = "babydex-api"
+main = "src/worker.ts"
+compatibility_date = "2024-01-01"
+node_compat = true
+
+[build]
+command = "pnpm build"
+
+# KV Namespace for caching
+[[kv_namespaces]]
+binding = "KV_BINDING"
+id = "04ce16804ad8420d88246be9cc70947d" # Add your KV namespace ID here after creating it
+
+# Hyperdrive for database connections
+[[hyperdrive]]
+binding = "HYPERDRIVE"
+id = "45c1359f565f422180b84bd77a8c35b0"
+
+# Environment Variables
+[vars]
+# Contract addresses - update with your actual contract addresses
+FACTORY_CONTRACT="bbn1suhgf5svhu4usrurvxzlgn54ksxmn8gljarjtxqnapv8kjnp4nrs3tkuvr"
+ROUTER_CONTRACT="bbn1466nf3zuxpya8q9emxukd7vftaf6h4psr0a07srl5zw74zh84yjqczkw9f"
+INCENTIVES_CONTRACT="bbn1xr3rq8yvd7qplsw5yx90ftsr2zdhg4e9z60h5duusgxpv72hud3swvshgw"
+COIN_REGISTRY_CONTRACT="bbn1hrpna9v7vs3stzyd4z3xf00676kf78zpe2u5ksvljswn2vnjp3ysx8e0sz"
+
+# RPC Configuration
+RPC_ENDPOINT = "https://babylon-rpc.tower.fi/"
+
+# API Configuration
+API_MODE = "hybrid"
+
+# Cache Configuration
+CACHE_MAX_SIZE = "1000"
+CACHE_DEFAULT_TTL = "60000"
+
+# Database configuration (secrets - set via wrangler secret)
+# Run these commands to set the database secrets:
+# wrangler secret put SUPABASE_HOST
+# wrangler secret put SUPABASE_PORT
+# wrangler secret put SUPABASE_USER
+# wrangler secret put SUPABASE_PW
+# wrangler secret put SUPABASE_DB
+# wrangler secret put SUPABASE_SSL
+
+# Deployment configuration
+[placement]
+mode = "smart"
+
+# Worker limits and settings
+# Note: Free tier allows up to 10ms, Paid tier allows up to 30s (30000ms)
+# Setting to 10000ms (10 second) for database operations since our database is badly optimized at the moment
+[limits]
+cpu_ms = 10000
+
+# Logging configuration
+[observability]
+enabled = true
+
+# Development configuration
+[env.development]
+name = "babydex-api-dev"

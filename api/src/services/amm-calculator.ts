@@ -16,8 +16,20 @@ export class AMMCalculator {
     poolAddress: string,
     baseAssetInfo: any,
     targetAssetInfo: any,
-    poolReserves: PoolAsset[]
+    poolReserves: PoolAsset[],
+    decimalsMap?: Map<string, number>
   ): Promise<{ bid: number; ask: number; spread: number }> {
+    // Get decimals for both tokens
+    let baseDecimals = 6;
+    let targetDecimals = 6;
+    
+    if (decimalsMap) {
+      const baseTokenId = baseAssetInfo.native_token?.denom || baseAssetInfo.token?.contract_addr || '';
+      const targetTokenId = targetAssetInfo.native_token?.denom || targetAssetInfo.token?.contract_addr || '';
+      baseDecimals = decimalsMap.get(baseTokenId) || 6;
+      targetDecimals = decimalsMap.get(targetTokenId) || 6;
+    }
+
     // Use 0.1% of base reserve for price discovery
     // This is a small enough amount to minimize price impact
     const baseReserve = poolReserves[0].amount;
@@ -34,8 +46,10 @@ export class AMMCalculator {
           amount: baseTestAmount
         }
       );
-      // Ask price = base_amount / target_amount_received
-      const askPrice = Number(baseTestAmount) / Number(askSimulation.return_amount);
+      // Ask price = base_amount / target_amount_received (adjusted for decimals)
+      const baseAmountNormalized = Number(baseTestAmount) / Math.pow(10, baseDecimals);
+      const targetAmountNormalized = Number(askSimulation.return_amount) / Math.pow(10, targetDecimals);
+      const askPrice = baseAmountNormalized / targetAmountNormalized;
       
       // Bid price: How much base we get for target (selling target for base)
       const bidSimulation = await this.contractService.simulateSwap(
@@ -45,15 +59,19 @@ export class AMMCalculator {
           amount: targetTestAmount
         }
       );
-      // Bid price = base_amount_received / target_amount
-      const bidPrice = Number(bidSimulation.return_amount) / Number(targetTestAmount);
+      // Bid price = base_amount_received / target_amount (adjusted for decimals)
+      const baseReturnNormalized = Number(bidSimulation.return_amount) / Math.pow(10, baseDecimals);
+      const targetInputNormalized = Number(targetTestAmount) / Math.pow(10, targetDecimals);
+      const bidPrice = baseReturnNormalized / targetInputNormalized;
       
       const spread = (askPrice - bidPrice) / askPrice;
       
       return { bid: bidPrice, ask: askPrice, spread };
     } catch (error) {
       // Fallback to simple calculation if simulation fails
-      const currentPrice = Number(targetReserve) / Number(baseReserve);
+      const baseNormalized = Number(baseReserve) / Math.pow(10, baseDecimals);
+      const targetNormalized = Number(targetReserve) / Math.pow(10, targetDecimals);
+      const currentPrice = targetNormalized / baseNormalized;
       const defaultSpread = 0.003; // 0.3% default
       return {
         bid: currentPrice * (1 - defaultSpread),
@@ -71,25 +89,49 @@ export class AMMCalculator {
     offerAsset: any,
     offerReserve: string,
     returnReserve: string,
-    isOfferBase: boolean = true
+    isOfferBase: boolean = true,
+    decimalsMap?: Map<string, number>
   ): Promise<number> {
+    // Get decimals for proper price calculation
+    let offerDecimals = 6;
+    let returnDecimals = 6;
+    
+    if (decimalsMap && offerAsset.info) {
+      const offerTokenId = offerAsset.info.native_token?.denom || offerAsset.info.token?.contract_addr || '';
+      offerDecimals = decimalsMap.get(offerTokenId) || 6;
+      // For return decimals, we need to find the other token in the pool
+      // This is a simplified approach - ideally we'd pass this info explicitly
+      for (const [tokenId, decimals] of decimalsMap.entries()) {
+        if (tokenId !== offerTokenId) {
+          returnDecimals = decimals;
+          break;
+        }
+      }
+    }
+    
     try {
       const simulation = await this.contractService.simulateSwap(
         poolAddress,
         offerAsset
       );
       
-      // Calculate spot price before swap
+      // Calculate spot price before swap (normalized for decimals)
+      const offerReserveNormalized = Number(offerReserve) / Math.pow(10, offerDecimals);
+      const returnReserveNormalized = Number(returnReserve) / Math.pow(10, returnDecimals);
+      
       // If offering base (asset 0), price is return/offer
       // If offering target (asset 1), price is offer/return
       const spotPriceBefore = isOfferBase 
-        ? Number(returnReserve) / Number(offerReserve)
-        : Number(offerReserve) / Number(returnReserve);
+        ? returnReserveNormalized / offerReserveNormalized
+        : offerReserveNormalized / returnReserveNormalized;
       
-      // Effective price of this swap (same logic)
+      // Effective price of this swap (normalized for decimals)
+      const offerAmountNormalized = Number(offerAsset.amount) / Math.pow(10, offerDecimals);
+      const returnAmountNormalized = Number(simulation.return_amount) / Math.pow(10, returnDecimals);
+      
       const effectivePrice = isOfferBase
-        ? Number(simulation.return_amount) / Number(offerAsset.amount)
-        : Number(offerAsset.amount) / Number(simulation.return_amount);
+        ? returnAmountNormalized / offerAmountNormalized
+        : offerAmountNormalized / returnAmountNormalized;
       
       // Price impact is the difference between spot price and effective price
       const priceImpact = (spotPriceBefore - effectivePrice) / spotPriceBefore;
@@ -171,9 +213,54 @@ export class AMMCalculator {
   }
   
   /**
-   * Get the current spot price from pool reserves
+   * Get the current spot price from the contract using a minimal simulation
    */
-  static getSpotPrice(
+  async getSpotPrice(
+    poolAddress: string,
+    baseAssetInfo: any,
+    targetAssetInfo: any,
+    decimalsMap?: Map<string, number>
+  ): Promise<number> {
+    // Get decimals for proper price calculation
+    let baseDecimals = 6;
+    let targetDecimals = 6;
+    
+    if (decimalsMap) {
+      const baseTokenId = baseAssetInfo.native_token?.denom || baseAssetInfo.token?.contract_addr || '';
+      const targetTokenId = targetAssetInfo.native_token?.denom || targetAssetInfo.token?.contract_addr || '';
+      baseDecimals = decimalsMap.get(baseTokenId) || 6;
+      targetDecimals = decimalsMap.get(targetTokenId) || 6;
+    }
+
+    try {
+      // Use a very small amount (1 unit) to get spot price without significant impact
+      const testAmount = Math.pow(10, baseDecimals).toString(); // 1 token in base units
+      
+      const simulation = await this.contractService.simulateSwap(
+        poolAddress,
+        {
+          info: baseAssetInfo,
+          amount: testAmount
+        }
+      );
+      
+      // Calculate spot price: how much target we get for 1 base token
+      const baseAmountNormalized = Number(testAmount) / Math.pow(10, baseDecimals);
+      const targetAmountNormalized = Number(simulation.return_amount) / Math.pow(10, targetDecimals);
+      
+      return targetAmountNormalized / baseAmountNormalized;
+      
+    } catch (error) {
+      console.log('Failed to get spot price from simulation:', (error as Error).message);
+      // Return a default price of 1.0 if simulation fails
+      return 1.0;
+    }
+  }
+
+  /**
+   * Fallback method: Get spot price from pool reserves (static calculation)
+   */
+  static getSpotPriceFromReserves(
     baseReserve: string,
     targetReserve: string,
     baseDecimals: number = 6,

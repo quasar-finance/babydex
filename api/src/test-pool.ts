@@ -37,6 +37,13 @@ async function testPool() {
     // Get pool info
     console.log('Fetching pool information...\n');
     const pool = await contractService.getPool(poolAddress);
+    
+    // Get decimals for all assets in the pool
+    console.log('Fetching token decimals...');
+    const decimalsMap = await contractService.getBatchTokenDecimals(pool.asset_infos);
+    for (const [tokenId, decimals] of decimalsMap.entries()) {
+      console.log(`  ${tokenId}: ${decimals} decimals`);
+    }
     console.log('Pool Info:');
     console.log(`  LP Token: ${pool.liquidity_token}`);
     console.log(`  Pair Type: ${JSON.stringify(pool.pair_type)}`);
@@ -61,18 +68,38 @@ async function testPool() {
       const asset = poolShares.assets[i];
       const info = asset.info.native_token?.denom || asset.info.token?.contract_addr || 'unknown';
       const amount = BigInt(asset.amount);
-      const readable = Number(amount) / 1e6; // Assuming 6 decimals
+      const decimals = decimalsMap.get(info) || 6;
+      const readable = Number(amount) / Math.pow(10, decimals);
       console.log(`  Reserve ${i + 1}: ${asset.amount} (${readable.toFixed(6)}) of ${info}`);
     }
     
     // Calculate spot price
     if (poolShares.assets.length >= 2) {
-      const spotPrice = AMMCalculator.getSpotPrice(
-        poolShares.assets[0].amount,
-        poolShares.assets[1].amount
+      // Get decimals for both assets
+      const asset0Id = pool.asset_infos[0].native_token?.denom || pool.asset_infos[0].token?.contract_addr || '';
+      const asset1Id = pool.asset_infos[1].native_token?.denom || pool.asset_infos[1].token?.contract_addr || '';
+      const asset0Decimals = decimalsMap.get(asset0Id) || 6;
+      const asset1Decimals = decimalsMap.get(asset1Id) || 6;
+      
+      // Get spot price using contract simulation
+      const spotPrice = await ammCalculator.getSpotPrice(
+        poolAddress,
+        pool.asset_infos[0],
+        pool.asset_infos[1],
+        decimalsMap
       );
       console.log(`\nSpot Price: ${AMMCalculator.formatPrice(spotPrice)}`);
-      console.log('  (Price of asset 1 in terms of asset 2)');
+      console.log('  (Price from contract simulation - asset 1 in terms of asset 2)');
+      
+      // Also show the reserve-based calculation for comparison
+      const reservePrice = AMMCalculator.getSpotPriceFromReserves(
+        poolShares.assets[0].amount,
+        poolShares.assets[1].amount,
+        asset0Decimals,
+        asset1Decimals
+      );
+      console.log(`Reserve Price: ${AMMCalculator.formatPrice(reservePrice)}`);
+      console.log('  (Price from reserves - for comparison)');
       
       // Test bid/ask calculation
       console.log('\nCalculating bid/ask prices...');
@@ -82,7 +109,8 @@ async function testPool() {
           poolAddress,
           pool.asset_infos[0],
           pool.asset_infos[1],
-          poolShares.assets
+          poolShares.assets,
+          decimalsMap
         );
         
         console.log(`  Bid Price: ${AMMCalculator.formatPrice(bid)}`);
@@ -90,7 +118,7 @@ async function testPool() {
         console.log(`  Spread: ${(spread * 100).toFixed(3)}%`);
         
       } catch (error) {
-        console.log(`  Error calculating bid/ask: ${error.message}`);
+        console.log(`  Error calculating bid/ask: ${(error as Error).message}`);
       }
       
       // Test price impact for different trade sizes
@@ -110,14 +138,15 @@ async function testPool() {
             offerAsset,
             poolShares.assets[0].amount,
             poolShares.assets[1].amount,
-            true // offering base asset (asset 0)
+            true, // offering base asset (asset 0)
+            decimalsMap
           );
           
           const readable = Number(testAmount) / 1e6;
           console.log(`  ${(size * 100).toFixed(1)}% of reserve (${readable.toFixed(6)} tokens): ${(priceImpact * 100).toFixed(3)}% impact`);
           
         } catch (error) {
-          console.log(`  ${(size * 100).toFixed(1)}% of reserve: Error - ${error.message}`);
+          console.log(`  ${(size * 100).toFixed(1)}% of reserve: Error - ${(error as Error).message}`);
         }
       }
       
@@ -131,14 +160,14 @@ async function testPool() {
           console.log(`  Parameters: ${JSON.stringify(config.params, null, 2)}`);
         }
       } catch (error) {
-        console.log(`  Error fetching config: ${error.message}`);
+        console.log(`  Error fetching config: ${(error as Error).message}`);
       }
     }
     
   } catch (error) {
-    console.error('Error:', error.message);
-    if (error.stack) {
-      console.error('Stack:', error.stack);
+    console.error('Error:', (error as Error).message);
+    if ((error as Error).stack) {
+      console.error('Stack:', (error as Error).stack);
     }
   } finally {
     await contractService.disconnect();

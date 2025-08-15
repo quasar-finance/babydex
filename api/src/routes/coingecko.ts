@@ -64,6 +64,17 @@ coingeckoRoute.get('/tickers', async (c) => {
     // Get prices for all tokens
     const prices = await priceService.getBatchPrices(Array.from(tokenAddresses));
     
+    // Collect all asset infos for batch decimals fetching
+    const allAssetInfos: PoolAssetInfo[] = [];
+    for (const pool of pools) {
+      if (pool.asset_infos.length >= 2) {
+        allAssetInfos.push(...pool.asset_infos);
+      }
+    }
+    
+    // Get decimals for all tokens in batch
+    const decimalsMap = await contracts.getBatchTokenDecimals(allAssetInfos);
+    
     // Process each pool
     for (const pool of pools) {
       if (pool.asset_infos.length < 2) continue;
@@ -80,10 +91,18 @@ coingeckoRoute.get('/tickers', async (c) => {
       // Get AMM calculator from context
       const ammCalculator = c.get('ammCalculator');
       
-      // Calculate current price from reserves
-      const currentPrice = AMMCalculator.getSpotPrice(
-        poolShares.assets[0].amount,
-        poolShares.assets[1].amount
+      // Get decimals for price calculation
+      const baseTokenId = getTokenIdentifier(baseAsset);
+      const targetTokenId = getTokenIdentifier(targetAsset);
+      const baseDecimals = decimalsMap.get(baseTokenId) || 6;
+      const targetDecimals = decimalsMap.get(targetTokenId) || 6;
+      
+      // Calculate current price using contract simulation
+      const currentPrice = await ammCalculator.getSpotPrice(
+        poolAddress,
+        baseAsset,
+        targetAsset,
+        decimalsMap
       );
       
       // Calculate bid/ask using on-chain simulations
@@ -92,11 +111,12 @@ coingeckoRoute.get('/tickers', async (c) => {
         poolAddress,
         baseAsset,
         targetAsset,
-        poolShares.assets
+        poolShares.assets,
+        decimalsMap
       );
       
       // Calculate liquidity in USD
-      const liquidityUSD = AMMCalculator.calculateLiquidityUSD(poolShares.assets, prices);
+      const liquidityUSD = AMMCalculator.calculateLiquidityUSD(poolShares.assets, prices, decimalsMap);
       
       const ticker: TickerResponse = {
         ticker_id: createTickerId(baseAsset, targetAsset),
@@ -130,7 +150,7 @@ coingeckoRoute.get('/tickers', async (c) => {
  */
 const orderbookSchema = z.object({
   ticker_id: z.string(),
-  depth: z.string().regex(/^\d+$/).transform(Number).optional().default(100)
+  depth: z.string().regex(/^\d+$/).transform(Number).optional().default('100')
 });
 
 coingeckoRoute.get('/orderbook', zValidator('query', orderbookSchema), async (c) => {
@@ -155,7 +175,7 @@ coingeckoRoute.get('/orderbook', zValidator('query', orderbookSchema), async (c)
 const historicalTradesSchema = z.object({
   ticker_id: z.string(),
   type: z.enum(['buy', 'sell', 'all']).optional().default('all'),
-  limit: z.string().regex(/^\d+$/).transform(Number).optional().default(100),
+  limit: z.string().regex(/^\d+$/).transform(Number).optional().default('100'),
   start_time: z.string().regex(/^\d+$/).transform(Number).optional(),
   end_time: z.string().regex(/^\d+$/).transform(Number).optional()
 });

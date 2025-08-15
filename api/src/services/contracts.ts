@@ -303,4 +303,88 @@ export class ContractService {
     await this.cache.set(cacheKey, simulation, { ttl: 3000 });
     return simulation;
   }
+
+  /**
+   * Get token decimals from native coin registry or CW20 contract
+   */
+  async getTokenDecimals(assetInfo: PoolAssetInfo): Promise<number> {
+    let cacheKey: string;
+    let tokenId: string;
+    
+    if (assetInfo.native_token) {
+      tokenId = assetInfo.native_token.denom;
+      cacheKey = this.cache.generateKey('decimals-native', tokenId);
+    } else if (assetInfo.token) {
+      tokenId = assetInfo.token.contract_addr;
+      cacheKey = this.cache.generateKey('decimals-cw20', tokenId);
+    } else {
+      return 6; // Default fallback
+    }
+
+    // Check cache first (long TTL since decimals rarely change)
+    const cached = await this.cache.get<number>(cacheKey);
+    if (cached !== null) {
+      return cached;
+    }
+
+    try {
+      let decimals: number;
+
+      if (assetInfo.native_token) {
+        // Query native coin registry
+        const result = await this.client.queryContractSmart({
+          address: this.contracts.coinRegistry,
+          msg: {
+            native_token: { denom: assetInfo.native_token.denom }
+          }
+        });
+        decimals = result.decimals || 6;
+      } else if (assetInfo.token) {
+        // Query CW20 token contract
+        const result = await this.client.queryContractSmart({
+          address: assetInfo.token.contract_addr,
+          msg: {
+            token_info: {}
+          }
+        });
+        decimals = result.decimals || 6;
+      } else {
+        decimals = 6; // Default fallback
+      }
+
+      // Cache with long TTL (1 hour) since decimals rarely change
+      await this.cache.set(cacheKey, decimals, { ttl: 3600000 });
+      return decimals;
+
+    } catch (error) {
+      console.log(`Failed to fetch decimals for ${tokenId}, using default (6):`, (error as Error).message);
+      // Cache the default value for a shorter time
+      await this.cache.set(cacheKey, 6, { ttl: 300000 }); // 5 minutes
+      return 6;
+    }
+  }
+
+  /**
+   * Batch fetch decimals for multiple tokens
+   */
+  async getBatchTokenDecimals(assetInfos: PoolAssetInfo[]): Promise<Map<string, number>> {
+    const decimalsMap = new Map<string, number>();
+    
+    // Fetch all decimals in parallel
+    const decimalsPromises = assetInfos.map(async (assetInfo) => {
+      const decimals = await this.getTokenDecimals(assetInfo);
+      const tokenId = assetInfo.native_token?.denom || assetInfo.token?.contract_addr || '';
+      return { tokenId, decimals };
+    });
+
+    const results = await Promise.all(decimalsPromises);
+    
+    for (const { tokenId, decimals } of results) {
+      if (tokenId) {
+        decimalsMap.set(tokenId, decimals);
+      }
+    }
+
+    return decimalsMap;
+  }
 }

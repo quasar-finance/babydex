@@ -1,4 +1,5 @@
-import { CosmWasmClient } from 'cosmi';
+import { createPublicClient, http } from 'cosmi';
+import type { PublicClient } from 'cosmi';
 import { CacheService } from './cache.js';
 import { PoolAssetInfo } from '../types/coingecko.js';
 
@@ -27,7 +28,7 @@ export interface PoolResponse {
 }
 
 export class ContractService {
-  private client: CosmWasmClient;
+  private client: PublicClient;
   private cache: CacheService;
   private contracts: ContractConfig;
 
@@ -36,17 +37,20 @@ export class ContractService {
     contracts: ContractConfig,
     cache: CacheService
   ) {
-    this.client = new CosmWasmClient(rpcEndpoint);
+    this.client = createPublicClient({
+      transport: http(rpcEndpoint)
+    });
     this.contracts = contracts;
     this.cache = cache;
   }
 
   async connect(): Promise<void> {
-    await this.client.connect();
+    // No explicit connection needed with cosmi's createPublicClient
+    // It connects on first request
   }
 
   async disconnect(): Promise<void> {
-    this.client.disconnect();
+    // No explicit disconnect needed
   }
 
   async getPools(limit: number = 100, startAfter?: string): Promise<PoolInfo[]> {
@@ -57,8 +61,11 @@ export class ContractService {
       return cached;
     }
 
-    const pools = await this.client.queryContractSmart(this.contracts.factory, {
-      pairs: { limit, start_after: startAfter }
+    const pools = await this.client.queryContractSmart({
+      address: this.contracts.factory,
+      msg: {
+        pairs: { limit, start_after: startAfter }
+      }
     });
 
     await this.cache.set(cacheKey, pools, { ttl: 30000 });
@@ -73,8 +80,11 @@ export class ContractService {
       return cached;
     }
 
-    const pool = await this.client.queryContractSmart(poolAddress, {
-      pair: {}
+    const pool = await this.client.queryContractSmart({
+      address: poolAddress,
+      msg: {
+        pair: {}
+      }
     });
 
     await this.cache.set(cacheKey, pool, { ttl: 10000 });
@@ -89,8 +99,11 @@ export class ContractService {
       return cached;
     }
 
-    const shares = await this.client.queryContractSmart(poolAddress, {
-      pool: {}
+    const shares = await this.client.queryContractSmart({
+      address: poolAddress,
+      msg: {
+        pool: {}
+      }
     });
 
     await this.cache.set(cacheKey, shares, { ttl: 5000 });
@@ -105,8 +118,11 @@ export class ContractService {
       return cached;
     }
 
-    const config = await this.client.queryContractSmart(poolAddress, {
-      config: {}
+    const config = await this.client.queryContractSmart({
+      address: poolAddress,
+      msg: {
+        config: {}
+      }
     });
 
     await this.cache.set(cacheKey, config, { ttl: 60000 });
@@ -130,14 +146,107 @@ export class ContractService {
       return cached;
     }
 
-    const simulation = await this.client.queryContractSmart(poolAddress, {
-      simulation: {
-        offer_asset: offerAsset,
-        ask_asset_info: askAssetInfo
+    const simulation = await this.client.queryContractSmart({
+      address: poolAddress,
+      msg: {
+        simulation: {
+          offer_asset: offerAsset,
+          ask_asset_info: askAssetInfo
+        }
       }
     });
 
     await this.cache.set(cacheKey, simulation, { ttl: 3000 });
+    return simulation;
+  }
+
+  async reverseSimulateSwap(
+    poolAddress: string,
+    askAsset: any,
+    offerAssetInfo?: any
+  ): Promise<any> {
+    const cacheKey = this.cache.generateKey(
+      'reverse-simulate',
+      poolAddress,
+      JSON.stringify(askAsset),
+      JSON.stringify(offerAssetInfo || {})
+    );
+    
+    const cached = await this.cache.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    const simulation = await this.client.queryContractSmart({
+      address: poolAddress,
+      msg: {
+        reverse_simulation: {
+          ask_asset: askAsset,
+          offer_asset_info: offerAssetInfo
+        }
+      }
+    });
+
+    await this.cache.set(cacheKey, simulation, { ttl: 3000 });
+    return simulation;
+  }
+
+  async simulateProvide(
+    poolAddress: string,
+    assets: any[],
+    slippage?: string
+  ): Promise<any> {
+    const cacheKey = this.cache.generateKey(
+      'simulate-provide',
+      poolAddress,
+      JSON.stringify(assets),
+      slippage || 'default'
+    );
+    
+    const cached = await this.cache.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    const simulation = await this.client.queryContractSmart({
+      address: poolAddress,
+      msg: {
+        simulate_provide: {
+          assets,
+          slippage_tolerance: slippage
+        }
+      }
+    });
+
+    await this.cache.set(cacheKey, simulation, { ttl: 5000 });
+    return simulation;
+  }
+
+  async simulateWithdraw(
+    poolAddress: string,
+    lpAmount: string
+  ): Promise<any> {
+    const cacheKey = this.cache.generateKey(
+      'simulate-withdraw',
+      poolAddress,
+      lpAmount
+    );
+    
+    const cached = await this.cache.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    const simulation = await this.client.queryContractSmart({
+      address: poolAddress,
+      msg: {
+        simulate_withdraw: {
+          lp_amount: lpAmount
+        }
+      }
+    });
+
+    await this.cache.set(cacheKey, simulation, { ttl: 5000 });
     return simulation;
   }
 
@@ -154,10 +263,10 @@ export class ContractService {
         ? { pending_rewards: { lp_token: lpToken, user } }
         : { pool_info: { lp_token: lpToken } };
 
-      const incentives = await this.client.queryContractSmart(
-        this.contracts.incentives,
+      const incentives = await this.client.queryContractSmart({
+        address: this.contracts.incentives,
         msg
-      );
+      });
 
       await this.cache.set(cacheKey, incentives, { ttl: 10000 });
       return incentives;
@@ -181,10 +290,13 @@ export class ContractService {
       return cached;
     }
 
-    const simulation = await this.client.queryContractSmart(this.contracts.router, {
-      simulate_swap_operations: {
-        offer_amount: offerAmount,
-        operations
+    const simulation = await this.client.queryContractSmart({
+      address: this.contracts.router,
+      msg: {
+        simulate_swap_operations: {
+          offer_amount: offerAmount,
+          operations
+        }
       }
     });
 

@@ -6,6 +6,7 @@ import { CacheService } from './services/cache.js';
 import { ContractService } from './services/contracts.js';
 import { VolumeTracker } from './services/volume-tracker.js';
 import { PriceService } from './services/price.js';
+import { AMMCalculator } from './services/amm-calculator.js';
 import { errorHandler } from './middleware/error.js';
 import coingeckoRoute from './routes/coingecko.js';
 import poolsRoute from './routes/pools.js';
@@ -31,6 +32,7 @@ const cacheService = new CacheService(config.cache.maxSize, config.cache.default
 const contractService = new ContractService(config.rpcEndpoint, config.contracts, cacheService);
 const volumeTracker = new VolumeTracker(cacheService);
 const priceService = new PriceService(cacheService);
+const ammCalculator = new AMMCalculator(contractService);
 
 // Initialize Hono app
 const app = new Hono();
@@ -45,6 +47,7 @@ app.use('*', async (c, next) => {
   c.set('contracts', contractService);
   c.set('volumeTracker', volumeTracker);
   c.set('priceService', priceService);
+  c.set('ammCalculator', ammCalculator);
   await next();
 });
 
@@ -105,8 +108,8 @@ const startServer = async () => {
       port: config.port
     });
     
-    console.log(`🚀 Astrofork DEX API server running on port ${config.port}`);
-    console.log(`📊 CoinGecko endpoints available at:`);
+    console.log(`Astrofork DEX API server running on port ${config.port}`);
+    console.log(`CoinGecko endpoints available at:`);
     console.log(`   - http://localhost:${config.port}/tickers`);
     console.log(`   - http://localhost:${config.port}/orderbook`);
     console.log(`   - http://localhost:${config.port}/historical_trades`);

@@ -17,6 +17,7 @@ const coingeckoRoute = new Hono<{
     contracts: ContractService;
     volumeTracker: VolumeTracker;
     priceService: PriceService;
+    ammCalculator: AMMCalculator;
   };
 }>();
 
@@ -76,19 +77,26 @@ coingeckoRoute.get('/tickers', async (c) => {
       // Get 24hr volume and price stats
       const volumeStats = await volumeTracker.get24HourVolume(poolAddress);
       
-      // Calculate current price
-      const baseAmount = BigInt(poolShares.assets[0].amount);
-      const targetAmount = BigInt(poolShares.assets[1].amount);
-      const currentPrice = Number(targetAmount) / Number(baseAmount);
+      // Get AMM calculator from context
+      const ammCalculator = c.get('ammCalculator');
+      
+      // Calculate current price from reserves
+      const currentPrice = AMMCalculator.getSpotPrice(
+        poolShares.assets[0].amount,
+        poolShares.assets[1].amount
+      );
+      
+      // Calculate bid/ask using on-chain simulations
+      // poolShares.assets contains the actual token reserves in the pool
+      const { bid, ask } = await ammCalculator.calculateBidAsk(
+        poolAddress,
+        baseAsset,
+        targetAsset,
+        poolShares.assets
+      );
       
       // Calculate liquidity in USD
       const liquidityUSD = AMMCalculator.calculateLiquidityUSD(poolShares.assets, prices);
-      
-      // TODO: Calculate bid/ask based on pool type
-      // For now, use a simple spread around current price
-      const spread = 0.001; // 0.1% spread
-      const bid = currentPrice * (1 - spread);
-      const ask = currentPrice * (1 + spread);
       
       const ticker: TickerResponse = {
         ticker_id: createTickerId(baseAsset, targetAsset),

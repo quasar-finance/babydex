@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
@@ -7,8 +8,12 @@ import { ContractService } from './services/contracts.js';
 import { VolumeTracker } from './services/volume-tracker.js';
 import { PriceService } from './services/price.js';
 import { AMMCalculator } from './services/amm-calculator.js';
+import { AMMCalculatorDB } from './services/amm-calculator-db.js';
+import { DatabaseService } from './services/database.js';
+import { createDatabaseService, getOperationMode } from './config/database.js';
 import { errorHandler } from './middleware/error.js';
 import coingeckoRoute from './routes/coingecko.js';
+import coingeckoDBRoute from './routes/coingecko-db.js';
 import poolsRoute from './routes/pools.js';
 
 // Environment configuration
@@ -28,14 +33,29 @@ const config = {
 };
 
 // Initialize services
+// For Cloudflare Workers, pass env.CACHE_KV as third parameter:
+// const cacheService = new CacheService(config.cache.maxSize, config.cache.defaultTTL, env.CACHE_KV);
 const cacheService = new CacheService(config.cache.maxSize, config.cache.defaultTTL);
 const contractService = new ContractService(config.rpcEndpoint, config.contracts, cacheService);
 const volumeTracker = new VolumeTracker(cacheService);
 const priceService = new PriceService(cacheService);
-const ammCalculator = new AMMCalculator(contractService);
 
-// Initialize Hono app
-const app = new Hono();
+// Initialize database service (if configured)
+let databaseService: DatabaseService | null = null;
+let ammCalculator: AMMCalculator | AMMCalculatorDB;
+let operationMode: 'database' | 'contract' | 'hybrid' = 'contract';
+
+// Initialize Hono app with typed context
+type AppVariables = {
+  contracts: ContractService;
+  volumeTracker: VolumeTracker;
+  priceService: PriceService;
+  ammCalculator: AMMCalculator | AMMCalculatorDB;
+  database?: DatabaseService;
+  ammCalculatorDB?: AMMCalculatorDB;
+};
+
+const app = new Hono<{ Variables: AppVariables }>();
 
 // Global middleware
 app.use('*', cors());
@@ -48,6 +68,15 @@ app.use('*', async (c, next) => {
   c.set('volumeTracker', volumeTracker);
   c.set('priceService', priceService);
   c.set('ammCalculator', ammCalculator);
+  
+  // Add database services if available
+  if (databaseService) {
+    c.set('database', databaseService);
+    if (ammCalculator instanceof AMMCalculatorDB) {
+      c.set('ammCalculatorDB', ammCalculator);
+    }
+  }
+  
   await next();
 });
 
@@ -56,8 +85,10 @@ app.get('/health', (c) => {
   return c.json({ 
     status: 'ok',
     timestamp: new Date().toISOString(),
+    mode: operationMode,
     config: {
       rpcEndpoint: config.rpcEndpoint,
+      database: databaseService ? 'connected' : 'not configured',
       contracts: Object.keys(config.contracts).reduce((acc, key) => {
         acc[key] = config.contracts[key as keyof typeof config.contracts] ? 'configured' : 'not configured';
         return acc;
@@ -88,19 +119,37 @@ app.get('/', (c) => {
   });
 });
 
-// Mount routes
-app.route('/api/v1', coingeckoRoute);
-app.route('/api/v1/pools', poolsRoute);
-
-// CoinGecko-specific routes at root level (if they expect it)
-app.route('/', coingeckoRoute);
+// Routes will be mounted after initialization
 
 // Start server
 const startServer = async () => {
   try {
     // Connect to blockchain
     await contractService.connect();
-    console.log('Connected to blockchain RPC');
+    console.log('✅ Connected to blockchain RPC');
+    
+    // Initialize database if configured
+    operationMode = getOperationMode();
+    databaseService = await createDatabaseService();
+    
+    if (databaseService && (operationMode === 'database' || operationMode === 'hybrid')) {
+      ammCalculator = new AMMCalculatorDB(databaseService, contractService);
+      console.log(`📊 Using ${operationMode} mode with database`);
+      
+      // Mount database-based routes
+      app.route('/api/v1', coingeckoDBRoute);
+      app.route('/', coingeckoDBRoute);
+    } else {
+      ammCalculator = new AMMCalculator(contractService);
+      console.log('📡 Using contract-only mode');
+      
+      // Mount contract-based routes
+      app.route('/api/v1', coingeckoRoute);
+      app.route('/', coingeckoRoute);
+    }
+    
+    // Mount pool routes (always available)
+    app.route('/api/v1/pools', poolsRoute);
     
     // Start HTTP server
     serve({
@@ -108,8 +157,10 @@ const startServer = async () => {
       port: config.port
     });
     
-    console.log(`Astrofork DEX API server running on port ${config.port}`);
-    console.log(`CoinGecko endpoints available at:`);
+    console.log(`\n🚀 Astrofork DEX API server running on port ${config.port}`);
+    console.log(`   Mode: ${operationMode.toUpperCase()}`);
+    console.log(`   Database: ${databaseService ? 'Connected' : 'Not configured'}`);
+    console.log(`\n📌 CoinGecko endpoints available at:`);
     console.log(`   - http://localhost:${config.port}/tickers`);
     console.log(`   - http://localhost:${config.port}/orderbook`);
     console.log(`   - http://localhost:${config.port}/historical_trades`);
@@ -123,6 +174,9 @@ const startServer = async () => {
 process.on('SIGINT', async () => {
   console.log('\nShutting down server...');
   await contractService.disconnect();
+  if (databaseService) {
+    await databaseService.disconnect();
+  }
   process.exit(0);
 });
 

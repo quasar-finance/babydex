@@ -31,7 +31,7 @@ export class PriceService {
         throw new Error('Failed to fetch price');
       }
       
-      const data: PriceData = await response.json();
+      const data = await response.json() as PriceData;
       const price = data[tokenAddress]?.usd || 0;
       
       await this.cache.set(cacheKey, price, { ttl: 60000 });
@@ -65,7 +65,7 @@ export class PriceService {
         );
         
         if (response.ok) {
-          const data: PriceData = await response.json();
+          const data = await response.json() as PriceData;
           
           for (const token of uncachedTokens) {
             const price = data[token]?.usd || 0;

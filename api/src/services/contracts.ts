@@ -387,4 +387,58 @@ export class ContractService {
 
     return decimalsMap;
   }
+
+  /**
+   * Get PCL pool configuration (contains amp, gamma, price_scale, fees)
+   */
+  async getPCLPoolConfig(poolAddress: string): Promise<any> {
+    const cacheKey = this.cache.generateKey('pcl-pool-config', poolAddress);
+    
+    const cached = await this.cache.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    try {
+      const config = await this.client.queryContractSmart({
+        address: poolAddress,
+        msg: {
+          config: {}
+        }
+      });
+
+      await this.cache.set(cacheKey, config, { ttl: 60000 }); // Cache for 1 minute
+      return config;
+    } catch (error) {
+      console.error(`Failed to get PCL pool config for ${poolAddress}:`, error);
+      return null;
+    }
+  }
+
+  /**
+   * Get PCL pool current D invariant
+   */
+  async getPCLPoolD(poolAddress: string): Promise<any> {
+    const cacheKey = this.cache.generateKey('pcl-pool-d', poolAddress);
+    
+    const cached = await this.cache.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    try {
+      const d = await this.client.queryContractSmart({
+        address: poolAddress,
+        msg: {
+          compute_d: {}
+        }
+      });
+
+      await this.cache.set(cacheKey, d, { ttl: 10000 }); // Cache for 10 seconds (more volatile)
+      return d;
+    } catch (error) {
+      console.error(`Failed to get PCL pool D for ${poolAddress}:`, error);
+      return null;
+    }
+  }
 }

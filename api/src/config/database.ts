@@ -53,7 +53,7 @@ export async function createDatabaseService(): Promise<DatabaseService | null> {
   const config = getDatabaseConfig();
   
   if (!config.enabled) {
-    console.log('📦 Database not configured - using contract-only mode');
+    // Database not configured - using contract-only mode
     return null;
   }
 
@@ -71,16 +71,16 @@ export async function createDatabaseService(): Promise<DatabaseService | null> {
     const isConnected = await dbService.testConnection();
     
     if (!isConnected) {
-      console.error('❌ Database connection failed - falling back to contract-only mode');
+      console.error('Database connection failed - falling back to contract-only mode');
       await dbService.disconnect();
       return null;
     }
 
-    console.log('✅ Database connected successfully');
+    // Database connected successfully
     return dbService;
     
   } catch (error) {
-    console.error('❌ Failed to initialize database:', error);
+    console.error('Failed to initialize database:', error);
     return null;
   }
 }

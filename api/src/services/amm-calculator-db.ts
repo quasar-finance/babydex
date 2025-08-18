@@ -40,7 +40,7 @@ export class AMMCalculatorDB {
       // Get pool balance from database
       const poolBalance = await this.databaseService.getPoolBalance(poolAddress);
       if (!poolBalance) {
-        console.log(`No pool balance found for ${poolAddress}`);
+        // No pool balance found
         return null;
       }
 
@@ -132,7 +132,7 @@ export class AMMCalculatorDB {
       
       if (lastSwaps.length === 0) {
         // Fallback to reserve calculation if no swaps found
-        console.log(`No swaps found for pool ${poolAddress}, using reserve calculation`);
+        // No swaps found, using reserve calculation
         return this.calculateSpotPriceFromReserves(
           poolBalance.token0Balance,
           poolBalance.token1Balance,
@@ -148,7 +148,7 @@ export class AMMCalculatorDB {
       const isToken1Offer = lastSwap.offerAsset === poolBalance.token1Denom;
       
       if (!isToken0Offer && !isToken1Offer) {
-        console.log(`Swap assets don't match pool tokens, using reserve calculation`);
+        // Swap assets don't match pool tokens, using reserve calculation
         return this.calculateSpotPriceFromReserves(
           poolBalance.token0Balance,
           poolBalance.token1Balance,
@@ -163,7 +163,7 @@ export class AMMCalculatorDB {
       const returnAmount = Number(lastSwap.returnAmount);
       
       if (offerAmount === 0 || returnAmount === 0) {
-        console.log(`Invalid swap amounts, using reserve calculation`);
+        // Invalid swap amounts, using reserve calculation
         return this.calculateSpotPriceFromReserves(
           poolBalance.token0Balance,
           poolBalance.token1Balance,
@@ -188,7 +188,7 @@ export class AMMCalculatorDB {
         spotPrice = token1AmountNormalized / token0AmountNormalized;
       }
 
-      console.log(`Spot price from last swap: ${spotPrice} (${lastSwap.timestamp})`);
+      // Calculated spot price from last swap
       return spotPrice;
       
     } catch (error) {
@@ -460,7 +460,7 @@ export class AMMCalculatorDB {
       }
 
       // Fallback to contract simulation
-      console.log(`Database balance not found for ${poolAddress}, falling back to contract`);
+      // Database balance not found, falling back to contract
       
       const baseDecimals = decimalsMap?.get(
         baseAssetInfo.native_token?.denom || baseAssetInfo.token?.contract_addr || ''

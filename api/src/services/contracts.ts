@@ -357,7 +357,7 @@ export class ContractService {
       return decimals;
 
     } catch (error) {
-      console.log(`Failed to fetch decimals for ${tokenId}, using default (6):`, (error as Error).message);
+      console.error(`Failed to fetch decimals for ${tokenId}, using default (6):`, (error as Error).message);
       // Cache the default value for a shorter time
       await this.cache.set(cacheKey, 6, { ttl: 300000 }); // 5 minutes
       return 6;

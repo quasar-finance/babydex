@@ -251,7 +251,7 @@ export class AMMCalculator {
       return targetAmountNormalized / baseAmountNormalized;
       
     } catch (error) {
-      console.log('Failed to get spot price from simulation:', (error as Error).message);
+      console.error('Failed to get spot price from simulation:', (error as Error).message);
       // Return a default price of 1.0 if simulation fails
       return 1.0;
     }

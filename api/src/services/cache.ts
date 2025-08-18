@@ -26,7 +26,7 @@ export class CacheService {
       if (!value) return null;
       return JSON.parse(value) as T;
     } catch (error) {
-      console.warn(`Cache get error for key ${key}:`, error);
+      // Cache get error - returning null
       return null;
     }
   }
@@ -46,7 +46,7 @@ export class CacheService {
       
       await this.kv.put(key, serialized, kvOptions);
     } catch (error) {
-      console.warn(`Cache set error for key ${key}:`, error);
+      // Cache set error - ignoring
       // Don't throw - cache failures shouldn't break the API
     }
   }
@@ -58,7 +58,7 @@ export class CacheService {
       // KV doesn't have explicit delete, set with immediate expiration
       await this.kv.put(key, '', { expirationTtl: 1 });
     } catch (error) {
-      console.warn(`Cache delete error for key ${key}:`, error);
+      // Cache delete error - ignoring
     }
   }
 
@@ -69,13 +69,13 @@ export class CacheService {
       const value = await this.kv.get(key);
       return value !== null;
     } catch (error) {
-      console.warn(`Cache has error for key ${key}:`, error);
+      // Cache has error - returning false
       return false;
     }
   }
 
   clear(): void {
-    console.warn('Cache clear not supported with Cloudflare KV');
+    // Cache clear not supported with Cloudflare KV
   }
 
   generateKey(...parts: string[]): string {

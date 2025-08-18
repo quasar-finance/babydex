@@ -227,7 +227,7 @@ coingeckoDBRoute.get('/tickers', async (c) => {
         return c.json(JSON.parse(cached));
       }
     } catch (e) {
-      console.warn('Cache read failed:', e);
+      // Cache read failed - proceeding without cache
     }
   }
   
@@ -288,7 +288,7 @@ coingeckoDBRoute.get('/tickers', async (c) => {
         const priceData = await ammCalculatorDB.getPoolPriceData(pool.poolAddress, decimalsMap);
         
         if (!priceData) {
-          console.warn(`No price data available for pool ${pool.poolAddress}`);
+          // No price data available for pool - skipping
           continue;
         }
         
@@ -331,7 +331,7 @@ coingeckoDBRoute.get('/tickers', async (c) => {
           expirationTtl: 30 // 30 seconds cache
         });
       } catch (e) {
-        console.warn('Cache write failed:', e);
+      // Cache write failed - ignoring
       }
     }
     

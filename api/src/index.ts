@@ -126,7 +126,7 @@ const startServer = async () => {
   try {
     // Connect to blockchain
     await contractService.connect();
-    console.log('✅ Connected to blockchain RPC');
+    // Connected to blockchain RPC
     
     // Initialize database if configured
     operationMode = getOperationMode();
@@ -134,14 +134,14 @@ const startServer = async () => {
     
     if (databaseService && (operationMode === 'database' || operationMode === 'hybrid')) {
       ammCalculator = new AMMCalculatorDB(databaseService, contractService);
-      console.log(`📊 Using ${operationMode} mode with database`);
+      // Using database mode
       
       // Mount database-based routes
       app.route('/api/v1', coingeckoDBRoute);
       app.route('/', coingeckoDBRoute);
     } else {
       ammCalculator = new AMMCalculator(contractService);
-      console.log('📡 Using contract-only mode');
+      // Using contract-only mode
       
       // Mount contract-based routes
       app.route('/api/v1', coingeckoRoute);
@@ -157,13 +157,7 @@ const startServer = async () => {
       port: config.port
     });
     
-    console.log(`\n🚀 Astrofork DEX API server running on port ${config.port}`);
-    console.log(`   Mode: ${operationMode.toUpperCase()}`);
-    console.log(`   Database: ${databaseService ? 'Connected' : 'Not configured'}`);
-    console.log(`\n📌 CoinGecko endpoints available at:`);
-    console.log(`   - http://localhost:${config.port}/tickers`);
-    console.log(`   - http://localhost:${config.port}/orderbook`);
-    console.log(`   - http://localhost:${config.port}/historical_trades`);
+    // Server started successfully
   } catch (error) {
     console.error('Failed to start server:', error);
     process.exit(1);
@@ -172,7 +166,7 @@ const startServer = async () => {
 
 // Handle graceful shutdown
 process.on('SIGINT', async () => {
-  console.log('\nShutting down server...');
+  // Shutting down server
   await contractService.disconnect();
   if (databaseService) {
     await databaseService.disconnect();

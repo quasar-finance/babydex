@@ -39,7 +39,7 @@ export class CloudflareCacheService {
       
       return JSON.parse(value) as T;
     } catch (error) {
-      console.warn(`Cache get error for key ${key}:`, error);
+      // Cache get error - returning null
       return null;
     }
   }
@@ -59,7 +59,7 @@ export class CloudflareCacheService {
       
       await this.kv.put(key, serialized, kvOptions);
     } catch (error) {
-      console.warn(`Cache set error for key ${key}:`, error);
+      // Cache set error - ignoring
       // Don't throw - cache failures shouldn't break the API
     }
   }
@@ -73,7 +73,7 @@ export class CloudflareCacheService {
       // We'll set with immediate expiration
       await this.kv.put(key, '', { expirationTtl: 1 });
     } catch (error) {
-      console.warn(`Cache delete error for key ${key}:`, error);
+      // Cache delete error - ignoring
     }
   }
 
@@ -82,6 +82,6 @@ export class CloudflareCacheService {
    * This is a no-op since KV doesn't support bulk operations
    */
   async clear(): Promise<void> {
-    console.warn('Cache clear not supported with Cloudflare KV');
+    // Cache clear not supported with Cloudflare KV
   }
 }

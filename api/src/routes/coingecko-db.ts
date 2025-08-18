@@ -11,6 +11,8 @@ import {
   HistoricalTradesResponse,
   PoolAssetInfo 
 } from '../types/coingecko.js';
+import { getTokenIdentifier, createTickerId, getAssetInfo } from '../utils/token-utils.js';
+import { handleError } from '../utils/error-utils.js';
 
 const coingeckoDBRoute = new Hono<{
   Variables: {
@@ -20,32 +22,12 @@ const coingeckoDBRoute = new Hono<{
   }
 }>();
 
-// Helper function to get token identifier
-function getTokenIdentifier(assetInfo: PoolAssetInfo | string): string {
-  if (typeof assetInfo === 'string') {
-    return assetInfo;
-  }
-  if (assetInfo.token) {
-    return assetInfo.token.contract_addr;
-  } else if (assetInfo.native_token) {
-    return assetInfo.native_token.denom;
-  }
-  return '';
-}
-
-// Helper function to create ticker ID
-function createTickerId(base: string, target: string): string {
-  return `${base}_${target}`;
-}
+// Helper functions moved to ../utils/token-utils.js
 
 // Helper function to get token decimals
 async function getTokenDecimals(contracts: ContractService, denom: string): Promise<number> {
   try {
-    const assetInfo = denom.startsWith('ibc/') 
-      ? { native_token: { denom } }
-      : denom.startsWith('u') 
-      ? { native_token: { denom } }
-      : { token: { contract_addr: denom } };
+    const assetInfo = getAssetInfo(denom);
     return await contracts.getTokenDecimals(assetInfo as PoolAssetInfo);
   } catch {
     return 6; // Default to 6 decimals
@@ -278,49 +260,65 @@ coingeckoDBRoute.get('/tickers', async (c) => {
       }
     }
     
-    // Process each pool
-    for (const pool of pools) {
-      const poolBalance = poolBalances.get(pool.poolAddress);
-      if (!poolBalance) continue;
-      
-      try {
-        // Get real price data from AMMCalculatorDB
-        const priceData = await ammCalculatorDB.getPoolPriceData(pool.poolAddress, decimalsMap);
+    // Process pools in parallel batches to avoid overwhelming the database
+    const BATCH_SIZE = 10; // Process 10 pools at a time
+    const poolBatches = [];
+    
+    // Split pools into batches
+    for (let i = 0; i < pools.length; i += BATCH_SIZE) {
+      poolBatches.push(pools.slice(i, i + BATCH_SIZE));
+    }
+    
+    // Process each batch in parallel
+    for (const batch of poolBatches) {
+      const batchPromises = batch.map(async (pool) => {
+        const poolBalance = poolBalances.get(pool.poolAddress);
+        if (!poolBalance) return null;
         
-        if (!priceData) {
-          // No price data available for pool - skipping
-          continue;
+        try {
+          // Parallel fetch of price data and liquidity calculation
+          const [priceData, liquidityUSD] = await Promise.all([
+            ammCalculatorDB.getPoolPriceData(pool.poolAddress, decimalsMap),
+            ammCalculatorDB.calculateLiquidityUSD(poolBalance, priceMap, decimalsMap)
+          ]);
+          
+          if (!priceData) {
+            return null; // No price data available for pool
+          }
+          
+          // Format the ticker response with real data
+          const ticker: TickerResponse = {
+            ticker_id: createTickerId(poolBalance.token0Denom, poolBalance.token1Denom),
+            base_currency: poolBalance.token0Denom,
+            target_currency: poolBalance.token1Denom,
+            pool_id: pool.poolAddress,
+            last_price: priceData.spotPrice.toString(),
+            base_volume: priceData.volume24h.baseVolume,
+            target_volume: priceData.volume24h.targetVolume,
+            liquidity_in_usd: liquidityUSD.toString(),
+            bid: priceData.bidPrice.toString(),
+            ask: priceData.askPrice.toString(),
+            high: priceData.high24h?.toString() || priceData.spotPrice.toString(),
+            low: priceData.low24h?.toString() || priceData.spotPrice.toString()
+          };
+          
+          return ticker;
+        } catch (poolError) {
+          console.error(`Error processing pool ${pool.poolAddress}:`, poolError);
+          return null;
         }
-        
-        // Calculate liquidity in USD
-        const liquidityUSD = await ammCalculatorDB.calculateLiquidityUSD(
-          poolBalance,
-          priceMap,
-          decimalsMap
-        );
-        
-        // Format the ticker response with real data
-        // Note: CoinGecko spec requires contract addresses for DEX, not symbols
-        const ticker: TickerResponse = {
-          ticker_id: createTickerId(poolBalance.token0Denom, poolBalance.token1Denom),
-          base_currency: poolBalance.token0Denom,  // Contract address/denom as per CoinGecko DEX spec
-          target_currency: poolBalance.token1Denom, // Contract address/denom as per CoinGecko DEX spec
-          pool_id: pool.poolAddress,
-          last_price: priceData.spotPrice.toString(),
-          base_volume: priceData.volume24h.baseVolume,
-          target_volume: priceData.volume24h.targetVolume,
-          liquidity_in_usd: liquidityUSD.toString(),
-          bid: priceData.bidPrice.toString(),
-          ask: priceData.askPrice.toString(),
-          high: priceData.high24h?.toString() || priceData.spotPrice.toString(),
-          low: priceData.low24h?.toString() || priceData.spotPrice.toString()
-        };
-        
-        tickers.push(ticker);
-      } catch (poolError) {
-        console.error(`Error processing pool ${pool.poolAddress}:`, poolError);
-        // Skip this pool and continue with others
-        continue;
+      });
+      
+      // Wait for this batch to complete
+      const batchResults = await Promise.all(batchPromises);
+      
+      // Add valid tickers to the results
+      const validTickers = batchResults.filter((ticker): ticker is TickerResponse => ticker !== null);
+      tickers.push(...validTickers);
+      
+      // Small delay between batches to prevent overwhelming the database
+      if (poolBatches.indexOf(batch) < poolBatches.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 50));
       }
     }
     
@@ -470,24 +468,28 @@ coingeckoDBRoute.get('/historical_trades', zValidator('query', historicalTradesS
     // Parse ticker_id to get tokens
     const [base, target] = ticker_id.split('_');
     
-    // Find the pool with these assets from database
+    // Optimized: Get all pools and their balances in parallel
     const allPools = await database.getPools(100);
     const pools = allPools.filter(pool => !EXCLUDED_POOLS.has(pool.poolAddress));
     
-    // Find matching pool and its balance
-    let matchingPool = null;
-    let poolBalance = null;
-    for (const pool of pools) {
+    // Parallel fetch all pool balances
+    const poolBalancePromises = pools.map(async (pool) => {
       const balance = await database.getPoolBalance(pool.poolAddress);
-      if (balance) {
-        if ((balance.token0Denom === base && balance.token1Denom === target) ||
-            (balance.token0Denom === target && balance.token1Denom === base)) {
-          matchingPool = pool;
-          poolBalance = balance;
-          break;
-        }
-      }
-    }
+      return { pool, balance };
+    });
+    
+    const poolBalanceResults = await Promise.all(poolBalancePromises);
+    
+    // Find matching pool from results
+    const matchingResult = poolBalanceResults.find(({ balance }) => 
+      balance && (
+        (balance.token0Denom === base && balance.token1Denom === target) ||
+        (balance.token0Denom === target && balance.token1Denom === base)
+      )
+    );
+    
+    const matchingPool = matchingResult?.pool || null;
+    const poolBalance = matchingResult?.balance || null;
     
     if (!matchingPool || !poolBalance) {
       return c.json({ error: 'Pool not found' }, 404);

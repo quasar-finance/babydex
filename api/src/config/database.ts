@@ -11,6 +11,7 @@ export interface DatabaseConfig {
   password?: string;
   database?: string;
   ssl?: boolean;
+  schema?: string;
 }
 
 /**
@@ -42,7 +43,8 @@ export function getDatabaseConfig(): DatabaseConfig {
     user: process.env.SUPABASE_USER!,
     password: process.env.SUPABASE_PW!,
     database: process.env.SUPABASE_DB!,
-    ssl: process.env.SUPABASE_SSL === 'true',
+    ssl: process.env.SUPABASE_SSL !== 'false', // Default to true for Supabase
+    schema: process.env.SUPABASE_SCHEMA || 'public',
   };
 }
 
@@ -65,14 +67,24 @@ export async function createDatabaseService(): Promise<DatabaseService | null> {
       password: config.password!,
       database: config.database!,
       ssl: config.ssl,
+      schema: config.schema,
     });
 
-    // Test connection
-    const isConnected = await dbService.testConnection();
+    // Test connection with timeout
+    const connectionPromise = dbService.testConnection();
+    const timeoutPromise = new Promise<boolean>((resolve) => {
+      setTimeout(() => resolve(false), 5000); // 5 second timeout
+    });
+    
+    const isConnected = await Promise.race([connectionPromise, timeoutPromise]);
     
     if (!isConnected) {
-      console.error('Database connection failed - falling back to contract-only mode');
-      await dbService.disconnect();
+      console.error('Database connection failed or timed out - falling back to contract-only mode');
+      try {
+        await dbService.disconnect();
+      } catch (e) {
+        // Ignore disconnect errors
+      }
       return null;
     }
 

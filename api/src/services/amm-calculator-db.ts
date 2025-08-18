@@ -37,31 +37,33 @@ export class AMMCalculatorDB {
     decimalsMap?: Map<string, number>
   ): Promise<PoolPriceData | null> {
     try {
-      // Get pool balance from database
-      const poolBalance = await this.databaseService.getPoolBalance(poolAddress);
+      // Parallel fetch all required data to reduce database round trips
+      const [poolBalance, volumeData, recentTrades] = await Promise.all([
+        this.databaseService.getPoolBalance(poolAddress),
+        this.databaseService.get24HourVolume(poolAddress),
+        this.databaseService.getHistoricalTrades(poolAddress, 20) // For bid/ask calculation
+      ]);
+      
       if (!poolBalance) {
         // No pool balance found
         return null;
       }
-
-      // Get 24h volume and price data
-      const volumeData = await this.databaseService.get24HourVolume(poolAddress);
       
       // Get decimals for tokens
       const baseDecimals = decimalsMap?.get(poolBalance.token0Denom) || 6;
       const targetDecimals = decimalsMap?.get(poolBalance.token1Denom) || 6;
 
-      // Calculate spot price from last swap (or fallback to reserves)
-      const spotPrice = await this.calculateSpotPriceFromLastSwap(
-        poolAddress,
+      // Calculate spot price from last swap using pre-fetched trades
+      const spotPrice = this.calculateSpotPriceFromTradesSync(
+        recentTrades,
         poolBalance,
         baseDecimals,
         targetDecimals
       );
 
-      // Calculate bid/ask from recent trades or use default spread
-      const { bid, ask, spread } = await this.calculateBidAskFromTrades(
-        poolAddress,
+      // Calculate bid/ask from pre-fetched trades
+      const { bid, ask, spread } = this.calculateBidAskFromTradesSync(
+        recentTrades,
         spotPrice,
         baseDecimals,
         targetDecimals
@@ -409,6 +411,132 @@ export class AMMCalculatorDB {
    */
   async getAllPools(limit: number = 100) {
     return await this.databaseService.getPools(limit);
+  }
+
+  /**
+   * Calculate spot price from pre-fetched trades (synchronous)
+   * This replaces the async calculateSpotPriceFromLastSwap for better performance
+   */
+  private calculateSpotPriceFromTradesSync(
+    recentTrades: any[],
+    poolBalance: any,
+    baseDecimals: number,
+    targetDecimals: number
+  ): number {
+    if (recentTrades.length === 0) {
+      // Fallback to reserve calculation if no swaps found
+      return this.calculateSpotPriceFromReserves(
+        poolBalance.token0Balance,
+        poolBalance.token1Balance,
+        baseDecimals,
+        targetDecimals
+      );
+    }
+
+    const lastSwap = recentTrades[0];
+    
+    // Determine if the swap was token0 -> token1 or token1 -> token0
+    const isToken0Offer = lastSwap.offerAsset === poolBalance.token0Denom;
+    const isToken1Offer = lastSwap.offerAsset === poolBalance.token1Denom;
+    
+    if (!isToken0Offer && !isToken1Offer) {
+      return this.calculateSpotPriceFromReserves(
+        poolBalance.token0Balance,
+        poolBalance.token1Balance,
+        baseDecimals,
+        targetDecimals
+      );
+    }
+
+    // Calculate the effective price from the swap
+    const offerAmount = Number(lastSwap.offerAmount);
+    const returnAmount = Number(lastSwap.returnAmount);
+    
+    if (offerAmount === 0 || returnAmount === 0) {
+      return this.calculateSpotPriceFromReserves(
+        poolBalance.token0Balance,
+        poolBalance.token1Balance,
+        baseDecimals,
+        targetDecimals
+      );
+    }
+
+    let spotPrice: number;
+    
+    if (isToken0Offer) {
+      // Swap was token0 -> token1
+      const token0AmountNormalized = offerAmount / Math.pow(10, baseDecimals);
+      const token1AmountNormalized = returnAmount / Math.pow(10, targetDecimals);
+      spotPrice = token1AmountNormalized / token0AmountNormalized;
+    } else {
+      // Swap was token1 -> token0
+      const token1AmountNormalized = offerAmount / Math.pow(10, targetDecimals);
+      const token0AmountNormalized = returnAmount / Math.pow(10, baseDecimals);
+      spotPrice = token1AmountNormalized / token0AmountNormalized;
+    }
+
+    return spotPrice;
+  }
+
+  /**
+   * Calculate bid/ask from pre-fetched trades (synchronous)
+   * This replaces the async calculateBidAskFromTrades for better performance
+   */
+  private calculateBidAskFromTradesSync(
+    recentTrades: any[],
+    spotPrice: number,
+    baseDecimals: number,
+    targetDecimals: number
+  ): { bid: number; ask: number; spread: number } {
+    if (recentTrades.length === 0) {
+      // Default spread of 0.3%
+      const spread = 0.003;
+      return {
+        bid: spotPrice * (1 - spread),
+        ask: spotPrice * (1 + spread),
+        spread
+      };
+    }
+
+    // Calculate effective prices from recent trades
+    const prices: number[] = [];
+    
+    for (const trade of recentTrades) {
+      if (trade.offerAmount && trade.returnAmount) {
+        const offerAmount = Number(trade.offerAmount) / Math.pow(10, baseDecimals);
+        const returnAmount = Number(trade.returnAmount) / Math.pow(10, targetDecimals);
+        
+        if (offerAmount > 0) {
+          const effectivePrice = returnAmount / offerAmount;
+          prices.push(effectivePrice);
+        }
+      }
+    }
+
+    if (prices.length > 0) {
+      // Calculate spread from recent trades
+      const minPrice = Math.min(...prices);
+      const maxPrice = Math.max(...prices);
+      const avgPrice = prices.reduce((sum, price) => sum + price, 0) / prices.length;
+      
+      // Use average spread or minimum of 0.1%
+      const calculatedSpread = avgPrice > 0 ? (maxPrice - minPrice) / avgPrice : 0.003;
+      const spread = Math.max(calculatedSpread, 0.001); // Minimum 0.1% spread
+      
+      return {
+        bid: spotPrice * (1 - spread / 2),
+        ask: spotPrice * (1 + spread / 2),
+        spread
+      };
+    }
+
+    // Fallback to default spread
+    const spread = 0.003;
+    return {
+      bid: spotPrice * (1 - spread),
+      ask: spotPrice * (1 + spread),
+      spread
+    };
   }
 
   /**

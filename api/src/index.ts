@@ -5,14 +5,10 @@ import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 import { CacheService } from './services/cache.js';
 import { ContractService } from './services/contracts.js';
-import { VolumeTracker } from './services/volume-tracker.js';
-import { PriceService } from './services/price.js';
-import { AMMCalculator } from './services/amm-calculator.js';
 import { AMMCalculatorDB } from './services/amm-calculator-db.js';
 import { DatabaseService } from './services/database.js';
-import { createDatabaseService, getOperationMode } from './config/database.js';
+import { createDatabaseService } from './config/database.js';
 import { errorHandler } from './middleware/error.js';
-import coingeckoRoute from './routes/coingecko.js';
 import coingeckoDBRoute from './routes/coingecko-db.js';
 import poolsRoute from './routes/pools.js';
 
@@ -37,22 +33,16 @@ const config = {
 // const cacheService = new CacheService(config.cache.maxSize, config.cache.defaultTTL, env.CACHE_KV);
 const cacheService = new CacheService(config.cache.maxSize, config.cache.defaultTTL);
 const contractService = new ContractService(config.rpcEndpoint, config.contracts, cacheService);
-const volumeTracker = new VolumeTracker(cacheService);
-const priceService = new PriceService(cacheService);
 
-// Initialize database service (if configured)
+// Initialize database service (required for this API)
 let databaseService: DatabaseService | null = null;
-let ammCalculator: AMMCalculator | AMMCalculatorDB;
-let operationMode: 'database' | 'contract' | 'hybrid' = 'contract';
+let ammCalculator: AMMCalculatorDB;
 
 // Initialize Hono app with typed context
 type AppVariables = {
   contracts: ContractService;
-  volumeTracker: VolumeTracker;
-  priceService: PriceService;
-  ammCalculator: AMMCalculator | AMMCalculatorDB;
-  database?: DatabaseService;
-  ammCalculatorDB?: AMMCalculatorDB;
+  ammCalculatorDB: AMMCalculatorDB;
+  database: DatabaseService;
 };
 
 const app = new Hono<{ Variables: AppVariables }>();
@@ -62,21 +52,9 @@ app.use('*', cors());
 app.use('*', logger());
 app.use('*', errorHandler);
 
-// Inject services into context
+// Inject services into context (will be set after database initialization)
 app.use('*', async (c, next) => {
-  c.set('contracts', contractService);
-  c.set('volumeTracker', volumeTracker);
-  c.set('priceService', priceService);
-  c.set('ammCalculator', ammCalculator);
-  
-  // Add database services if available
-  if (databaseService) {
-    c.set('database', databaseService);
-    if (ammCalculator instanceof AMMCalculatorDB) {
-      c.set('ammCalculatorDB', ammCalculator);
-    }
-  }
-  
+  // Services are injected after database initialization in startServer
   await next();
 });
 
@@ -85,7 +63,7 @@ app.get('/health', (c) => {
   return c.json({ 
     status: 'ok',
     timestamp: new Date().toISOString(),
-    mode: operationMode,
+    mode: 'database',
     config: {
       rpcEndpoint: config.rpcEndpoint,
       database: databaseService ? 'connected' : 'not configured',
@@ -128,27 +106,28 @@ const startServer = async () => {
     await contractService.connect();
     // Connected to blockchain RPC
     
-    // Initialize database if configured
-    operationMode = getOperationMode();
+    // Initialize database (required)
     databaseService = await createDatabaseService();
     
-    if (databaseService && (operationMode === 'database' || operationMode === 'hybrid')) {
-      ammCalculator = new AMMCalculatorDB(databaseService, contractService);
-      // Using database mode
-      
-      // Mount database-based routes
-      app.route('/api/v1', coingeckoDBRoute);
-      app.route('/', coingeckoDBRoute);
-    } else {
-      ammCalculator = new AMMCalculator(contractService);
-      // Using contract-only mode
-      
-      // Mount contract-based routes
-      app.route('/api/v1', coingeckoRoute);
-      app.route('/', coingeckoRoute);
+    if (!databaseService) {
+      console.error('Database connection is required for this API. Please check your database configuration.');
+      throw new Error('Database connection is required for this API');
     }
     
-    // Mount pool routes (always available)
+    // Initialize AMM calculator with database
+    ammCalculator = new AMMCalculatorDB(databaseService, contractService);
+    
+    // Inject services into all routes
+    app.use('*', async (c, next) => {
+      c.set('contracts', contractService);
+      c.set('database', databaseService!);
+      c.set('ammCalculatorDB', ammCalculator);
+      await next();
+    });
+    
+    // Mount database-based routes
+    app.route('/api/v1', coingeckoDBRoute);
+    app.route('/', coingeckoDBRoute);
     app.route('/api/v1/pools', poolsRoute);
     
     // Start HTTP server

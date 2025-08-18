@@ -17,6 +17,7 @@ export interface DatabaseConfig {
   password: string;
   database: string;
   ssl?: boolean;
+  schema?: string;
 }
 
 export interface PoolInfo {
@@ -59,8 +60,10 @@ export interface TokenPrice {
 export class DatabaseService {
   private db: ReturnType<typeof drizzle>;
   private pool: InstanceType<typeof Pool>;
+  private schema: string;
 
   constructor(config: DatabaseConfig) {
+    this.schema = config.schema || 'public';
     this.pool = new Pool({
       host: config.host,
       port: config.port,
@@ -395,6 +398,11 @@ export class DatabaseService {
    */
   async testConnection(): Promise<boolean> {
     try {
+      // Set schema search path if needed
+      if (this.schema && this.schema !== 'public') {
+        await this.db.execute(sql`SET search_path TO ${sql.raw(this.schema)}, public`);
+      }
+      
       const result = await this.db.execute(sql`SELECT 1 as test`);
       return Array.isArray(result) ? result.length > 0 : result.rowCount !== null && result.rowCount > 0;
     } catch (error) {

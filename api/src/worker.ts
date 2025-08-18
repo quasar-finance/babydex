@@ -13,7 +13,7 @@ import { CacheService } from './services/cache.js';
 import { ContractService } from './services/contracts.js';
 import { AMMCalculatorDB } from './services/amm-calculator-db.js';
 import { DatabaseService } from './services/database.js';
-import { createDatabaseService, getOperationMode } from './config/database.js';
+import { createDatabaseService } from './config/database.js';
 import { errorHandler } from './middleware/error.js';
 import coingeckoDBRoute from './routes/coingecko-db.js';
 

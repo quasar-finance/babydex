@@ -4,12 +4,14 @@ REST API for Astrofork DEX with CoinGecko integration, built with Hono framework
 
 ## Features
 
-- ✅ CoinGecko-compliant endpoints for DEX integration
-- ✅ Built-in caching with LRU cache
+- ✅ CoinGecko-compliant endpoints for DEX integration  
+- ✅ Dual deployment: Node.js server + Cloudflare Workers
+- ✅ Smart caching: LRU cache (Node.js) + KV cache (Workers)
 - ✅ Support for both XYK and PCL pool types
-- ✅ 24-hour volume tracking
-- ✅ Historical trade data
-- ✅ Real-time price and liquidity data
+- ✅ Database integration with PostgreSQL materialized views
+- ✅ Real-time price depth simulation
+- ✅ Pool filtering (32 deprecated pools excluded)
+- ✅ 24-hour volume tracking and historical trade data
 
 ## CoinGecko Endpoints
 
@@ -30,73 +32,141 @@ Returns 24-hour pricing and volume information for all market pairs.
 - `high`: 24h high price
 - `low`: 24h low price
 
-### 2. `/orderbook` - Order Book
-For AMM pools, returns information about the liquidity formula used.
+### 2. `/orderbook` - Order Book  
+For AMM pools, returns information about the liquidity formula used and directs to simulation endpoints.
 
 **Query Parameters:**
 - `ticker_id` (required): Trading pair identifier
 - `depth` (optional): Order book depth (default: 100)
 
 ### 3. `/historical_trades` - Historical Trades
-Returns historical trade data for a given trading pair.
+Returns historical trade data for a given trading pair from database.
 
 **Query Parameters:**
 - `ticker_id` (required): Trading pair identifier
-- `type` (optional): Trade type filter (buy/sell/all)
+- `type` (optional): Trade type filter (buy/sell/all)  
 - `limit` (optional): Number of trades to return
 - `start_time` (optional): Start timestamp (milliseconds)
 - `end_time` (optional): End timestamp (milliseconds)
 
+### 4. `/simulate_depth` - Price Depth Simulation
+**NEW**: Calculates liquidity needed for specific price movements.
+
+**Query Parameters:**
+- `pool_id` (required): Pool contract address
+- `percentage` (required): Price change percentage (e.g., 2 or -2 for ±2%)
+- `amount_usd` (optional): Target USD amount for depth calculation
+
 ## Setup
+
+### Node.js Development
 
 1. Install dependencies:
 ```bash
 cd api
-npm install
+pnpm install
 ```
 
 2. Configure environment variables:
 ```bash
-cp .env.example .env
-# Edit .env with your contract addresses and RPC endpoint
+# Create .env file with:
+SUPABASE_HOST=your-db-host
+SUPABASE_PORT=5432
+SUPABASE_USER=your-username
+SUPABASE_PW=your-password
+SUPABASE_DB=your-database
+SUPABASE_SSL=require
+FACTORY_CONTRACT=your-factory-contract
+ROUTER_CONTRACT=your-router-contract
+INCENTIVES_CONTRACT=your-incentives-contract
+COIN_REGISTRY_CONTRACT=your-coin-registry-contract
+API_MODE=hybrid
+RPC_ENDPOINT=https://rpc.babylon.nodestake.org
 ```
 
 3. Run the server:
 ```bash
 # Development
-npm run dev
+pnpm dev
 
-# Production
-npm run build
-npm start
+# Production  
+pnpm run build
+pnpm start
+```
+
+### Cloudflare Workers Deployment
+
+1. **Install Wrangler CLI:**
+```bash
+npm install -g wrangler
+wrangler login
+```
+
+2. **Create KV Namespace:**
+```bash
+wrangler kv:namespace create "CACHE_KV"
+wrangler kv:namespace create "CACHE_KV" --preview
+# Update wrangler.toml with returned IDs
+```
+
+3. **Set Environment Secrets:**
+```bash
+wrangler secret put SUPABASE_HOST
+wrangler secret put SUPABASE_PORT
+wrangler secret put SUPABASE_USER
+wrangler secret put SUPABASE_PW
+wrangler secret put SUPABASE_DB
+wrangler secret put SUPABASE_SSL
+```
+
+4. **Deploy:**
+```bash
+pnpm run build
+pnpm run deploy
 ```
 
 ## Architecture
 
 ### Services
 
-- **CacheService**: LRU cache for API responses
-- **ContractService**: Blockchain contract interactions
-- **VolumeTracker**: 24-hour volume and trade tracking
-- **PriceService**: Token price fetching
-- **AMMCalculator**: AMM-specific calculations (TODO: Implement pool-specific formulas)
+- **CacheService**: Smart caching (LRU for Node.js, KV for Workers)
+- **ContractService**: Blockchain contract interactions with caching
+- **DatabaseService**: PostgreSQL integration with materialized views
+- **AMMCalculatorDB**: Database-backed AMM calculations with real price data
+- **PriceService**: Token price fetching from external APIs
 
 ### Pool Types
 
-The API supports multiple pool types:
-- **XYK Pools**: Standard x*y=k constant product pools
-- **PCL Pools**: Passive Concentrated Liquidity pools
+The API supports multiple pool types with full depth simulation:
 
-## TODO
+#### XYK Pools
+- **Formula**: x*y=k constant product
+- **Depth Calculation**: Mathematical simulation using √(k/target_price)
+- **Swap Amount**: Exact calculation for ±2% price movements
 
-- [ ] Implement XYK pool formula in AMMCalculator
-- [ ] Implement PCL pool formula in AMMCalculator
-- [ ] Add token decimals fetching from registry
-- [ ] Implement actual trade detection from blockchain events
-- [ ] Add WebSocket support for real-time updates
-- [ ] Implement rate limiting
-- [ ] Add comprehensive error handling
-- [ ] Add unit and integration tests
+#### PCL Pools (Astroport Concentrated Liquidity)  
+- **Formula**: Curve CryptoSwap with dynamic parameters
+- **Parameters**: amp, gamma, price_scale extracted from contracts
+- **Depth Calculation**: Approximation based on curve mathematics
+- **Contract Queries**: `config` and `compute_d` messages
+
+### Database Schema
+
+Required materialized views:
+- `poolsInV1Cosmos` - Pool metadata and addresses
+- `poolBalancesInV1Cosmos` - Current pool reserves  
+- `swapsInV1Cosmos` - Historical swap transactions
+- `tokenPricesInV1Cosmos` - Token USD price data
+
+## Completed Features
+
+- ✅ Real data integration with PostgreSQL database
+- ✅ XYK pool mathematical depth simulation  
+- ✅ PCL pool parameter extraction and approximation
+- ✅ 32 deprecated pools filtered from all endpoints
+- ✅ Cloudflare Workers deployment ready
+- ✅ Comprehensive error handling and validation
+- ✅ Token decimals handling for accurate calculations
 
 ## Contract Integration
 

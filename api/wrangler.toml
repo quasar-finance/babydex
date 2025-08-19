@@ -25,7 +25,7 @@ INCENTIVES_CONTRACT="bbn1xr3rq8yvd7qplsw5yx90ftsr2zdhg4e9z60h5duusgxpv72hud3swvs
 COIN_REGISTRY_CONTRACT="bbn1hrpna9v7vs3stzyd4z3xf00676kf78zpe2u5ksvljswn2vnjp3ysx8e0sz"
 
 # RPC Configuration
-RPC_ENDPOINT = "https://rpc.babylon.nodestake.org"
+RPC_ENDPOINT = "https://babylon-rpc.tower.fi/"
 
 # API Configuration
 API_MODE = "hybrid"

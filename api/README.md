@@ -92,6 +92,7 @@ pnpm start
 ```
 
 ### Cloudflare Workers Deployment
+The api is currently deployed directly from the CLI with no CI attached. For now no CI is needed since this should be a 1 off and overhauled anyway on EVM dex deployment
 
 1. **Install Wrangler CLI:**
 ```bash

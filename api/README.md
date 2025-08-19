@@ -4,14 +4,11 @@ REST API for Astrofork DEX with CoinGecko integration, built with Hono framework
 
 ## Features
 
-- ✅ CoinGecko-compliant endpoints for DEX integration  
-- ✅ Dual deployment: Node.js server + Cloudflare Workers
-- ✅ Smart caching: LRU cache (Node.js) + KV cache (Workers)
-- ✅ Support for both XYK and PCL pool types
-- ✅ Database integration with PostgreSQL materialized views
-- ✅ Real-time price depth simulation
-- ✅ Pool filtering (32 deprecated pools excluded)
-- ✅ 24-hour volume tracking and historical trade data
+- CoinGecko-compliant endpoints for DEX integration  
+- deployment on Cloudflare Workers
+- KV cache on Cloudflare Workers
+- Support for both XYK and PCL pool types
+- Database integration with the Tower babydex indexer
 
 ## CoinGecko Endpoints
 

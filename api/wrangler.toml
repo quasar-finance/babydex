@@ -11,6 +11,11 @@ command = "pnpm build"
 binding = "KV_BINDING"
 id = "04ce16804ad8420d88246be9cc70947d" # Add your KV namespace ID here after creating it
 
+# Hyperdrive for database connections
+[[hyperdrive]]
+binding = "HYPERDRIVE"
+id = "45c1359f565f422180b84bd77a8c35b0"
+
 # Environment Variables
 [vars]
 # Contract addresses - update with your actual contract addresses

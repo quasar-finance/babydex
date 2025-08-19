@@ -215,19 +215,21 @@ async function findSwapAmountForTargetPrice(
   const baseReserve = poolShares?.assets[0]?.amount ? Number(poolShares.assets[0].amount) : 0;
   const targetReserve = poolShares?.assets[1]?.amount ? Number(poolShares.assets[1].amount) : 0;
   
-  // Set maximum swap to 20% of the reserve we're swapping from
+  // Set maximum swap to 80% of the reserve we're swapping from
   const swapReserve = isPriceIncrease ? targetReserve : baseReserve;
-  const maxReasonableSwap = Math.floor(swapReserve * 0.2); // 20% of reserve
+  const maxReasonableSwap = Math.floor(swapReserve * 0.8); // 80% of reserve
   
   // Ensure we have a reasonable maximum even if pool reserves are small
   const minReasonableMax = Math.pow(10, swapDecimals + 1); // At least 10 tokens
   const finalMaxAmount = Math.max(maxReasonableSwap, minReasonableMax);
   
-  // Binary search parameters - use reasonable limits based on pool size
-  let minAmount = Math.pow(10, Math.max(swapDecimals - 6, 0)); // Start with 0.000001 normalized units  
+  // Binary search parameters - use reasonable limits based on pool size  
+  let minAmount = Math.pow(10, swapDecimals); // Start with 1.0 normalized units  
   let maxAmount = finalMaxAmount;
-  const tolerance = 0.001; // 0.1% tolerance
+  const tolerance = 0.01; // 1% tolerance on the percentage change
   const maxIterations = 50;
+  
+  const targetPercentageChange = ((targetPrice - currentPrice) / currentPrice) * 100;
   
   
   
@@ -254,18 +256,20 @@ async function findSwapAmountForTargetPrice(
       // When we swap token0 for token1, the new price should be higher
       let effectivePrice: number;
       if (isPriceIncrease) {
-        // Swapping token0 (base) for token1 (target): price = token1_received / token0_offered
-        effectivePrice = returnAmountNormalized / swapAmountNormalized;
+        // Swapping asset1 (target) for asset0 (base): price = target_offered / base_received
+        effectivePrice = swapAmountNormalized / returnAmountNormalized;
       } else {
-        // Swapping token1 (target) for token0 (base): price = token1_offered / token0_received
-        // But we want the inverse: token0_received / token1_offered
+        // Swapping asset0 (base) for asset1 (target): price = target_received / base_offered
         effectivePrice = returnAmountNormalized / swapAmountNormalized;
       }
       
-      // Check if we're close enough to target price
-      const priceError = Math.abs(effectivePrice - targetPrice) / targetPrice;
+      // Calculate the actual percentage change achieved
+      const actualPercentageChange = ((effectivePrice - currentPrice) / currentPrice) * 100;
       
-      if (priceError < tolerance) {
+      // Check if we're close enough to target percentage change (within 5% relative error)
+      const percentageError = Math.abs(actualPercentageChange - targetPercentageChange) / Math.abs(targetPercentageChange);
+      
+      if (percentageError < tolerance) {
         return {
           swapAmount: swapAmountNormalized,
           swapToken,
@@ -273,25 +277,22 @@ async function findSwapAmountForTargetPrice(
         };
       }
       
-      // Update best result
-      if (priceError < Math.abs(bestPrice - targetPrice) / targetPrice) {
+      // Update best result if this is closer to target percentage
+      const bestActualPercentage = ((bestPrice - currentPrice) / currentPrice) * 100;
+      const bestPercentageError = Math.abs(bestActualPercentage - targetPercentageChange) / Math.abs(targetPercentageChange);
+      
+      if (percentageError < bestPercentageError) {
         bestAmount = testAmount;
         bestPrice = effectivePrice;
       }
       
-      // Adjust search range based on result
-      if (isPriceIncrease) {
-        if (effectivePrice < targetPrice) {
-          minAmount = testAmount + 1; // Need more swap to increase price further
-        } else {
-          maxAmount = testAmount - 1; // Too much swap, reduce
-        }
+      // Adjust search range based on whether we've achieved enough percentage change
+      if (Math.abs(actualPercentageChange) < Math.abs(targetPercentageChange)) {
+        // Haven't achieved enough percentage change, need larger swap
+        minAmount = testAmount + 1;
       } else {
-        if (effectivePrice > targetPrice) {
-          minAmount = testAmount + 1; // Need more swap to decrease price further
-        } else {
-          maxAmount = testAmount - 1; // Too much swap, reduce
-        }
+        // Achieved too much percentage change, need smaller swap  
+        maxAmount = testAmount - 1;
       }
       
       if (minAmount >= maxAmount) break;
@@ -303,7 +304,7 @@ async function findSwapAmountForTargetPrice(
     }
   }
   
-  // Return best result found
+  // Return best result found - bestAmount is already in raw units
   return {
     swapAmount: bestAmount / Math.pow(10, swapDecimals),
     swapToken,

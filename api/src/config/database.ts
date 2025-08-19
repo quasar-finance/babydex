@@ -51,41 +51,58 @@ export function getDatabaseConfig(): DatabaseConfig {
 /**
  * Create database service if configured
  */
-export async function createDatabaseService(): Promise<DatabaseService | null> {
+export async function createDatabaseService(hyperdrive?: any): Promise<DatabaseService | null> {
   const config = getDatabaseConfig();
   
-  if (!config.enabled) {
+  if (!config.enabled && !hyperdrive) {
     // Database not configured - using contract-only mode
     return null;
   }
 
   try {
-    const dbService = new DatabaseService({
-      host: config.host!,
-      port: config.port!,
-      user: config.user!,
-      password: config.password!,
-      database: config.database!,
-      ssl: config.ssl,
-      schema: config.schema,
-    });
+    let dbService: DatabaseService;
+    
+    if (hyperdrive) {
+      // Use Hyperdrive in Cloudflare Workers
+      dbService = new DatabaseService({
+        hyperdrive: hyperdrive,
+        schema: config.schema || 'v1_cosmos', // Use v1_cosmos schema
+      });
+    } else {
+      // Direct connection for local development
+      dbService = new DatabaseService({
+        host: config.host!,
+        port: config.port!,
+        user: config.user!,
+        password: config.password!,
+        database: config.database!,
+        ssl: config.ssl,
+        schema: config.schema,
+      });
+    }
 
-    // Test connection with timeout
-    const connectionPromise = dbService.testConnection();
-    const timeoutPromise = new Promise<boolean>((resolve) => {
-      setTimeout(() => resolve(false), 5000); // 5 second timeout
-    });
+    // Skip connection test in Cloudflare Workers environment when using Hyperdrive
+    const isWorker = (typeof globalThis !== 'undefined' && 'navigator' in globalThis) || 
+                    process.env.CF_WORKER === 'true';
     
-    const isConnected = await Promise.race([connectionPromise, timeoutPromise]);
-    
-    if (!isConnected) {
-      console.error('Database connection failed or timed out - falling back to contract-only mode');
-      try {
-        await dbService.disconnect();
-      } catch (e) {
-        // Ignore disconnect errors
+    if (!isWorker && !hyperdrive) {
+      // Only test connection in Node.js environment with direct connection
+      const connectionPromise = dbService.testConnection();
+      const timeoutPromise = new Promise<boolean>((resolve) => {
+        setTimeout(() => resolve(false), 5000); // 5 second timeout
+      });
+      
+      const isConnected = await Promise.race([connectionPromise, timeoutPromise]);
+      
+      if (!isConnected) {
+        console.error('Database connection failed or timed out - falling back to contract-only mode');
+        try {
+          await dbService.disconnect();
+        } catch (e) {
+          // Ignore disconnect errors
+        }
+        return null;
       }
-      return null;
     }
 
     // Database connected successfully

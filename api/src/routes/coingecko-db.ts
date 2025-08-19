@@ -83,7 +83,7 @@ async function simulateXYKDepth(
   };
 }
 
-// Helper function to simulate PCL pool depth using Curve CryptoSwap math
+// Helper function to simulate PCL pool depth using contract simulation
 async function simulatePCLDepth(
   contracts: ContractService,
   poolId: string,
@@ -122,15 +122,21 @@ async function simulatePCLDepth(
       throw new Error('Invalid pool reserves');
     }
 
-    // Calculate depth using simplified Curve CryptoSwap approach
-    const depth = calculateCurveDepth({
-      b0,
-      b1, 
-      priceScale,
-      A,
-      gamma,
-      percentage
-    });
+    // Get current spot price from a small test swap
+    const currentSpotPrice = await getCurrentSpotPrice(contracts, poolId, assetInfos, baseDecimals, targetDecimals);
+    const targetPrice = currentSpotPrice * (1 + percentage / 100);
+    
+    // Use binary search to find the exact swap amount needed for the target price
+    const swapResult = await findSwapAmountForTargetPrice(
+      contracts,
+      poolId,
+      assetInfos,
+      currentSpotPrice,
+      targetPrice,
+      percentage > 0, // isPriceIncrease
+      baseDecimals,
+      targetDecimals
+    );
 
     return {
       pool_params: {
@@ -139,8 +145,14 @@ async function simulatePCLDepth(
         price_scale: priceScale
       },
       current_reserves: { base: b0, target: b1 },
-      depth_calculation: depth,
-      formula: 'PCL: Curve CryptoSwap with amp/gamma parameters'
+      current_spot_price: currentSpotPrice,
+      target_price: targetPrice,
+      swap_amount: swapResult.swapAmount,
+      swap_token: swapResult.swapToken,
+      effective_price: swapResult.effectivePrice,
+      price_impact: Math.abs((swapResult.effectivePrice - currentSpotPrice) / currentSpotPrice * 100),
+      method: 'contract_simulation_binary_search',
+      formula: 'PCL: Contract simulation with binary search'
     };
     
   } catch (error) {
@@ -152,39 +164,150 @@ async function simulatePCLDepth(
   }
 }
 
-// Simplified Curve CryptoSwap depth calculation
-function calculateCurveDepth(params: {
-  b0: number;
-  b1: number; 
-  priceScale: number;
-  A: number;
-  gamma: number;
-  percentage: number;
-}): any {
-  const { b0, b1, priceScale, A, gamma, percentage } = params;
+// Helper function to get current spot price using a small test swap
+async function getCurrentSpotPrice(
+  contracts: ContractService,
+  poolId: string,
+  assetInfos: PoolAssetInfo[],
+  baseDecimals: number,
+  targetDecimals: number
+): Promise<number> {
+  try {
+    // Use a small test amount (0.01% of typical reserves)
+    const testAmount = Math.pow(10, Math.max(baseDecimals - 4, 0)).toString();
+    
+    const simulation = await contracts.simulateSwap(poolId, {
+      info: assetInfos[0],
+      amount: testAmount
+    });
+    
+    const baseAmountNormalized = Number(testAmount) / Math.pow(10, baseDecimals);
+    const targetAmountNormalized = Number(simulation.return_amount) / Math.pow(10, targetDecimals);
+    
+    return targetAmountNormalized / baseAmountNormalized;
+  } catch (error) {
+    console.error('Error getting current spot price:', error);
+    throw error;
+  }
+}
+
+// Helper function to find swap amount needed for target price using binary search
+async function findSwapAmountForTargetPrice(
+  contracts: ContractService,
+  poolId: string,
+  assetInfos: PoolAssetInfo[],
+  currentPrice: number,
+  targetPrice: number,
+  isPriceIncrease: boolean,
+  baseDecimals: number,
+  targetDecimals: number
+): Promise<{ swapAmount: number; swapToken: string; effectivePrice: number }> {
+  // Determine which asset to swap based on price direction
+  // Rule: swapping asset0 lowers price, swapping asset1 increases price
+  const swapAssetInfo = isPriceIncrease ? assetInfos[1] : assetInfos[0];
+  const swapToken = isPriceIncrease ? 'asset1' : 'asset0';
+  // For decimals: when swapping asset0, use baseDecimals; when swapping asset1, use targetDecimals
+  const swapDecimals = isPriceIncrease ? targetDecimals : baseDecimals;
+  const receiveDecimals = isPriceIncrease ? baseDecimals : targetDecimals;
   
-  // Transform to scaled space (x0 = b0, x1 = b1 * priceScale)
-  const x0 = b0;
-  const x1 = b1 * priceScale;
+  // Get current pool reserves to calculate reasonable swap limits
+  const poolShares = await contracts.getPoolShares(poolId);
+  const baseReserve = poolShares?.assets[0]?.amount ? Number(poolShares.assets[0].amount) : 0;
+  const targetReserve = poolShares?.assets[1]?.amount ? Number(poolShares.assets[1].amount) : 0;
   
-  // Simplified invariant calculation (full implementation would solve D iteratively)
-  const D_approx = Math.sqrt(x0 * x1 * 4); // Simplified, actual is more complex
+  // Set maximum swap to 20% of the reserve we're swapping from
+  const swapReserve = isPriceIncrease ? targetReserve : baseReserve;
+  const maxReasonableSwap = Math.floor(swapReserve * 0.2); // 20% of reserve
   
-  // Current spot price approximation
-  const currentSpot = (x1 / x0) / priceScale;
-  const targetPrice = currentSpot * (1 + percentage / 100);
+  // Ensure we have a reasonable maximum even if pool reserves are small
+  const minReasonableMax = Math.pow(10, swapDecimals + 1); // At least 10 tokens
+  const finalMaxAmount = Math.max(maxReasonableSwap, minReasonableMax);
   
-  // Simplified depth estimation using geometric mean and amplification
-  const liquidityDepth = Math.sqrt(x0 * x1) / A; // Higher A = lower depth needed
-  const baseDepthEstimate = liquidityDepth * Math.abs(percentage) / 100;
+  // Binary search parameters - use reasonable limits based on pool size
+  let minAmount = Math.pow(10, Math.max(swapDecimals - 6, 0)); // Start with 0.000001 normalized units  
+  let maxAmount = finalMaxAmount;
+  const tolerance = 0.001; // 0.1% tolerance
+  const maxIterations = 50;
   
+  
+  
+  let bestAmount = minAmount;
+  let bestPrice = currentPrice;
+  
+  for (let i = 0; i < maxIterations; i++) {
+    const testAmount = Math.floor((minAmount + maxAmount) / 2);
+    
+    try {
+      const simulation = await contracts.simulateSwap(poolId, {
+        info: swapAssetInfo,
+        amount: testAmount.toString()
+      });
+      
+      
+      // Calculate effective price from simulation
+      const swapAmountNormalized = testAmount / Math.pow(10, swapDecimals);
+      const returnAmountNormalized = Number(simulation.return_amount) / Math.pow(10, receiveDecimals);
+      
+      // Calculate the new effective price after the swap
+      // The pool price is defined as: how much of token1 you get for 1 token0
+      // When we swap token1 for token0, the new price should be lower
+      // When we swap token0 for token1, the new price should be higher
+      let effectivePrice: number;
+      if (isPriceIncrease) {
+        // Swapping token0 (base) for token1 (target): price = token1_received / token0_offered
+        effectivePrice = returnAmountNormalized / swapAmountNormalized;
+      } else {
+        // Swapping token1 (target) for token0 (base): price = token1_offered / token0_received
+        // But we want the inverse: token0_received / token1_offered
+        effectivePrice = returnAmountNormalized / swapAmountNormalized;
+      }
+      
+      // Check if we're close enough to target price
+      const priceError = Math.abs(effectivePrice - targetPrice) / targetPrice;
+      
+      if (priceError < tolerance) {
+        return {
+          swapAmount: swapAmountNormalized,
+          swapToken,
+          effectivePrice
+        };
+      }
+      
+      // Update best result
+      if (priceError < Math.abs(bestPrice - targetPrice) / targetPrice) {
+        bestAmount = testAmount;
+        bestPrice = effectivePrice;
+      }
+      
+      // Adjust search range based on result
+      if (isPriceIncrease) {
+        if (effectivePrice < targetPrice) {
+          minAmount = testAmount + 1; // Need more swap to increase price further
+        } else {
+          maxAmount = testAmount - 1; // Too much swap, reduce
+        }
+      } else {
+        if (effectivePrice > targetPrice) {
+          minAmount = testAmount + 1; // Need more swap to decrease price further
+        } else {
+          maxAmount = testAmount - 1; // Too much swap, reduce
+        }
+      }
+      
+      if (minAmount >= maxAmount) break;
+      
+    } catch (error) {
+      // Swap failed, probably too large
+      maxAmount = testAmount - 1;
+      if (minAmount >= maxAmount) break;
+    }
+  }
+  
+  // Return best result found
   return {
-    estimated_swap_amount: baseDepthEstimate,
-    current_spot_price: currentSpot,
-    target_price: targetPrice,
-    method: 'simplified_curve_approximation',
-    note: 'This is a simplified approximation. Full implementation requires iterative D calculation.',
-    recommendation: 'Use contract simulation for precise values'
+    swapAmount: bestAmount / Math.pow(10, swapDecimals),
+    swapToken,
+    effectivePrice: bestPrice
   };
 }
 
@@ -234,6 +357,13 @@ coingeckoDBRoute.get('/tickers', async (c) => {
     const decimalsMap = new Map<string, number>();
     const decimalsPromises = Array.from(uniqueTokens).map(async (token) => {
       try {
+        // First try to get decimals from database (more reliable for IBC tokens)
+        const tokenDecimals = await database.getTokenDecimals(token);
+        if (tokenDecimals !== null) {
+          return { token, decimals: tokenDecimals };
+        }
+        
+        // Fallback to contract query
         const assetInfo = token.startsWith('ibc/') 
           ? { native_token: { denom: token } }
           : token.startsWith('u') 
@@ -241,7 +371,7 @@ coingeckoDBRoute.get('/tickers', async (c) => {
           : { token: { contract_addr: token } };
         const decimals = await contracts.getTokenDecimals(assetInfo as PoolAssetInfo);
         return { token, decimals };
-      } catch {
+      } catch (error) {
         return { token, decimals: 6 }; // Default to 6 decimals
       }
     });
@@ -251,12 +381,27 @@ coingeckoDBRoute.get('/tickers', async (c) => {
       decimalsMap.set(token, decimals);
     }
     
-    // Get token prices for USD calculations
-    const tokenPrices = await database.getTokenPrices(Array.from(uniqueTokens));
+    // Get token symbols/names from denominations
+    const tokenSymbols = await database.getTokenSymbols(Array.from(uniqueTokens));
+    
+    // Get token prices using the token names/symbols
+    const tokenNames = Array.from(tokenSymbols.values());
+    const tokenPrices = await database.getTokenPrices(tokenNames);
+    
+    // Create a price map keyed by denomination (not token name)
     const priceMap = new Map<string, number>();
+    
+    // Map prices back to denominations
     for (const tokenPrice of tokenPrices) {
       if (tokenPrice.token && tokenPrice.price) {
-        priceMap.set(tokenPrice.token, parseFloat(tokenPrice.price));
+        const price = parseFloat(tokenPrice.price);
+        // Find the denomination that maps to this token name
+        for (const [denom, tokenName] of tokenSymbols) {
+          if (tokenName === tokenPrice.token) {
+            priceMap.set(denom, price);
+            break;
+          }
+        }
       }
     }
     

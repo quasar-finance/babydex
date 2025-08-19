@@ -21,8 +21,9 @@ import coingeckoDBRoute from './routes/coingecko-db.js';
 export interface Env {
   CACHE_KV: any; // KVNamespace type not available in this context
   KV_BINDING: any; // Additional KV binding from wrangler.toml
+  HYPERDRIVE: any; // Hyperdrive binding for database connections
   
-  // Database config
+  // Database config (fallback for local dev)
   SUPABASE_HOST: string;
   SUPABASE_PORT: string;
   SUPABASE_USER: string;
@@ -131,7 +132,8 @@ app.use('*', async (c, next) => {
     process.env.SUPABASE_SSL = env.SUPABASE_SSL;
     process.env.API_MODE = env.API_MODE;
 
-    databaseService = await createDatabaseService();
+    // Pass Hyperdrive binding if available, otherwise use environment variables
+    databaseService = await createDatabaseService(env.HYPERDRIVE);
     
     if (databaseService) {
       ammCalculator = new AMMCalculatorDB(databaseService, contractService);

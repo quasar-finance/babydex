@@ -1,7 +1,7 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { sql, eq, desc, and, gte, lte, inArray } from 'drizzle-orm';
 import pg from 'pg';
-const { Pool } = pg;
+const { Client } = pg;
 import { 
   materializedSwapInV1Cosmos,
   materializedPoolBalanceInV1Cosmos,
@@ -11,13 +11,14 @@ import {
 } from '../../../indexer/src/drizzle/schema.js';
 
 export interface DatabaseConfig {
-  host: string;
-  port: number;
-  user: string;
-  password: string;
-  database: string;
+  host?: string;
+  port?: number;
+  user?: string;
+  password?: string;
+  database?: string;
   ssl?: boolean;
   schema?: string;
+  hyperdrive?: any; // Cloudflare Hyperdrive binding
 }
 
 export interface PoolInfo {
@@ -58,31 +59,67 @@ export interface TokenPrice {
 }
 
 export class DatabaseService {
-  private db: ReturnType<typeof drizzle>;
-  private pool: InstanceType<typeof Pool>;
+  private db!: ReturnType<typeof drizzle>;
+  private client: InstanceType<typeof Client>;
   private schema: string;
+  private isConnected: boolean = false;
 
   constructor(config: DatabaseConfig) {
     this.schema = config.schema || 'public';
-    this.pool = new Pool({
-      host: config.host,
-      port: config.port,
-      user: config.user,
-      password: config.password,
-      database: config.database,
-      ssl: config.ssl ? { rejectUnauthorized: false } : false,
-      max: 20, // Maximum number of connections
-      idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
-      connectionTimeoutMillis: 10000, // Return error after 10 seconds if connection could not be established
-    });
+    
+    // Use Hyperdrive if available, otherwise fallback to direct connection
+    if (config.hyperdrive) {
+      // Use Hyperdrive connection in Cloudflare Workers
+      this.client = new Client({
+        connectionString: config.hyperdrive.connectionString,
+        connectionTimeoutMillis: 10000,
+      });
+    } else {
+      // Direct connection for local development
+      this.client = new Client({
+        host: config.host,
+        port: config.port,
+        user: config.user,
+        password: config.password,
+        database: config.database,
+        ssl: config.ssl ? { rejectUnauthorized: false } : false,
+        connectionTimeoutMillis: 10000,
+      });
+    }
+  }
 
-    this.db = drizzle(this.pool);
+  /**
+   * Initialize connection - MUST be called before any queries
+   */
+  async connect(): Promise<void> {
+    if (!this.isConnected) {
+      await this.client.connect();
+      this.isConnected = true;
+      
+      // Create drizzle instance after connecting
+      this.db = drizzle(this.client);
+      
+      // Set schema search path
+      if (this.schema && this.schema !== 'public') {
+        await this.db.execute(sql`SET search_path TO ${sql.raw(this.schema)}, public`);
+      }
+    }
+  }
+
+  /**
+   * Ensure connected before queries
+   */
+  private async ensureConnected(): Promise<void> {
+    if (!this.isConnected) {
+      await this.connect();
+    }
   }
 
   /**
    * Get all pools with their token pairs
    */
   async getPools(limit: number = 100): Promise<PoolInfo[]> {
+    await this.ensureConnected();
     const pools = await this.db
       .select({
         poolAddress: materializedPoolsInV1Cosmos.poolAddress,
@@ -108,6 +145,7 @@ export class DatabaseService {
    * Get current pool balance for a specific pool
    */
   async getPoolBalance(poolAddress: string): Promise<PoolBalance | null> {
+    await this.ensureConnected();
     const result = await this.db
       .select({
         poolAddress: materializedPoolBalanceInV1Cosmos.poolAddress,
@@ -140,7 +178,7 @@ export class DatabaseService {
    */
   async getBatchPoolBalances(poolAddresses: string[]): Promise<PoolBalance[]> {
     if (poolAddresses.length === 0) return [];
-
+    
     // Get latest balance for each pool
     const latestBalances = await this.db
       .select({
@@ -301,25 +339,27 @@ export class DatabaseService {
   async getTokenPrices(tokens: string[]): Promise<TokenPrice[]> {
     if (tokens.length === 0) return [];
 
-    const prices = await this.db
-      .select({
-        token: tokenPricesInV1Cosmos.token,
-        price: tokenPricesInV1Cosmos.price,
-        lastUpdatedAt: tokenPricesInV1Cosmos.lastUpdatedAt,
-      })
-      .from(tokenPricesInV1Cosmos)
-      .where(inArray(tokenPricesInV1Cosmos.token, tokens))
-      .orderBy(desc(tokenPricesInV1Cosmos.createdAt));
+    // Get only the latest price for each token using window function
+    const latestPrices = await this.db.execute(sql`
+      WITH latest_prices AS (
+        SELECT DISTINCT ON (token) token, price, last_updated_at
+        FROM v1_cosmos.token_prices 
+        WHERE token = ANY(${sql.raw(`ARRAY[${tokens.map(token => `'${token.replace(/'/g, "''")}'`).join(',')}]`)})
+        ORDER BY token, created_at DESC
+      )
+      SELECT token, price, last_updated_at 
+      FROM latest_prices
+    `);
 
-    return prices.map((price: any) => ({
-      token: price.token,
-      price: price.price?.toString() || null,
-      lastUpdatedAt: price.lastUpdatedAt?.toString() || null,
+    return latestPrices.rows.map((row: any) => ({
+      token: row.token,
+      price: row.price?.toString() || null,
+      lastUpdatedAt: row.last_updated_at?.toString() || null,
     }));
   }
 
   /**
-   * Get token metadata including decimals
+   * Get token metadata including decimals by token name
    */
   async getTokenInfo(tokenName: string): Promise<{
     decimals: number | null;
@@ -344,6 +384,23 @@ export class DatabaseService {
       denomination: token.denomination,
       coingeckoId: token.coingeckoId,
     };
+  }
+
+  /**
+   * Get token decimals by denomination
+   */
+  async getTokenDecimals(denomination: string): Promise<number | null> {
+    const result = await this.db
+      .select({
+        decimals: tokenInV1Cosmos.decimals,
+      })
+      .from(tokenInV1Cosmos)
+      .where(eq(tokenInV1Cosmos.denomination, denomination))
+      .limit(1);
+
+    if (result.length === 0) return null;
+
+    return result[0].decimals ? Number(result[0].decimals) : null;
   }
 
   /**
@@ -390,7 +447,10 @@ export class DatabaseService {
    * Close database connection
    */
   async disconnect(): Promise<void> {
-    await this.pool.end();
+    if (this.isConnected) {
+      await this.client.end();
+      this.isConnected = false;
+    }
   }
 
   /**
@@ -398,11 +458,7 @@ export class DatabaseService {
    */
   async testConnection(): Promise<boolean> {
     try {
-      // Set schema search path if needed
-      if (this.schema && this.schema !== 'public') {
-        await this.db.execute(sql`SET search_path TO ${sql.raw(this.schema)}, public`);
-      }
-      
+      await this.connect(); // Set schema
       const result = await this.db.execute(sql`SELECT 1 as test`);
       return Array.isArray(result) ? result.length > 0 : result.rowCount !== null && result.rowCount > 0;
     } catch (error) {

@@ -60,7 +60,7 @@ async function simulateXYKDepth(
     // Target price: targetPrice = (y - Δy)/(x + Δx)
     // Solving: Δx = √(k/targetPrice) - x
     const newX = Math.sqrt(k / targetPrice);
-    swapAmount = newX - x;
+    swapAmount = Math.abs(newX - x); // Take absolute value to ensure positive
     swapToken = 'base';
   } else {
     // Price decrease: need to sell target token (y) to get base token (x)
@@ -68,7 +68,7 @@ async function simulateXYKDepth(
     // Target price: targetPrice = (y + Δy)/(x - Δx)
     // Solving: Δy = targetPrice * √(k * targetPrice) - y
     const newY = targetPrice * Math.sqrt(k * targetPrice);
-    swapAmount = newY - y;
+    swapAmount = Math.abs(newY - y); // Take absolute value to ensure positive
     swapToken = 'target';
   }
   

@@ -6,6 +6,10 @@ node_compat = true
 [build]
 command = "pnpm build"
 
+[[routes]]
+pattern = "babydex.tower.fi"
+custom_domain = true
+
 # KV Namespace for caching
 [[kv_namespaces]]
 binding = "KV_BINDING"

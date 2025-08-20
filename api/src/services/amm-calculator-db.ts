@@ -4,9 +4,6 @@ import { PoolAssetInfo } from '../types/coingecko.js';
 
 export interface PoolPriceData {
   spotPrice: number;
-  bidPrice: number;
-  askPrice: number;
-  spread: number;
   volume24h: {
     baseVolume: string;
     targetVolume: string;
@@ -41,7 +38,7 @@ export class AMMCalculatorDB {
       const [poolBalance, volumeData, recentTrades] = await Promise.all([
         this.databaseService.getPoolBalance(poolAddress),
         this.databaseService.get24HourVolume(poolAddress),
-        this.databaseService.getHistoricalTrades(poolAddress, 20) // For bid/ask calculation
+        this.databaseService.getHistoricalTrades(poolAddress, 20) // For spot price calculation
       ]);
       
       if (!poolBalance) {
@@ -61,13 +58,6 @@ export class AMMCalculatorDB {
         targetDecimals
       );
 
-      // Calculate bid/ask from pre-fetched trades
-      const { bid, ask, spread } = this.calculateBidAskFromTradesSync(
-        recentTrades,
-        spotPrice,
-        baseDecimals,
-        targetDecimals
-      );
 
       // Calculate 24h price change if we have high/low
       let priceChange24h = null;
@@ -81,9 +71,6 @@ export class AMMCalculatorDB {
 
       return {
         spotPrice,
-        bidPrice: bid,
-        askPrice: ask,
-        spread,
         volume24h: {
           baseVolume: volumeData.baseVolume,
           targetVolume: volumeData.targetVolume,
@@ -119,91 +106,6 @@ export class AMMCalculatorDB {
     return balanceMap;
   }
 
-  /**
-   * Calculate spot price from the last actual swap
-   */
-  private async calculateSpotPriceFromLastSwap(
-    poolAddress: string,
-    poolBalance: PoolBalance,
-    baseDecimals: number,
-    targetDecimals: number
-  ): Promise<number> {
-    try {
-      // Get the most recent swap
-      const lastSwaps = await this.databaseService.getHistoricalTrades(poolAddress, 1);
-      
-      if (lastSwaps.length === 0) {
-        // Fallback to reserve calculation if no swaps found
-        // No swaps found, using reserve calculation
-        return this.calculateSpotPriceFromReserves(
-          poolBalance.token0Balance,
-          poolBalance.token1Balance,
-          baseDecimals,
-          targetDecimals
-        );
-      }
-
-      const lastSwap = lastSwaps[0];
-      
-      // Determine if the swap was token0 -> token1 or token1 -> token0
-      const isToken0Offer = lastSwap.offerAsset === poolBalance.token0Denom;
-      const isToken1Offer = lastSwap.offerAsset === poolBalance.token1Denom;
-      
-      if (!isToken0Offer && !isToken1Offer) {
-        // Swap assets don't match pool tokens, using reserve calculation
-        return this.calculateSpotPriceFromReserves(
-          poolBalance.token0Balance,
-          poolBalance.token1Balance,
-          baseDecimals,
-          targetDecimals
-        );
-      }
-
-      // Calculate the effective price from the swap
-      // Price = amount received / amount offered
-      const offerAmount = Number(lastSwap.offerAmount);
-      const returnAmount = Number(lastSwap.returnAmount);
-      
-      if (offerAmount === 0 || returnAmount === 0) {
-        // Invalid swap amounts, using reserve calculation
-        return this.calculateSpotPriceFromReserves(
-          poolBalance.token0Balance,
-          poolBalance.token1Balance,
-          baseDecimals,
-          targetDecimals
-        );
-      }
-
-      let spotPrice: number;
-      
-      if (isToken0Offer) {
-        // Swap was token0 -> token1
-        // Price of token0 in terms of token1 = token1_received / token0_offered
-        const token0AmountNormalized = offerAmount / Math.pow(10, baseDecimals);
-        const token1AmountNormalized = returnAmount / Math.pow(10, targetDecimals);
-        spotPrice = token1AmountNormalized / token0AmountNormalized;
-      } else {
-        // Swap was token1 -> token0
-        // Price of token0 in terms of token1 = token1_offered / token0_received
-        const token1AmountNormalized = offerAmount / Math.pow(10, targetDecimals);
-        const token0AmountNormalized = returnAmount / Math.pow(10, baseDecimals);
-        spotPrice = token1AmountNormalized / token0AmountNormalized;
-      }
-
-      // Calculated spot price from last swap
-      return spotPrice;
-      
-    } catch (error) {
-      console.error('Error calculating spot price from last swap:', error);
-      // Fallback to reserve calculation
-      return this.calculateSpotPriceFromReserves(
-        poolBalance.token0Balance,
-        poolBalance.token1Balance,
-        baseDecimals,
-        targetDecimals
-      );
-    }
-  }
 
   /**
    * Fallback: Calculate spot price from pool reserves
@@ -221,73 +123,6 @@ export class AMMCalculatorDB {
     return targetAmount / baseAmount;
   }
 
-  /**
-   * Calculate bid/ask prices from recent trades or use default spread
-   */
-  private async calculateBidAskFromTrades(
-    poolAddress: string,
-    spotPrice: number,
-    baseDecimals: number,
-    targetDecimals: number
-  ): Promise<{ bid: number; ask: number; spread: number }> {
-    try {
-      // Get recent trades to calculate actual spread
-      const recentTrades = await this.databaseService.getHistoricalTrades(
-        poolAddress, 
-        20 // Get last 20 trades
-      );
-
-      if (recentTrades.length > 0) {
-        // Calculate effective prices from recent trades
-        const prices: number[] = [];
-        
-        for (const trade of recentTrades) {
-          if (trade.offerAmount && trade.returnAmount) {
-            const offerAmount = Number(trade.offerAmount) / Math.pow(10, baseDecimals);
-            const returnAmount = Number(trade.returnAmount) / Math.pow(10, targetDecimals);
-            
-            if (offerAmount > 0) {
-              const effectivePrice = returnAmount / offerAmount;
-              if (effectivePrice > 0 && isFinite(effectivePrice)) {
-                prices.push(effectivePrice);
-              }
-            }
-          }
-        }
-
-        if (prices.length > 0) {
-          // Use min/max of recent trade prices for bid/ask
-          const minPrice = Math.min(...prices);
-          const maxPrice = Math.max(...prices);
-          
-          // Bid is typically lower, ask is higher
-          const bid = Math.min(minPrice, spotPrice * 0.997); // At least 0.3% below spot
-          const ask = Math.max(maxPrice, spotPrice * 1.003); // At least 0.3% above spot
-          const spread = (ask - bid) / ask;
-          
-          return { bid, ask, spread };
-        }
-      }
-
-      // Default spread if no recent trades
-      const defaultSpread = 0.003; // 0.3%
-      return {
-        bid: spotPrice * (1 - defaultSpread),
-        ask: spotPrice * (1 + defaultSpread),
-        spread: defaultSpread * 2
-      };
-      
-    } catch (error) {
-      console.error('Error calculating bid/ask from trades:', error);
-      // Fallback to default spread
-      const defaultSpread = 0.003;
-      return {
-        bid: spotPrice * (1 - defaultSpread),
-        ask: spotPrice * (1 + defaultSpread),
-        spread: defaultSpread * 2
-      };
-    }
-  }
 
   /**
    * Calculate liquidity in USD using database prices
@@ -478,66 +313,6 @@ export class AMMCalculatorDB {
     return spotPrice;
   }
 
-  /**
-   * Calculate bid/ask from pre-fetched trades (synchronous)
-   * This replaces the async calculateBidAskFromTrades for better performance
-   */
-  private calculateBidAskFromTradesSync(
-    recentTrades: any[],
-    spotPrice: number,
-    baseDecimals: number,
-    targetDecimals: number
-  ): { bid: number; ask: number; spread: number } {
-    if (recentTrades.length === 0) {
-      // Default spread of 0.3%
-      const spread = 0.003;
-      return {
-        bid: spotPrice * (1 - spread),
-        ask: spotPrice * (1 + spread),
-        spread
-      };
-    }
-
-    // Calculate effective prices from recent trades
-    const prices: number[] = [];
-    
-    for (const trade of recentTrades) {
-      if (trade.offerAmount && trade.returnAmount) {
-        const offerAmount = Number(trade.offerAmount) / Math.pow(10, baseDecimals);
-        const returnAmount = Number(trade.returnAmount) / Math.pow(10, targetDecimals);
-        
-        if (offerAmount > 0) {
-          const effectivePrice = returnAmount / offerAmount;
-          prices.push(effectivePrice);
-        }
-      }
-    }
-
-    if (prices.length > 0) {
-      // Calculate spread from recent trades
-      const minPrice = Math.min(...prices);
-      const maxPrice = Math.max(...prices);
-      const avgPrice = prices.reduce((sum, price) => sum + price, 0) / prices.length;
-      
-      // Use average spread or minimum of 0.1%
-      const calculatedSpread = avgPrice > 0 ? (maxPrice - minPrice) / avgPrice : 0.003;
-      const spread = Math.max(calculatedSpread, 0.001); // Minimum 0.1% spread
-      
-      return {
-        bid: spotPrice * (1 - spread / 2),
-        ask: spotPrice * (1 + spread / 2),
-        spread
-      };
-    }
-
-    // Fallback to default spread
-    const spread = 0.003;
-    return {
-      bid: spotPrice * (1 - spread),
-      ask: spotPrice * (1 + spread),
-      spread
-    };
-  }
 
   /**
    * Get 24-hour volume data

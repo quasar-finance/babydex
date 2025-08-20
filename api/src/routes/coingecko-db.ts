@@ -441,11 +441,7 @@ coingeckoDBRoute.get('/tickers', async (c) => {
             last_price: priceData.spotPrice.toString(),
             base_volume: priceData.volume24h.baseVolume,
             target_volume: priceData.volume24h.targetVolume,
-            liquidity_in_usd: liquidityUSD.toString(),
-            bid: priceData.bidPrice.toString(),
-            ask: priceData.askPrice.toString(),
-            high: priceData.high24h?.toString() || priceData.spotPrice.toString(),
-            low: priceData.low24h?.toString() || priceData.spotPrice.toString()
+            liquidity_in_usd: liquidityUSD.toString()
           };
           
           return ticker;

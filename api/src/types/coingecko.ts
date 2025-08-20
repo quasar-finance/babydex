@@ -7,10 +7,6 @@ export interface TickerResponse {
   base_volume: string;
   target_volume: string;
   liquidity_in_usd: string;
-  bid: string;
-  ask: string;
-  high: string;
-  low: string;
 }
 
 export interface OrderBookResponse {

@@ -244,14 +244,10 @@ export class DatabaseService {
     for (const swap of swaps) {
       swapCount++;
       
+      // Only count input volume (offer amounts) to avoid double-counting
       if (swap.offerAsset && swap.offerAmount) {
         const current = volumeMap.get(swap.offerAsset) || 0n;
         volumeMap.set(swap.offerAsset, current + BigInt(swap.offerAmount.toString()));
-      }
-      
-      if (swap.askAsset && swap.returnAmount) {
-        const current = volumeMap.get(swap.askAsset) || 0n;
-        volumeMap.set(swap.askAsset, current + BigInt(swap.returnAmount.toString()));
       }
 
       // Calculate price for high/low

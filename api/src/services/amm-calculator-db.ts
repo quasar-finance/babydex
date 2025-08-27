@@ -31,13 +31,13 @@ export class AMMCalculatorDB {
    */
   async getPoolPriceData(
     poolAddress: string,
-    decimalsMap?: Map<string, number>
+    decimalsMap?: Map<string, number>,
+    tokenPricesMap?: Map<string, number>
   ): Promise<PoolPriceData | null> {
     try {
       // Parallel fetch all required data to reduce database round trips
-      const [poolBalance, volumeData, recentTrades] = await Promise.all([
+      const [poolBalance, recentTrades] = await Promise.all([
         this.databaseService.getPoolBalance(poolAddress),
-        this.databaseService.get24HourVolume(poolAddress),
         this.databaseService.getHistoricalTrades(poolAddress, 20) // For spot price calculation
       ]);
       
@@ -58,6 +58,38 @@ export class AMMCalculatorDB {
         targetDecimals
       );
 
+      // Get token prices for USD-based volume calculation
+      const basePrice = tokenPricesMap?.get(poolBalance.token0Denom) || 0;
+      const targetPrice = tokenPricesMap?.get(poolBalance.token1Denom) || 0;
+
+      // Debug logging for specific pool
+      if (poolAddress === 'bbn1478sh2c7xgk2xufh32l3p4vsyeyd5xemqm6f2jrwz39wa9atgkps7z9d52') {
+        console.log('DEBUG - Pool analysis:');
+        console.log('  Pool:', poolAddress);
+        console.log('  Base token:', poolBalance.token0Denom);
+        console.log('  Target token:', poolBalance.token1Denom);
+        console.log('  Base price:', basePrice);
+        console.log('  Target price:', targetPrice);
+        console.log('  Has decimals map:', !!decimalsMap);
+        console.log('  Will use USD calculation:', basePrice > 0 && targetPrice > 0 && decimalsMap);
+      }
+
+      let volumeData;
+      
+      // Use USD-based calculation if prices are available, otherwise fallback to old method
+      if (basePrice > 0 && targetPrice > 0 && decimalsMap) {
+        volumeData = await this.databaseService.get24HourVolumeUSD(
+          poolAddress,
+          poolBalance.token0Denom,
+          poolBalance.token1Denom,
+          basePrice,
+          targetPrice,
+          decimalsMap
+        );
+      } else {
+        // Fallback to old method
+        volumeData = await this.databaseService.get24HourVolume(poolAddress);
+      }
 
       // Calculate 24h price change if we have high/low
       let priceChange24h = null;
@@ -74,6 +106,7 @@ export class AMMCalculatorDB {
         volume24h: {
           baseVolume: volumeData.baseVolume,
           targetVolume: volumeData.targetVolume,
+          usdVolume: volumeData.usdVolume,
         },
         high24h: volumeData.high ? parseFloat(volumeData.high) : null,
         low24h: volumeData.low ? parseFloat(volumeData.low) : null,

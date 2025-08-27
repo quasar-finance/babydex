@@ -218,6 +218,7 @@ export class DatabaseService {
     high: string | null;
     low: string | null;
     swapCount: number;
+    usdVolume?: number;
   }> {
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
     
@@ -272,6 +273,116 @@ export class DatabaseService {
       high,
       low,
       swapCount,
+    };
+  }
+
+  /**
+   * Get 24-hour trading volume using USD-based calculation
+   * Returns base_volume = total USD volume / base price, target_volume = total USD volume / target price
+   */
+  async get24HourVolumeUSD(
+    poolAddress: string,
+    baseDenom: string,
+    targetDenom: string,
+    basePrice: number,
+    targetPrice: number,
+    decimalsMap: Map<string, number>
+  ): Promise<{
+    baseVolume: string;
+    targetVolume: string;
+    high: string | null;
+    low: string | null;
+    swapCount: number;
+    usdVolume: number;
+  }> {
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    
+    const swaps = await this.db
+      .select({
+        offerAsset: materializedSwapInV1Cosmos.offerAsset,
+        offerAmount: materializedSwapInV1Cosmos.offerAmount,
+        askAsset: materializedSwapInV1Cosmos.askAsset,
+        returnAmount: materializedSwapInV1Cosmos.returnAmount,
+      })
+      .from(materializedSwapInV1Cosmos)
+      .where(
+        and(
+          eq(materializedSwapInV1Cosmos.poolAddress, poolAddress),
+          gte(materializedSwapInV1Cosmos.timestamp, oneDayAgo.toISOString())
+        )
+      );
+
+    let swapCount = 0;
+    let prices: number[] = [];
+    let totalUSDVolume = 0;
+
+    // Get token prices for volume calculation
+    const tokenPrices = new Map<string, number>();
+    tokenPrices.set(baseDenom, basePrice);
+    tokenPrices.set(targetDenom, targetPrice);
+
+    for (const swap of swaps) {
+      swapCount++;
+      
+      // Calculate USD volume for this swap using offer amount
+      if (swap.offerAsset && swap.offerAmount) {
+        const tokenPrice = tokenPrices.get(swap.offerAsset) || 0;
+        const decimals = decimalsMap.get(swap.offerAsset) || 6;
+        
+        if (tokenPrice > 0) {
+          const normalizedAmount = Number(swap.offerAmount) / Math.pow(10, decimals);
+          const usdValue = normalizedAmount * tokenPrice;
+          totalUSDVolume += usdValue;
+          
+          // Debug for specific pool
+          if (poolAddress === 'bbn1478sh2c7xgk2xufh32l3p4vsyeyd5xemqm6f2jrwz39wa9atgkps7z9d52') {
+            console.log(`    Swap: ${swap.offerAsset} amount=${swap.offerAmount} decimals=${decimals} price=$${tokenPrice} normalized=${normalizedAmount} usd=$${usdValue}`);
+          }
+        }
+      }
+
+      // Calculate price for high/low
+      if (swap.offerAmount && swap.returnAmount) {
+        const price = Number(swap.returnAmount.toString()) / Number(swap.offerAmount.toString());
+        if (price > 0 && isFinite(price)) {
+          prices.push(price);
+        }
+      }
+    }
+
+    const high = prices.length > 0 ? Math.max(...prices).toString() : null;
+    const low = prices.length > 0 ? Math.min(...prices).toString() : null;
+
+    // Calculate volumes using new formula: USD volume / token price
+    const baseVolumeNumber = basePrice > 0 ? totalUSDVolume / basePrice : 0;
+    const targetVolumeNumber = targetPrice > 0 ? totalUSDVolume / targetPrice : 0;
+    
+    // Convert back to token amounts with decimals
+    const baseDecimals = decimalsMap.get(baseDenom) || 6;
+    const targetDecimals = decimalsMap.get(targetDenom) || 6;
+    
+    const baseVolume = (baseVolumeNumber * Math.pow(10, baseDecimals)).toFixed(0);
+    const targetVolume = (targetVolumeNumber * Math.pow(10, targetDecimals)).toFixed(0);
+
+    // Debug for specific pool
+    if (poolAddress === 'bbn1478sh2c7xgk2xufh32l3p4vsyeyd5xemqm6f2jrwz39wa9atgkps7z9d52') {
+      console.log(`  Final calculation:`);
+      console.log(`    Total USD volume: $${totalUSDVolume}`);
+      console.log(`    Base price: $${basePrice}, decimals: ${baseDecimals}`);
+      console.log(`    Target price: $${targetPrice}, decimals: ${targetDecimals}`);
+      console.log(`    Base volume (normalized): ${baseVolumeNumber}`);
+      console.log(`    Target volume (normalized): ${targetVolumeNumber}`);
+      console.log(`    Base volume (with decimals): ${baseVolume}`);
+      console.log(`    Target volume (with decimals): ${targetVolume}`);
+    }
+
+    return {
+      baseVolume,
+      targetVolume,
+      high,
+      low,
+      swapCount,
+      usdVolume: totalUSDVolume,
     };
   }
 

@@ -62,18 +62,6 @@ export class AMMCalculatorDB {
       const basePrice = tokenPricesMap?.get(poolBalance.token0Denom) || 0;
       const targetPrice = tokenPricesMap?.get(poolBalance.token1Denom) || 0;
 
-      // Debug logging for specific pool
-      if (poolAddress === 'bbn1478sh2c7xgk2xufh32l3p4vsyeyd5xemqm6f2jrwz39wa9atgkps7z9d52') {
-        console.log('DEBUG - Pool analysis:');
-        console.log('  Pool:', poolAddress);
-        console.log('  Base token:', poolBalance.token0Denom);
-        console.log('  Target token:', poolBalance.token1Denom);
-        console.log('  Base price:', basePrice);
-        console.log('  Target price:', targetPrice);
-        console.log('  Has decimals map:', !!decimalsMap);
-        console.log('  Will use USD calculation:', basePrice > 0 && targetPrice > 0 && decimalsMap);
-      }
-
       let volumeData;
       
       // Use USD-based calculation if prices are available, otherwise fallback to old method

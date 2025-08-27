@@ -333,11 +333,6 @@ export class DatabaseService {
           const normalizedAmount = Number(swap.offerAmount) / Math.pow(10, decimals);
           const usdValue = normalizedAmount * tokenPrice;
           totalUSDVolume += usdValue;
-          
-          // Debug for specific pool
-          if (poolAddress === 'bbn1478sh2c7xgk2xufh32l3p4vsyeyd5xemqm6f2jrwz39wa9atgkps7z9d52') {
-            console.log(`    Swap: ${swap.offerAsset} amount=${swap.offerAmount} decimals=${decimals} price=$${tokenPrice} normalized=${normalizedAmount} usd=$${usdValue}`);
-          }
         }
       }
 
@@ -363,18 +358,6 @@ export class DatabaseService {
     
     const baseVolume = (baseVolumeNumber * Math.pow(10, baseDecimals)).toFixed(0);
     const targetVolume = (targetVolumeNumber * Math.pow(10, targetDecimals)).toFixed(0);
-
-    // Debug for specific pool
-    if (poolAddress === 'bbn1478sh2c7xgk2xufh32l3p4vsyeyd5xemqm6f2jrwz39wa9atgkps7z9d52') {
-      console.log(`  Final calculation:`);
-      console.log(`    Total USD volume: $${totalUSDVolume}`);
-      console.log(`    Base price: $${basePrice}, decimals: ${baseDecimals}`);
-      console.log(`    Target price: $${targetPrice}, decimals: ${targetDecimals}`);
-      console.log(`    Base volume (normalized): ${baseVolumeNumber}`);
-      console.log(`    Target volume (normalized): ${targetVolumeNumber}`);
-      console.log(`    Base volume (with decimals): ${baseVolume}`);
-      console.log(`    Target volume (with decimals): ${targetVolume}`);
-    }
 
     return {
       baseVolume,

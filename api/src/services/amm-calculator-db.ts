@@ -76,7 +76,7 @@ export class AMMCalculatorDB {
         );
       } else {
         // Fallback to old method
-        volumeData = await this.databaseService.get24HourVolume(poolAddress);
+        volumeData = await this.databaseService.get24HourVolume(poolAddress, decimalsMap);
       }
 
       // Calculate 24h price change if we have high/low
@@ -338,8 +338,8 @@ export class AMMCalculatorDB {
   /**
    * Get 24-hour volume data
    */
-  async get24HourVolume(poolAddress: string) {
-    return await this.databaseService.get24HourVolume(poolAddress);
+  async get24HourVolume(poolAddress: string, decimalsMap?: Map<string, number>) {
+    return await this.databaseService.get24HourVolume(poolAddress, decimalsMap);
   }
 
   /**

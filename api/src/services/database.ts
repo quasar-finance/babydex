@@ -212,7 +212,10 @@ export class DatabaseService {
   /**
    * Get 24-hour trading volume for a pool
    */
-  async get24HourVolume(poolAddress: string): Promise<{
+  async get24HourVolume(
+    poolAddress: string,
+    decimalsMap?: Map<string, number>
+  ): Promise<{
     baseVolume: string;
     targetVolume: string;
     high: string | null;
@@ -261,8 +264,24 @@ export class DatabaseService {
     }
 
     const volumes = Array.from(volumeMap.entries());
-    const baseVolume = volumes.length > 0 ? volumes[0][1].toString() : '0';
-    const targetVolume = volumes.length > 1 ? volumes[1][1].toString() : '0';
+    
+    // Convert volumes from base units to main units using decimals
+    let baseVolume = '0';
+    let targetVolume = '0';
+    
+    if (volumes.length > 0) {
+      const [baseAsset, baseVolumeRaw] = volumes[0];
+      const baseDecimals = decimalsMap?.get(baseAsset) || 6;
+      const baseVolumeNumber = Number(baseVolumeRaw.toString()) / Math.pow(10, baseDecimals);
+      baseVolume = baseVolumeNumber.toString();
+    }
+    
+    if (volumes.length > 1) {
+      const [targetAsset, targetVolumeRaw] = volumes[1];
+      const targetDecimals = decimalsMap?.get(targetAsset) || 6;
+      const targetVolumeNumber = Number(targetVolumeRaw.toString()) / Math.pow(10, targetDecimals);
+      targetVolume = targetVolumeNumber.toString();
+    }
 
     const high = prices.length > 0 ? Math.max(...prices).toString() : null;
     const low = prices.length > 0 ? Math.min(...prices).toString() : null;
@@ -349,15 +368,13 @@ export class DatabaseService {
     const low = prices.length > 0 ? Math.min(...prices).toString() : null;
 
     // Calculate volumes using new formula: USD volume / token price
+    // Return volumes in main units (e.g., BTC instead of sats)
     const baseVolumeNumber = basePrice > 0 ? totalUSDVolume / basePrice : 0;
     const targetVolumeNumber = targetPrice > 0 ? totalUSDVolume / targetPrice : 0;
     
-    // Convert back to token amounts with decimals
-    const baseDecimals = decimalsMap.get(baseDenom) || 6;
-    const targetDecimals = decimalsMap.get(targetDenom) || 6;
-    
-    const baseVolume = (baseVolumeNumber * Math.pow(10, baseDecimals)).toFixed(0);
-    const targetVolume = (targetVolumeNumber * Math.pow(10, targetDecimals)).toFixed(0);
+    // Return as string with proper precision
+    const baseVolume = baseVolumeNumber.toString();
+    const targetVolume = targetVolumeNumber.toString();
 
     return {
       baseVolume,

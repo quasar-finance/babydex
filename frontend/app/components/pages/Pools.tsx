@@ -1,58 +1,58 @@
-"use client";
-import Input from "../atoms/Input";
-import { Button } from "../atoms/Button";
-import { twMerge } from "~/utils/twMerge";
-import { useModal } from "~/app/providers/ModalProvider";
-import { ModalTypes } from "~/types/modal";
-import { trpc } from "~/trpc/client";
+'use client';
+import Input from '../atoms/Input';
+import { Button } from '../atoms/Button';
+import { twMerge } from '~/utils/twMerge';
+import { useModal } from '~/app/providers/ModalProvider';
+import { ModalTypes } from '~/types/modal';
+import { trpc } from '~/trpc/client';
 
-import type React from "react";
-import PoolsSkeleton from "../molecules/skeletons/PoolsSkeleton";
-import { CellPoolName } from "../atoms/cells/CellPoolName";
-import { CellTVL } from "../atoms/cells/CellTVL";
-import { type Column, SortableTable, type SortDirection, Table, TableRow } from "../atoms/Table";
-import { useEffect, useState, useMemo, useCallback } from "react";
-import { Pagination } from "../atoms/Pagination";
-import { blockedPoolAddresses, DefaultPoolMetric } from "~/utils/consts";
-import type { PoolMetricSerialized } from "@towerfi/types";
-import { CellVolume } from "../atoms/cells/CellVolume";
-import { CellPoints } from "../atoms/cells/CellPoints";
-import { usePrices } from "~/app/hooks/usePrices";
-import { convertMicroDenomToDenom } from "~/utils/intl";
-import CellApr from "../atoms/cells/CellApr";
-import { useRouter } from "next/navigation";
-import { PeriodToggle, type Period } from "../atoms/PeriodToggle";
-import { Assets } from "~/config";
-import { usePoolTVLRecordStore } from "~/app/hooks/useTVL";
+import type React from 'react';
+import PoolsSkeleton from '../molecules/skeletons/PoolsSkeleton';
+import { CellPoolName } from '../atoms/cells/CellPoolName';
+import { CellTVL } from '../atoms/cells/CellTVL';
+import { type Column, SortableTable, type SortDirection, Table, TableRow } from '../atoms/Table';
+import { useEffect, useState, useMemo, useCallback } from 'react';
+import { Pagination } from '../atoms/Pagination';
+import { blockedPoolAddresses, DefaultPoolMetric } from '~/utils/consts';
+import type { PoolMetricSerialized } from '@towerfi/types';
+import { CellVolume } from '../atoms/cells/CellVolume';
+import { CellPoints } from '../atoms/cells/CellPoints';
+import { usePrices } from '~/app/hooks/usePrices';
+import { convertMicroDenomToDenom } from '~/utils/intl';
+import CellApr from '../atoms/cells/CellApr';
+import { useRouter } from 'next/navigation';
+import { PeriodToggle, type Period } from '../atoms/PeriodToggle';
+import { Assets } from '~/config';
+import { usePoolTVLRecordStore } from '~/app/hooks/useTVL';
 
-type SortableField = "poolLiquidity" | "apr" | "volume";
+type SortableField = 'poolLiquidity' | 'apr' | 'volume';
 
 const Pools: React.FC = () => {
   const { showModal } = useModal();
   const { getPrice } = usePrices();
   const { getRecord: getTVLRecord } = usePoolTVLRecordStore();
   const router = useRouter();
-  const gridClass = "grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr] gap-4";
+  const gridClass = 'grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr] gap-4';
   const { data: pools = [], isLoading } = trpc.local.pools.getPools.useQuery({
     limit: 100,
   });
 
-  const [searchText, setSearchText] = useState("");
-  const [aprTimeframe, setAprTimeframe] = useState<Period>("7d");
+  const [searchText, setSearchText] = useState('');
+  const [aprTimeframe, setAprTimeframe] = useState<Period>('7d');
   const onAprTimeframeChange = useCallback(
     (period: Period) => {
       setAprTimeframe(period);
     },
-    [setAprTimeframe],
+    [setAprTimeframe]
   );
-  const [sortField, setSortField] = useState<SortableField>("poolLiquidity");
-  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+  const [sortField, setSortField] = useState<SortableField>('poolLiquidity');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
 
   const poolAddresses = useMemo(() => [...pools.map((pool) => pool.poolAddress)].sort(), [pools]);
 
   const startDate = useMemo(() => {
     const date = new Date();
-    date.setUTCDate(date.getUTCDate() - (aprTimeframe === "7d" ? 7 : 1));
+    date.setUTCDate(date.getUTCDate() - (aprTimeframe === '7d' ? 7 : 1));
     return date.toUTCString();
   }, [aprTimeframe]);
 
@@ -61,21 +61,20 @@ const Pools: React.FC = () => {
       addresses: poolAddresses,
       startDate,
     }),
-    [poolAddresses, startDate],
+    [poolAddresses, startDate]
   );
 
-  const { data: metrics, isLoading: isMetricLoading } =
-    trpc.edge.indexer.getPoolMetricsByAddresses.useQuery(queryInput, {
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      enabled: poolAddresses.length > 0,
-      staleTime: 1000 * 60 * 5, // 5 minutes
-    });
+  const { data: metrics, isLoading: isMetricLoading } = trpc.edge.indexer.getPoolMetricsByAddresses.useQuery(queryInput, {
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    enabled: poolAddresses.length > 0,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
 
   const { data: incentiveAprs } = trpc.edge.indexer.getPoolIncentivesByAddresses.useQuery({
     addresses: poolAddresses,
-    interval: aprTimeframe === "7d" ? 7 : 1,
+    interval: aprTimeframe === '7d' ? 7 : 1,
   });
 
   // Calculate total APR including incentives
@@ -84,21 +83,10 @@ const Pools: React.FC = () => {
 
     const swapApr = metric.average_apr || 0;
     const yearInSeconds = 31557600;
-    const total_incentives = incentive?.rewards_per_second
-      ? incentive.rewards_per_second * yearInSeconds
-      : 0;
+    const total_incentives = incentive?.rewards_per_second ? incentive.rewards_per_second * yearInSeconds : 0;
     const incentives_apr =
       incentive?.rewards_per_second && metric.tvl_usd
-        ? (getPrice(
-            convertMicroDenomToDenom(
-              total_incentives || 0,
-              incentive?.token_decimals || 0,
-              incentive?.token_decimals || 0,
-              false,
-            ),
-            incentive?.reward_token || "",
-            { format: false },
-          ) /
+        ? (getPrice(convertMicroDenomToDenom(total_incentives || 0, incentive?.token_decimals || 0, incentive?.token_decimals || 0, false), incentive?.reward_token || '', { format: false }) /
             metric.tvl_usd) *
           100
         : 0;
@@ -107,17 +95,14 @@ const Pools: React.FC = () => {
   };
 
   const columns: Column[] = [
-    { key: "name", title: "Pool", className: "col-span-2 lg:col-span-1" },
-    { key: "poolLiquidity", title: "TVL", sortable: true },
-    { key: "apr", title: "APR", sortable: true },
-    { key: "volume", title: `Volume ${aprTimeframe === "1d" ? "24h" : "7d"}`, sortable: true },
-    { key: "points", title: "Points" },
-    { key: "actions", title: "" },
+    { key: 'name', title: 'Pool', className: 'col-span-2 lg:col-span-1' },
+    { key: 'poolLiquidity', title: 'TVL', sortable: true },
+    { key: 'apr', title: 'APR', sortable: true },
+    { key: 'volume', title: `Volume ${aprTimeframe === '1d' ? '24h' : '7d'}`, sortable: true },
+    { key: 'actions', title: '' },
   ];
 
-  const filteredPools = pools
-    .filter((pool) => !blockedPoolAddresses.includes(pool.poolAddress))
-    .filter((pool) => pool.name.toLowerCase().includes(searchText.toLowerCase()));
+  const filteredPools = pools.filter((pool) => !blockedPoolAddresses.includes(pool.poolAddress)).filter((pool) => pool.name.toLowerCase().includes(searchText.toLowerCase()));
 
   useEffect(() => {
     setCurrentPage(0);
@@ -129,15 +114,11 @@ const Pools: React.FC = () => {
 
   const sortedPools = [...filteredPools].sort((a, b) => {
     const metricA = metrics?.[a.poolAddress] || DefaultPoolMetric();
-    metricA.token0_decimals =
-      metricA.token0_decimals || Assets[metricA.token0_denom]?.decimals || 0;
-    metricA.token1_decimals =
-      metricA.token1_decimals || Assets[metricA.token1_denom]?.decimals || 0;
+    metricA.token0_decimals = metricA.token0_decimals || Assets[metricA.token0_denom]?.decimals || 0;
+    metricA.token1_decimals = metricA.token1_decimals || Assets[metricA.token1_denom]?.decimals || 0;
     const metricB = metrics?.[b.poolAddress] || DefaultPoolMetric();
-    metricB.token0_decimals =
-      metricB.token0_decimals || Assets[metricB.token0_denom]?.decimals || 0;
-    metricB.token1_decimals =
-      metricB.token1_decimals || Assets[metricB.token1_denom]?.decimals || 0;
+    metricB.token0_decimals = metricB.token0_decimals || Assets[metricB.token0_denom]?.decimals || 0;
+    metricB.token1_decimals = metricB.token1_decimals || Assets[metricB.token1_denom]?.decimals || 0;
     const incentiveA = incentiveAprs?.[a.poolAddress];
     const incentiveB = incentiveAprs?.[b.poolAddress];
 
@@ -145,54 +126,18 @@ const Pools: React.FC = () => {
     let valueB: number;
 
     switch (sortField) {
-      case "apr":
+      case 'apr':
         valueA = calculateTotalApr(metricA, incentiveA);
         valueB = calculateTotalApr(metricB, incentiveB);
         break;
       // TODO once the token price is fetched from the indexer, use that to sort
-      case "volume": {
+      case 'volume': {
         // Convert token0 volume to USD
-        const token0VolumeA = getPrice(
-          convertMicroDenomToDenom(
-            metricA.token0_swap_volume,
-            metricA.token0_decimals,
-            metricA.token0_decimals,
-            false,
-          ),
-          metricA.token0_denom,
-          { format: false },
-        );
-        const token0VolumeB = getPrice(
-          convertMicroDenomToDenom(
-            metricB.token0_swap_volume,
-            metricB.token0_decimals,
-            metricB.token0_decimals,
-            false,
-          ),
-          metricB.token0_denom,
-          { format: false },
-        );
+        const token0VolumeA = getPrice(convertMicroDenomToDenom(metricA.token0_swap_volume, metricA.token0_decimals, metricA.token0_decimals, false), metricA.token0_denom, { format: false });
+        const token0VolumeB = getPrice(convertMicroDenomToDenom(metricB.token0_swap_volume, metricB.token0_decimals, metricB.token0_decimals, false), metricB.token0_denom, { format: false });
         // Convert token1 volume to USD
-        const token1VolumeA = getPrice(
-          convertMicroDenomToDenom(
-            metricA.token1_swap_volume,
-            metricA.token1_decimals,
-            metricA.token1_decimals,
-            false,
-          ),
-          metricA.token1_denom,
-          { format: false },
-        );
-        const token1VolumeB = getPrice(
-          convertMicroDenomToDenom(
-            metricB.token1_swap_volume,
-            metricB.token1_decimals,
-            metricB.token1_decimals,
-            false,
-          ),
-          metricB.token1_denom,
-          { format: false },
-        );
+        const token1VolumeA = getPrice(convertMicroDenomToDenom(metricA.token1_swap_volume, metricA.token1_decimals, metricA.token1_decimals, false), metricA.token1_denom, { format: false });
+        const token1VolumeB = getPrice(convertMicroDenomToDenom(metricB.token1_swap_volume, metricB.token1_decimals, metricB.token1_decimals, false), metricB.token1_denom, { format: false });
         // Sum USD volumes
         valueA = token0VolumeA + token1VolumeA;
         valueB = token0VolumeB + token1VolumeB;
@@ -203,17 +148,17 @@ const Pools: React.FC = () => {
         valueB = getTVLRecord(b.poolAddress) || 0;
     }
 
-    return sortDirection === "desc" ? valueB - valueA : valueA - valueB;
+    return sortDirection === 'desc' ? valueB - valueA : valueA - valueB;
   });
 
   const handleSort = (col: Column) => {
     const field = col.key as SortableField;
 
     if (field === sortField) {
-      setSortDirection(sortDirection === "desc" ? "asc" : "desc");
+      setSortDirection(sortDirection === 'desc' ? 'asc' : 'desc');
     } else {
       setSortField(field);
-      setSortDirection("desc");
+      setSortDirection('desc');
     }
   };
 
@@ -223,78 +168,28 @@ const Pools: React.FC = () => {
         <h1 className="text-xl">Pools</h1>
         <div className="flex gap-3 h-[42px] items-center px-2">
           <PeriodToggle onChange={onAprTimeframeChange} defaultPeriod={aprTimeframe} />
-          <Input
-            isSearch
-            placeholder="Search"
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-          />
+          <Input isSearch placeholder="Search" value={searchText} onChange={(e) => setSearchText(e.target.value)} />
         </div>
       </div>
 
-      <SortableTable
-        columns={columns}
-        sortField={sortField}
-        sortDirection={sortDirection}
-        handleSort={handleSort}
-        gridClass={gridClass}
-      >
-        {isLoading && <PoolsSkeleton className={twMerge("grid", gridClass)} />}
-        {sortedPools
-          .slice(currentPage * numberPerPage, currentPage * numberPerPage + numberPerPage)
-          .map((pool, i) => (
-            <TableRow
-              key={i}
-              gridClass={twMerge("grid cursor-pointer hover:bg-white/5", gridClass)}
-              onClick={() => router.push(`/pools/${pool.poolAddress}`)}
-            >
-              <CellPoolName
-                assets={pool.assets}
-                name={pool.name}
-                poolType={pool.poolType}
-                config={pool.config}
-                incentives={incentiveAprs?.[pool.poolAddress]}
-                className="w-full pr-4"
-              />
-              <CellTVL
-                poolLiquidity={pool.poolLiquidity}
-                poolAddress={pool.poolAddress}
-                assets={pool.assets}
-                className="w-full pl-4"
-              />
-              <CellApr
-                title={`APR (${aprTimeframe})`}
-                metrics={metrics?.[pool.poolAddress]}
-                incentives={incentiveAprs?.[pool.poolAddress]}
-                isLoading={isMetricLoading}
-                className="w-full px-4"
-              />
-              <CellVolume
-                title={`Volume ${aprTimeframe === "1d" ? "24h" : "7d"}`}
-                metrics={metrics?.[pool.poolAddress]}
-                assets={pool.assets}
-                timeframe={aprTimeframe}
-                className="w-full px-4"
-              />
-              <CellPoints assets={pool.assets} poolType={pool.poolType} className="w-full px-1" />
-              <div className="flex items-end justify-end w-full px-4">
-                <Button
-                  variant="flat"
-                  onPress={() => showModal(ModalTypes.add_liquidity, false, { pool })}
-                >
-                  Add Liquidity
-                </Button>
-              </div>
-            </TableRow>
-          ))}
+      <SortableTable columns={columns} sortField={sortField} sortDirection={sortDirection} handleSort={handleSort} gridClass={gridClass}>
+        {isLoading && <PoolsSkeleton className={twMerge('grid', gridClass)} />}
+        {sortedPools.slice(currentPage * numberPerPage, currentPage * numberPerPage + numberPerPage).map((pool, i) => (
+          <TableRow key={i} gridClass={twMerge('grid cursor-pointer hover:bg-white/5', gridClass)} onClick={() => router.push(`/pools/${pool.poolAddress}`)}>
+            <CellPoolName assets={pool.assets} name={pool.name} poolType={pool.poolType} config={pool.config} incentives={incentiveAprs?.[pool.poolAddress]} className="w-full pr-4" />
+            <CellTVL poolLiquidity={pool.poolLiquidity} poolAddress={pool.poolAddress} assets={pool.assets} className="w-full pl-4" />
+            <CellApr title={`APR (${aprTimeframe})`} metrics={metrics?.[pool.poolAddress]} incentives={incentiveAprs?.[pool.poolAddress]} isLoading={isMetricLoading} className="w-full px-4" />
+            <CellVolume title={`Volume ${aprTimeframe === '1d' ? '24h' : '7d'}`} metrics={metrics?.[pool.poolAddress]} assets={pool.assets} timeframe={aprTimeframe} className="w-full px-4" />
+            <div className="flex items-end justify-end w-full px-4">
+              <Button variant="flat" onPress={() => showModal(ModalTypes.add_liquidity, false, { pool })}>
+                Add Liquidity
+              </Button>
+            </div>
+          </TableRow>
+        ))}
       </SortableTable>
       {filteredPools.length > numberPerPage && (
-        <Pagination
-          total={totalPools}
-          onPageChange={(page) => setCurrentPage(page - 1)}
-          initialPage={currentPage + 1}
-          className={{ base: "self-center backdrop-blur-xl rounded-3xl p-1" }}
-        />
+        <Pagination total={totalPools} onPageChange={(page) => setCurrentPage(page - 1)} initialPage={currentPage + 1} className={{ base: 'self-center backdrop-blur-xl rounded-3xl p-1' }} />
       )}
     </div>
   );

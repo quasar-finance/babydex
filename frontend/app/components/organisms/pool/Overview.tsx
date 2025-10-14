@@ -1,38 +1,34 @@
-import type { PoolInfo } from "@towerfi/types";
-import { useSwapSimulation } from "~/app/hooks/useSwapSimulation";
-import { convertDenomToMicroDenom, convertMicroDenomToDenom } from "~/utils/intl";
-import Skeleton from "../../atoms/Skeleton";
-import { CellPoints } from "../../atoms/cells/CellPoints";
-import { trpc } from "~/trpc/client";
-import { type Period, periodToNumber } from "../../atoms/PeriodToggle";
-import { IncentivesOverview } from "./IncentivesOverview";
-import { addressShorten } from "~/utils/masks";
-import { IconCopy, IconExternalLink } from "@tabler/icons-react";
-import { copyToClipboard } from "~/utils/browser";
-import { useToast } from "~/app/hooks";
+import type { PoolInfo } from '@towerfi/types';
+import { useSwapSimulation } from '~/app/hooks/useSwapSimulation';
+import { convertDenomToMicroDenom, convertMicroDenomToDenom } from '~/utils/intl';
+import Skeleton from '../../atoms/Skeleton';
+import { CellPoints } from '../../atoms/cells/CellPoints';
+import { trpc } from '~/trpc/client';
+import { type Period, periodToNumber } from '../../atoms/PeriodToggle';
+import { IncentivesOverview } from './IncentivesOverview';
+import { addressShorten } from '~/utils/masks';
+import { IconCopy, IconExternalLink } from '@tabler/icons-react';
+import { copyToClipboard } from '~/utils/browser';
+import { useToast } from '~/app/hooks';
 
-export const Overview: React.FC<{ pool: PoolInfo; aprTimeframe: Period }> = ({
-  pool,
-  aprTimeframe,
-}) => {
+export const Overview: React.FC<{ pool: PoolInfo; aprTimeframe: Period }> = ({ pool, aprTimeframe }) => {
   const swap = useSwapSimulation({
     poolAddress: pool.poolAddress,
     assets: pool.assets,
     amount: convertDenomToMicroDenom(1, pool.assets[0].decimals),
   });
 
-  const { data: incentiveApr, isLoading: incentiveAprsIsLoading } =
-    trpc.edge.indexer.getPoolIncentivesByAddresses.useQuery(
-      {
-        addresses: [pool.poolAddress],
-        interval: periodToNumber(aprTimeframe),
+  const { data: incentiveApr, isLoading: incentiveAprsIsLoading } = trpc.edge.indexer.getPoolIncentivesByAddresses.useQuery(
+    {
+      addresses: [pool.poolAddress],
+      interval: periodToNumber(aprTimeframe),
+    },
+    {
+      select: (data) => {
+        return data?.[pool.poolAddress];
       },
-      {
-        select: (data) => {
-          return data?.[pool.poolAddress];
-        },
-      },
-    );
+    }
+  );
 
   const { toast } = useToast();
 
@@ -44,16 +40,9 @@ export const Overview: React.FC<{ pool: PoolInfo; aprTimeframe: Period }> = ({
           <Skeleton className="h-4 w-1/2" />
         ) : (
           <span>
-            1 {pool.assets[0].symbol} ={" "}
-            {convertMicroDenomToDenom(swap.data?.return_amount, pool.assets[1].decimals, 2)}{" "}
-            {pool.assets[1].symbol}
+            1 {pool.assets[0].symbol} = {convertMicroDenomToDenom(swap.data?.return_amount, pool.assets[1].decimals, 2)} {pool.assets[1].symbol}
           </span>
         )}
-      </span>
-
-      <span className="text-sm font-medium text-white/50">Points:</span>
-      <span className="text-sm ">
-        <CellPoints assets={pool.assets} poolType={pool.poolType} />
       </span>
 
       {incentiveAprsIsLoading ? (
@@ -77,25 +66,20 @@ export const Overview: React.FC<{ pool: PoolInfo; aprTimeframe: Period }> = ({
           className="ml-2 hover:cursor-pointer text-white/50 hover:text-white"
           onClick={() => {
             copyToClipboard(pool.poolAddress);
-            console.log("Copied to clipboard", pool.poolAddress);
+            console.log('Copied to clipboard', pool.poolAddress);
             toast.info(
               {
-                description: "Copied to clipboard",
+                description: 'Copied to clipboard',
               },
               {
                 removeDelay: 100,
-              },
+              }
             );
           }}
         >
           <IconCopy />
         </span>
-        <a
-          href={"https://www.mintscan.io/babylon/wasm/contract/" + pool.poolAddress}
-          className="ml-2 hover:cursor-pointer text-white/50 hover:text-white"
-          target="_blank"
-          rel="noreferrer"
-        >
+        <a href={'https://www.mintscan.io/babylon/wasm/contract/' + pool.poolAddress} className="ml-2 hover:cursor-pointer text-white/50 hover:text-white" target="_blank" rel="noreferrer">
           <IconExternalLink />
         </a>
       </span>

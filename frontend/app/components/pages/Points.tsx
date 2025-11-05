@@ -1,26 +1,20 @@
-"use client";
+'use client';
 
-import { Button } from "../atoms/Button";
-import { DefaultPoints } from "~/utils/consts";
-import { Overview } from "../organisms/points/Overview";
-import { Leaderboard } from "../organisms/points/Leaderboard";
-import Pill from "../atoms/Pill";
-import { trpc } from "~/trpc/client";
-import { useAccount } from "@cosmi/react";
-import WithConnectedWallet from "../atoms/WithConnectedWallet";
-import type React from "react";
-import { useMemo } from "react";
-import Link from "next/link";
-import Referral from "../organisms/points/Referral";
+import { Button } from '../atoms/Button';
+import { DefaultPoints } from '~/utils/consts';
+import { Overview } from '../organisms/points/Overview';
+import { Leaderboard } from '../organisms/points/Leaderboard';
+import Pill from '../atoms/Pill';
+import { trpc } from '~/trpc/client';
+import { useAccount } from '@cosmi/react';
+import WithConnectedWallet from '../atoms/WithConnectedWallet';
+import type React from 'react';
+import { useMemo } from 'react';
+import Link from 'next/link';
+import Claim from '../organisms/points/Claim';
 
 const GetPointsButton: React.FC<{ className: string }> = ({ className }) => (
-  <Button
-    as={Link}
-    color="tertiary"
-    className={className}
-    target="_blank"
-    href="https://docs.tower.fi/user-guides/points-campaigns"
-  >
+  <Button as={Link} color="tertiary" className={className} target="_blank" href="https://docs.tower.fi/user-guides/points-campaigns">
     Get Points Now
   </Button>
 );
@@ -29,18 +23,15 @@ const Points: React.FC = () => {
   const { address: userAddress } = useAccount();
   const { data: userPoints, isLoading: _userPointsLoading } = trpc.edge.indexer.getPoints.useQuery(
     {
-      addresses: [userAddress || ""],
+      addresses: [userAddress || ''],
       limit: 1,
     },
     {
       enabled: !!userAddress,
-    },
+    }
   );
 
-  const userPointsData = useMemo(
-    () => userPoints?.[userAddress || ""] || DefaultPoints(),
-    [userPoints, userAddress],
-  );
+  const userPointsData = useMemo(() => userPoints?.[userAddress || ''] || DefaultPoints(), [userPoints, userAddress]);
 
   return (
     <div className="flex flex-col gap-8 px-4 pb-20 max-w-[84.5rem] mx-auto w-full min-h-[65vh] lg:pt-8">
@@ -52,7 +43,7 @@ const Points: React.FC = () => {
         <div className="w-full lg:w-[65%] p-4 border border-white/10 rounded-2xl overflow-hidden">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-4">
-              <img src={"/tower/points.png"} alt="Tower Points" className="w-auto h-[24px]" />
+              <img src={'/tower/points.png'} alt="Tower Points" className="w-auto h-[24px]" />
               <h2 className="text-lg">BabyDex Points</h2>
             </div>
             <GetPointsButton className="hidden lg:inline-flex" />
@@ -64,16 +55,13 @@ const Points: React.FC = () => {
           </div>
         </div>
 
-        <Referral className="w-full lg:w-[35%]" />
+        <Claim className="w-full lg:w-[35%]" />
       </div>
       <div className="flex flex-col my-4 gap-4 lg:px-4">
         <div className="flex flex-col-reverse lg:flex-row gap-6">
           <h1 className="text-2xl">BabyDex Points Leaderboard</h1>
           {userAddress && userPoints?.[userAddress] && (
-            <div
-              className="flex items-center gap-2 text-yellow-500"
-              style={{ textShadow: "rgba(238, 173, 33, 0.8) 0 0 20px" }}
-            >
+            <div className="flex items-center gap-2 text-yellow-500" style={{ textShadow: 'rgba(238, 173, 33, 0.8) 0 0 20px' }}>
               <Pill color="yellow" className="border border-yellow-500 text-md">
                 #{userPoints?.[userAddress]?.rank}
               </Pill>
@@ -81,9 +69,7 @@ const Points: React.FC = () => {
             </div>
           )}
         </div>
-        <p className="text-white/70">
-          Earn BabyDex points through Referrals, Providing Liquidity and Swapping on Tower
-        </p>
+        <p className="text-white/70">Earn BabyDex points through Referrals, Providing Liquidity and Swapping on Tower</p>
       </div>
       <div>
         <Leaderboard userPoints={userPointsData} />

@@ -14,7 +14,8 @@ type AirdropStatusView = 'disconnected' | 'eligible' | 'ineligible';
 
 const formatTokenAmount = (amount: number) =>
   amount.toLocaleString(undefined, {
-    maximumFractionDigits: amount >= 1 ? 0 : 4,
+    minimumFractionDigits: amount >= 1 ? 2 : 0,
+    maximumFractionDigits: amount >= 1 ? 2 : 4,
   });
 
 const typedAirdropData = airdropData as Record<string, AirdropRecord>;
@@ -40,11 +41,11 @@ const AirdropStatus: React.FC<{ className: string }> = ({ className }) => {
 
   return (
     <div className={twMerge('p-4 border bg-origin-border border-white/10 rounded-2xl bg-gradient-to-r from-transparent via-transparent via-30% to-tw-orange-500/85', className)}>
-      <h2 className="text-lg font-bold mb-3">Points Airdrop Completed on Nov 15th</h2>
+      <h2 className="text-lg font-bold mb-3">Points Airdrop Completed on Nov 12th</h2>
 
       {view === 'disconnected' && (
         <>
-          <p className="text-sm text-white/70 mb-4">The $BABY token airdrop was sent to eligible wallets on Nov 15th. Connect Wallet to see how much you received.</p>
+          <p className="text-base text-white/80 mb-4">The $BABY token airdrop was sent to eligible wallets on Nov 12th. Connect Wallet to see how much you received.</p>
           <Button size="md" className="rounded-xl" onPress={() => showModal(ModalTypes.connect_wallet)}>
             Connect Wallet
           </Button>
@@ -52,12 +53,12 @@ const AirdropStatus: React.FC<{ className: string }> = ({ className }) => {
       )}
 
       {view === 'eligible' && typeof amount === 'number' && (
-        <p className="text-sm text-white/70">
-          You received <strong>{formatTokenAmount(amount)} $BABY tokens</strong>
+        <p className="text-lg font-semibold text-emerald-400">
+          You received <span className="text-white">{formatTokenAmount(amount)} $BABY tokens</span>
         </p>
       )}
 
-      {view === 'ineligible' && <p className="text-sm text-white/70">You were not eligible for the airdrop</p>}
+      {view === 'ineligible' && <p className="text-lg font-semibold text-red-400">You were not eligible for the airdrop</p>}
     </div>
   );
 };

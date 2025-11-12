@@ -11,7 +11,7 @@ import WithConnectedWallet from '../atoms/WithConnectedWallet';
 import type React from 'react';
 import { useMemo } from 'react';
 import Link from 'next/link';
-import Claim from '../organisms/points/Claim';
+import AirdropStatus from '../organisms/points/AirdropStatus';
 
 const GetPointsButton: React.FC<{ className: string }> = ({ className }) => (
   <Button as={Link} color="tertiary" className={className} target="_blank" href="https://docs.tower.fi/user-guides/points-campaigns">
@@ -55,7 +55,7 @@ const Points: React.FC = () => {
           </div>
         </div>
 
-        <Claim className="w-full lg:w-[35%]" />
+        <AirdropStatus className="w-full lg:w-[35%]" />
       </div>
       <div className="flex flex-col my-4 gap-4 lg:px-4">
         <div className="flex flex-col-reverse lg:flex-row gap-6">

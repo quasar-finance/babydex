@@ -49,7 +49,7 @@ const Points: React.FC = () => {
         <h1 className="text-2xl">My Points</h1>
       </div>
       <div className="flex flex-col lg:flex-row gap-6">
-        <div className="w-full lg:w-[65%] p-4 border border-white/10 rounded-2xl overflow-hidden">
+        <div className="flex-1 p-4 border border-white/10 rounded-2xl overflow-hidden">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-4">
               <img src={'/tower/points.png'} alt="Tower Points" className="w-auto h-[24px]" />
@@ -63,7 +63,7 @@ const Points: React.FC = () => {
           </div>
         </div>
 
-        <AirdropStatus className="w-full lg:w-[35%]" />
+        <AirdropStatus className="flex-1" />
       </div>
     </div>
   );

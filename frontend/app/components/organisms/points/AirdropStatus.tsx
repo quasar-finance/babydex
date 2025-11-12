@@ -41,7 +41,7 @@ const AirdropStatus: React.FC<{ className: string }> = ({ className }) => {
 
   return (
     <div className={twMerge('p-4 border bg-origin-border border-white/10 rounded-2xl bg-gradient-to-r from-transparent via-transparent via-30% to-tw-orange-500/85', className)}>
-      <h2 className="text-lg font-bold mb-3">Points Airdrop Completed on Nov 12th</h2>
+      <h2 className="text-lg font-medium mb-3">Points Airdrop Completed on Nov 12th</h2>
 
       {view === 'disconnected' && (
         <>
@@ -53,12 +53,12 @@ const AirdropStatus: React.FC<{ className: string }> = ({ className }) => {
       )}
 
       {view === 'eligible' && typeof amount === 'number' && (
-        <p className="text-lg font-semibold text-emerald-400">
+        <p className="text-xl font-semibold text-emerald-400 mt-10">
           You received <span className="text-white">{formatTokenAmount(amount)} $BABY tokens</span>
         </p>
       )}
 
-      {view === 'ineligible' && <p className="text-lg font-semibold text-red-400">You were not eligible for the airdrop</p>}
+      {view === 'ineligible' && <p className="text-xl font-semibold text-red-400 mt-10">You were not eligible for the airdrop</p>}
     </div>
   );
 };

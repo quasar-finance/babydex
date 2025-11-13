@@ -41,7 +41,7 @@ const AirdropStatus: React.FC<{ className: string }> = ({ className }) => {
 
   return (
     <div className={twMerge('p-4 border bg-origin-border border-white/10 rounded-2xl bg-gradient-to-r from-transparent via-transparent via-30% to-tw-orange-500/85', className)}>
-      <h2 className="text-lg font-medium mb-3">Points Airdrop Completed on Nov 12th</h2>
+      <h2 className="text-lg font-medium mb-3">Points Airdrop Completed on Nov 13th</h2>
 
       {view === 'disconnected' && (
         <>

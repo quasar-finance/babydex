@@ -45,7 +45,7 @@ const AirdropStatus: React.FC<{ className: string }> = ({ className }) => {
 
       {view === 'disconnected' && (
         <>
-          <p className="text-base text-white/80 mb-4">The $BABY token airdrop was sent to eligible wallets on Nov 12th. Connect Wallet to see how much you received.</p>
+          <p className="text-base text-white/80 mb-4">The $BABY token airdrop was sent to eligible wallets on Nov 13th. Connect Wallet to see how much you received.</p>
           <Button size="md" className="rounded-xl" onPress={() => showModal(ModalTypes.connect_wallet)}>
             Connect Wallet
           </Button>

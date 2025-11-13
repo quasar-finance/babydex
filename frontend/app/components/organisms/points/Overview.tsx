@@ -1,37 +1,21 @@
-import type { Points } from "@towerfi/types";
-import { twMerge } from "~/utils/twMerge";
+const formatTotalPoints = (value?: number) => {
+  if (value === undefined || value === null) {
+    return '-';
+  }
 
-export const Overview: React.FC<{ points: Points }> = ({ points }) => {
-  const cells = [
-    { points: points.total_points, title: "Total", highlight: true },
-    { points: points.lping_points, title: "LPing" },
-    { points: points.swapping_points, title: "Swapping" },
-    { points: points.referral_link_points, title: "Referral Link" },
-    { points: points.invite_boost_points, title: "Invite Boost" },
-  ];
+  return value.toLocaleString(undefined, {
+    minimumFractionDigits: value >= 1 ? 2 : 0,
+    maximumFractionDigits: value >= 1 ? 2 : 4,
+  });
+};
 
+export const Overview: React.FC<{ totalPoints?: number }> = ({ totalPoints }) => {
   return (
-    <>
-      <div className="flex flex-wrap lg:flex-nowrap lg:-ml-4">
-        {Array.from(cells).map((cell, index, a) => (
-          <div
-            key={index}
-            className={twMerge(
-              "w-1/2 lg:w-1/5 p-1 pl-4 box-border mb-6 lg:mb-0 flex flex-col justify-center space-y-1",
-              "lg:border-r-3 border-white/10",
-              index % 2 === 0 && "border-r-3",
-              index === a.length - 1 && "border-none",
-            )}
-          >
-            <span className={twMerge("text-2xl text-white/50", cell.highlight && "text-white/100")}>
-              {cell.points?.toLocaleString(undefined, {
-                maximumFractionDigits: cell.points > 1 ? 0 : 3,
-              }) || "-"}
-            </span>
-            <span className="text-sm text-white/50">{cell.title}</span>
-          </div>
-        ))}
+    <div className="flex flex-wrap">
+      <div className="w-full p-2 pl-4 flex flex-col justify-center space-y-2">
+        <span className="text-4xl font-semibold text-white">{formatTotalPoints(totalPoints)}</span>
+        <span className="text-sm text-white/60">Total</span>
       </div>
-    </>
+    </div>
   );
 };

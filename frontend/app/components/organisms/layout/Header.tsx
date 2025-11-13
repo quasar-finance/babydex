@@ -14,7 +14,12 @@ export const Header: React.FC = () => {
       <nav className="sticky top-0 w-full border-b-1 border-b-white/10 pb-4 backdrop-blur-lg z-50 ">
         <div className="w-full text-[#0F0F0F] bg-tw-orange-400 flex items-center justify-center gap-3 sm:gap-1 px-2 py-1 sm:py-2 mb-4">
           <span className="text-md font-semibold">The Points Airdrop was completed on Nov 13th.</span>
-          <a href="https://medium.com/tower-dex/final-baby-airdrop-for-tower-point-farmers-44ff49c8da0a" target="_blank" rel="noopener noreferrer" className="hover:underline text-sm font-bold">
+          <a
+            href="https://medium.com/tower-dex/final-baby-airdrop-for-tower-point-farmers-44ff49c8da0a"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:underline text-sm font-bold"
+          >
             Learn More
           </a>
         </div>
